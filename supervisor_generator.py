@@ -1,10 +1,14 @@
 import streamlit as st
+import requests
+import pandas as pd
 from fpdf import FPDF
 
 # --- Configuration ---
-st.set_page_config(page_title="Supervisor Guide Generator", page_icon="📑", layout="centered")
+st.set_page_config(page_title="Elmcrest Supervisor Dashboard", page_icon="📊", layout="wide")
 
-# --- Data (Shared with main app, plus specific supervisor content) ---
+# --- Constants ---
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
+
 COMM_PROFILES = {
     "Director": {
         "overview": "Moves quickly toward action. In high-pressure moments, steps in, organizes people, and pushes for clear decisions.",
@@ -29,7 +33,7 @@ COMM_PROFILES = {
     },
     "Tracker": {
         "overview": "Notices patterns, details, and gaps. Keeps routines and documentation on track to protect the team from risk.",
-        "supervising": "Provide clear expectations and structure. They need to know the 'why' and the specific 'how'. respecting their systems builds trust.",
+        "supervising": "Provide clear expectations and structure. They need to know the 'why' and the specific 'how'. Respecting their systems builds trust.",
         "struggle": "May become rigid, critical, or get stuck in the weeds. Can come across as inflexible when stressed.",
         "coaching": ["Does this detail change the outcome?", "How can we meet the standard while keeping the relationship warm?", "What is the big picture goal here?"],
         "advancement": "Help them delegate details so they can focus on strategy. Teach them to tolerate 'good enough' in non-critical areas."
@@ -54,7 +58,7 @@ MOTIVATION_PROFILES = {
     "Connection": {
         "summary": "Energized by strong relationships and community. Belonging fuels resilience.",
         "motivating": "Prioritize team cohesion. Recognize shared wins. Check in on them personally.",
-        "support": "Ensure they aren't isolated. facilitate team bonding moments.",
+        "support": "Ensure they aren't isolated. Facilitate team bonding moments.",
         "killers": "Isolation, unresolved team conflict, cold leadership.",
         "thriving": "Collaborative, morale-booster, highly empathetic and supportive.",
     },
@@ -67,23 +71,26 @@ MOTIVATION_PROFILES = {
     }
 }
 
-INTEGRATED_PROFILES = {
-    # Generic fallback generator if specific combo isn't hardcoded
-    "Generic": {
-        "title": "Integrated Leader",
-        "summary": "A leader blending communication style with specific motivational drivers.",
-        "strengths": ["Unique perspective", "Balanced approach"],
-        "intervention": "Align tasks with their motivation while coaching their communication gaps."
-    }
-}
-
 # --- Helper Function: Clean Text for PDF ---
 def clean_text(text):
     if not text: return ""
+    text = str(text)
     replacements = {'\u2018': "'", '\u2019': "'", '\u201c': '"', '\u201d': '"', '\u2013': '-', '—': '-'}
     for k, v in replacements.items():
         text = text.replace(k, v)
     return text.encode('latin-1', 'replace').decode('latin-1')
+
+# --- Data Fetching ---
+@st.cache_data(ttl=60) # Cache data for 1 minute to prevent constant API calls
+def fetch_staff_data():
+    try:
+        response = requests.get(GOOGLE_SCRIPT_URL)
+        if response.status_code == 200:
+            return response.json()
+        return []
+    except Exception as e:
+        st.error(f"Error connecting to database: {e}")
+        return []
 
 # --- PDF Generator ---
 def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
@@ -92,12 +99,9 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     
     # Colors
     blue = (1, 91, 173)
-    grey = (100, 100, 100)
     black = (0, 0, 0)
     
-    # ---------------------------------------------------------
     # HEADER
-    # ---------------------------------------------------------
     pdf.set_font("Arial", 'B', 20)
     pdf.set_text_color(*blue)
     pdf.cell(0, 10, "Supervisory Guide", ln=True, align='C')
@@ -105,16 +109,11 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf.set_font("Arial", '', 12)
     pdf.set_text_color(*black)
     pdf.cell(0, 8, clean_text(f"For: {name} ({role})"), ln=True, align='C')
-    pdf.cell(0, 8, clean_text(f"Profile: {p_comm} Communicator x {p_mot} Motivation"), ln=True, align='C')
+    pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C')
     pdf.ln(10)
 
-    # Data Retrieval
     c_data = COMM_PROFILES.get(p_comm, COMM_PROFILES["Director"])
     m_data = MOTIVATION_PROFILES.get(p_mot, MOTIVATION_PROFILES["Achievement"])
-    
-    # ---------------------------------------------------------
-    # 12 HEADINGS
-    # ---------------------------------------------------------
     
     def add_section(title, content):
         pdf.set_font("Arial", 'B', 12)
@@ -131,78 +130,93 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             pdf.multi_cell(0, 6, clean_text(content))
         pdf.ln(4)
 
-    # 1. Communication Profile
     add_section("1. Communication Profile", c_data['overview'])
-
-    # 2. Supervising Their Communication
     add_section("2. Supervising Their Communication", c_data['supervising'])
-
-    # 3. Motivation Profile
     add_section("3. Motivation Profile", m_data['summary'])
-
-    # 4. Motivating This Program Supervisor
     add_section("4. Motivating This Person", m_data['motivating'])
-
-    # 5. Integrated Leadership Profile
-    # Constructing a dynamic summary
-    integrated_summary = f"This leader leads with {p_comm} energy (focused on {c_data['overview'].split('.')[0].lower()}) and is fueled by {p_mot} (seeking {m_data['summary'].split('.')[0].lower()}). They are at their best when they can communicate via {p_comm} channels to achieve {p_mot} goals."
+    
+    integrated_summary = f"This leader leads with {p_comm} energy (focused on {c_data['overview'].split('.')[0].lower()}) and is fueled by {p_mot} (seeking {m_data['summary'].split('.')[0].lower()})."
     add_section("5. Integrated Leadership Profile", integrated_summary)
-
-    # 6. How You Can Best Support Them
+    
     add_section("6. How You Can Best Support Them", m_data['support'])
-
-    # 7. What They Look Like When Thriving
     add_section("7. What They Look Like When Thriving", m_data['thriving'])
-
-    # 8. What They Look Like When Struggling
     add_section("8. What They Look Like When Struggling", c_data['struggle'])
-
-    # 9. Supervisory Interventions
+    
     intervention = f"When struggling, they likely need you to validate their {p_mot} needs first, then coach them on the impact of their {p_comm} style. If they are stuck, check if they are feeling {m_data['killers'].split(',')[0]}."
     add_section("9. Supervisory Interventions", intervention)
-
-    # 10. What You Should Celebrate
+    
     celebrate = f"Celebrate moments where they use their {p_comm} style to drive {p_mot} outcomes. Specifically, acknowledge when they: {m_data['thriving']}."
     add_section("10. What You Should Celebrate", celebrate)
-
-    # 11. Coaching Questions
+    
     add_section("11. Coaching Questions", c_data['coaching'])
-
-    # 12. Helping Them Prepare for Advancement
     add_section("12. Helping Them Prepare for Advancement", c_data['advancement'])
 
     return pdf.output(dest='S').encode('latin-1')
 
 # --- Main UI ---
 
-st.title("Supervisor Guide Generator")
-st.markdown("Generate a comprehensive 12-point PDF guide for supervisors based on assessment results.")
+st.title("Supervisor & Admin Dashboard")
+st.markdown("View staff assessments and generate supervisory guides.")
 
-with st.form("generator_form"):
-    col1, col2 = st.columns(2)
-    with col1:
-        name = st.text_input("Staff Name")
-        role = st.selectbox("Role", ["Program Supervisor", "Shift Supervisor", "YDP"])
-    with col2:
-        p_comm = st.selectbox("Primary Communication", ["Director", "Encourager", "Facilitator", "Tracker"])
-        p_mot = st.selectbox("Primary Motivation", ["Growth", "Purpose", "Connection", "Achievement"])
+# Tabs for Manual Entry vs Database
+tab1, tab2 = st.tabs(["📚 Database (Auto-Fill)", "✏️ Manual Entry"])
+
+with tab1:
+    if st.button("Refresh Data"):
+        st.cache_data.clear()
         
-    # Optional Secondaries (for future expansion, currently not used heavily in the 12-point guide to keep it focused)
-    with st.expander("Secondary Traits (Optional)"):
-        s_comm = st.selectbox("Secondary Communication", ["None", "Director", "Encourager", "Facilitator", "Tracker"])
-        s_mot = st.selectbox("Secondary Motivation", ["None", "Growth", "Purpose", "Connection", "Achievement"])
-
-    submitted = st.form_submit_button("Generate Guide PDF")
-
-if submitted:
-    if not name:
-        st.error("Please enter a name.")
+    staff_list = fetch_staff_data()
+    
+    if staff_list:
+        # Create a nice display string for the dropdown
+        staff_options = {f"{s['name']} ({s['role']})": s for s in staff_list}
+        
+        selected_staff_name = st.selectbox("Select Staff Member", options=list(staff_options.keys()))
+        
+        if selected_staff_name:
+            data = staff_options[selected_staff_name]
+            
+            # Display Quick Stats
+            col1, col2, col3 = st.columns(3)
+            col1.metric("Role", data['role'])
+            col2.metric("Primary Comm", data['p_comm'])
+            col3.metric("Primary Motiv", data['p_mot'])
+            
+            st.info(f"Secondary Traits: {data['s_comm']} / {data['s_mot']}")
+            
+            if st.button("Generate Guide for " + data['name']):
+                pdf_bytes = create_supervisor_guide(
+                    data['name'], data['role'], 
+                    data['p_comm'], data['s_comm'], 
+                    data['p_mot'], data['s_mot']
+                )
+                st.success("Guide Ready!")
+                st.download_button(
+                    label="Download PDF Guide",
+                    data=pdf_bytes,
+                    file_name=f"Supervisor_Guide_{data['name'].replace(' ', '_')}.pdf",
+                    mime="application/pdf"
+                )
     else:
-        pdf_bytes = create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot)
-        st.success(f"Guide generated for {name}!")
-        st.download_button(
-            label="Download PDF Guide",
-            data=pdf_bytes,
-            file_name=f"Supervisor_Guide_{name.replace(' ', '_')}.pdf",
-            mime="application/pdf"
-        )
+        st.warning("No data found in database yet.")
+
+with tab2:
+    with st.form("manual_form"):
+        col1, col2 = st.columns(2)
+        with col1:
+            m_name = st.text_input("Staff Name")
+            m_role = st.selectbox("Role", ["Program Supervisor", "Shift Supervisor", "YDP"])
+        with col2:
+            m_p_comm = st.selectbox("Primary Communication", ["Director", "Encourager", "Facilitator", "Tracker"])
+            m_p_mot = st.selectbox("Primary Motivation", ["Growth", "Purpose", "Connection", "Achievement"])
+            
+        m_submitted = st.form_submit_button("Generate Guide (Manual)")
+        
+        if m_submitted and m_name:
+            pdf_bytes = create_supervisor_guide(m_name, m_role, m_p_comm, "None", m_p_mot, "None")
+            st.download_button(
+                label="Download PDF Guide",
+                data=pdf_bytes,
+                file_name=f"Supervisor_Guide_{m_name.replace(' ', '_')}.pdf",
+                mime="application/pdf"
+            )
