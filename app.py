@@ -13,7 +13,6 @@ st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-        /* CSS Variables for Theming */
         :root {
             --primary: #015bad;
             --secondary: #51c3c5;
@@ -39,134 +38,49 @@ st.markdown("""
             }
         }
 
-        html, body, [class*="css"] {
-            font-family: 'Inter', sans-serif;
-        }
+        html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+        .stApp { background-image: var(--bg-gradient-light); background-attachment: fixed; }
+        @media (prefers-color-scheme: dark) { .stApp { background-image: var(--bg-gradient-dark); } }
 
-        /* Main App Background */
-        .stApp {
-            background-image: var(--bg-gradient-light);
-            background-attachment: fixed;
-        }
-        @media (prefers-color-scheme: dark) {
-            .stApp { background-image: var(--bg-gradient-dark); }
-        }
+        h1, h2, h3 { color: var(--primary) !important; font-weight: 700 !important; letter-spacing: -0.02em; }
+        p, label, li, .stMarkdown { color: var(--text-main) !important; line-height: 1.6; }
+        .small-text { color: var(--text-sub) !important; font-size: 0.85rem; }
 
-        /* Typography */
-        h1, h2, h3 {
-            color: var(--primary) !important;
-            font-weight: 700 !important;
-            letter-spacing: -0.02em;
-        }
-        p, label, li, .stMarkdown {
-            color: var(--text-main) !important;
-            line-height: 1.6;
-        }
-        .small-text {
-            color: var(--text-sub) !important;
-            font-size: 0.85rem;
-        }
-
-        /* Card / Block Container */
         .block-container {
-            padding: 3rem 2rem;
-            max-width: 800px;
+            padding: 3rem 2rem; max-width: 800px;
             background-color: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
-            border-radius: 24px;
-            box-shadow: var(--shadow);
-            margin-top: 2rem;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border); border-radius: 24px;
+            box-shadow: var(--shadow); margin-top: 2rem;
         }
 
-        /* Buttons - Modern Gradient */
         .stButton button {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white !important;
-            border: none;
-            border-radius: 12px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            letter-spacing: 0.02em;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(1, 91, 173, 0.2);
-            width: 100%;
+            color: white !important; border: none; border-radius: 12px;
+            padding: 0.75rem 1.5rem; font-weight: 600; letter-spacing: 0.02em;
+            transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(1, 91, 173, 0.2); width: 100%;
         }
-        .stButton button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(1, 91, 173, 0.3);
-            opacity: 0.95;
-        }
-        .stButton button:active {
-            transform: translateY(0);
-        }
+        .stButton button:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(1, 91, 173, 0.3); opacity: 0.95; }
+        .stButton button:active { transform: translateY(0); }
 
-        /* Inputs & Selects - Generic styling only, avoiding deep overrides that break dropdowns */
         .stTextInput input, .stSelectbox [data-baseweb="select"] {
-            background-color: var(--input-bg);
-            border-radius: 12px;
-            border: 1px solid var(--card-border);
-            color: var(--text-main);
+            background-color: var(--input-bg); border-radius: 12px; border: 1px solid var(--card-border); color: var(--text-main);
         }
 
-        /* Radio Buttons - Clean up spacing and center them */
-        .stRadio {
-            background-color: transparent;
-            padding: 10px 0;
-            display: flex;
-            justify-content: center;
-        }
+        .stRadio { background-color: transparent; padding: 10px 0; display: flex; justify-content: center; }
+        .stRadio [role="radiogroup"] { justify-content: space-between; width: 100%; }
         
-        .stRadio [role="radiogroup"] {
-            justify-content: space-between;
-            width: 100%;
-        }
-        
-        /* Custom Score Bar Styling */
         .score-container {
-            background-color: var(--input-bg);
-            border-radius: 8px;
-            height: 12px;
-            width: 100%;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            overflow: hidden;
+            background-color: var(--input-bg); border-radius: 8px; height: 12px; width: 100%; margin-top: 5px; margin-bottom: 15px; overflow: hidden;
         }
         .score-fill {
-            height: 100%;
-            border-radius: 8px;
-            background: linear-gradient(90deg, var(--secondary), var(--primary));
-            transition: width 1s ease-in-out;
+            height: 100%; border-radius: 8px; background: linear-gradient(90deg, var(--secondary), var(--primary)); transition: width 1s ease-in-out;
         }
 
-        /* Info Cards in Results */
-        .info-card {
-            background-color: var(--input-bg);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--card-border);
-        }
-        
-        /* Divider */
-        hr {
-            margin: 2rem 0;
-            border: 0;
-            border-top: 1px solid var(--card-border);
-            opacity: 0.5;
-        }
-
-        /* Radio selection color */
-        div[role="radiogroup"] > label > div:first-of-type {
-            background-color: var(--primary) !important;
-            border-color: var(--primary) !important;
-        }
-        
-        /* Error message styling */
-        .stAlert {
-            border-radius: 12px;
-        }
+        .info-card { background-color: var(--input-bg); border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; border: 1px solid var(--card-border); }
+        hr { margin: 2rem 0; border: 0; border-top: 1px solid var(--card-border); opacity: 0.5; }
+        div[role="radiogroup"] > label > div:first-of-type { background-color: var(--primary) !important; border-color: var(--primary) !important; }
+        .stAlert { border-radius: 12px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -201,7 +115,7 @@ COMMUNICATION_QUESTIONS = [
     {"id": "comm5", "text": "I’m comfortable giving direct feedback, even when I know it may be hard for someone to hear.", "style": "Director"},
     {"id": "comm6", "text": "I pay close attention to the emotional tone of the team and try to lift people up when morale is low.", "style": "Encourager"},
     {"id": "comm7", "text": "I often use encouragement, humor, or positive energy to help youth and staff get through hard shifts.", "style": "Encourager"},
-    {"id": "comm8", "text": "I notice small wins and like to name them out loud so people know theyre seen.", "style": "Encourager"},
+    {"id": "comm8", "text": "I notice small wins and like to name them out loud so people know they’re seen.", "style": "Encourager"},
     {"id": "comm9", "text": "I tend to talk things through with people rather than just giving short instructions.", "style": "Encourager"},
     {"id": "comm10", "text": "I’m often the one coworkers come to when they need to vent or feel understood.", "style": "Encourager"},
     {"id": "comm11", "text": "I’m good at slowing conversations down so that different perspectives can be heard before we decide.", "style": "Facilitator"},
@@ -436,15 +350,8 @@ def get_top_two(scores):
     return primary, secondary
 
 def submit_to_google_sheets(data, action="save"):
-    """
-    Submits data to Google Sheets.
-    action can be 'save' (default) or 'email' (triggers email in Apps Script)
-    """
     url = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
-    
-    # Add action flag to payload
     data["action"] = action
-    
     try:
         response = requests.post(url, json=data)
         if response.status_code == 200:
@@ -460,92 +367,256 @@ def clean_text(text):
     """Helper to replace incompatible unicode characters with latin-1 equivalents"""
     if not text: return ""
     replacements = {
-        '\u2018': "'", '\u2019': "'",  # Smart quotes
-        '\u201c': '"', '\u201d': '"',  # Smart double quotes
-        '\u2013': '-', '\u2014': '-',  # Dashes
-        '\u2026': '...',               # Ellipsis
+        '\u2018': "'", '\u2019': "'", '\u201c': '"', '\u201d': '"',
+        '\u2013': '-', '\u2014': '-', '\u2026': '...',
+        '—': '-', '–': '-'
     }
     for k, v in replacements.items():
         text = text.replace(k, v)
     return text.encode('latin-1', 'replace').decode('latin-1')
 
-def create_pdf(user_info, results, comm_prof, mot_prof, int_prof):
+def generate_text_report(user_info, results, comm_prof, mot_prof, int_prof, role_key, role_labels):
+    """Generates a detailed text version of the profile for emails"""
+    
+    lines = []
+    lines.append("ELMCREST COMPASS PROFILE")
+    lines.append("========================")
+    lines.append(f"Name: {user_info['name']}")
+    lines.append(f"Role: {user_info['role']}")
+    lines.append("")
+    
+    # Communication
+    lines.append("PART 1: COMMUNICATION STYLE")
+    lines.append("---------------------------")
+    lines.append(f"Primary Style: {comm_prof['name']}")
+    lines.append(f"Tagline: {comm_prof['tagline']}")
+    lines.append("")
+    lines.append("OVERVIEW:")
+    lines.append(comm_prof['overview'])
+    lines.append("")
+    
+    lines.append("DETAILED ROLE TIPS:")
+    tips = comm_prof['roleTips'][role_key]
+    lines.append(f"• With {role_labels['directReportsLabel']}: {tips['directReports']}")
+    lines.append(f"• With Youth: {tips['youth']}")
+    lines.append(f"• With Supervisor: {tips['supervisor']}")
+    lines.append(f"• With Leadership: {tips['leadership']}")
+    lines.append("")
+    
+    lines.append("UNDER STRESS:")
+    lines.append(comm_prof['conflictImpact'])
+    lines.append("")
+    
+    lines.append("TRAUMA STRATEGY:")
+    lines.append(comm_prof['traumaStrategy'])
+    lines.append("")
+    
+    lines.append("SCORE BREAKDOWN:")
+    for style, score in results['commScores'].items():
+        lines.append(f"• {style}: {score}")
+    lines.append("")
+    
+    # Motivation
+    lines.append("PART 2: MOTIVATION DRIVER")
+    lines.append("-------------------------")
+    lines.append(f"Primary Driver: {mot_prof['name']}")
+    lines.append(f"Tagline: {mot_prof['tagline']}")
+    lines.append("")
+    lines.append("SUMMARY:")
+    lines.append(mot_prof['summary'])
+    lines.append("")
+    
+    lines.append("BOOSTERS (What energizes you):")
+    for b in mot_prof['boosters']:
+        lines.append(f"• {b}")
+    lines.append("")
+    
+    lines.append("DRAINERS (What drains you):")
+    for k in mot_prof['killers']:
+        lines.append(f"• {k}")
+    lines.append("")
+    
+    lines.append("SUPPORT NEEDED:")
+    lines.append(mot_prof['roleSupport'][role_key])
+    lines.append("")
+    
+    # Integrated
+    if int_prof:
+        lines.append("PART 3: INTEGRATED PROFILE")
+        lines.append("--------------------------")
+        lines.append(f"Type: {int_prof['title']}")
+        lines.append("")
+        lines.append(int_prof['summary'])
+        lines.append("")
+        lines.append("KEY STRENGTHS:")
+        for s in int_prof['strengths']:
+            lines.append(f"• {s}")
+        lines.append("")
+        lines.append("WATCH-OUTS:")
+        for w in int_prof['watchouts']:
+            lines.append(f"• {w}")
+            
+    return "\n".join(lines)
+
+def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role_labels):
     pdf = FPDF()
     pdf.add_page()
-    
-    # Colors
-    primary_color = (1, 91, 173) # #015bad
+    pdf.set_auto_page_break(auto=True, margin=15)
     
     # Header
-    pdf.set_font("Arial", 'B', 24)
-    pdf.set_text_color(*primary_color)
+    pdf.set_font("Arial", 'B', 20)
+    pdf.set_text_color(1, 91, 173) # Primary Blue
     pdf.cell(0, 10, "Elmcrest Compass Profile", ln=True, align='C')
     
     pdf.set_font("Arial", '', 12)
     pdf.set_text_color(50, 50, 50)
     pdf.cell(0, 10, clean_text(f"Prepared for: {user_info['name']} | Role: {user_info['role']}"), ln=True, align='C')
-    pdf.ln(10)
+    pdf.ln(5)
     
-    # Communication Section
+    # --- Communication Section ---
     pdf.set_font("Arial", 'B', 16)
-    pdf.set_text_color(*primary_color)
-    pdf.cell(0, 10, clean_text(f"Communication Style: {comm_prof['name']}"), ln=True)
+    pdf.set_text_color(1, 91, 173)
+    pdf.cell(0, 10, clean_text(f"1. Communication Style: {comm_prof['name']}"), ln=True)
     
     pdf.set_font("Arial", 'I', 12)
     pdf.set_text_color(100, 100, 100)
-    pdf.multi_cell(0, 8, clean_text(comm_prof['tagline']))
+    pdf.multi_cell(0, 6, clean_text(comm_prof['tagline']))
+    pdf.ln(2)
     
     pdf.set_font("Arial", '', 11)
     pdf.set_text_color(0, 0, 0)
-    pdf.ln(4)
     pdf.multi_cell(0, 6, clean_text(comm_prof['overview']))
     pdf.ln(5)
     
+    # Detailed Role Tips
+    pdf.set_font("Arial", 'B', 12)
+    pdf.set_fill_color(240, 245, 250)
+    pdf.cell(0, 8, "Detailed Role Tips", ln=True, fill=True)
+    pdf.ln(2)
+    
+    pdf.set_font("Arial", '', 11)
+    tips = comm_prof['roleTips'][role_key]
+    
     pdf.set_font("Arial", 'B', 11)
-    pdf.cell(0, 8, "Under Stress:", ln=True)
+    pdf.write(6, clean_text(f"With {role_labels['directReportsLabel']}: "))
+    pdf.set_font("Arial", '', 11)
+    pdf.multi_cell(0, 6, clean_text(tips['directReports']))
+    pdf.ln(1)
+    
+    pdf.set_font("Arial", 'B', 11)
+    pdf.write(6, "With Youth: ")
+    pdf.set_font("Arial", '', 11)
+    pdf.multi_cell(0, 6, clean_text(tips['youth']))
+    pdf.ln(1)
+    
+    pdf.set_font("Arial", 'B', 11)
+    pdf.write(6, "With Supervisor: ")
+    pdf.set_font("Arial", '', 11)
+    pdf.multi_cell(0, 6, clean_text(tips['supervisor']))
+    pdf.ln(1)
+    
+    pdf.set_font("Arial", 'B', 11)
+    pdf.write(6, "With Leadership: ")
+    pdf.set_font("Arial", '', 11)
+    pdf.multi_cell(0, 6, clean_text(tips['leadership']))
+    pdf.ln(5)
+    
+    # Stress & Trauma
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 8, "Under Stress & Trauma Strategy", ln=True, fill=True)
+    pdf.ln(2)
+    
+    pdf.set_font("Arial", 'B', 11)
+    pdf.write(6, "Under Stress: ")
     pdf.set_font("Arial", '', 11)
     pdf.multi_cell(0, 6, clean_text(comm_prof['conflictImpact']))
+    pdf.ln(2)
+    
+    pdf.set_font("Arial", 'B', 11)
+    pdf.write(6, "Trauma Strategy: ")
+    pdf.set_font("Arial", '', 11)
+    pdf.multi_cell(0, 6, clean_text(comm_prof['traumaStrategy']))
+    pdf.ln(5)
+    
+    # Score Breakdown
+    pdf.set_font("Arial", 'B', 11)
+    pdf.cell(0, 8, "Score Breakdown:", ln=True)
+    pdf.set_font("Arial", '', 10)
+    for style, score in results['commScores'].items():
+        pdf.cell(40, 6, f"{style}: {score}/25", ln=False)
     pdf.ln(10)
 
-    # Motivation Section
+    # --- Motivation Section ---
     pdf.set_font("Arial", 'B', 16)
-    pdf.set_text_color(*primary_color)
-    pdf.cell(0, 10, clean_text(f"Motivation Driver: {mot_prof['name']}"), ln=True)
+    pdf.set_text_color(1, 91, 173)
+    pdf.cell(0, 10, clean_text(f"2. Motivation Driver: {mot_prof['name']}"), ln=True)
     
     pdf.set_font("Arial", 'I', 12)
     pdf.set_text_color(100, 100, 100)
-    pdf.multi_cell(0, 8, clean_text(mot_prof['tagline']))
+    pdf.multi_cell(0, 6, clean_text(mot_prof['tagline']))
+    pdf.ln(2)
     
     pdf.set_font("Arial", '', 11)
     pdf.set_text_color(0, 0, 0)
-    pdf.ln(4)
     pdf.multi_cell(0, 6, clean_text(mot_prof['summary']))
     pdf.ln(5)
     
+    col_width = pdf.w / 2 - 15
+    
+    # Boosters & Drainers
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 8, "Boosters & Drainers", ln=True, fill=True)
+    pdf.ln(2)
+    
     pdf.set_font("Arial", 'B', 11)
-    pdf.cell(0, 8, "Key Boosters:", ln=True)
+    pdf.cell(0, 6, "Boosters (Energizers):", ln=True)
     pdf.set_font("Arial", '', 11)
     for b in mot_prof['boosters']:
-        pdf.cell(0, 6, clean_text(f"- {b}"), ln=True)
-    pdf.ln(10)
+        pdf.multi_cell(0, 6, clean_text(f"- {b}"))
+    pdf.ln(3)
+    
+    pdf.set_font("Arial", 'B', 11)
+    pdf.cell(0, 6, "Drainers (De-energizers):", ln=True)
+    pdf.set_font("Arial", '', 11)
+    for k in mot_prof['killers']:
+        pdf.multi_cell(0, 6, clean_text(f"- {k}"))
+    pdf.ln(5)
+    
+    # Support
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 8, "Support Needed", ln=True, fill=True)
+    pdf.set_font("Arial", '', 11)
+    pdf.ln(2)
+    pdf.multi_cell(0, 6, clean_text(mot_prof['roleSupport'][role_key]))
+    pdf.ln(8)
 
-    # Integrated Section
+    # --- Integrated Section ---
     if int_prof:
         pdf.set_font("Arial", 'B', 16)
-        pdf.set_text_color(*primary_color)
-        pdf.cell(0, 10, clean_text(f"Integrated Profile: {int_prof['title']}"), ln=True)
+        pdf.set_text_color(1, 91, 173)
+        pdf.cell(0, 10, clean_text(f"3. Integrated Profile: {int_prof['title']}"), ln=True)
         
         pdf.set_font("Arial", '', 11)
         pdf.set_text_color(0, 0, 0)
-        pdf.ln(4)
         pdf.multi_cell(0, 6, clean_text(int_prof['summary']))
         pdf.ln(5)
         
+        pdf.set_font("Arial", 'B', 12)
+        pdf.cell(0, 8, "Strengths & Watch-outs", ln=True, fill=True)
+        pdf.ln(2)
+        
         pdf.set_font("Arial", 'B', 11)
-        pdf.cell(0, 8, "Key Strengths:", ln=True)
+        pdf.cell(0, 6, "Key Strengths:", ln=True)
         pdf.set_font("Arial", '', 11)
         for s in int_prof['strengths']:
-            pdf.cell(0, 6, clean_text(f"- {s}"), ln=True)
+            pdf.multi_cell(0, 6, clean_text(f"- {s}"))
+        pdf.ln(3)
+        
+        pdf.set_font("Arial", 'B', 11)
+        pdf.cell(0, 6, "Watch-outs:", ln=True)
+        pdf.set_font("Arial", '', 11)
+        for w in int_prof['watchouts']:
+            pdf.multi_cell(0, 6, clean_text(f"- {w}"))
 
     return pdf.output(dest='S').encode('latin-1')
 
@@ -777,7 +848,8 @@ elif st.session_state.step == 'results':
     # --- Actions Section ---
     c1, c2 = st.columns(2)
     with c1:
-        pdf_bytes = create_pdf(st.session_state.user_info, res, comm_prof, mot_prof, int_prof)
+        # Pass ALL necessary data to the PDF generator
+        pdf_bytes = create_pdf(st.session_state.user_info, res, comm_prof, mot_prof, int_prof, role_key, role_labels)
         st.download_button(
             label="📄 Download PDF Report",
             data=pdf_bytes,
@@ -785,11 +857,17 @@ elif st.session_state.step == 'results':
             mime="application/pdf",
         )
     with c2:
-        if st.button("📧 Email Me Results"):
-            # Re-construct payload
+        if st.button("📧 Email Me Full Report"):
+            # Generate the FULL text body in Python
+            full_text_report = generate_text_report(
+                st.session_state.user_info, res, comm_prof, mot_prof, int_prof, role_key, role_labels
+            )
+            
+            # Payload now includes the full text
             payload = {
                 "name": st.session_state.user_info['name'],
                 "email": st.session_state.user_info['email'],
+                "emailBody": full_text_report, # New field!
                 "role": st.session_state.user_info['role'],
                 "scores": {
                     "communication": res['commScores'],
@@ -803,7 +881,7 @@ elif st.session_state.step == 'results':
             with st.spinner("Sending email request..."):
                 success = submit_to_google_sheets(payload, action="email")
                 if success:
-                    st.success("Email request sent!")
+                    st.success("Full report sent to your email!")
 
     st.markdown("---")
 
