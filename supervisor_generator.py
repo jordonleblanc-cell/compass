@@ -2,134 +2,93 @@ import streamlit as st
 import requests
 import pandas as pd
 from fpdf import FPDF
+import plotly.express as px
 
 # --- Configuration ---
-st.set_page_config(page_title="Elmcrest Supervisor Dashboard", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Elmcrest Supervisor Platform", page_icon="📊", layout="wide")
 
 # --- Constants ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
 
-# --- Expanded Content Dictionaries ---
+# --- Content Dictionaries (Shortened for logic use, Full text in PDF generator) ---
+COMM_TRAITS = {
+    "Director": {"focus": "Action & Speed", "blindspot": "Patience & Consensus"},
+    "Encourager": {"focus": "Morale & Harmony", "blindspot": "Hard Truths & Conflict"},
+    "Facilitator": {"focus": "Fairness & Process", "blindspot": "Decisiveness & Speed"},
+    "Tracker": {"focus": "Details & Safety", "blindspot": "Flexibility & Big Picture"}
+}
 
+MOTIV_DRIVERS = {
+    "Growth": "New Skills & Challenges",
+    "Purpose": "Mission & Impact",
+    "Connection": "Belonging & Team",
+    "Achievement": "Goals & Progress"
+}
+
+# --- Expanded Content Dictionaries for PDF ---
 COMM_PROFILES = {
     "Director": {
-        "overview": "This staff member communicates primarily as a Director, meaning they lead with the core traits associated with this style—such as clarity, structure, and urgency. This significantly shapes how they interact with their team, youth, families, and you as their supervisor.\n\nThey influence the emotional tone of the program through their natural decisiveness, while also facing challenges that arise under stress. Their communication tendencies affect how comfortable staff feel approaching them, how effectively they redirect youth, and how well they sustain structure during crises.",
-        "supervising": "When supervising someone with a Director communication profile, it is important to adapt your approach so they feel supported, understood, and able to use their style effectively without overusing it.\n\nKey strategies include:\n- Matching their level of directness or warmth appropriately.\n- Giving feedback in ways that reinforce their strengths while addressing blind spots.\n- Helping them adjust communication with youth and staff based on situational needs rather than just command-and-control.",
-        "struggle_bullets": [
-            "Decreased patience or overcommunication of demands",
-            "Avoidance of listening or over-assertiveness",
-            "Fatigue, irritability, or becoming overly blunt",
-            "Rigid enforcement of structure without empathy"
-        ],
-        "coaching": [
-            "I noticed we moved very fast on that decision. What are the risks of not hearing from the rest of the team first?",
-            "How can you frame this directive so the team feels supported rather than just commanded?",
-            "Who haven't we heard from yet? What might they be seeing that we are missing?"
-        ],
-        "advancement": "Challenge them to lead through influence rather than authority. Help them practice patience and consensus-building. Their next level of growth is learning to bring the team along with them, rather than just dragging them across the finish line."
+        "overview": "This staff member communicates primarily as a Director, meaning they lead with the core traits associated with this style—such as clarity, structure, and urgency.",
+        "supervising": "Be direct, concise, and outcome-focused. They respect leaders who get to the point. Do not micromanage; define the 'what' (the goal) clearly, but give them autonomy on the 'how'.",
+        "struggle_bullets": ["Decreased patience", "Over-assertiveness", "Fatigue/Irritability", "Rigid enforcement"],
+        "coaching": ["What are the risks of moving this fast?", "Who haven't we heard from yet?", "How can you frame this directive so the team feels supported?"],
+        "advancement": "Challenge them to lead through influence rather than authority. Help them practice patience and consensus-building."
     },
     "Encourager": {
-        "overview": "This staff member communicates primarily as an Encourager, meaning they lead with warmth, optimism, and high emotional intelligence. This significantly shapes how they build rapport with their team, youth, and families.\n\nThey influence the emotional tone of the program by acting as the 'glue' that holds the team together. Their communication tendencies affect how well staff feel heard, how they de-escalate youth through connection, and how they maintain morale during difficult shifts.",
-        "supervising": "When supervising someone with an Encourager profile, it is important to connect relationally before diving into tasks. They need to feel that their emotional labor is seen and valued.\n\nKey strategies include:\n- Validating their feelings and the impact they have on team culture.\n- Framing feedback around professional growth rather than personal failure, as criticism can hit them hard.\n- Helping them set boundaries so they don't burn out from carrying the team's emotional weight.",
-        "struggle_bullets": [
-            "Avoidance of hard truths or necessary conflict",
-            "Disorganization or lack of follow-through on details",
-            "Prioritizing being liked over being effective",
-            "Emotional exhaustion or taking youth behaviors personally"
-        ],
-        "coaching": [
-            "How can you deliver this difficult message clearly while still remaining kind?",
-            "Are we prioritizing popularity over effectiveness in this situation?",
-            "What boundaries do you need to set right now to protect your own energy?"
-        ],
-        "advancement": "Help them master the operational and administrative sides of leadership so their high EQ is backed by unshakable reliability. Challenge them to see 'clarity' and 'accountability' as forms of kindness, not opposition to it."
+        "overview": "This staff member communicates primarily as an Encourager, meaning they lead with warmth, optimism, and high emotional intelligence.",
+        "supervising": "Connect relationally before diving into tasks. Validate their emotional labor. Criticism can feel personal, so frame it around professional growth.",
+        "struggle_bullets": ["Avoidance of conflict", "Disorganization", "Prioritizing being liked", "Emotional exhaustion"],
+        "coaching": ["How can you deliver this hard news while remaining kind?", "Are we prioritizing popularity over effectiveness?", "What boundaries do you need to set?"],
+        "advancement": "Help them master the operational side of leadership. Challenge them to see clarity and accountability as forms of kindness."
     },
     "Facilitator": {
-        "overview": "This staff member communicates primarily as a Facilitator, meaning they lead by listening, gathering perspectives, and seeking fairness. This significantly shapes how they navigate team dynamics and conflict.\n\nThey influence the tone of the program by creating a sense of stability and inclusion. Their tendencies affect how slowly or quickly decisions are made, how well all voices are heard, and how conflict is mediated between staff or youth.",
-        "supervising": "When supervising a Facilitator, it is crucial to give them time to process information. They often see dynamics you might miss but need an invitation to share them.\n\nKey strategies include:\n- Asking for their observations explicitly during supervision.\n- Validating their desire for fairness while pushing them to make decisions even when consensus isn't possible.\n- Encouraging them to voice their own opinion, not just summarize others.",
-        "struggle_bullets": [
-            "Analysis paralysis or delaying decisions too long",
-            "Passive-aggressiveness or holding tension silently",
-            "Saying 'it is fine' when it clearly is not",
-            "Getting stuck in the middle of staff conflicts without resolving them"
-        ],
-        "coaching": [
-            "If you had to make a decision right now with only 80% of the information, what would it be?",
-            "What is the cost to the team of waiting for total consensus on this?",
-            "Where are you holding tension for the team that you need to release?"
-        ],
-        "advancement": "Encourage them to be more vocal and decisive during crises. Help them see that they can be assertive without being aggressive. Their growth lies in becoming a leader who can make the tough call even when not everyone agrees."
+        "overview": "This staff member communicates primarily as a Facilitator, meaning they lead by listening, gathering perspectives, and seeking fairness.",
+        "supervising": "Give them time to process. Ask for their observations explicitly. Validate their desire for fairness but push for decisions.",
+        "struggle_bullets": ["Analysis paralysis", "Passive-aggressiveness", "Saying 'it's fine' when it isn't", "Getting stuck in the middle"],
+        "coaching": ["If you had to decide right now, what would you do?", "What is the cost of waiting for consensus?", "Where are you holding tension for the team?"],
+        "advancement": "Encourage them to be more vocal and decisive. Help them see that they can be assertive without being aggressive."
     },
     "Tracker": {
-        "overview": "This staff member communicates primarily as a Tracker, meaning they lead with details, data, and systems. This shapes how they view safety, compliance, and routine.\n\nThey influence the program by ensuring nothing falls through the cracks. Their tendencies affect how safe the environment feels physically, how well documentation is maintained, and how consistent the routine is for the youth.",
-        "supervising": "When supervising a Tracker, provide clear expectations and structure. They respect competence and reliability. Ambiguity is their enemy.\n\nKey strategies include:\n- Providing the 'why' behind changes and the specific 'how' for implementation.\n- Respecting their systems and organization; disrupting their routine erodes trust.\n- Helping them zoom out from the details to see the human/relational picture.",
-        "struggle_bullets": [
-            "Becoming rigid, critical, or perfectionistic",
-            "Getting 'stuck in the weeds' of minor details",
-            "Coming across as cold or inflexible to youth in crisis",
-            " prioritizing policy over immediate relational needs"
-        ],
-        "coaching": [
-            "Does this specific detail change the safety or outcome of the situation?",
-            "How can we meet the standard here while keeping the relationship with the youth warm?",
-            "What is the big picture goal, and are we sacrificing it for a minor procedural win?"
-        ],
-        "advancement": "Help them delegate the details so they can focus on strategy and people development. Teach them to distinguish between 'mission-critical' compliance and 'preference,' helping them tolerate 'good enough' in non-essential areas."
+        "overview": "This staff member communicates primarily as a Tracker, meaning they lead with details, data, and systems.",
+        "supervising": "Provide clear expectations and structure. Respecting their systems builds trust. Explain the 'why' behind changes.",
+        "struggle_bullets": ["Rigidity/Perfectionism", "Getting stuck in weeds", "Coming across as cold", "Prioritizing policy over people"],
+        "coaching": ["Does this detail change the outcome?", "How can we meet the standard while keeping the relationship warm?", "What is the big picture goal?"],
+        "advancement": "Help them delegate details to focus on strategy. Teach them to distinguish between 'mission-critical' and 'preference'."
     }
 }
 
 MOTIVATION_PROFILES = {
     "Growth": {
-        "overview": "Their primary motivator is Growth. This means they thrive when their work environment honors their need for progress, new skills, and developmental challenges.\n\nUnderstanding this pattern helps you anticipate what conditions will bring out their best—and what circumstances (like stagnation or repetitive tasks) may cause frustration, burnout, or disengagement.",
-        "motivating": "As someone driven by Growth, this staff member responds best to strategies that feed their curiosity and competence. Examples include:\n- Assigning 'stretch' projects that require learning new skills.\n- Framing feedback as coaching for the future, not just critique of the past.\n- Connecting their daily work to their long-term career trajectory.",
-        "support": "To support them effectively:\n- Sponsor them for trainings or special certifications.\n- Ask 'What are you learning right now?' during supervision.\n- Ensure they don't feel boxed in; show them the path forward.",
-        "thriving_bullets": [
-            "Proactive questions about 'why' and 'how'",
-            "Volunteering for new responsibilities",
-            "Mentoring peers on new skills",
-            "High engagement in training and development"
-        ],
-        "intervention": "Realign their tasks to include a learning component. If they are struggling, they may be bored. Ask: 'Do you feel challenged right now?'",
-        "celebrate": "Celebrate their acquisition of new skills and their adaptability. 'I saw how you learned X and applied it—great work.'"
+        "overview": "Their primary motivator is Growth. They thrive on progress, new skills, and developmental challenges.",
+        "motivating": "Give them problems to solve. Provide feedback on skill development. Connect work to career trajectory.",
+        "support": "Sponsor them for training. Ask 'What are you learning?'. Ensure they don't feel boxed in.",
+        "thriving_bullets": ["Proactive questions", "Volunteering", "Mentoring peers", "High engagement"],
+        "intervention": "Realign tasks to include learning. Ask: 'Do you feel challenged right now?'",
+        "celebrate": "Celebrate acquisition of new skills and adaptability."
     },
     "Purpose": {
-        "overview": "Their primary motivator is Purpose. This means they thrive when their work environment honors their need for meaning, alignment, and values-driven action.\n\nUnderstanding this pattern helps you anticipate what conditions will bring out their best—and what circumstances (like perceived injustice or bureaucracy) may cause frustration, burnout, or disengagement.",
-        "motivating": "As someone driven by Purpose, this staff member responds best to strategies that reinforce the mission. Examples include:\n- Connecting every directive back to the impact on youth and families.\n- Being transparent about the 'why' behind difficult policies.\n- Inviting their input on ethical or care-related decisions.",
-        "support": "To support them effectively:\n- Create space for them to voice ethical concerns.\n- Validate their passion, even when you have to say no.\n- Remind them of the human impact of their work during hard times.",
-        "thriving_bullets": [
-            "Passionate advocacy for youth needs",
-            "High integrity and ethical standards",
-            "Willingness to go the extra mile for a kid",
-            "Deep commitment to program outcomes"
-        ],
-        "intervention": "Reconnect them to the mission. If they are struggling, they may feel cynical. Ask: 'Does this feel misaligned with why you are here?'",
-        "celebrate": "Celebrate moments where their work directly impacted a youth's life. Share specific stories of their impact."
+        "overview": "Their primary motivator is Purpose. They thrive on meaning, alignment, and values-driven action.",
+        "motivating": "Connect directives to the mission. Be transparent about the 'why'. Invite input on ethical decisions.",
+        "support": "Create space for ethical concerns. Validate their passion. Remind them of human impact.",
+        "thriving_bullets": ["Passionate advocacy", "High integrity", "Going the extra mile", "Commitment to outcomes"],
+        "intervention": "Reconnect to mission. Ask: 'Does this feel misaligned with why you are here?'",
+        "celebrate": "Celebrate moments where their work directly impacted a youth's life."
     },
     "Connection": {
-        "overview": "Their primary motivator is Connection. This means they thrive when their work environment honors their need for belonging, team cohesion, and relationship.\n\nUnderstanding this pattern helps you anticipate what conditions will bring out their best—and what circumstances (like isolation or unresolved conflict) may cause frustration, burnout, or disengagement.",
-        "motivating": "As someone driven by Connection, this staff member responds best to strategies that reinforce the team dynamic. Examples include:\n- Prioritizing team cohesion and shared wins.\n- Checking in on them personally before diving into business.\n- Allowing time for team processing and debriefing.",
-        "support": "To support them effectively:\n- Ensure they aren't working in isolation for long periods.\n- Facilitate team bonding and repair conflict quickly.\n- Be a warm, accessible presence to them.",
-        "thriving_bullets": [
-            "Collaborative problem solving",
-            "High morale and support of peers",
-            "Creating a 'family' atmosphere on the unit",
-            "Strong rapport with difficult youth"
-        ],
-        "intervention": "Repair relationships. If they are struggling, they may feel isolated. Ask: 'How are you feeling about the team dynamic right now?'",
-        "celebrate": "Celebrate their contributions to culture. 'You really held the team together today.'"
+        "overview": "Their primary motivator is Connection. They thrive on belonging, team cohesion, and relationships.",
+        "motivating": "Prioritize team cohesion. Recognize shared wins. Check in personally.",
+        "support": "Ensure they aren't isolated. Facilitate team bonding. Be accessible.",
+        "thriving_bullets": ["Collaborative", "High morale", "Family atmosphere", "Strong rapport"],
+        "intervention": "Repair relationships. Ask: 'How are you feeling about the team dynamic?'",
+        "celebrate": "Celebrate their contributions to culture and supporting peers."
     },
     "Achievement": {
-        "overview": "Their primary motivator is Achievement. This means they thrive when their work environment honors their need for progress, results, and concrete accomplishment.\n\nUnderstanding this pattern helps you anticipate what conditions will bring out their best—and what circumstances (like vague goals or shifting goalposts) may cause frustration, burnout, or disengagement.",
-        "motivating": "As someone driven by Achievement, this staff member responds best to strategies that reinforce their intrinsic drive to win. Examples include:\n- Setting clear, measurable goals with defined finish lines.\n- Using checklists or data to visualize progress.\n- Giving them autonomy to reach the target once it is set.",
-        "support": "To support them effectively:\n- Remove blockers that prevent them from finishing tasks.\n- Protect their time from unnecessary meetings.\n- Be definitive about what 'success' looks like.",
-        "thriving_bullets": [
-            "High-quality documentation and follow-through",
-            "Efficient management of shift tasks",
-            "Reliability and consistency",
-            "Goal-oriented leadership"
-        ],
-        "intervention": "Clarify expectations. If they are struggling, they may feel ineffective. Ask: 'Is it clear what success looks like in this situation?'",
-        "celebrate": "Celebrate the completion of projects and reliability. 'You said you'd do it, and you did it.'"
+        "overview": "Their primary motivator is Achievement. They thrive on progress, results, and concrete accomplishment.",
+        "motivating": "Set clear goals. Use checklists/metrics. Give autonomy to reach targets.",
+        "support": "Remove blockers. Protect their time. Be definitive about 'success'.",
+        "thriving_bullets": ["High follow-through", "Efficiency", "Reliability", "Goal-oriented"],
+        "intervention": "Clarify expectations. Ask: 'Is it clear what success looks like here?'",
+        "celebrate": "Celebrate completion of projects and reliability."
     }
 }
 
@@ -164,15 +123,12 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
     
-    # Colors
     blue = (1, 91, 173)
     black = (0, 0, 0)
-    gray = (100, 100, 100)
     
-    # HEADER
     pdf.set_font("Arial", 'B', 20)
     pdf.set_text_color(*blue)
-    pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align='C')
+    pdf.cell(0, 10, "Supervisory Guide", ln=True, align='C')
     
     pdf.set_font("Arial", '', 12)
     pdf.set_text_color(*black)
@@ -180,11 +136,8 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C')
     pdf.ln(5)
     
-    # Retrieve Data
     c_data = COMM_PROFILES.get(p_comm, COMM_PROFILES["Director"])
     m_data = MOTIVATION_PROFILES.get(p_mot, MOTIVATION_PROFILES["Achievement"])
-
-    # --- Content Sections ---
 
     def add_heading(title):
         pdf.set_font("Arial", 'B', 12)
@@ -206,130 +159,100 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             pdf.multi_cell(0, 6, clean_text(f"- {item}"))
         pdf.ln(3)
 
-    # 1. Communication Profile
+    # 12-Point Structure
     add_heading(f"1. Communication Profile: {p_comm}")
     add_body(c_data['overview'])
 
-    # 2. Supervising Their Communication
     add_heading("2. Supervising Their Communication")
     add_body(c_data['supervising'])
 
-    # 3. Motivation Profile
     add_heading(f"3. Motivation Profile: {p_mot}")
     add_body(m_data['overview'])
 
-    # 4. Motivating This Program Supervisor
     add_heading("4. Motivating This Staff Member")
     add_body(m_data['motivating'])
 
-    # 5. Integrated Leadership Profile
-    # This dynamic text mimics the logic of "Director x Achievement"
     integrated_text = (
-        f"When their {p_comm} communication style intersects with their {p_mot} motivation, a distinct leadership pattern emerges. "
-        f"This integrated style influences how they problem-solve, how they support youth and staff, and how they manage crises.\n\n"
-        f"This crossover determines how they carry expectations (often driven by {p_mot}), how they respond to pressure (often reverting to {p_comm} tendencies), "
-        f"and how they regulate during emotional intensity. They are at their best when they can communicate via {p_comm} channels "
-        f"to achieve {p_mot}-aligned outcomes."
+        f"This staff member leads with {p_comm} energy (focused on {c_data['overview'].split('leads with')[0] if 'leads with' in c_data['overview'] else 'their style'}) "
+        f"and is fueled by a drive for {p_mot}. "
+        f"They are at their best when they can communicate via {p_comm} channels to achieve {p_mot}-aligned outcomes."
     )
     add_heading("5. Integrated Leadership Profile")
     add_body(integrated_text)
 
-    # 6. How You Can Best Support Them
     add_heading("6. How You Can Best Support Them")
-    add_body(f"To support this staff member effectively, tailor your supervision to both their communication ({p_comm}) and motivation ({p_mot}) styles.")
-    add_body("Best practices include:")
-    # Combine support tips from both
-    support_tips = [
-        "Reinforcing boundaries, self-regulation, and emotional sustainability.",
-        "Helping them navigate youth complexity without becoming overwhelmed or rigid."
-    ]
-    # Add motivation-specific support tip
-    support_tips.insert(0, m_data['support'].split('\n')[0]) # Take the first sentence/line for brevity or use full if preferred
-    add_body(m_data['support']) # Using full block for richness
+    add_body(m_data['support'])
 
-    # 7. What They Look Like When Thriving
     add_heading("7. What They Look Like When Thriving")
     add_bullets(m_data['thriving_bullets'])
 
-    # 8. What They Look Like When Struggling
     add_heading("8. What They Look Like When Struggling")
     add_bullets(c_data['struggle_bullets'])
 
-    # 9. Supervisory Interventions
-    add_heading("9. Supervisory Interventions")
+    killer_hint = "disengagement" 
     intervention_text = (
         f"• Increase structure or flexibility depending on their {p_comm} style.\n"
         f"• Re-establish expectations or reclarify priorities to satisfy their {p_mot} drive.\n"
         f"• {m_data['intervention']}\n"
         f"• Provide emotional support without enabling overextension."
     )
+    add_heading("9. Supervisory Interventions")
     add_body(intervention_text)
 
-    # 10. What You Should Celebrate
     add_heading("10. What You Should Celebrate")
-    celebrate_intro = (
-        f"• Their unique {p_comm} leadership strengths\n"
-        f"• Their contributions to climate, safety, or structure\n"
-        f"• {m_data['celebrate']}"
-    )
-    add_body(celebrate_intro)
+    add_body(f"• Their unique {p_comm} leadership strengths\n• {m_data['celebrate']}")
 
-    # 11. Coaching Questions
     add_heading("11. Coaching Questions")
     add_bullets(c_data['coaching'])
 
-    # 12. Helping Them Prepare for Advancement
     add_heading("12. Helping Them Prepare for Advancement")
     add_body(c_data['advancement'])
 
     return pdf.output(dest='S').encode('latin-1')
 
-# --- Main UI ---
+# --- MAIN APP LOGIC ---
 
-st.title("Supervisor & Admin Dashboard")
-st.markdown("View staff assessments and generate comprehensive supervisory guides.")
+# Fetch data once
+staff_list = fetch_staff_data()
+df = pd.DataFrame(staff_list)
 
-# Tabs for Manual Entry vs Database
-tab1, tab2 = st.tabs(["📚 Database (Auto-Fill)", "✏️ Manual Entry"])
+# TABS
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    "📝 Guide Generator", 
+    "🧬 Team DNA", 
+    "⚖️ Conflict Mediator", 
+    "🚀 Career Pathfinder",
+    "📈 Org Pulse"
+])
 
+# --- TAB 1: GUIDE GENERATOR (Original) ---
 with tab1:
-    col_a, col_b = st.columns([0.8, 0.2])
-    with col_a:
-        st.write("Select a staff member from the database to auto-generate their guide.")
+    st.markdown("### Generate Individual Supervisory Guides")
+    
+    col_a, col_b = st.columns([3, 1])
     with col_b:
-        if st.button("Refresh Data"):
+        if st.button("🔄 Refresh Database"):
             st.cache_data.clear()
             st.rerun()
-        
-    staff_list = fetch_staff_data()
-    
-    if staff_list:
-        # Create a nice display string for the dropdown
+            
+    if not df.empty:
         staff_options = {f"{s['name']} ({s['role']})": s for s in staff_list}
-        
         selected_staff_name = st.selectbox("Select Staff Member", options=list(staff_options.keys()))
         
         if selected_staff_name:
             data = staff_options[selected_staff_name]
             
-            # Display Quick Stats
-            st.markdown("---")
             col1, col2, col3 = st.columns(3)
             col1.metric("Role", data['role'])
-            col2.metric("Primary Comm", data['p_comm'])
-            col3.metric("Primary Motiv", data['p_mot'])
+            col2.metric("Communication", data['p_comm'])
+            col3.metric("Motivation", data['p_mot'])
             
-            if data['s_comm'] and data['s_comm'] != 'None':
-                st.caption(f"Secondary Traits: {data['s_comm']} (Comm) / {data['s_mot']} (Motiv)")
-            
-            st.markdown("###")
             if st.button("Generate Guide for " + data['name'], type="primary"):
                 pdf_bytes = create_supervisor_guide(
                     data['name'], data['role'], 
                     data['p_comm'], data['s_comm'], 
                     data['p_mot'], data['s_mot']
                 )
-                st.success("Guide Generated Successfully!")
                 st.download_button(
                     label="Download PDF Guide",
                     data=pdf_bytes,
@@ -337,27 +260,152 @@ with tab1:
                     mime="application/pdf"
                 )
     else:
-        st.warning("No data found in database yet. Ensure the Google Script is deployed correctly.")
+        st.info("Database is empty or loading...")
 
+# --- TAB 2: TEAM DNA ---
 with tab2:
-    st.write("Manually enter profile details to generate a guide.")
-    with st.form("manual_form"):
-        col1, col2 = st.columns(2)
-        with col1:
-            m_name = st.text_input("Staff Name")
-            m_role = st.selectbox("Role", ["Program Supervisor", "Shift Supervisor", "YDP"])
-        with col2:
-            m_p_comm = st.selectbox("Primary Communication", ["Director", "Encourager", "Facilitator", "Tracker"])
-            m_p_mot = st.selectbox("Primary Motivation", ["Growth", "Purpose", "Connection", "Achievement"])
-            
-        m_submitted = st.form_submit_button("Generate Guide (Manual)")
+    st.markdown("### 🧬 Team Dynamics Mapper")
+    st.write("Select multiple staff members to analyze the culture of a specific unit or team.")
+    
+    if not df.empty:
+        team_selection = st.multiselect("Build your Team", df['name'].tolist())
         
-        if m_submitted and m_name:
-            pdf_bytes = create_supervisor_guide(m_name, m_role, m_p_comm, "None", m_p_mot, "None")
-            st.success(f"Guide generated for {m_name}")
-            st.download_button(
-                label="Download PDF Guide",
-                data=pdf_bytes,
-                file_name=f"Supervisor_Guide_{m_name.replace(' ', '_')}.pdf",
-                mime="application/pdf"
-            )
+        if team_selection:
+            team_df = df[df['name'].isin(team_selection)]
+            
+            st.divider()
+            c1, c2 = st.columns(2)
+            
+            with c1:
+                st.subheader("Communication Mix")
+                comm_counts = team_selection_counts = team_df['p_comm'].value_counts()
+                fig_team_comm = px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4)
+                st.plotly_chart(fig_team_comm, use_container_width=True)
+                
+                # Comm Analysis
+                dominant_comm = comm_counts.idxmax()
+                if comm_counts.max() / len(team_df) > 0.6:
+                    st.warning(f"⚠️ **Echo Chamber Risk:** This team is dominated by **{dominant_comm}s**.")
+                    if dominant_comm == "Director":
+                        st.write("Risk: Moving too fast, steamrolling quieter voices. **Correction:** Intentionally invite dissent.")
+                    elif dominant_comm == "Encourager":
+                        st.write("Risk: 'Nice' culture that avoids hard accountability. **Correction:** Standardize review processes.")
+                    elif dominant_comm == "Facilitator":
+                        st.write("Risk: Slow decision making, endless meetings. **Correction:** Set hard deadlines.")
+                    elif dominant_comm == "Tracker":
+                        st.write("Risk: Rigid adherence to rules over relationships. **Correction:** Schedule team bonding time.")
+            
+            with c2:
+                st.subheader("Motivation Drivers")
+                mot_counts = team_df['p_mot'].value_counts()
+                fig_team_mot = px.bar(x=mot_counts.index, y=mot_counts.values)
+                st.plotly_chart(fig_team_mot, use_container_width=True)
+                
+                # Motivation Analysis
+                if "Growth" in mot_counts and mot_counts["Growth"] > 1:
+                    st.success("💡 **High Growth Energy:** This team will love pilots and new initiatives.")
+                if "Connection" in mot_counts and mot_counts["Connection"] > 1:
+                    st.info("💡 **High Connection Energy:** This team needs time to process emotions together.")
+
+# --- TAB 3: CONFLICT MEDIATOR ---
+with tab3:
+    st.markdown("### ⚖️ Conflict Resolution Script")
+    st.write("Select two staff members who are struggling to collaborate.")
+    
+    if not df.empty:
+        c1, c2 = st.columns(2)
+        with c1:
+            p1_name = st.selectbox("Staff Member A", df['name'].unique(), key="p1")
+        with c2:
+            p2_name = st.selectbox("Staff Member B", df['name'].unique(), key="p2")
+            
+        if p1_name and p2_name and p1_name != p2_name:
+            p1 = df[df['name'] == p1_name].iloc[0]
+            p2 = df[df['name'] == p2_name].iloc[0]
+            
+            st.divider()
+            st.subheader(f"The Clash: {p1['p_comm']} vs. {p2['p_comm']}")
+            
+            # Logic for Conflict
+            style1 = p1['p_comm']
+            style2 = p2['p_comm']
+            
+            clash_map = {
+                "Director": {"Encourager": "Efficiency vs. Harmony", "Facilitator": "Speed vs. Process", "Tracker": "Big Picture vs. Details", "Director": "Power Struggle"},
+                "Encourager": {"Director": "Harmony vs. Efficiency", "Facilitator": "Feelings vs. Fairness", "Tracker": "Relationships vs. Rules", "Encourager": "Lack of Structure"},
+                "Facilitator": {"Director": "Process vs. Speed", "Encourager": "Fairness vs. Feelings", "Tracker": "Consensus vs. Policy", "Facilitator": "Analysis Paralysis"},
+                "Tracker": {"Director": "Details vs. Big Picture", "Encourager": "Rules vs. Relationships", "Facilitator": "Policy vs. Consensus", "Tracker": "Rigidity"}
+            }
+            
+            core_tension = clash_map.get(style1, {}).get(style2, "Differing Perspectives")
+            st.info(f"**Core Tension:** {core_tension}")
+            
+            st.markdown("#### 🗣️ Mediation Script")
+            st.markdown(f"**To {p1_name} ({style1}):**")
+            st.write(f"\"{p2_name} isn't trying to be difficult. Their {style2} style focuses on {COMM_TRAITS[style2]['focus']}. When you push for {COMM_TRAITS[style1]['focus']}, they feel you are ignoring {COMM_TRAITS[style2]['focus']}. Try asking for their input first before deciding.\"")
+            
+            st.markdown(f"**To {p2_name} ({style2}):**")
+            st.write(f"\"{p1_name} values {COMM_TRAITS[style1]['focus']}. When they push hard, it's not personal; they are trying to solve the problem. Be direct with them about what you need rather than waiting for them to guess.\"")
+
+# --- TAB 4: CAREER PATHFINDER ---
+with tab4:
+    st.markdown("### 🚀 Career Gap Analysis")
+    st.write("Analyze readiness for promotion.")
+    
+    if not df.empty:
+        candidate_name = st.selectbox("Select Candidate", df['name'].unique(), key="career")
+        target_role = st.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor", "Manager"])
+        
+        if candidate_name:
+            cand = df[df['name'] == candidate_name].iloc[0]
+            
+            st.divider()
+            st.markdown(f"**Candidate:** {cand['name']} ({cand['p_comm']} / {cand['p_mot']})")
+            
+            # Simple Logic for "Gap"
+            st.subheader("The Growth Gap")
+            
+            if cand['p_comm'] == "Director":
+                st.write("⚠️ **Challenge:** Moving up requires leading leaders, not just followers. You cannot command a Shift Supervisor the way you command a YDP.")
+                st.write("✅ **Action Plan:** Delegate a project entirely. If you intervene to 'fix it', you fail the assignment.")
+            
+            elif cand['p_comm'] == "Encourager":
+                st.write("⚠️ **Challenge:** Higher roles require delivering unpopular news without wavering. Your desire to be liked will be tested.")
+                st.write("✅ **Action Plan:** Lead a disciplinary conversation or a policy reinforcement meeting without apologizing for the rule.")
+                
+            elif cand['p_comm'] == "Tracker":
+                st.write("⚠️ **Challenge:** Senior roles are ambiguous. You won't always have a checklist. You need to get comfortable with 'gray areas'.")
+                st.write("✅ **Action Plan:** Manage a situation where two policies conflict and a judgment call is required.")
+                
+            elif cand['p_comm'] == "Facilitator":
+                st.write("⚠️ **Challenge:** The higher you go, the less time you have for consensus. You will need to make unpopular calls quickly.")
+                st.write("✅ **Action Plan:** Make a time-sensitive decision for the team without calling a meeting first.")
+
+# --- TAB 5: ORG PULSE ---
+with tab5:
+    st.markdown("### 📈 Organization Pulse")
+    
+    if not df.empty:
+        c1, c2 = st.columns(2)
+        with c1:
+            st.subheader("Communication Styles")
+            fig_org_comm = px.pie(df, names='p_comm', color='p_comm', 
+                                 color_discrete_map={'Director':'#015bad', 'Encourager':'#b9dca4', 'Facilitator':'#51c3c5', 'Tracker':'#64748b'})
+            st.plotly_chart(fig_org_comm, use_container_width=True)
+        
+        with c2:
+            st.subheader("Motivation Drivers")
+            fig_org_mot = px.bar(df, x='p_mot', color='p_mot')
+            st.plotly_chart(fig_org_mot, use_container_width=True)
+            
+        st.divider()
+        st.subheader("Role Breakdown")
+        
+        # Pivot table for Role vs Comm Style
+        if 'role' in df.columns:
+            role_breakdown = pd.crosstab(df['role'], df['p_comm'])
+            st.dataframe(role_breakdown, use_container_width=True)
+            
+            st.info("Tip: If 'Shift Supervisors' are mostly 'Encouragers' but 'Program Supervisors' are mostly 'Directors', expect friction during hand-offs.")
+    else:
+        st.warning("No data available.")
