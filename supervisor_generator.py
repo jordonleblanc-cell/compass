@@ -10,7 +10,7 @@ st.set_page_config(page_title="Elmcrest Supervisor Platform", page_icon="📊", 
 # --- Constants ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
 
-# --- Expanded Content Dictionaries for PDF & Tools ---
+# --- Expanded Content Dictionaries ---
 
 COMM_TRAITS = {
     "Director": {"focus": "Action & Speed", "blindspot": "Patience & Consensus", "needs": "Clarity & Autonomy"},
@@ -53,23 +53,75 @@ CONFLICT_SCRIPTS = {
     }
 }
 
-# Career Growth Maps
+# Expanded Career Growth Maps
 CAREER_PATHWAYS = {
     "Director": {
-        "Shift Supervisor": "You must learn that you can't do it all yourself. Your job is now to direct the *traffic*, not drive every car. Delegate, don't rescue.",
-        "Program Supervisor": "You are excellent at execution, but senior leadership requires political capital. You need to build bridges with other departments, not just demand things from them."
+        "Shift Supervisor": {
+            "gap": "The Shift from 'Doing' to 'Enabling'.",
+            "challenge": "You act fast, but now you must slow down to let others act. You likely try to fix every problem yourself because it's faster, which disempowers your team.",
+            "assignment": "Delegate a crisis. Next time a minor incident happens, stand back physically. Guide the YDP verbally but do not intervene unless safety is compromised."
+        },
+        "Program Supervisor": {
+            "gap": "The Shift from 'Command' to 'Influence'.",
+            "challenge": "You can't order other departments (School, Clinical) to do things. You struggle with the politics of the role because you view negotiation as a waste of time.",
+            "assignment": "Build a bridge. Identify a peer in another department you have friction with. Take them to coffee with no agenda other than relationship building."
+        },
+        "Manager": {
+            "gap": "The Shift from 'Tactical' to 'Strategic'.",
+            "challenge": "You react beautifully to problems but struggle to sit still long enough to plan long-term prevention. You rely on force of will rather than systems.",
+            "assignment": "Write a 1-year strategic plan for a specific program outcome. It must include data projections, not just gut feeling actions."
+        }
     },
     "Encourager": {
-        "Shift Supervisor": "You have to be willing to be the 'bad guy.' Holding staff accountable is a form of care. If you let standards slide to be liked, you will fail.",
-        "Program Supervisor": "You need to master the data. Your high EQ is an asset, but you need to back it up with budget management, compliance tracking, and strategic planning."
+        "Shift Supervisor": {
+            "gap": "The Shift from 'Friend' to 'Boss'.",
+            "challenge": "You avoid hard conversations because you don't want to hurt feelings. This creates a chaotic shift where standards slide to keep the peace.",
+            "assignment": "The Accountability Test. Find a staff member who is consistently late or missing protocols. Have the hard conversation without apologizing for the standard."
+        },
+        "Program Supervisor": {
+            "gap": "The Shift from 'Vibe' to 'Structure'.",
+            "challenge": "Morale is great, but are we safe? You rely on personality to lead. You need to master the boring, unsexy parts of leadership (schedules, budgets, audits).",
+            "assignment": "Master the Audit. Take ownership of a compliance audit for your unit. Ensure it is 100% perfect without asking a Tracker to do it for you."
+        },
+        "Manager": {
+            "gap": "The Shift from 'Caregiver' to 'Director'.",
+            "challenge": "You can't carry everyone's emotions anymore. You take organizational failure personally and burnout because you try to 'love' the organization into health.",
+            "assignment": "Set an emotional boundary. Deliver a 'No' to a request for resources or time without over-explaining or feeling guilty."
+        }
     },
     "Facilitator": {
-        "Shift Supervisor": "You need to make calls when the team is split. Waiting for everyone to agree during a crisis is dangerous. Practice 'disagree and commit'.",
-        "Program Supervisor": "You act as a great buffer, but you need to set the vision. Don't just mediate the team's ideas; inject your own direction and strategy."
+        "Shift Supervisor": {
+            "gap": "The Shift from 'Peer' to 'Decider'.",
+            "challenge": "You freeze when the team is split. You want everyone to agree, but safety often requires immediate direction without consensus.",
+            "assignment": "The 60-Second Decision. In the next ambiguous situation, make a decision within 60 seconds. Do not ask 'What do you guys think?' first."
+        },
+        "Program Supervisor": {
+            "gap": "The Shift from 'Mediator' to 'Visionary'.",
+            "challenge": "You lead from the middle or back. Program Supervisors must lead from the front. You act as a great buffer, but you struggle to set the vision.",
+            "assignment": "Set a vision. Define one change you want to see in your program culture. Announce it to the team as a directive, not a discussion topic."
+        },
+        "Manager": {
+            "gap": "The Shift from 'Process' to 'Outcome'.",
+            "challenge": "Sometimes fair process yields poor results. You get bogged down in ensuring everyone feels heard, stalling critical organizational changes.",
+            "assignment": "Drive a change. Implement a new policy that you know 20% of staff will dislike. Stand firm in the 'Why' without backtracking."
+        }
     },
     "Tracker": {
-        "Shift Supervisor": "You cannot track everything. You have to trust your team to do their jobs without hovering. Focus on the critical safety items, let the rest go.",
-        "Program Supervisor": "You need to tolerate ambiguity. Program leadership involves gray areas where there is no clear policy. Develop your intuition and judgment."
+        "Shift Supervisor": {
+            "gap": "The Shift from 'Executor' to 'Overseer'.",
+            "challenge": "Micro-management. You don't trust others to do the checklist correctly, so you hover. You can't track every detail personally at this level.",
+            "assignment": "The 'Hands-Off' Test. Assign a complex task to a YDP. Do not check on them until it is finished. Debrief the result, whether good or bad."
+        },
+        "Program Supervisor": {
+            "gap": "The Shift from 'Black & White' to 'Gray'.",
+            "challenge": "You want a policy for everything. Program leadership involves judgment calls where no policy exists. You struggle to tolerate ambiguity.",
+            "assignment": "Navigate the Gray. Handle a complex parent/youth complaint where 'the rules' don't offer a clear answer. Make a call based on values."
+        },
+        "Manager": {
+            "gap": "The Shift from 'Compliance' to 'Culture'.",
+            "challenge": "Culture eats strategy (and checklists) for breakfast. You value efficiency over human connection, risking a sterile, compliant, but unhappy organization.",
+            "assignment": "Focus on People. Spend one week focusing solely on staff development and relationships, delegating all paperwork/metrics to a deputy."
+        }
     }
 }
 
@@ -173,9 +225,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     
     blue = (1, 91, 173)
     black = (0, 0, 0)
-    gray = (100, 100, 100)
     
-    # HEADER
     pdf.set_font("Arial", 'B', 20)
     pdf.set_text_color(*blue)
     pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align='C')
@@ -186,11 +236,8 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C')
     pdf.ln(5)
     
-    # Retrieve Data
     c_data = COMM_PROFILES.get(p_comm, COMM_PROFILES["Director"])
     m_data = MOTIVATION_PROFILES.get(p_mot, MOTIVATION_PROFILES["Achievement"])
-
-    # --- Content Sections ---
 
     def add_heading(title):
         pdf.set_font("Arial", 'B', 12)
@@ -212,23 +259,18 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             pdf.multi_cell(0, 6, clean_text(f"- {item}"))
         pdf.ln(3)
 
-    # 1. Communication Profile
     add_heading(f"1. Communication Profile: {p_comm}")
     add_body(c_data['overview'])
 
-    # 2. Supervising Their Communication
     add_heading("2. Supervising Their Communication")
     add_body(c_data['supervising'])
 
-    # 3. Motivation Profile
     add_heading(f"3. Motivation Profile: {p_mot}")
     add_body(m_data['overview'])
 
-    # 4. Motivating This Program Supervisor
     add_heading("4. Motivating This Staff Member")
     add_body(m_data['motivating'])
 
-    # 5. Integrated Leadership Profile
     integrated_text = (
         f"This staff member leads with {p_comm} energy (focused on {c_data['overview'].split('leads with')[0] if 'leads with' in c_data['overview'] else 'their style'}) "
         f"and is fueled by a drive for {p_mot}. "
@@ -237,42 +279,30 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     add_heading("5. Integrated Leadership Profile")
     add_body(integrated_text)
 
-    # 6. How You Can Best Support Them
     add_heading("6. How You Can Best Support Them")
     add_body(m_data['support'])
 
-    # 7. What They Look Like When Thriving
     add_heading("7. What They Look Like When Thriving")
     add_bullets(m_data['thriving_bullets'])
 
-    # 8. What They Look Like When Struggling
     add_heading("8. What They Look Like When Struggling")
     add_bullets(c_data['struggle_bullets'])
 
-    # 9. Supervisory Interventions
-    add_heading("9. Supervisory Interventions")
     intervention_text = (
         f"• Increase structure or flexibility depending on their {p_comm} style.\n"
         f"• Re-establish expectations or reclarify priorities to satisfy their {p_mot} drive.\n"
         f"• {m_data['intervention']}\n"
         f"• Provide emotional support without enabling overextension."
     )
+    add_heading("9. Supervisory Interventions")
     add_body(intervention_text)
 
-    # 10. What You Should Celebrate
     add_heading("10. What You Should Celebrate")
-    celebrate_intro = (
-        f"• Their unique {p_comm} leadership strengths\n"
-        f"• Their contributions to climate, safety, or structure\n"
-        f"• {m_data['celebrate']}"
-    )
-    add_body(celebrate_intro)
+    add_body(f"• Their unique {p_comm} leadership strengths\n• {m_data['celebrate']}")
 
-    # 11. Coaching Questions
     add_heading("11. Coaching Questions")
     add_bullets(c_data['coaching'])
 
-    # 12. Helping Them Prepare for Advancement
     add_heading("12. Helping Them Prepare for Advancement")
     add_body(c_data['advancement'])
 
@@ -306,7 +336,6 @@ with tab1:
     
     with subtab1:
         if not df.empty:
-            # --- CALLBACK FUNCTION FOR RESET ---
             def reset_t1():
                 st.session_state.t1_staff_select = None
 
@@ -335,7 +364,6 @@ with tab1:
                     st.download_button(label="Download PDF Guide", data=pdf_bytes, file_name=f"Supervisor_Guide_{data['name'].replace(' ', '_')}.pdf", mime="application/pdf")
                 
                 st.markdown("---")
-                # --- RESET BUTTON WITH CALLBACK ---
                 st.button("Reset Selection", key="reset_t1_db", on_click=reset_t1)
         else:
             st.info("Database is empty or loading...")
@@ -362,7 +390,6 @@ with tab2:
     st.markdown("### 🧬 Team Dynamics Mapper")
     st.write("Select multiple staff members to analyze the culture of a specific unit or team.")
     
-    # --- CALLBACK FOR RESET ---
     def reset_t2():
         st.session_state.t2_team_select = []
 
@@ -397,7 +424,6 @@ with tab2:
                 if "Connection" in mot_counts and mot_counts["Connection"] > 1: st.info("💡 **High Connection Energy:** This team needs time to process emotions together.")
             
             st.markdown("---")
-            # --- RESET BUTTON WITH CALLBACK ---
             st.button("Clear Team Selection", key="reset_btn_t2", on_click=reset_t2)
 
 # --- TAB 3: CONFLICT MEDIATOR ---
@@ -405,7 +431,6 @@ with tab3:
     st.markdown("### ⚖️ Conflict Resolution Script")
     st.write("Select two staff members who are struggling to collaborate.")
     
-    # --- CALLBACK FOR RESET ---
     def reset_t3():
         st.session_state.p1 = None
         st.session_state.p2 = None
@@ -450,7 +475,6 @@ with tab3:
                     st.success(f"\"{advice2}\"")
             
             st.markdown("---")
-            # --- RESET BUTTON WITH CALLBACK ---
             st.button("Reset Conflict Tool", key="reset_btn_t3", on_click=reset_t3)
 
 # --- TAB 4: CAREER PATHFINDER ---
@@ -458,7 +482,6 @@ with tab4:
     st.markdown("### 🚀 Career Gap Analysis")
     st.write("Analyze readiness for promotion.")
     
-    # --- CALLBACK FOR RESET ---
     def reset_t4():
         st.session_state.career = None
         st.session_state.career_target = None
@@ -473,22 +496,26 @@ with tab4:
         if candidate_name and target_role:
             cand = df[df['name'] == candidate_name].iloc[0]
             style = cand['p_comm']
-            st.divider()
-            st.markdown(f"**Candidate:** {cand['name']} ({style} / {cand['p_mot']})")
-            st.markdown(f"**Target:** {target_role}")
-            advice = CAREER_PATHWAYS.get(style, {}).get(target_role, "Standard advancement path.")
-            st.info(f"💡 **The Growth Gap:** {advice}")
             
-            st.subheader("Assignments to Test Readiness")
-            if target_role == "Shift Supervisor":
-                st.write("1. **Delegation Test:** Assign them a project where they are NOT allowed to do the work themselves, only organize others.")
-                st.write("2. **Conflict Test:** Have them facilitate a shift debrief after a difficult incident.")
-            elif target_role == "Program Supervisor":
-                st.write("1. **Strategy Test:** Ask them to write a 1-page proposal for changing a cottage routine, including impact on other depts.")
-                st.write("2. **Hiring Test:** Have them interview a candidate and defend their recommendation based on team fit.")
+            st.divider()
+            st.markdown(f"**Candidate:** {cand['name']} ({style})")
+            st.markdown(f"**Target:** {target_role}")
+            
+            # Extract Path Data safely
+            path_data = CAREER_PATHWAYS.get(style, {}).get(target_role)
+            
+            if path_data:
+                st.info(f"💡 **The Core Gap:** {path_data['gap']}")
+                
+                c1, c2 = st.columns(2)
+                with c1:
+                    st.warning(f"⚠️ **The Specific Challenge:**\n\n{path_data['challenge']}")
+                with c2:
+                    st.success(f"✅ **The Litmus Test Assignment:**\n\n{path_data['assignment']}")
+            else:
+                st.write("Standard advancement path. No specific warnings for this profile.")
             
             st.markdown("---")
-            # --- RESET BUTTON WITH CALLBACK ---
             st.button("Reset Career Path", key="reset_btn_t4", on_click=reset_t4)
 
 # --- TAB 5: ORG PULSE ---
