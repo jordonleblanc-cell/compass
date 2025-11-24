@@ -293,21 +293,23 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📈 Org Pulse"
 ])
 
-# --- TAB 1: GUIDE GENERATOR (Original) ---
+# --- TAB 1: GUIDE GENERATOR ---
 with tab1:
     st.markdown("### Generate Individual Supervisory Guides")
-    
     col_a, col_b = st.columns([3, 1])
     with col_b:
         if st.button("🔄 Refresh Database"):
             st.cache_data.clear()
             st.rerun()
             
-    # NESTED TABS FOR DATABASE vs MANUAL
     subtab1, subtab2 = st.tabs(["📚 From Database", "✏️ Manual Entry"])
     
     with subtab1:
         if not df.empty:
+            # --- CALLBACK FUNCTION FOR RESET ---
+            def reset_t1():
+                st.session_state.t1_staff_select = None
+
             staff_options = {f"{s['name']} ({s['role']})": s for s in staff_list}
             selected_staff_name = st.selectbox(
                 "Select Staff Member", 
@@ -319,7 +321,6 @@ with tab1:
             
             if selected_staff_name:
                 data = staff_options[selected_staff_name]
-                
                 col1, col2, col3 = st.columns(3)
                 col1.metric("Role", data['role'])
                 col2.metric("Communication", data['p_comm'])
@@ -331,17 +332,11 @@ with tab1:
                         data['p_comm'], data['s_comm'], 
                         data['p_mot'], data['s_mot']
                     )
-                    st.download_button(
-                        label="Download PDF Guide",
-                        data=pdf_bytes,
-                        file_name=f"Supervisor_Guide_{data['name'].replace(' ', '_')}.pdf",
-                        mime="application/pdf"
-                    )
+                    st.download_button(label="Download PDF Guide", data=pdf_bytes, file_name=f"Supervisor_Guide_{data['name'].replace(' ', '_')}.pdf", mime="application/pdf")
                 
                 st.markdown("---")
-                if st.button("Reset Selection", key="reset_t1_db"):
-                    st.session_state.t1_staff_select = None
-                    st.rerun()
+                # --- RESET BUTTON WITH CALLBACK ---
+                st.button("Reset Selection", key="reset_t1_db", on_click=reset_t1)
         else:
             st.info("Database is empty or loading...")
 
@@ -360,62 +355,61 @@ with tab1:
             if m_submitted and m_name:
                 pdf_bytes = create_supervisor_guide(m_name, m_role, m_p_comm, "None", m_p_mot, "None")
                 st.success(f"Guide generated for {m_name}")
-                st.download_button(
-                    label="Download PDF Guide",
-                    data=pdf_bytes,
-                    file_name=f"Supervisor_Guide_{m_name.replace(' ', '_')}.pdf",
-                    mime="application/pdf"
-                )
+                st.download_button(label="Download PDF Guide", data=pdf_bytes, file_name=f"Supervisor_Guide_{m_name.replace(' ', '_')}.pdf", mime="application/pdf")
 
 # --- TAB 2: TEAM DNA ---
 with tab2:
     st.markdown("### 🧬 Team Dynamics Mapper")
     st.write("Select multiple staff members to analyze the culture of a specific unit or team.")
     
+    # --- CALLBACK FOR RESET ---
+    def reset_t2():
+        st.session_state.t2_team_select = []
+
     if not df.empty:
         team_selection = st.multiselect("Build your Team", df['name'].tolist(), key="t2_team_select")
         
         if team_selection:
             team_df = df[df['name'].isin(team_selection)]
-            
             st.divider()
             c1, c2 = st.columns(2)
-            
             with c1:
                 st.subheader("Communication Mix")
                 comm_counts = team_df['p_comm'].value_counts()
                 fig_team_comm = px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4)
                 st.plotly_chart(fig_team_comm, use_container_width=True)
                 
-                dominant_comm = comm_counts.idxmax()
-                if comm_counts.max() / len(team_df) > 0.6:
-                    st.warning(f"⚠️ **Echo Chamber Risk:** This team is dominated by **{dominant_comm}s**.")
-                    if dominant_style == "Director": st.write("Risk: Moving too fast, steamrolling quieter voices. **Correction:** Intentionally invite dissent.")
-                    elif dominant_style == "Encourager": st.write("Risk: 'Nice' culture that avoids hard accountability. **Correction:** Standardize review processes.")
-                    elif dominant_style == "Facilitator": st.write("Risk: Slow decision making, endless meetings. **Correction:** Set hard deadlines.")
-                    elif dominant_style == "Tracker": st.write("Risk: Rigid adherence to rules over relationships. **Correction:** Schedule team bonding time.")
-            
+                if not comm_counts.empty:
+                    dominant_style = comm_counts.idxmax()
+                    dom_pct = comm_counts.max() / len(team_df)
+                    if dom_pct > 0.5:
+                        st.warning(f"⚠️ **Echo Chamber Risk:** {int(dom_pct*100)}% of this team are **{dominant_style}s**.")
+                        if dominant_style == "Director": st.write("Risk: Moving too fast, steamrolling quieter voices. **Correction:** Intentionally invite dissent.")
+                        elif dominant_style == "Encourager": st.write("Risk: 'Nice' culture that avoids hard accountability. **Correction:** Standardize review processes.")
+                        elif dominant_style == "Facilitator": st.write("Risk: Slow decision making, endless meetings. **Correction:** Set hard deadlines.")
+                        elif dominant_style == "Tracker": st.write("Risk: Rigid adherence to rules over relationships. **Correction:** Schedule team bonding time.")
             with c2:
                 st.subheader("Motivation Drivers")
                 mot_counts = team_df['p_mot'].value_counts()
                 fig_team_mot = px.bar(x=mot_counts.index, y=mot_counts.values)
                 st.plotly_chart(fig_team_mot, use_container_width=True)
-                
-                if "Growth" in mot_counts and mot_counts["Growth"] > 1:
-                    st.success("💡 **High Growth Energy:** This team will love pilots and new initiatives.")
-                if "Connection" in mot_counts and mot_counts["Connection"] > 1:
-                    st.info("💡 **High Connection Energy:** This team needs time to process emotions together.")
-                    
+                if "Growth" in mot_counts and mot_counts["Growth"] > 1: st.success("💡 **High Growth Energy:** This team will love pilots and new initiatives.")
+                if "Connection" in mot_counts and mot_counts["Connection"] > 1: st.info("💡 **High Connection Energy:** This team needs time to process emotions together.")
+            
             st.markdown("---")
-            if st.button("Clear Team Selection", key="reset_t2"):
-                st.session_state.t2_team_select = []
-                st.rerun()
+            # --- RESET BUTTON WITH CALLBACK ---
+            st.button("Clear Team Selection", key="reset_btn_t2", on_click=reset_t2)
 
 # --- TAB 3: CONFLICT MEDIATOR ---
 with tab3:
     st.markdown("### ⚖️ Conflict Resolution Script")
     st.write("Select two staff members who are struggling to collaborate.")
     
+    # --- CALLBACK FOR RESET ---
+    def reset_t3():
+        st.session_state.p1 = None
+        st.session_state.p2 = None
+
     if not df.empty:
         c1, c2 = st.columns(2)
         with c1:
@@ -426,13 +420,11 @@ with tab3:
         if p1_name and p2_name and p1_name != p2_name:
             p1 = df[df['name'] == p1_name].iloc[0]
             p2 = df[df['name'] == p2_name].iloc[0]
-            
             st.divider()
             st.subheader(f"The Clash: {p1['p_comm']} vs. {p2['p_comm']}")
             
             style1 = p1['p_comm']
             style2 = p2['p_comm']
-            
             key = "-".join(sorted([style1, style2]))
             
             if style1 == style2:
@@ -440,7 +432,6 @@ with tab3:
             elif key in CONFLICT_SCRIPTS:
                 script = CONFLICT_SCRIPTS[key]
                 st.info(f"**Root Tension:** {script['tension']}")
-                
                 st.markdown("#### 🗣️ What to say to them individually:")
                 
                 if style1 < style2:
@@ -457,18 +448,21 @@ with tab3:
                 with col_y:
                     st.markdown(f"**To {p2_name} ({style2}):**")
                     st.success(f"\"{advice2}\"")
-                    
+            
             st.markdown("---")
-            if st.button("Reset Conflict Tool", key="reset_t3"):
-                st.session_state.p1 = None
-                st.session_state.p2 = None
-                st.rerun()
+            # --- RESET BUTTON WITH CALLBACK ---
+            st.button("Reset Conflict Tool", key="reset_btn_t3", on_click=reset_t3)
 
 # --- TAB 4: CAREER PATHFINDER ---
 with tab4:
     st.markdown("### 🚀 Career Gap Analysis")
     st.write("Analyze readiness for promotion.")
     
+    # --- CALLBACK FOR RESET ---
+    def reset_t4():
+        st.session_state.career = None
+        st.session_state.career_target = None
+
     if not df.empty:
         col_a, col_b = st.columns(2)
         with col_a:
@@ -479,13 +473,10 @@ with tab4:
         if candidate_name and target_role:
             cand = df[df['name'] == candidate_name].iloc[0]
             style = cand['p_comm']
-            
             st.divider()
             st.markdown(f"**Candidate:** {cand['name']} ({style} / {cand['p_mot']})")
             st.markdown(f"**Target:** {target_role}")
-            
             advice = CAREER_PATHWAYS.get(style, {}).get(target_role, "Standard advancement path.")
-            
             st.info(f"💡 **The Growth Gap:** {advice}")
             
             st.subheader("Assignments to Test Readiness")
@@ -497,35 +488,28 @@ with tab4:
                 st.write("2. **Hiring Test:** Have them interview a candidate and defend their recommendation based on team fit.")
             
             st.markdown("---")
-            if st.button("Reset Career Path", key="reset_t4"):
-                st.session_state.career = None
-                st.session_state.career_target = None
-                st.rerun()
+            # --- RESET BUTTON WITH CALLBACK ---
+            st.button("Reset Career Path", key="reset_btn_t4", on_click=reset_t4)
 
 # --- TAB 5: ORG PULSE ---
 with tab5:
     st.markdown("### 📈 Organization Pulse")
-    
     if not df.empty:
         c1, c2 = st.columns(2)
         with c1:
             st.subheader("Communication Styles")
-            fig_org_comm = px.pie(df, names='p_comm', color='p_comm', 
-                                 color_discrete_map={'Director':'#015bad', 'Encourager':'#b9dca4', 'Facilitator':'#51c3c5', 'Tracker':'#64748b'})
+            fig_org_comm = px.pie(df, names='p_comm', color='p_comm', color_discrete_map={'Director':'#015bad', 'Encourager':'#b9dca4', 'Facilitator':'#51c3c5', 'Tracker':'#64748b'})
             st.plotly_chart(fig_org_comm, use_container_width=True)
-        
         with c2:
             st.subheader("Motivation Drivers")
             fig_org_mot = px.bar(df, x='p_mot', color='p_mot')
             st.plotly_chart(fig_org_mot, use_container_width=True)
-            
+        
         st.divider()
         st.subheader("Role Breakdown")
-        
         if 'role' in df.columns:
             role_breakdown = pd.crosstab(df['role'], df['p_comm'])
             st.dataframe(role_breakdown.style.background_gradient(cmap="Blues"), use_container_width=True)
-            
             st.info("Tip: If 'Shift Supervisors' are mostly 'Encouragers' but 'Program Supervisors' are mostly 'Directors', expect friction during hand-offs.")
     else:
         st.warning("No data available.")
