@@ -19,346 +19,113 @@ COMM_TRAITS = {
     "Tracker": {"focus": "Details & Safety", "blindspot": "Flexibility & Big Picture", "needs": "Structure & Logic"}
 }
 
-# --- EXPANDED SUPERVISOR CLASH MATRIX ---
-SUPERVISOR_CLASH_MATRIX = {
-    "Director": {
-        "Encourager": {
-            "dynamic_text": "This is the classic 'Task vs. Relationship' friction. As a Director, you prioritize speed, clarity, and results. You likely view the Encourager's need for emotional processing as an obstacle to execution. Conversely, the Encourager views your directness as aggression. They feel unsafe when you skip the 'human element', causing them to withdraw or passively resist.",
-            "dynamic_bullets": [
-                "You push for 'What by When'; they want to know 'Who and How does it feel'.",
-                "You interpret their silence as agreement; usually, it is fear or hurt.",
-                "They interpret your brevity as anger."
-            ],
-            "self_check_text": "Am I optimizing for efficiency at the expense of effectiveness? If I 'win' this conversation by overpowering them with logic, I lose their loyalty. I need to realize that for an Encourager, feeling heard is a prerequisite for getting back to work.",
-            "self_check_bullets": [
-                "Did I start the meeting with a relational check-in, or did I dive straight into the error?",
-                "Am I interrupting them to 'get to the point'?",
-                "Is my tone conveying frustration before they even speak?"
-            ],
-            "script_text": "Bridge the gap between your need for speed and their need for safety.",
-            "script_options": [
-                "Opening: 'I know I can be intense when I’m focused on a goal. I want to pause and check in—how are you feeling about this project right now?'",
-                "Validation: 'I value how much you care about the team. I don't want my directness to shut that down.'",
-                "The Ask: 'I need your help to get us to the finish line. Can we agree on the plan, while you help me monitor the team's morale?'"
-            ]
-        },
-        "Facilitator": {
-            "dynamic_text": "The 'Gas vs. Brake' dynamic. You operate on 'Ready, Fire, Aim'. They operate on 'Ready, Aim, Aim...'. You feel slowed down and obstructed by their need for consensus. They feel steamrolled and reckless because you act without hearing every voice. You risk making fast decisions that fail because the team wasn't bought in.",
-            "dynamic_bullets": [
-                "You perceive their processing time as 'stalling'.",
-                "They perceive your decisiveness as 'arrogance'.",
-                "You interrupt to force a conclusion; they retreat into silence."
-            ],
-            "self_check_text": "Am I mistaking their 'processing time' for 'resistance'? If I force a decision before they are heard, I get compliance, not buy-in. I need to slow down to speed up.",
-            "self_check_bullets": [
-                "Did I give them the agenda in advance so they could prepare?",
-                "Am I demanding an answer in the hallway instead of a scheduled meeting?",
-                "Have I asked for their perspective, or just told them mine?"
-            ],
-            "script_text": "Acknowledge the pace difference and negotiate a deadline.",
-            "script_options": [
-                "Opening: 'I feel a lot of urgency to move this forward, but I know you need to ensure we aren't missing perspectives.'",
-                "Validation: 'I respect your need to get this right. I don't want to be reckless.'",
-                "The Ask: 'I can't wait forever, but I can wait 24 hours. What specific input do you need before we make the final call tomorrow?'"
-            ]
-        },
-        "Tracker": {
-            "dynamic_text": "The 'Vision vs. Obstacles' dynamic. You say 'Make it happen.' They say 'But Regulation 14.B says...'. You feel they are blocking you with red tape; they feel you are asking them to be negligent. You care about the destination; they care about the safe path.",
-            "dynamic_bullets": [
-                "You speak in broad strokes; they speak in footnotes.",
-                "You get annoyed by 'details'; they get panicked by 'vague ideas'.",
-                "They say 'No' to protect you; you hear 'No' as defiance."
-            ],
-            "self_check_text": "Am I dismissing their details because they are annoying, or because they are irrelevant? Usually, they are trying to keep me out of trouble. I need to stop fighting their data.",
-            "self_check_bullets": [
-                "Did I explain the 'Why' before demanding the 'What'?",
-                "Am I asking them to violate a safety protocol just to save time?",
-                "Did I roll my eyes when they brought up a policy?"
-            ],
-            "script_text": "Validate their expertise, then ask for a solution path.",
-            "script_options": [
-                "Opening: 'I appreciate you watching the compliance side of this. I know I miss those details sometimes.'",
-                "Validation: 'I know this request pushes the envelope on our usual process.'",
-                "The Ask: 'I feel frustrated when I hear 'No' without a 'How'. Instead of telling me why we can't do it, can you map out the safest path to get us to 'Yes'?'"
-            ]
-        },
-        "Director": {
-            "dynamic_text": "The 'Power Struggle'. Two alphas in a room. You both want to lead. The conversation quickly becomes a debate about who is right rather than what is best. You both interrupt, you both speak loudly, and neither listens. The risk is a permanent ego-clash.",
-            "dynamic_bullets": [
-                "Conversations feel like combat.",
-                "You both fight for the last word.",
-                "You micromanage them because they do it differently than you."
-            ],
-            "self_check_text": "Am I fighting to be 'The Boss' or to solve the problem? I need to give them a lane to lead. They don't need my protection; they need my trust.",
-            "self_check_bullets": [
-                "Am I arguing about the method (how) or the outcome (what)?",
-                "Did I interrupt them more than once?",
-                "Can I let them win this point?"
-            ],
-            "script_text": "Call a truce and divide the territory.",
-            "script_options": [
-                "Opening: 'We both have strong opinions and want to move fast. I think we are getting in each other's way.'",
-                "Validation: 'I trust your ability to execute this.'",
-                "The Ask: 'I'm going to define the 'What' (the Goal), and I'm going to trust you with the 'How'. I won't micromanage it. Go run with it.'"
-            ]
-        }
+# --- CONFLICT SCRIPTS (Expanded for Teaching Supervisors) ---
+CONFLICT_SCRIPTS = {
+    "Director-Encourager": {
+        "tension": "The 'Head vs. Heart' Battle. The Director wants to solve the problem efficiently; the Encourager wants to heal the relationship. The Director thinks the Encourager is 'soft' or emotional; the Encourager thinks the Director is 'cold' or mean.",
+        "prep": [
+            "Tell the Director: 'If you win the logic argument but hurt their feelings, you lose the war. You must validate their emotion.'",
+            "Tell the Encourager: 'The Director isn't attacking you personally; they are attacking the inefficiency. Don't withdraw.'"
+        ],
+        "protocol": [
+            "1. Open by stating the shared goal (e.g., 'We both want a smooth shift').",
+            "2. Let the Encourager speak first about the *impact* of the friction. The Director must listen without interrupting.",
+            "3. Ask the Director to restate what they heard (Validation Check).",
+            "4. Let the Director define the *task* or *standard* that isn't being met.",
+            "5. Ask the Encourager to agree to the standard, provided the delivery is respectful."
+        ],
+        "script_a": "Director: 'I need to know you have my back on enforcing rules, even when it's uncomfortable.'",
+        "script_b": "Encourager: 'I can enforce the rules, but I need you to stop correcting me in front of the kids.'"
     },
-    "Encourager": {
-        "Director": {
-            "dynamic_text": "The 'Soft vs. Hard' dynamic. They want the bottom line; you want the story. They interrupt you or check their phone while you talk, which hurts your feelings. You perceive them as 'mean' or 'uncaring'. You likely over-explain to try and get them to connect, which makes them tune out more.",
-            "dynamic_bullets": [
-                "You feel steamrolled by their speed.",
-                "They seem annoyed by your relationship-building.",
-                "You take their professional critiques personally."
-            ],
-            "self_check_text": "Am I taking their directness personally? Am I burying the headline? I need to speak their language (Results) to be heard. I cannot force them to be my therapist.",
-            "self_check_bullets": [
-                "Did I start with the main point, or a story?",
-                "Am I reading malice into their brevity?",
-                "Am I avoiding the hard truth because I want them to like me?"
-            ],
-            "script_text": "Speak their language (efficiency) to buy space for your language (humanity).",
-            "script_options": [
-                "Opening: 'I know you value efficiency, so I will give you the bottom line first.'",
-                "Validation: 'I know we need to hit this target.'",
-                "The Ask: 'To get there, I need you to soften your delivery with the team. If we push this hard, we will lose them, and that will hurt the result.'"
-            ]
-        },
-        "Facilitator": {
-            "dynamic_text": "The 'Nice-Off'. You want to protect the individual's feelings; they want to be fair to the group. You both avoid conflict, so decisions stall indefinitely. You spend meetings agreeing with each other but nothing changes because neither of you wants to be the 'bad guy' to the staff.",
-            "dynamic_bullets": [
-                "Meetings are pleasant but unproductive.",
-                "Bad behavior persists because 'we don't want to upset them'.",
-                "You defer to them; they defer to you."
-            ],
-            "self_check_text": "Am I prioritizing being liked over being effective? Are we circling the issue to avoid upsetting someone? I need to be the leader, not the friend.",
-            "self_check_bullets": [
-                "Have we talked about this issue 3 times without solving it?",
-                "Am I waiting for them to do the hard part?",
-                "Is my empathy actually enabling poor performance?"
-            ],
-            "script_text": "Name the dynamic and force a decision.",
-            "script_options": [
-                "Opening: 'I feel like we are both trying to be kind here, but the lack of a decision is actually hurting the team.'",
-                "Validation: 'I love that we care about the staff.'",
-                "The Ask: 'I'm going to make the call to move forward, even though it might be uncomfortable. I need you to back me up.'"
-            ]
-        },
-        "Tracker": {
-            "dynamic_text": "The 'Chaos vs. Order' dynamic. You bend rules to help people. They enforce rules to protect people. They think you are unsafe/chaotic; you think they are cold/robotic. You feel judged by their clipboard. They feel undermined by your exceptions.",
-            "dynamic_bullets": [
-                "You say 'It depends'; they say 'The rule is X'.",
-                "You feel restricted by their process.",
-                "They feel anxious about your spontaneity."
-            ],
-            "self_check_text": "Am I undermining their authority by being inconsistent? Structure is a form of care. If I change the rules based on my mood, I am not being kind, I am being confusing.",
-            "self_check_bullets": [
-                "Did I change a plan without telling them?",
-                "Am I prioritizing a 'nice moment' over long-term consistency?",
-                "Did I validate their concern for safety?"
-            ],
-            "script_text": "Validate the structure, then ask for flexibility.",
-            "script_options": [
-                "Opening: 'I know my flexibility stresses you out because you value consistency. I value it too.'",
-                "Validation: 'Your attention to detail keeps us safe.'",
-                "The Ask: 'Help me build a structure that still allows room for human judgment in this specific case, and I promise to stick to it.'"
-            ]
-        },
-        "Encourager": {
-            "dynamic_text": "The 'Therapy Session'. You connect deeply and support each other, but you may struggle to hold each other accountable. Meetings feel good—lots of venting and validation—but produce few action items. You risk creating a clique that feels 'us vs. them'.",
-            "dynamic_bullets": [
-                "You spend 80% of the meeting dealing with feelings.",
-                "You avoid giving each other feedback.",
-                "You enable each other's stress rather than solving it."
-            ],
-            "self_check_text": "Are we just venting? Venting feels good but changes nothing. I need to pivot this connection into action. We need to be professionals, not just friends.",
-            "self_check_bullets": [
-                "Did we create an action plan?",
-                "Am I afraid to challenge them?",
-                "Are we feeding each other's negativity?"
-            ],
-            "script_text": "Pivot from feelings to action.",
-            "script_options": [
-                "Opening: 'I love that we support each other. It helps me get through the day.'",
-                "Validation: 'It is really hard right now.'",
-                "The Ask: 'But to protect the program, I need to put my 'Boss Hat' on for a second. We have to fix [Issue], even if it feels hard.'"
-            ]
-        }
+    "Director-Facilitator": {
+        "tension": "The 'Gas vs. Brake' Battle. The Director operates on 'Ready, Fire, Aim.' The Facilitator operates on 'Ready, Aim, Aim, Aim.' The Director feels held back; the Facilitator feels steamrolled.",
+        "prep": [
+            "Tell the Director: 'Silence does not mean agreement. If you push too fast, they will shut down.'",
+            "Tell the Facilitator: 'You cannot wait for 100% consensus. You need to articulate your specific risk, not just a vague feeling.'"
+        ],
+        "protocol": [
+            "1. Acknowledge the pace difference immediately.",
+            "2. Ask the Director to propose their plan.",
+            "3. Ask the Facilitator: 'What is the ONE major risk you see with this speed?' (Force specificity).",
+            "4. Negotiate a timeline. Not 'Now' (Director) and not 'Next Month' (Facilitator). Pick a date.",
+            "5. Director commits to waiting until the date; Facilitator commits to deciding on that date."
+        ],
+        "script_a": "Director: 'I am frustrated because every delay feels like we are paralyzed.'",
+        "script_b": "Facilitator: 'I am frustrated because we keep making the same mistakes by rushing.'"
     },
-    "Facilitator": {
-        "Director": {
-            "dynamic_text": "The 'Steamroll'. They demand a decision. You freeze because you haven't heard from everyone. They interpret your silence as agreement or incompetence. You feel unsafe speaking up because they are so forceful.",
-            "dynamic_bullets": [
-                "You retreat into silence when they push.",
-                "They move forward assuming you agreed.",
-                "You resent them for not listening."
-            ],
-            "self_check_text": "Am I hiding behind 'the team's opinion' to avoid taking a stand? I need to be decisive. Silence is consent. If I don't speak up, I can't complain later.",
-            "self_check_bullets": [
-                "Did I say 'I disagree' or did I just stay quiet?",
-                "Am I waiting for permission to lead?",
-                "Is my need for consensus an excuse for delay?"
-            ],
-            "script_text": "Assert your role as the risk-manager.",
-            "script_options": [
-                "Opening: 'I know you want an answer now. I am not stalling; I am risk-managing.'",
-                "Validation: 'I agree we need to move.'",
-                "The Ask: 'If we decide without [Person]'s input, the plan will fail. I will have the answer for you by [Time]. Can you wait until then?'"
-            ]
-        },
-        "Encourager": {
-            "dynamic_text": "The 'Fairness vs. Feelings' dynamic. You are looking at the system fairness; they are looking at the person's feelings. You might struggle to rein them in when they over-function for a client, creating inequity in the program.",
-            "dynamic_bullets": [
-                "They want an exception; you want a precedent.",
-                "You feel they are playing favorites.",
-                "They feel you are being too clinical."
-            ],
-            "self_check_text": "Am I being too clinical? I need to validate the heart behind their actions before correcting the process. They need to know I care about the person, not just the policy.",
-            "self_check_bullets": [
-                "Did I acknowledge their good intent?",
-                "Am I focusing too much on 'being fair' and missing the crisis?",
-                "Can I explain the 'why' of the rule?"
-            ],
-            "script_text": "Connect the specific exception to the general harm.",
-            "script_options": [
-                "Opening: 'I see how much you care about [Youth]. Your heart is in the right place.'",
-                "Validation: 'I know you want to help.'",
-                "The Ask: 'However, if we make a special exception for him, it creates unfairness for the other 10 kids. We need a solution that is fair to everyone.'"
-            ]
-        },
-        "Tracker": {
-            "dynamic_text": "The 'Analysis Paralysis' Loop. You want consensus; they want data. You both are risk-averse. You wait for everyone to agree; they wait for the perfect plan. The program stagnates because no one pulls the trigger.",
-            "dynamic_bullets": [
-                "Meetings end with 'let's look into it more'.",
-                "Zero risk tolerance.",
-                "Frustration from the team due to lack of direction."
-            ],
-            "self_check_text": "Am I waiting for perfect agreement? It doesn't exist. Leadership is making decisions with imperfect information. I need to declare a direction.",
-            "self_check_bullets": [
-                "Is this decision reversible? If yes, just make it.",
-                "Am I afraid of being wrong?",
-                "Do we really need more data?"
-            ],
-            "script_text": "Authorize the imperfect action.",
-            "script_options": [
-                "Opening: 'We have analyzed this enough. We are never going to be 100% sure.'",
-                "Validation: 'I appreciate your caution.'",
-                "The Ask: 'I am making the decision to go with Plan A. I need you to help me track the data to see if it works, and we can adjust later.'"
-            ]
-        },
-        "Facilitator": {
-            "dynamic_text": "The 'Committee'. Endless meetings. Great process, low output. You both listen, nod, and validate, but no one directs. The team feels heard but leaderless.",
-            "dynamic_bullets": [
-                "Conversations go in circles.",
-                "Everyone feels good but nothing gets done.",
-                "Conflict is buried under politeness."
-            ],
-            "self_check_text": "Who is driving the bus? If I don't set the destination, no one will. I need to stop facilitating and start directing.",
-            "self_check_bullets": [
-                "Did I state a clear decision at the end?",
-                "Am I hoping they will decide so I don't have to?",
-                "Is this meeting necessary?"
-            ],
-            "script_text": "Shift modes from Facilitator to Director.",
-            "script_options": [
-                "Opening: 'We are spinning. We have heard all the viewpoints.'",
-                "Validation: 'I appreciate the dialogue.'",
-                "The Ask: 'I'm going to step out of 'listening mode' and into 'directing mode'. Here is the plan we are going with.'"
-            ]
-        }
+    "Director-Tracker": {
+        "tension": "The 'Vision vs. Reality' Battle. The Director says 'Just make it happen.' The Tracker asks 'But what about Regulation 14.B?'. The Director feels blocked by details; the Tracker feels their expertise is being ignored.",
+        "prep": [
+            "Tell the Director: 'They are not trying to be difficult; they are trying to keep you out of jail/trouble. Listen to the risk.'",
+            "Tell the Tracker: 'Start with 'Yes, if...' instead of 'No'. Show them the path to the goal, don't just put up a wall.'"
+        ],
+        "protocol": [
+            "1. Director states the desired outcome.",
+            "2. Tracker outlines the specific compliance/safety blockers.",
+            "3. Supervisor asks Tracker: 'Is this a preference or a policy?'",
+            "4. If Policy: Director must adapt. If Preference: Tracker must adapt.",
+            "5. Agree on the 'Minimum Viable Compliant Plan'."
+        ],
+        "script_a": "Director: 'I value your eye for detail, but I need solutions, not just problems.'",
+        "script_b": "Tracker: 'I want to get there too, but I cannot sign off on a plan that violates safety protocols.'"
     },
-    "Tracker": {
-        "Director": {
-            "dynamic_text": "The 'Micromanagement Trap'. You see their broad strokes as reckless. You ask 10 specific questions to ensure safety; they get annoyed and feel you don't trust them. You feel disrespected when they ignore your protocols.",
-            "dynamic_bullets": [
-                "You nag them about details; they avoid you.",
-                "You feel anxious about their speed.",
-                "They feel handcuffed by your questions."
-            ],
-            "self_check_text": "Am I trying to control them? I need to trust their intent and only block on true safety issues. Not every detail needs to be perfect; it just needs to be safe.",
-            "self_check_bullets": [
-                "Is this a 'Must Have' or a 'Nice to Have'?",
-                "Am I asking questions to delay the action?",
-                "Can I let them fail on a small thing?"
-            ],
-            "script_text": "Distinguish between blocking and helping.",
-            "script_options": [
-                "Opening: 'I'm not trying to slow you down; I'm trying to ensure this sticks.'",
-                "Validation: 'I know you want to move fast.'",
-                "The Ask: 'I don't need to control the whole project, but I do need veto power on these two specific safety compliance items. The rest is yours.'"
-            ]
-        },
-        "Encourager": {
-            "dynamic_text": "The 'Rules vs. Relationship' dynamic. You see their exceptions as chaos. They feel judged by your clipboard. You risk becoming the 'Principal' to their 'Cool Teacher'. They think you care more about the paperwork than the people.",
-            "dynamic_bullets": [
-                "You correct them publicly; they shut down.",
-                "You quote policy; they quote feelings.",
-                "Resentment builds over 'nitpicking'."
-            ],
-            "self_check_text": "Am I valuing the paperwork over the person? I need to explain the 'Why' (Safety) not just the 'What' (Rule). I need to connect before I correct.",
-            "self_check_bullets": [
-                "Did I say hello before I pointed out the error?",
-                "Is this rule critical for safety?",
-                "Am I being right or being effective?"
-            ],
-            "script_text": "Link the rule to the relationship.",
-            "script_options": [
-                "Opening: 'I know it feels rigid when I enforce that rule.'",
-                "Validation: 'I know you are trying to connect with the youth.'",
-                "The Ask: 'But when you bend the rule for that youth, it makes the shift unsafe for the rest of us because we don't know what to expect. I need you to follow the protocol to keep us safe.'"
-            ]
-        },
-        "Facilitator": {
-            "dynamic_text": "The 'Details vs. Concepts' dynamic. You want a checklist; they want a conversation. You get frustrated when meetings end without a clear 'To-Do' list. They feel you are rushing the relational process.",
-            "dynamic_bullets": [
-                "You check your watch while they talk.",
-                "They feel you are transactional.",
-                "You leave meetings confused about next steps."
-            ],
-            "self_check_text": "Am I being too rigid? Sometimes the 'deliverable' is just alignment, not a spreadsheet. I need to value the soft work they are doing.",
-            "self_check_bullets": [
-                "Did I listen or just wait to speak?",
-                "Am I demanding clarity too soon?",
-                "Can I tolerate some ambiguity?"
-            ],
-            "script_text": "Ask for the specific output.",
-            "script_options": [
-                "Opening: 'I appreciate the discussion and the perspective.'",
-                "Validation: 'It is important we are all aligned.'",
-                "The Ask: 'To help me execute this, can we spend the last 5 minutes defining exactly who is doing what by when?'"
-            ]
-        },
-        "Tracker": {
-            "dynamic_text": "The 'Audit'. You both love details. You might argue over *which* rule applies or the specific formatting of a document. You risk missing the forest for the trees, creating a perfect system that no one uses.",
-            "dynamic_bullets": [
-                "Arguments over semantics.",
-                "Email wars with bullet points.",
-                "Zero emotional connection."
-            ],
-            "self_check_text": "Are we rearranging deck chairs on the Titanic? We need to zoom out. The goal isn't a perfect spreadsheet; it's a functioning program.",
-            "self_check_bullets": [
-                "Does this detail actually matter?",
-                "Are we ignoring the human element?",
-                "When was the last time we talked about a person?"
-            ],
-            "script_text": "Zoom out to the goal.",
-            "script_options": [
-                "Opening: 'I think we are getting stuck in the weeds here.'",
-                "Validation: 'I know we both want this to be accurate.'",
-                "The Ask: 'Let's pause the detail work. What is the actual outcome we need for the client today? Let's solve for that first.'"
-            ]
-        }
+    "Encourager-Tracker": {
+        "tension": "The 'Empathy vs. Policy' Battle. The Encourager bends rules to build rapport. The Tracker enforces rules to build safety. The Tracker sees the Encourager as chaotic/unsafe; the Encourager sees the Tracker as robotic/uncaring.",
+        "prep": [
+            "Tell the Encourager: 'Structure is a form of care. Inconsistency creates anxiety for traumatized youth.'",
+            "Tell the Tracker: 'Rules without relationship breeds rebellion. You need the Encourager's rapport to get the youth to comply.'"
+        ],
+        "protocol": [
+            "1. Frame the conflict around 'Safety'.",
+            "2. Ask Tracker to explain *why* the rule exists (the safety rationale).",
+            "3. Ask Encourager to explain *why* they bent it (the relational need).",
+            "4. Compromise: The Rule remains firm (Tracker wins), but the Delivery changes (Encourager wins).",
+            "5. Script the exact language to use with the youth next time."
+        ],
+        "script_a": "Encourager: 'I felt like enforcing that consequence would have caused a restrain, so I let it slide.'",
+        "script_b": "Tracker: 'When you let it slide, you made me the bad guy for the next shift. We have to be consistent.'"
+    },
+    "Encourager-Facilitator": {
+        "tension": "The 'Nice-Off' (Stagnation). Both want harmony. The Facilitator focuses on fairness to the group; the Encourager focuses on the feelings of the individual. They will circle an issue for hours to avoid upsetting anyone.",
+        "prep": [
+            "Supervisor Role: You must be the 'Bad Guy' who forces the conflict into the open.",
+            "Warning: Watch out for them agreeing just to end the meeting. You need to dig for the disagreement."
+        ],
+        "protocol": [
+            "1. Call out the elephant: 'We are being too nice. What is the actual problem?'",
+            "2. Force a choice: 'If we prioritize the individual (Encourager), is it fair to the group (Facilitator)?'",
+            "3. If they can't decide, you (Supervisor) make the call.",
+            "4. Assign specific communication roles so they don't have to feel 'mean' delivering the news."
+        ],
+        "script_a": "Encourager: 'I just don't want [Staff Member] to feel singled out.'",
+        "script_b": "Facilitator: 'But if we don't address it, the rest of the team feels it's unfair.'"
+    },
+    "Facilitator-Tracker": {
+        "tension": "The 'Analysis Paralysis' Loop. The Facilitator waits for consensus. The Tracker waits for more data. Nothing happens. The risk is total stagnation.",
+        "prep": [
+            "Supervisor Role: You must set a hard deadline.",
+            "Tell both: 'A good decision today is better than a perfect decision next week.'"
+        ],
+        "protocol": [
+            "1. Identify the decision that is stuck.",
+            "2. Ask Tracker: 'Do we have enough data to be 80% sure?' (They will never be 100% sure).",
+            "3. Ask Facilitator: 'Does anyone have a major objection that endangers the program?'",
+            "4. Supervisor declares: 'We are moving forward. I take responsibility for the risk.'",
+            "5. Set a review date to adjust the plan later (this lowers their anxiety)."
+        ],
+        "script_a": "Facilitator: 'I want to make sure everyone is comfortable with the new schedule.'",
+        "script_b": "Tracker: 'I'm just worried we haven't accounted for the Tuesday transport logistics yet.'"
     }
 }
 
-# --- CAREER PATHWAYS (Expanded) ---
+# --- CAREER PATHWAYS (Expanded for Teaching Supervisors) ---
 CAREER_PATHWAYS = {
     "Director": {
         "Shift Supervisor": {
             "shift": "From 'Doing' to 'Enabling'.",
             "why": "Directors act fast. They see a problem and fix it. As a Shift Sup, if they fix everything, their team learns nothing. They become the bottleneck.",
             "conversation": "You have high capacity and speed, which is a gift. To succeed as a Shift Supervisor, you have to resist the urge to 'rescue' the shift by doing everything yourself. Your success is no longer defined by how many tasks *you* complete, but by how confident your team feels completing theirs.",
-            "assignment_setup": "Assign them to lead a shift where they are physically restricted to the office or a central hub (unless safety dictates otherwise).",
+            "assignment_setup": "Assign them to lead a shift where they are physically restricted to the office or a central hub (unless absolute safety dictates otherwise).",
             "assignment_task": "They must run the shift entirely through verbal direction and delegation to peers. They cannot touch paperwork or intervene in minor conflicts.",
             "success_indicators": "Did they let a staff member struggle through a task without jumping in? Did they give clear verbal instructions?",
             "red_flags": "They ran out of the office to 'just do it quick'. They complain that their team is 'too slow'.",
@@ -409,7 +176,7 @@ CAREER_PATHWAYS = {
         "Manager": {
             "shift": "From 'Caregiver' to 'Director'.",
             "why": "Managers deal with resource scarcity. Encouragers take 'No' personally and burn out trying to save everyone.",
-            "conversation": "You naturally carry the emotions of your people. At the manager level, the weight is too heavy to carry alone. Your growth edge is learning to set emotional boundaries—caring deeply about the person without taking responsibility for their feelings.",
+            "conversation": "You naturally carry the emotions of your people. At the manager level, the weight is too heavy to carry alone. Your growth edge is caring deeply about the person without taking responsibility for their feelings.",
             "assignment_setup": "Have them manage a resource allocation conflict (e.g., denying a budget request or staffing request).",
             "assignment_task": "Deliver a 'No' to a request, explain the business reason, and withstand the disappointment of the staff member.",
             "success_indicators": "They hold the line. They don't promise to 'fix it later' just to stop the person from being sad.",
@@ -453,7 +220,7 @@ CAREER_PATHWAYS = {
         "Shift Supervisor": {
             "shift": "From 'Executor' to 'Overseer'.",
             "why": "Trackers don't trust others to do it right, so they micromanage. They burn out trying to do 5 jobs.",
-            "conversation": "You are brilliant at the details. But you cannot track every detail personally at this level without burning out or micromanaging. Your growth is trusting your team. You have to let them do the checklist, even if they do it differently than you would.",
+            "conversation": "You are brilliant at the details. But you cannot track every detail personally. You have to let the team do the checklist, even if they do it differently than you would.",
             "assignment_setup": "The 'Hands-Off' Day. Assign them to supervise a complex task (intake/search).",
             "assignment_task": "Strictly prohibited from touching paperwork. Must guide a peer to do it verbally.",
             "success_indicators": "They kept their hands in their pockets. They gave clear corrections without taking over.",
@@ -463,7 +230,7 @@ CAREER_PATHWAYS = {
         "Program Supervisor": {
             "shift": "From 'Black & White' to 'Gray'.",
             "why": "Trackers want a rule for everything. Leadership involves judgment calls where no rule exists.",
-            "conversation": "You excel when the rules are clear. Program leadership is full of gray areas where the policy manual doesn't have an answer. You need to develop your intuition and judgment to navigate complex family or youth dynamics that don't fit the spreadsheet.",
+            "conversation": "You excel when rules are clear. Leadership is full of gray areas. You need to develop your intuition to navigate dynamics that don't fit the spreadsheet.",
             "assignment_setup": "Handle a complex parent/youth complaint where standard rules don't apply.",
             "assignment_task": "Make a principle-based decision (fairness/safety) rather than a rule-based one.",
             "success_indicators": "They made a decision that wasn't in the handbook but made sense. They can explain the 'spirit' of the rule.",
@@ -483,9 +250,72 @@ CAREER_PATHWAYS = {
     }
 }
 
-# ... (The rest of the file: PDF Content, Helper Functions, and UI Logic remains the same) ...
-# Note: I am omitting the repeated PDF/UI code here for brevity as it relies on the dictionaries above.
-# The full file content would include lines 253-597 from the previous version unchanged.
+# --- PDF Content Dictionaries (Full Text) ---
+COMM_PROFILES = {
+    "Director": {
+        "overview": "This staff member communicates primarily as a Director, meaning they lead with clarity, structure, and urgency.",
+        "supervising": "Be direct, concise, and outcome-focused. They respect leaders who get to the point. Define the 'what' clearly, but give autonomy on the 'how'.",
+        "struggle_bullets": ["Decreased patience", "Over-assertiveness", "Fatigue/Irritability", "Rigid enforcement"],
+        "coaching": ["What are the risks of moving this fast?", "Who haven't we heard from yet?", "How can you frame this so the team feels supported?", "What is the difference between being 'right' and being 'effective'?", "If you had to achieve this result without giving a single order, how would you do it?"],
+        "advancement": "Challenge them to lead through influence rather than authority. Help them practice patience."
+    },
+    "Encourager": {
+        "overview": "This staff member communicates primarily as an Encourager, leading with warmth, optimism, and emotional intelligence.",
+        "supervising": "Connect relationally before diving into tasks. Validate their emotional labor. Frame criticism around professional growth.",
+        "struggle_bullets": ["Avoidance of conflict", "Disorganization", "Prioritizing being liked", "Emotional exhaustion"],
+        "coaching": ["How can you deliver this hard news while remaining kind?", "Are we prioritizing popularity over effectiveness?", "What boundaries do you need to set?", "If you avoid this conflict today, what is the cost to the team next week?", "How does holding this standard actually create safety for the youth?"],
+        "advancement": "Help them master the operational side. Challenge them to see clarity and accountability as kindness."
+    },
+    "Facilitator": {
+        "overview": "This staff member communicates primarily as a Facilitator, leading by listening, gathering perspectives, and seeking fairness.",
+        "supervising": "Give them time to process. Ask for observations explicitly. Validate fairness but push for decisions.",
+        "struggle_bullets": ["Analysis paralysis", "Passive-aggressiveness", "Saying 'it's fine' when it isn't", "Getting stuck in the middle"],
+        "coaching": ["If you had to decide right now, what would you do?", "What is the cost of waiting?", "Where are you holding tension?", "Who specifically are you trying not to upset with this decision?", "How can you support the team's direction even if you don't fully agree?"],
+        "advancement": "Encourage them to be more vocal and decisive. Help them be assertive without being aggressive."
+    },
+    "Tracker": {
+        "overview": "This staff member communicates primarily as a Tracker, leading with details, data, and systems.",
+        "supervising": "Provide clear expectations. Respecting their systems builds trust. Explain the 'why' behind changes.",
+        "struggle_bullets": ["Rigidity/Perfectionism", "Getting stuck in weeds", "Coming across as cold", "Prioritizing policy over people"],
+        "coaching": ["Does this detail change the outcome?", "How can we meet the standard while keeping the relationship warm?", "What is the big picture goal?", "If we follow the rule perfectly but lose the kid's trust, did we succeed?", "What is the 'Good Enough' version of this task?"],
+        "advancement": "Help them delegate details. Teach them to distinguish between 'mission-critical' and 'preference'."
+    }
+}
+
+MOTIVATION_PROFILES = {
+    "Growth": {
+        "overview": "Primary motivator: Growth. Thrives on progress, new skills, and challenges.",
+        "motivating": "Give problems to solve. Provide skill feedback. Connect work to career.",
+        "support": "Sponsor for training. Ask 'What are you learning?'. Don't box them in.",
+        "thriving_bullets": ["Proactive questions", "Volunteering", "Mentoring", "High engagement"],
+        "intervention": "Realign tasks to include learning. Ask: 'Do you feel challenged?'",
+        "celebrate": "Celebrate acquisition of new skills and adaptability."
+    },
+    "Purpose": {
+        "overview": "Primary motivator: Purpose. Thrives on meaning, alignment, and values.",
+        "motivating": "Connect directives to mission. Be transparent about the 'why'. Invite ethical input.",
+        "support": "Create space for ethical concerns. Validate passion. Remind of human impact.",
+        "thriving_bullets": ["Passionate advocacy", "High integrity", "Going the extra mile", "Commitment"],
+        "intervention": "Reconnect to mission. Ask: 'Does this feel misaligned?'",
+        "celebrate": "Celebrate moments where their work directly impacted a youth's life."
+    },
+    "Connection": {
+        "overview": "Primary motivator: Connection. Thrives on belonging, cohesion, and relationships.",
+        "motivating": "Prioritize team cohesion. Recognize shared wins. Check in personally.",
+        "support": "Ensure no isolation. Facilitate bonding. Be accessible.",
+        "thriving_bullets": ["Collaborative", "High morale", "Family atmosphere", "Strong rapport"],
+        "intervention": "Repair relationships. Ask: 'How is the team dynamic?'",
+        "celebrate": "Celebrate contributions to culture and supporting peers."
+    },
+    "Achievement": {
+        "overview": "Primary motivator: Achievement. Thrives on progress, results, and completion.",
+        "motivating": "Set clear goals. Use checklists. Give autonomy to reach targets.",
+        "support": "Remove blockers. Protect time. Be definitive about 'success'.",
+        "thriving_bullets": ["High follow-through", "Efficiency", "Reliability", "Goal-oriented"],
+        "intervention": "Clarify expectations. Ask: 'Is success clear here?'",
+        "celebrate": "Celebrate completion of projects and reliability."
+    }
+}
 
 # --- Helper Function: Clean Text for PDF ---
 def clean_text(text):
@@ -501,7 +331,8 @@ def clean_text(text):
     return text.encode('latin-1', 'replace').decode('latin-1')
 
 # --- Data Fetching ---
-@st.cache_data(ttl=60)
+# No TTL = Manual Refresh Only
+@st.cache_data
 def fetch_staff_data():
     try:
         response = requests.get(GOOGLE_SCRIPT_URL)
@@ -629,6 +460,12 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 staff_list = fetch_staff_data()
 df = pd.DataFrame(staff_list)
 
+# RESET FUNCTIONS (Defined at module level for safety)
+def reset_t1(): st.session_state.t1_staff_select = None
+def reset_t2(): st.session_state.t2_team_select = []
+def reset_t3(): st.session_state.p1 = None; st.session_state.p2 = None
+def reset_t4(): st.session_state.career = None; st.session_state.career_target = None
+
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📝 Guide Generator", 
     "🧬 Team DNA", 
@@ -650,28 +487,22 @@ with tab1:
     
     with subtab1:
         if not df.empty:
-            def reset_t1(): st.session_state.t1_staff_select = None
             staff_options = {f"{s['name']} ({s['role']})": s for s in staff_list}
             selected_staff_name = st.selectbox(
                 "Select Staff Member", options=list(staff_options.keys()), 
                 index=None, key="t1_staff_select", placeholder="Choose a staff member..."
             )
-            
             if selected_staff_name:
                 data = staff_options[selected_staff_name]
                 col1, col2, col3 = st.columns(3)
                 col1.metric("Role", data['role'])
                 col2.metric("Communication", data['p_comm'])
                 col3.metric("Motivation", data['p_mot'])
-                
                 if st.button("Generate Guide for " + data['name'], type="primary"):
                     pdf_bytes = create_supervisor_guide(
-                        data['name'], data['role'], 
-                        data['p_comm'], data['s_comm'], 
-                        data['p_mot'], data['s_mot']
+                        data['name'], data['role'], data['p_comm'], data['s_comm'], data['p_mot'], data['s_mot']
                     )
                     st.download_button(label="Download PDF Guide", data=pdf_bytes, file_name=f"Supervisor_Guide_{data['name'].replace(' ', '_')}.pdf", mime="application/pdf")
-                
                 st.markdown("---")
                 st.button("Reset Selection", key="reset_t1_db", on_click=reset_t1)
         else:
@@ -679,32 +510,23 @@ with tab1:
 
     with subtab2:
         with st.form("manual_form"):
-            col1, col2 = st.columns(2)
-            with col1:
+            c1, c2 = st.columns(2)
+            with c1:
                 m_name = st.text_input("Staff Name")
                 m_role = st.selectbox("Role", ["Program Supervisor", "Shift Supervisor", "YDP"])
-            with col2:
+            with c2:
                 m_p_comm = st.selectbox("Primary Communication", ["Director", "Encourager", "Facilitator", "Tracker"])
                 m_p_mot = st.selectbox("Primary Motivation", ["Growth", "Purpose", "Connection", "Achievement"])
-                
             m_submitted = st.form_submit_button("Generate Guide (Manual)")
-            
             if m_submitted and m_name:
                 pdf_bytes = create_supervisor_guide(m_name, m_role, m_p_comm, "None", m_p_mot, "None")
-                st.success(f"Guide generated for {m_name}")
                 st.download_button(label="Download PDF Guide", data=pdf_bytes, file_name=f"Supervisor_Guide_{m_name.replace(' ', '_')}.pdf", mime="application/pdf")
 
 # --- TAB 2: TEAM DNA ---
 with tab2:
     st.markdown("### 🧬 Team Dynamics Mapper")
-    st.write("Select multiple staff members to analyze the culture of a specific unit or team.")
-    
-    def reset_t2():
-        st.session_state.t2_team_select = []
-
     if not df.empty:
         team_selection = st.multiselect("Build your Team", df['name'].tolist(), key="t2_team_select")
-        
         if team_selection:
             team_df = df[df['name'].isin(team_selection)]
             st.divider()
@@ -712,74 +534,52 @@ with tab2:
             with c1:
                 st.subheader("Communication Mix")
                 comm_counts = team_df['p_comm'].value_counts()
-                fig_team_comm = px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4)
-                st.plotly_chart(fig_team_comm, use_container_width=True)
-                
+                st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4), use_container_width=True)
                 if not comm_counts.empty:
-                    dominant_style = comm_counts.idxmax()
-                    dom_pct = comm_counts.max() / len(team_df)
-                    if dom_pct > 0.5:
-                        st.warning(f"⚠️ **Echo Chamber Risk:** {int(dom_pct*100)}% of this team are **{dominant_style}s**.")
+                    dom_style = comm_counts.idxmax()
+                    if comm_counts.max() / len(team_df) > 0.5:
+                        st.warning(f"⚠️ **Echo Chamber Risk:** {int(comm_counts.max()/len(team_df)*100)}% of this team are **{dom_style}s**.")
             with c2:
                 st.subheader("Motivation Drivers")
                 mot_counts = team_df['p_mot'].value_counts()
-                fig_team_mot = px.bar(x=mot_counts.index, y=mot_counts.values)
-                st.plotly_chart(fig_team_mot, use_container_width=True)
-            
+                st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values), use_container_width=True)
             st.markdown("---")
             st.button("Clear Team Selection", key="reset_btn_t2", on_click=reset_t2)
 
 # --- TAB 3: CONFLICT MEDIATOR ---
 with tab3:
     st.markdown("### ⚖️ Conflict Resolution Script")
-    st.write("Select yourself (Supervisor) and a staff member to resolve friction.")
-    
-    def reset_t3():
-        st.session_state.p1 = None
-        st.session_state.p2 = None
-
     if not df.empty:
         c1, c2 = st.columns(2)
-        with c1:
-            p1_name = st.selectbox("Select Yourself (Supervisor)", df['name'].unique(), index=None, key="p1", placeholder="Select first person...")
-        with c2:
-            p2_name = st.selectbox("Select Staff Member", df['name'].unique(), index=None, key="p2", placeholder="Select second person...")
-            
+        with c1: p1_name = st.selectbox("Select Yourself (Supervisor)", df['name'].unique(), index=None, key="p1", placeholder="Select first person...")
+        with c2: p2_name = st.selectbox("Select Staff Member", df['name'].unique(), index=None, key="p2", placeholder="Select second person...")
+        
         if p1_name and p2_name and p1_name != p2_name:
             p1 = df[df['name'] == p1_name].iloc[0]
             p2 = df[df['name'] == p2_name].iloc[0]
-            
-            # Here p1 is Supervisor, p2 is Staff
-            sup_style = p1['p_comm']
-            staff_style = p2['p_comm']
+            sup_style, staff_style = p1['p_comm'], p2['p_comm']
             
             st.divider()
             st.subheader(f"Dynamic: {sup_style} (You) vs. {staff_style} (Staff)")
             
             if sup_style == staff_style:
-                st.warning("⚠️ **Same-Style Blindspot:** You both communicate the same way. This often means you amplify each other's weaknesses (e.g., two Directors moving too fast, or two Facilitators waiting too long).")
-                st.info("💡 **Tip:** Consciously adopt the opposite style to create balance.")
-            
+                st.warning("⚠️ **Same-Style Blindspot:** You both communicate the same way. This often means you amplify each other's weaknesses.")
             elif sup_style in SUPERVISOR_CLASH_MATRIX and staff_style in SUPERVISOR_CLASH_MATRIX[sup_style]:
                 data = SUPERVISOR_CLASH_MATRIX[sup_style][staff_style]
                 
-                # Dynamic Section
                 with st.expander("🔥 The Dynamic (Read First)", expanded=True):
-                    st.markdown(f"**{data['dynamic_text']}**")
-                    for b in data['dynamic_bullets']:
-                        st.markdown(f"- {b}")
+                    st.write(data['dynamic_text'])
+                    for b in data['dynamic_bullets']: st.markdown(f"- {b}")
 
                 c_a, c_b = st.columns(2)
                 with c_a:
                     st.markdown("#### 🛑 Self-Check")
-                    st.write(data['self_check_text'])
-                    for b in data['self_check_bullets']:
-                        st.error(f"• {b}")
+                    st.info(data['self_check_text'])
+                    for b in data['self_check_bullets']: st.write(f"• {b}")
                 with c_b:
                     st.markdown("#### 🗣️ The 1:1 Script")
-                    st.write(data['script_text'])
-                    for s in data['script_options']:
-                        st.success(f"\"{s}\"")
+                    st.success(data['script_text'])
+                    for s in data['script_options']: st.markdown(f"> *{s}*")
             
             st.markdown("---")
             st.button("Reset Conflict Tool", key="reset_btn_t3", on_click=reset_t3)
@@ -787,44 +587,29 @@ with tab3:
 # --- TAB 4: CAREER PATHFINDER ---
 with tab4:
     st.markdown("### 🚀 Career Gap Analysis")
-    st.write("Analyze readiness for promotion.")
-    
-    def reset_t4():
-        st.session_state.career = None
-        st.session_state.career_target = None
-
     if not df.empty:
-        col_a, col_b = st.columns(2)
-        with col_a:
-            candidate_name = st.selectbox("Select Candidate", df['name'].unique(), index=None, key="career", placeholder="Select candidate...")
-        with col_b:
-            target_role = st.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor", "Manager"], index=None, key="career_target", placeholder="Select target role...")
+        c1, c2 = st.columns(2)
+        with c1: candidate_name = st.selectbox("Select Candidate", df['name'].unique(), index=None, key="career", placeholder="Select candidate...")
+        with c2: target_role = st.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor", "Manager"], index=None, key="career_target", placeholder="Select target role...")
         
         if candidate_name and target_role:
             cand = df[df['name'] == candidate_name].iloc[0]
             style = cand['p_comm']
-            
             st.divider()
             st.markdown(f"**Candidate:** {cand['name']} ({style})")
-            st.markdown(f"**Target:** {target_role}")
-            
             path_data = CAREER_PATHWAYS.get(style, {}).get(target_role)
             
             if path_data:
                 st.info(f"💡 **The Core Shift:** {path_data['shift']}")
-                
                 st.markdown(f"**Why it's hard for a {style}:** {path_data['why']}")
-                
                 st.divider()
-                
-                c1, c2 = st.columns([1, 1])
-                with c1:
+                c_a, c_b = st.columns([1, 1])
+                with c_a:
                     st.markdown("#### 🗣️ The Coaching Conversation")
                     st.write(path_data['conversation'])
                     if 'supervisor_focus' in path_data:
                         st.warning(f"👀 **Supervisor Watch Item:**\n\n{path_data['supervisor_focus']}")
-                        
-                with c2:
+                with c_b:
                     st.markdown("#### ✅ The Developmental Assignment")
                     with st.container(border=True):
                         st.write(f"**Setup:** {path_data['assignment_setup']}")
@@ -834,7 +619,6 @@ with tab4:
                         st.error(f"**🚩 Red flag:** {path_data['red_flags']}")
             else:
                 st.write("Standard advancement path.")
-            
             st.markdown("---")
             st.button("Reset Career Path", key="reset_btn_t4", on_click=reset_t4)
 
@@ -845,13 +629,10 @@ with tab5:
         c1, c2 = st.columns(2)
         with c1:
             st.subheader("Communication Styles")
-            fig_org_comm = px.pie(df, names='p_comm', color='p_comm', color_discrete_map={'Director':'#015bad', 'Encourager':'#b9dca4', 'Facilitator':'#51c3c5', 'Tracker':'#64748b'})
-            st.plotly_chart(fig_org_comm, use_container_width=True)
+            st.plotly_chart(px.pie(df, names='p_comm', color='p_comm', color_discrete_map={'Director':'#015bad', 'Encourager':'#b9dca4', 'Facilitator':'#51c3c5', 'Tracker':'#64748b'}), use_container_width=True)
         with c2:
             st.subheader("Motivation Drivers")
-            fig_org_mot = px.bar(df, x='p_mot', color='p_mot')
-            st.plotly_chart(fig_org_mot, use_container_width=True)
-        
+            st.plotly_chart(px.bar(df, x='p_mot', color='p_mot'), use_container_width=True)
         st.divider()
         if 'role' in df.columns:
             role_breakdown = pd.crosstab(df['role'], df['p_comm'])
