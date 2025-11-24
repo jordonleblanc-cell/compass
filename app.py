@@ -6,27 +6,52 @@ import time
 # --- Configuration & Styling ---
 st.set_page_config(page_title="Elmcrest Compass", page_icon="🧭", layout="centered")
 
-# Custom CSS to match Elmcrest branding
-# FIXED: Added text color overrides to prevent invisible text in Dark Mode
+# Custom CSS with Automatic Dark/Light Mode Support
 st.markdown("""
     <style>
-        /* Force the main app background to the light Elmcrest gradient */
+        /* Define CSS Variables for Light Mode (Default) */
+        :root {
+            --bg-top: #e0f2fe;
+            --bg-bottom: #dcfce7;
+            --text-main: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --headline: #015bad;
+            --input-bg: #ffffff;
+            --input-text: #0f172a;
+            --border-color: #e5e7eb;
+        }
+
+        /* Override Variables for Dark Mode */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-top: #0f172a;
+                --bg-bottom: #064e3b;
+                --text-main: #e2e8f0;
+                --card-bg: rgba(30, 41, 59, 0.95);
+                --headline: #51c3c5;
+                --input-bg: #1e293b;
+                --input-text: #f1f5f9;
+                --border-color: #334155;
+            }
+        }
+
+        /* Apply Background Gradient using Variables */
         .stApp {
-            background: radial-gradient(circle at top, #e0f2fe 0, transparent 55%),
-                        radial-gradient(circle at bottom, #dcfce7 0, transparent 55%);
+            background: radial-gradient(circle at top, var(--bg-top) 0, transparent 55%),
+                        radial-gradient(circle at bottom, var(--bg-bottom) 0, transparent 55%);
         }
         
-        /* Force ALL text to be dark gray/blue, overriding Streamlit's dark mode white text */
+        /* Dynamic Text Colors */
         .stApp, .stMarkdown, .stText, p, div, span, label, li, .stRadio label {
-            color: #0f172a !important; 
+            color: var(--text-main) !important; 
         }
 
-        /* Headlines */
+        /* Dynamic Headlines */
         h1, h2, h3, h4, h5, h6 {
-            color: #015bad !important;
+            color: var(--headline) !important;
         }
 
-        /* Style buttons to look like the React app */
+        /* Button Styling (Kept consistent as it pops in both modes) */
         .stButton button {
             background: linear-gradient(135deg, #015bad, #51c3c5);
             color: white !important;
@@ -41,31 +66,42 @@ st.markdown("""
             opacity: 0.9;
         }
 
-        /* Container styling - white card look */
+        /* Card Container Styling */
         .block-container {
             padding-top: 2rem;
             padding-bottom: 2rem;
             max-width: 800px;
-            background-color: rgba(255, 255, 255, 0.95);
+            background-color: var(--card-bg);
             border-radius: 18px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
         }
         
-        /* Input fields background fix */
+        /* Input Fields */
         .stTextInput input, .stSelectbox div[data-baseweb="select"] > div {
-            color: #0f172a !important;
-            background-color: #ffffff !important;
+            color: var(--input-text) !important;
+            background-color: var(--input-bg) !important;
+            border-color: var(--border-color) !important;
+        }
+        .stSelectbox div[data-baseweb="popover"] {
+             background-color: var(--card-bg) !important;
         }
 
-        /* Radio button selected color */
+        /* Radio Button Active State */
         div[role="radiogroup"] > label > div:first-of-type {
             background-color: #015bad !important;
             border-color: #015bad !important;
         }
         
-        /* Horizontal divider */
+        /* Dividers */
         hr {
-            border-color: #e5e7eb !important;
+            border-color: var(--border-color) !important;
+        }
+        
+        /* Expander Header */
+        .streamlit-expanderHeader {
+            background-color: transparent !important;
+            color: var(--text-main) !important;
         }
     </style>
 """, unsafe_allow_html=True)
