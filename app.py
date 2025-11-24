@@ -2,6 +2,8 @@ import streamlit as st
 import random
 import requests
 import time
+from fpdf import FPDF
+import io
 
 # --- Configuration & Styling ---
 st.set_page_config(page_title="Elmcrest Compass", page_icon="🧭", layout="centered")
@@ -100,19 +102,25 @@ st.markdown("""
             transform: translateY(0);
         }
 
-        /* Inputs & Selects */
-        .stTextInput input, .stSelectbox div[data-baseweb="select"] > div {
-            background-color: var(--input-bg) !important;
-            color: var(--text-main) !important;
+        /* Inputs & Selects - Generic styling only, avoiding deep overrides that break dropdowns */
+        .stTextInput input, .stSelectbox [data-baseweb="select"] {
+            background-color: var(--input-bg);
             border-radius: 12px;
-            border: 1px solid var(--card-border) !important;
-            padding: 0.5rem 1rem;
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
         }
 
-        /* Radio Buttons - Clean up spacing */
+        /* Radio Buttons - Clean up spacing and center them */
         .stRadio {
             background-color: transparent;
             padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .stRadio [role="radiogroup"] {
+            justify-content: space-between;
+            width: 100%;
         }
         
         /* Custom Score Bar Styling */
@@ -154,6 +162,11 @@ st.markdown("""
             background-color: var(--primary) !important;
             border-color: var(--primary) !important;
         }
+        
+        /* Error message styling */
+        .stAlert {
+            border-radius: 12px;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -188,7 +201,7 @@ COMMUNICATION_QUESTIONS = [
     {"id": "comm5", "text": "I’m comfortable giving direct feedback, even when I know it may be hard for someone to hear.", "style": "Director"},
     {"id": "comm6", "text": "I pay close attention to the emotional tone of the team and try to lift people up when morale is low.", "style": "Encourager"},
     {"id": "comm7", "text": "I often use encouragement, humor, or positive energy to help youth and staff get through hard shifts.", "style": "Encourager"},
-    {"id": "comm8", "text": "I notice small wins and like to name them out loud so people know they’re seen.", "style": "Encourager"},
+    {"id": "comm8", "text": "I notice small wins and like to name them out loud so people know theyre seen.", "style": "Encourager"},
     {"id": "comm9", "text": "I tend to talk things through with people rather than just giving short instructions.", "style": "Encourager"},
     {"id": "comm10", "text": "I’m often the one coworkers come to when they need to vent or feel understood.", "style": "Encourager"},
     {"id": "comm11", "text": "I’m good at slowing conversations down so that different perspectives can be heard before we decide.", "style": "Facilitator"},
@@ -422,18 +435,106 @@ def get_top_two(scores):
     secondary = sorted_scores[1][0] if len(sorted_scores) > 1 else None
     return primary, secondary
 
-def submit_to_google_sheets(data):
+def submit_to_google_sheets(data, action="save"):
+    """
+    Submits data to Google Sheets.
+    action can be 'save' (default) or 'email' (triggers email in Apps Script)
+    """
     url = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
+    
+    # Add action flag to payload
+    data["action"] = action
+    
     try:
         response = requests.post(url, json=data)
         if response.status_code == 200:
             return True
         else:
-            st.warning(f"Data saved, but server returned status: {response.status_code}")
+            st.warning(f"Server returned status: {response.status_code}")
             return True
     except Exception as e:
-        st.error(f"Error submitting to Google Sheets: {e}")
+        st.error(f"Error connecting to server: {e}")
         return False
+
+def create_pdf(user_info, results, comm_prof, mot_prof, int_prof):
+    pdf = FPDF()
+    pdf.add_page()
+    
+    # Colors
+    primary_color = (1, 91, 173) # #015bad
+    
+    # Header
+    pdf.set_font("Arial", 'B', 24)
+    pdf.set_text_color(*primary_color)
+    pdf.cell(0, 10, "Elmcrest Compass Profile", ln=True, align='C')
+    
+    pdf.set_font("Arial", '', 12)
+    pdf.set_text_color(50, 50, 50)
+    pdf.cell(0, 10, f"Prepared for: {user_info['name']} | Role: {user_info['role']}", ln=True, align='C')
+    pdf.ln(10)
+    
+    # Communication Section
+    pdf.set_font("Arial", 'B', 16)
+    pdf.set_text_color(*primary_color)
+    pdf.cell(0, 10, f"Communication Style: {comm_prof['name']}", ln=True)
+    
+    pdf.set_font("Arial", 'I', 12)
+    pdf.set_text_color(100, 100, 100)
+    pdf.multi_cell(0, 8, comm_prof['tagline'])
+    
+    pdf.set_font("Arial", '', 11)
+    pdf.set_text_color(0, 0, 0)
+    pdf.ln(4)
+    pdf.multi_cell(0, 6, comm_prof['overview'])
+    pdf.ln(5)
+    
+    pdf.set_font("Arial", 'B', 11)
+    pdf.cell(0, 8, "Under Stress:", ln=True)
+    pdf.set_font("Arial", '', 11)
+    pdf.multi_cell(0, 6, comm_prof['conflictImpact'])
+    pdf.ln(10)
+
+    # Motivation Section
+    pdf.set_font("Arial", 'B', 16)
+    pdf.set_text_color(*primary_color)
+    pdf.cell(0, 10, f"Motivation Driver: {mot_prof['name']}", ln=True)
+    
+    pdf.set_font("Arial", 'I', 12)
+    pdf.set_text_color(100, 100, 100)
+    pdf.multi_cell(0, 8, mot_prof['tagline'])
+    
+    pdf.set_font("Arial", '', 11)
+    pdf.set_text_color(0, 0, 0)
+    pdf.ln(4)
+    pdf.multi_cell(0, 6, mot_prof['summary'])
+    pdf.ln(5)
+    
+    pdf.set_font("Arial", 'B', 11)
+    pdf.cell(0, 8, "Key Boosters:", ln=True)
+    pdf.set_font("Arial", '', 11)
+    for b in mot_prof['boosters']:
+        pdf.cell(0, 6, f"- {b}", ln=True)
+    pdf.ln(10)
+
+    # Integrated Section
+    if int_prof:
+        pdf.set_font("Arial", 'B', 16)
+        pdf.set_text_color(*primary_color)
+        pdf.cell(0, 10, f"Integrated Profile: {int_prof['title']}", ln=True)
+        
+        pdf.set_font("Arial", '', 11)
+        pdf.set_text_color(0, 0, 0)
+        pdf.ln(4)
+        pdf.multi_cell(0, 6, int_prof['summary'])
+        pdf.ln(5)
+        
+        pdf.set_font("Arial", 'B', 11)
+        pdf.cell(0, 8, "Key Strengths:", ln=True)
+        pdf.set_font("Arial", '', 11)
+        for s in int_prof['strengths']:
+            pdf.cell(0, 6, f"- {s}", ln=True)
+
+    return pdf.output(dest='S').encode('latin-1')
 
 # --- Logic & State Management ---
 
@@ -506,13 +607,13 @@ if st.session_state.step == 'intro':
         with col2:
             email = st.text_input("Email Address", placeholder="e.g. jane@elmcrest.org")
             
-        role = st.selectbox("Current Role", ["Program Supervisor", "Shift Supervisor", "YDP"], help="Tailors results to your specific leadership level.")
+        role = st.selectbox("Current Role", ["Program Supervisor", "Shift Supervisor", "YDP"], index=None, placeholder="Select your role...", help="Tailors results to your specific leadership level.")
         
         st.markdown("<br>", unsafe_allow_html=True)
         submitted = st.form_submit_button("Start Assessment →")
         if submitted:
-            if not name or not email:
-                st.error("Please complete your name and email.")
+            if not name or not email or not role:
+                st.error("Please complete your name, email, and role selection.")
             else:
                 st.session_state.user_info = {"name": name, "email": email, "role": role}
                 st.session_state.step = 'comm'
@@ -531,6 +632,7 @@ elif st.session_state.step == 'comm':
                 f"q_{i}", 
                 options=[1, 2, 3, 4, 5], 
                 horizontal=True, 
+                index=None,
                 key=f"c_{q['id']}",
                 label_visibility="collapsed"
             )
@@ -544,9 +646,17 @@ elif st.session_state.step == 'comm':
         st.markdown("<br>", unsafe_allow_html=True)
         submitted = st.form_submit_button("Continue to Motivation →")
         if submitted:
-            st.session_state.answers_comm = answers
-            st.session_state.step = 'motiv'
-            st.rerun()
+            # Validation check
+            missing_questions = [q['id'] for q in st.session_state.shuffled_comm if answers.get(q['id']) is None]
+            
+            if missing_questions:
+                # Find the index of the first missing question to show the user
+                first_missing_idx = next((i for i, q in enumerate(st.session_state.shuffled_comm) if q['id'] in missing_questions), 0) + 1
+                st.error(f"Please answer all questions before continuing. You missed question {first_missing_idx} (and {len(missing_questions)-1} others).")
+            else:
+                st.session_state.answers_comm = answers
+                st.session_state.step = 'motiv'
+                st.rerun()
 
 elif st.session_state.step == 'motiv':
     show_brand_header("Part 2: Motivation")
@@ -561,6 +671,7 @@ elif st.session_state.step == 'motiv':
                 f"q_m_{i}", 
                 options=[1, 2, 3, 4, 5], 
                 horizontal=True, 
+                index=None,
                 key=f"m_{q['id']}",
                 label_visibility="collapsed"
             )
@@ -574,9 +685,17 @@ elif st.session_state.step == 'motiv':
         st.markdown("<br>", unsafe_allow_html=True)
         submitted = st.form_submit_button("Complete & View Profile →")
         if submitted:
-            st.session_state.answers_motiv = answers
-            st.session_state.step = 'processing'
-            st.rerun()
+            # Validation check
+            missing_questions = [q['id'] for q in st.session_state.shuffled_motiv if answers.get(q['id']) is None]
+            
+            if missing_questions:
+                 # Find the index of the first missing question to show the user
+                first_missing_idx = next((i for i, q in enumerate(st.session_state.shuffled_motiv) if q['id'] in missing_questions), 0) + 1
+                st.error(f"Please answer all questions before submitting. You missed question {first_missing_idx} (and {len(missing_questions)-1} others).")
+            else:
+                st.session_state.answers_motiv = answers
+                st.session_state.step = 'processing'
+                st.rerun()
 
 elif st.session_state.step == 'processing':
     # Calculate Scores
@@ -619,7 +738,7 @@ elif st.session_state.step == 'processing':
     }
     
     with st.spinner("Analyzing results..."):
-        submit_to_google_sheets(payload)
+        submit_to_google_sheets(payload, action="save")
         time.sleep(1.5) # Slight artificial delay for UX smoothness
     
     st.session_state.step = 'results'
@@ -636,8 +755,46 @@ elif st.session_state.step == 'results':
     
     st.success("Analysis Complete! Your results have been saved to the Elmcrest database.")
 
-    # --- Comm Section ---
+    # --- PDF Generation Preparation ---
     comm_prof = COMM_PROFILES[res['primaryComm']]
+    mot_prof = MOTIVATION_PROFILES[res['primaryMotiv']]
+    int_key = f"{res['primaryComm']}-{res['primaryMotiv']}"
+    int_prof = INTEGRATED_PROFILES.get(int_key)
+    
+    # --- Actions Section ---
+    c1, c2 = st.columns(2)
+    with c1:
+        pdf_bytes = create_pdf(st.session_state.user_info, res, comm_prof, mot_prof, int_prof)
+        st.download_button(
+            label="📄 Download PDF Report",
+            data=pdf_bytes,
+            file_name=f"Elmcrest_Profile_{st.session_state.user_info['name'].replace(' ', '_')}.pdf",
+            mime="application/pdf",
+        )
+    with c2:
+        if st.button("📧 Email Me Results"):
+            # Re-construct payload
+            payload = {
+                "name": st.session_state.user_info['name'],
+                "email": st.session_state.user_info['email'],
+                "role": st.session_state.user_info['role'],
+                "scores": {
+                    "communication": res['commScores'],
+                    "motivation": res['motivScores'],
+                    "primaryComm": res['primaryComm'],
+                    "secondaryComm": res['secondaryComm'],
+                    "primaryMotiv": res['primaryMotiv'],
+                    "secondaryMotiv": res['secondaryMotiv'],
+                }
+            }
+            with st.spinner("Sending email request..."):
+                success = submit_to_google_sheets(payload, action="email")
+                if success:
+                    st.success("Email request sent!")
+
+    st.markdown("---")
+
+    # --- Comm Section ---
     
     st.markdown(f"## 🗣️ Communication Style")
     
@@ -670,7 +827,6 @@ elif st.session_state.step == 'results':
     st.markdown("---")
 
     # --- Motivation Section ---
-    mot_prof = MOTIVATION_PROFILES[res['primaryMotiv']]
     
     st.markdown(f"## 🔋 Motivation Driver")
     
@@ -699,9 +855,7 @@ elif st.session_state.step == 'results':
     st.markdown("---")
 
     # --- Integrated Section ---
-    int_key = f"{res['primaryComm']}-{res['primaryMotiv']}"
-    if int_key in INTEGRATED_PROFILES:
-        int_prof = INTEGRATED_PROFILES[int_key]
+    if int_prof:
         st.markdown(f"## 🔗 Integrated Profile: {int_prof['title']}")
         st.write(int_prof['summary'])
         
