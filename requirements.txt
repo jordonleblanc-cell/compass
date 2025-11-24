@@ -3,3 +3,4 @@ requests
 fpdf
 plotly
 pandas
+matplotlib
