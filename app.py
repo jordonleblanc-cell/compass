@@ -7,19 +7,29 @@ import time
 st.set_page_config(page_title="Elmcrest Compass", page_icon="🧭", layout="centered")
 
 # Custom CSS to match Elmcrest branding
+# FIXED: Added text color overrides to prevent invisible text in Dark Mode
 st.markdown("""
     <style>
+        /* Force the main app background to the light Elmcrest gradient */
         .stApp {
             background: radial-gradient(circle at top, #e0f2fe 0, transparent 55%),
                         radial-gradient(circle at bottom, #dcfce7 0, transparent 55%);
         }
-        h1, h2, h3 {
-            color: #015bad;
+        
+        /* Force ALL text to be dark gray/blue, overriding Streamlit's dark mode white text */
+        .stApp, .stMarkdown, .stText, p, div, span, label, li, .stRadio label {
+            color: #0f172a !important; 
         }
+
+        /* Headlines */
+        h1, h2, h3, h4, h5, h6 {
+            color: #015bad !important;
+        }
+
         /* Style buttons to look like the React app */
         .stButton button {
             background: linear-gradient(135deg, #015bad, #51c3c5);
-            color: white;
+            color: white !important;
             border: none;
             border-radius: 20px;
             padding: 10px 24px;
@@ -27,10 +37,11 @@ st.markdown("""
             width: 100%;
         }
         .stButton button:hover {
-            color: white;
+            color: white !important;
             opacity: 0.9;
         }
-        /* Container styling */
+
+        /* Container styling - white card look */
         .block-container {
             padding-top: 2rem;
             padding-bottom: 2rem;
@@ -39,9 +50,22 @@ st.markdown("""
             border-radius: 18px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-        /* Radio button styling tweaks */
+        
+        /* Input fields background fix */
+        .stTextInput input, .stSelectbox div[data-baseweb="select"] > div {
+            color: #0f172a !important;
+            background-color: #ffffff !important;
+        }
+
+        /* Radio button selected color */
         div[role="radiogroup"] > label > div:first-of-type {
             background-color: #015bad !important;
+            border-color: #015bad !important;
+        }
+        
+        /* Horizontal divider */
+        hr {
+            border-color: #e5e7eb !important;
         }
     </style>
 """, unsafe_allow_html=True)
