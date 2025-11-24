@@ -4,26 +4,124 @@ import pandas as pd
 from fpdf import FPDF
 import plotly.express as px
 
-# --- Configuration ---
+# --- 1. CONFIGURATION ---
 st.set_page_config(page_title="Elmcrest Supervisor Platform", page_icon="📊", layout="wide")
 
-# --- Constants ---
+# --- 2. CONSTANTS ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
 
-# --- Helper Function: Clean Text for PDF ---
-def clean_text(text):
-    if not text: return ""
-    text = str(text)
-    replacements = {
-        '\u2018': "'", '\u2019': "'", '\u201c': '"', '\u201d': '"', 
-        '\u2013': '-', '\u2014': '-', '\u2026': '...',
-        '—': '-', '–': '-', '“': '"', '”': '"'
-    }
-    for k, v in replacements.items():
-        text = text.replace(k, v)
-    return text.encode('latin-1', 'replace').decode('latin-1')
+# --- 3. CONTENT DICTIONARIES ---
 
-# --- RICH CONTENT DICTIONARIES ---
+COMM_TRAITS = {
+    "Director": {"focus": "Action & Speed", "blindspot": "Patience & Consensus", "needs": "Clarity & Autonomy"},
+    "Encourager": {"focus": "Morale & Harmony", "blindspot": "Hard Truths & Conflict", "needs": "Validation & Connection"},
+    "Facilitator": {"focus": "Fairness & Process", "blindspot": "Decisiveness & Speed", "needs": "Time & Perspective"},
+    "Tracker": {"focus": "Details & Safety", "blindspot": "Flexibility & Big Picture", "needs": "Structure & Logic"}
+}
+
+CONFLICT_SCRIPTS = {
+    "Director-Encourager": {
+        "tension": "The Director feels the Encourager is 'too soft' or wasting time on feelings. The Encourager feels the Director is 'mean' or steamrolling the team.",
+        "advice_a": "Your drive for efficiency is hurting the relationship. If you crush their morale, they will disengage. Stop interrupting and acknowledge the *feeling* before you fix the *problem*.",
+        "advice_b": "The Director isn't trying to be mean; they are stressed by the lack of progress. Be direct. Say, 'I can move faster, but I need you to listen to my concern about the team's morale first.'"
+    },
+    "Director-Facilitator": {
+        "tension": "The Speed vs. Process Clash. The Director wants to decide *now*; the Facilitator wants to hear from everyone first.",
+        "advice_a": "You are moving too fast for them. If you force a decision now, you get compliance, not buy-in. Ask: 'What specific perspective are we missing?' then set a deadline.",
+        "advice_b": "Silence looks like agreement to a Director. You must speak up. Say: 'I am not stalling, I am preventing a mistake. Give me 10 minutes to outline the risk.'"
+    },
+    "Director-Tracker": {
+        "tension": "The Big Picture vs. The Weeds. The Director says 'Just get it done.' The Tracker asks 'But how? What about regulation X?'",
+        "advice_a": "They aren't being difficult; they are protecting you from liability. Stop dismissing the details. Ask: 'What is the critical blocker preventing us from moving?'",
+        "advice_b": "The Director doesn't need every detail. Start with the solution, not the problem. Say: 'We can hit that deadline, but we have to skip step B. Do you agree?'"
+    },
+    "Encourager-Tracker": {
+        "tension": "Heart vs. Head. The Encourager bends rules to help the kid. The Tracker cites the policy manual.",
+        "advice_a": "Rules aren't just red tape; they create the safety container for your relationship. If you are inconsistent, you aren't being kind, you're being confusing.",
+        "advice_b": "You are right about the rule, but you are losing the relationship. Validate the intent ('I know you want to help the kid') before correcting the method."
+    },
+    "Encourager-Facilitator": {
+        "tension": "The Nice-Off. Both want harmony, but the Facilitator focuses on fairness while the Encourager focuses on feelings. Decisions can stall indefinitely.",
+        "advice_a": "You are prioritizing the person in front of you over the fairness of the whole group. Step back.",
+        "advice_b": "You are prioritizing the process over the immediate emotional need. Step in."
+    },
+    "Facilitator-Tracker": {
+        "tension": "Analysis Paralysis. Both are cautious. The Facilitator waits for consensus; the Tracker waits for data. Nothing happens.",
+        "advice_a": "Consensus doesn't mean unanimity. You have enough votes. Move.",
+        "advice_b": "You have enough data. Perfection is the enemy of done. Move."
+    }
+}
+
+CAREER_PATHWAYS = {
+    "Director": {
+        "Shift Supervisor": {
+            "shift": "From 'Doing' to 'Enabling'.",
+            "conversation": "You have high capacity and speed, which is a gift. To succeed as a Shift Supervisor, you have to resist the urge to 'rescue' the shift by doing everything yourself. Your success is no longer defined by how many tasks *you* complete, but by how confident your team feels completing theirs.",
+            "assignment": "Assign them to lead a shift where they are physically restricted to the office or a central hub (unless safety dictates otherwise). Their goal is to run the shift entirely through verbal direction and delegation to peers, forcing them to build trust."
+        },
+        "Program Supervisor": {
+            "shift": "From 'Command' to 'Influence'.",
+            "conversation": "You are excellent at execution within your unit. However, program leadership requires getting buy-in from people you don't supervise (School, Clinical, other cottages). You need to learn that 'slowing down' to build relationships is actually a strategic move that speeds up long-term results.",
+            "assignment": "Task them with a cross-departmental project (e.g., improving school transitions). Their goal is to interview stakeholders in the School and Clinical teams and present a plan that incorporates *their* feedback, not just the Director's own ideas."
+        },
+        "Manager": {
+            "shift": "From 'Tactical' to 'Strategic'.",
+            "conversation": "You react beautifully to problems. The next level requires you to prevent them 6 months in advance. You need to shift from reliance on your force of will to reliance on sustainable systems.",
+            "assignment": "Have them write a strategic plan for a recurring seasonal issue (e.g., summer break structure). It must rely on data and systems, not just 'working harder'."
+        }
+    },
+    "Encourager": {
+        "Shift Supervisor": {
+            "shift": "From 'Friend' to 'Guardian'.",
+            "conversation": "Your empathy is your superpower, but if you avoid hard conversations to keep the peace, you create an unsafe environment. The team needs you to be a 'Guardian' of the standard. Holding people accountable is actually the kindest thing you can do, because it ensures clarity and safety for everyone.",
+            "assignment": "Have them lead a policy refresher or 'reset' meeting with the team regarding a specific routine that has slipped. Coach them beforehand on how to be firm about the standard while remaining warm in their tone."
+        },
+        "Program Supervisor": {
+            "shift": "From 'Vibe' to 'Structure'.",
+            "conversation": "You create an amazing emotional climate. To lead a program, that climate must be backed by unshakeable structure. You need to master the 'boring' parts of leadership—budgets, schedules, audits—because those are the tools that protect your team from burnout.",
+            "assignment": "Assign them ownership of a compliance audit or a schedule overhaul. Challenge them to present the data and the rationale, ensuring they don't just rely on personality to sell the change."
+        },
+        "Manager": {
+            "shift": "From 'Caregiver' to 'Director'.",
+            "conversation": "You naturally carry the emotions of your people. At the manager level, the weight is too heavy to carry alone. Your growth edge is learning to set emotional boundaries—caring deeply about the person without taking responsibility for their feelings.",
+            "assignment": "Have them manage a resource allocation conflict (e.g., denying a budget request or staffing request) where they have to say 'No' clearly, explain the business reason, and withstand the disappointment of the staff member."
+        }
+    },
+    "Facilitator": {
+        "Shift Supervisor": {
+            "shift": "From 'Peer' to 'Decider'.",
+            "conversation": "You are gifted at ensuring everyone feels heard. As a Shift Sup, there will be moments where consensus is impossible and safety requires speed. You need to get comfortable making the '51% decision'—listening to input, but making the call even if 49% disagree.",
+            "assignment": "Put them in charge of a time-sensitive crisis drill or transition. Debrief afterwards: 'Where did you hesitate? How did it feel to give a direct command?' Affirm their authority."
+        },
+        "Program Supervisor": {
+            "shift": "From 'Mediator' to 'Visionary'.",
+            "conversation": "You are a great stabilizer. But a Program Supervisor must also be a driver. Instead of just mediating the team's ideas, we need you to inject your own vision. Don't just wait to see what the group wants; tell us where you think the group needs to go.",
+            "assignment": "Ask them to propose a new initiative for the program culture. They must present it to the team not as a 'discussion' but as a direction, practicing assertive leadership."
+        },
+        "Manager": {
+            "shift": "From 'Process' to 'Outcome'.",
+            "conversation": "Fair process is vital, but sometimes it yields poor results. At this level, you must prioritize the outcome over the comfort of the process. You need to be willing to disrupt the harmony to achieve the mission.",
+            "assignment": "Task them with implementing a necessary but unpopular policy change. Coach them on how to listen to complaints without backtracking on the decision."
+        }
+    },
+    "Tracker": {
+        "Shift Supervisor": {
+            "shift": "From 'Executor' to 'Overseer'.",
+            "conversation": "You are brilliant at the details. But you cannot track every detail personally at this level without burning out or micromanaging. Your growth is trusting your team. You have to let them do the checklist, even if they do it differently than you would.",
+            "assignment": "The 'Hands-Off' Day. Assign them to supervise a complex task (like an intake or a room search) where they are strictly prohibited from touching any paperwork themselves. They must guide a peer to do it."
+        },
+        "Program Supervisor": {
+            "shift": "From 'Black & White' to 'Gray'.",
+            "conversation": "You excel when the rules are clear. Program leadership is full of gray areas where the policy manual doesn't have an answer. You need to develop your intuition and judgment to navigate complex family or youth dynamics that don't fit the spreadsheet.",
+            "assignment": "Have them handle a complex parent complaint or a unique youth restriction plan where standard rules don't apply. Guide them to make a principle-based decision rather than a rule-based one."
+        },
+        "Manager": {
+            "shift": "From 'Compliance' to 'Culture'.",
+            "conversation": "Culture eats strategy (and checklists) for breakfast. If you prioritize efficiency over connection, you will have a compliant but brittle organization. You need to invest as much energy in 'how people feel' as 'what people do'.",
+            "assignment": "Task them with a retention or morale initiative. Success is measured not by a completed task list, but by staff feedback and engagement scores."
+        }
+    }
+}
 
 COMM_PROFILES = {
     "Director": {
@@ -67,7 +165,7 @@ COMM_PROFILES = {
         },
         "s8_struggling": {
             "text": "Under stress, the Encourager's desire for harmony can lead to conflict avoidance and a lack of accountability. They may struggle to hold boundaries with youth or staff because they don't want to be 'mean.' This can result in a chaotic environment where rules are applied inconsistently based on feelings.",
-            "bullets": ["avoiding necessary hard conversations.", "Venting or gossiping as a way to manage stress.", "Disorganization or missed deadlines due to social distractions.", "Taking youth behaviors personally or becoming emotionally enmeshed."]
+            "bullets": ["Avoiding necessary hard conversations.", "Venting or gossiping as a way to manage stress.", "Disorganization or missed deadlines due to social distractions.", "Taking youth behaviors personally or becoming emotionally enmeshed."]
         },
         "s11_coaching": [
             "How can you deliver this hard truth while still remaining kind?",
@@ -239,7 +337,18 @@ MOTIVATION_PROFILES = {
     }
 }
 
-# --- PDF Generator ---
+# --- 4. HELPER FUNCTIONS ---
+
+def fetch_staff_data():
+    try:
+        response = requests.get(GOOGLE_SCRIPT_URL)
+        if response.status_code == 200:
+            return response.json()
+        return []
+    except Exception as e:
+        st.error(f"Error connecting to database: {e}")
+        return []
+
 def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf = FPDF()
     pdf.add_page()
@@ -248,8 +357,8 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     blue = (1, 91, 173)
     black = (0, 0, 0)
     
-    # Header
-    pdf.set_font("Arial", 'B', 24)
+    # HEADER
+    pdf.set_font("Arial", 'B', 20)
     pdf.set_text_color(*blue)
     pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align='C')
     
@@ -376,7 +485,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
     return pdf.output(dest='S').encode('latin-1')
 
-# --- MAIN APP LOGIC ---
+# --- 5. MAIN APP LOGIC ---
 
 # Fetch data once
 staff_list = fetch_staff_data()
@@ -507,13 +616,34 @@ with tab3:
         if p1_name and p2_name and p1_name != p2_name:
             p1 = df[df['name'] == p1_name].iloc[0]
             p2 = df[df['name'] == p2_name].iloc[0]
+            st.divider()
+            st.subheader(f"The Clash: {p1['p_comm']} vs. {p2['p_comm']}")
             
             style1 = p1['p_comm']
             style2 = p2['p_comm']
+            key = "-".join(sorted([style1, style2]))
             
-            st.divider()
-            st.subheader(f"The Clash: {style1} vs. {style2}")
-            st.markdown("_(Conflict Matrix scripts would populate here as in previous versions)_")
+            if style1 == style2:
+                st.warning("Same-Style Conflict: These two are likely clashing because they are too similar (fighting for airtime) or amplifying each other's weaknesses.")
+            elif key in CONFLICT_SCRIPTS:
+                script = CONFLICT_SCRIPTS[key]
+                st.info(f"**Root Tension:** {script['tension']}")
+                st.markdown("#### 🗣️ What to say to them individually:")
+                
+                if style1 < style2:
+                    advice1 = script['advice_a']
+                    advice2 = script['advice_b']
+                else:
+                    advice1 = script['advice_b']
+                    advice2 = script['advice_a']
+                
+                col_x, col_y = st.columns(2)
+                with col_x:
+                    st.markdown(f"**To {p1_name} ({style1}):**")
+                    st.success(f"\"{advice1}\"")
+                with col_y:
+                    st.markdown(f"**To {p2_name} ({style2}):**")
+                    st.success(f"\"{advice2}\"")
             
             st.markdown("---")
             st.button("Reset Conflict Tool", key="reset_btn_t3", on_click=reset_t3)
@@ -536,9 +666,26 @@ with tab4:
         
         if candidate_name and target_role:
             cand = df[df['name'] == candidate_name].iloc[0]
+            style = cand['p_comm']
+            
             st.divider()
-            st.markdown(f"**Candidate:** {cand['name']}")
-            st.write("_(Career path logic would populate here)_")
+            st.markdown(f"**Candidate:** {cand['name']} ({style})")
+            st.markdown(f"**Target:** {target_role}")
+            
+            path_data = CAREER_PATHWAYS.get(style, {}).get(target_role)
+            
+            if path_data:
+                st.info(f"💡 **The Core Shift:** {path_data['shift']}")
+                
+                c1, c2 = st.columns([1, 1])
+                with c1:
+                    st.markdown("#### 🗣️ The Coaching Conversation")
+                    st.write(path_data['conversation'])
+                with c2:
+                    st.markdown("#### ✅ The Developmental Assignment")
+                    st.success(path_data['assignment'])
+            else:
+                st.write("Standard advancement path.")
             
             st.markdown("---")
             st.button("Reset Career Path", key="reset_btn_t4", on_click=reset_t4)
