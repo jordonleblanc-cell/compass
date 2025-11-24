@@ -456,6 +456,19 @@ def submit_to_google_sheets(data, action="save"):
         st.error(f"Error connecting to server: {e}")
         return False
 
+def clean_text(text):
+    """Helper to replace incompatible unicode characters with latin-1 equivalents"""
+    if not text: return ""
+    replacements = {
+        '\u2018': "'", '\u2019': "'",  # Smart quotes
+        '\u201c': '"', '\u201d': '"',  # Smart double quotes
+        '\u2013': '-', '\u2014': '-',  # Dashes
+        '\u2026': '...',               # Ellipsis
+    }
+    for k, v in replacements.items():
+        text = text.replace(k, v)
+    return text.encode('latin-1', 'replace').decode('latin-1')
+
 def create_pdf(user_info, results, comm_prof, mot_prof, int_prof):
     pdf = FPDF()
     pdf.add_page()
@@ -470,69 +483,69 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof):
     
     pdf.set_font("Arial", '', 12)
     pdf.set_text_color(50, 50, 50)
-    pdf.cell(0, 10, f"Prepared for: {user_info['name']} | Role: {user_info['role']}", ln=True, align='C')
+    pdf.cell(0, 10, clean_text(f"Prepared for: {user_info['name']} | Role: {user_info['role']}"), ln=True, align='C')
     pdf.ln(10)
     
     # Communication Section
     pdf.set_font("Arial", 'B', 16)
     pdf.set_text_color(*primary_color)
-    pdf.cell(0, 10, f"Communication Style: {comm_prof['name']}", ln=True)
+    pdf.cell(0, 10, clean_text(f"Communication Style: {comm_prof['name']}"), ln=True)
     
     pdf.set_font("Arial", 'I', 12)
     pdf.set_text_color(100, 100, 100)
-    pdf.multi_cell(0, 8, comm_prof['tagline'])
+    pdf.multi_cell(0, 8, clean_text(comm_prof['tagline']))
     
     pdf.set_font("Arial", '', 11)
     pdf.set_text_color(0, 0, 0)
     pdf.ln(4)
-    pdf.multi_cell(0, 6, comm_prof['overview'])
+    pdf.multi_cell(0, 6, clean_text(comm_prof['overview']))
     pdf.ln(5)
     
     pdf.set_font("Arial", 'B', 11)
     pdf.cell(0, 8, "Under Stress:", ln=True)
     pdf.set_font("Arial", '', 11)
-    pdf.multi_cell(0, 6, comm_prof['conflictImpact'])
+    pdf.multi_cell(0, 6, clean_text(comm_prof['conflictImpact']))
     pdf.ln(10)
 
     # Motivation Section
     pdf.set_font("Arial", 'B', 16)
     pdf.set_text_color(*primary_color)
-    pdf.cell(0, 10, f"Motivation Driver: {mot_prof['name']}", ln=True)
+    pdf.cell(0, 10, clean_text(f"Motivation Driver: {mot_prof['name']}"), ln=True)
     
     pdf.set_font("Arial", 'I', 12)
     pdf.set_text_color(100, 100, 100)
-    pdf.multi_cell(0, 8, mot_prof['tagline'])
+    pdf.multi_cell(0, 8, clean_text(mot_prof['tagline']))
     
     pdf.set_font("Arial", '', 11)
     pdf.set_text_color(0, 0, 0)
     pdf.ln(4)
-    pdf.multi_cell(0, 6, mot_prof['summary'])
+    pdf.multi_cell(0, 6, clean_text(mot_prof['summary']))
     pdf.ln(5)
     
     pdf.set_font("Arial", 'B', 11)
     pdf.cell(0, 8, "Key Boosters:", ln=True)
     pdf.set_font("Arial", '', 11)
     for b in mot_prof['boosters']:
-        pdf.cell(0, 6, f"- {b}", ln=True)
+        pdf.cell(0, 6, clean_text(f"- {b}"), ln=True)
     pdf.ln(10)
 
     # Integrated Section
     if int_prof:
         pdf.set_font("Arial", 'B', 16)
         pdf.set_text_color(*primary_color)
-        pdf.cell(0, 10, f"Integrated Profile: {int_prof['title']}", ln=True)
+        pdf.cell(0, 10, clean_text(f"Integrated Profile: {int_prof['title']}"), ln=True)
         
         pdf.set_font("Arial", '', 11)
         pdf.set_text_color(0, 0, 0)
         pdf.ln(4)
-        pdf.multi_cell(0, 6, int_prof['summary'])
+        pdf.multi_cell(0, 6, clean_text(int_prof['summary']))
         pdf.ln(5)
         
         pdf.set_font("Arial", 'B', 11)
         pdf.cell(0, 8, "Key Strengths:", ln=True)
         pdf.set_font("Arial", '', 11)
         for s in int_prof['strengths']:
-            pdf.cell(0, 6, f"- {s}", ln=True)
+            pdf.cell(0, 6, clean_text(f"- {s}"), ln=True)
 
     return pdf.output(dest='S').encode('latin-1')
 
