@@ -6,102 +6,153 @@ import time
 # --- Configuration & Styling ---
 st.set_page_config(page_title="Elmcrest Compass", page_icon="🧭", layout="centered")
 
-# Custom CSS with Automatic Dark/Light Mode Support
+# Custom CSS with Polished UI & Automatic Dark/Light Mode
 st.markdown("""
     <style>
-        /* Define CSS Variables for Light Mode (Default) */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        /* CSS Variables for Theming */
         :root {
-            --bg-top: #e0f2fe;
-            --bg-bottom: #dcfce7;
+            --primary: #015bad;
+            --secondary: #51c3c5;
+            --accent: #b9dca4;
+            --bg-gradient-light: radial-gradient(circle at top left, #e0f2fe 0%, #ffffff 40%, #dcfce7 100%);
+            --bg-gradient-dark: radial-gradient(circle at top left, #0f172a 0%, #1e293b 40%, #064e3b 100%);
             --text-main: #0f172a;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --headline: #015bad;
-            --input-bg: #ffffff;
-            --input-text: #0f172a;
-            --border-color: #e5e7eb;
+            --text-sub: #475569;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(255, 255, 255, 0.6);
+            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+            --input-bg: #f8fafc;
         }
 
-        /* Override Variables for Dark Mode */
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-top: #0f172a;
-                --bg-bottom: #064e3b;
-                --text-main: #e2e8f0;
-                --card-bg: rgba(30, 41, 59, 0.95);
-                --headline: #51c3c5;
-                --input-bg: #1e293b;
-                --input-text: #f1f5f9;
-                --border-color: #334155;
+                --text-main: #f1f5f9;
+                --text-sub: #94a3b8;
+                --card-bg: rgba(30, 41, 59, 0.85);
+                --card-border: rgba(255, 255, 255, 0.1);
+                --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+                --input-bg: #0f172a;
             }
         }
 
-        /* Apply Background Gradient using Variables */
+        html, body, [class*="css"] {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Main App Background */
         .stApp {
-            background: radial-gradient(circle at top, var(--bg-top) 0, transparent 55%),
-                        radial-gradient(circle at bottom, var(--bg-bottom) 0, transparent 55%);
+            background-image: var(--bg-gradient-light);
+            background-attachment: fixed;
         }
-        
-        /* Dynamic Text Colors */
-        .stApp, .stMarkdown, .stText, p, div, span, label, li, .stRadio label {
-            color: var(--text-main) !important; 
+        @media (prefers-color-scheme: dark) {
+            .stApp { background-image: var(--bg-gradient-dark); }
         }
 
-        /* Dynamic Headlines */
-        h1, h2, h3, h4, h5, h6 {
-            color: var(--headline) !important;
+        /* Typography */
+        h1, h2, h3 {
+            color: var(--primary) !important;
+            font-weight: 700 !important;
+            letter-spacing: -0.02em;
+        }
+        p, label, li, .stMarkdown {
+            color: var(--text-main) !important;
+            line-height: 1.6;
+        }
+        .small-text {
+            color: var(--text-sub) !important;
+            font-size: 0.85rem;
         }
 
-        /* Button Styling (Kept consistent as it pops in both modes) */
+        /* Card / Block Container */
+        .block-container {
+            padding: 3rem 2rem;
+            max-width: 800px;
+            background-color: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+        }
+
+        /* Buttons - Modern Gradient */
         .stButton button {
-            background: linear-gradient(135deg, #015bad, #51c3c5);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white !important;
             border: none;
-            border-radius: 20px;
-            padding: 10px 24px;
-            font-weight: bold;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(1, 91, 173, 0.2);
             width: 100%;
         }
         .stButton button:hover {
-            color: white !important;
-            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(1, 91, 173, 0.3);
+            opacity: 0.95;
+        }
+        .stButton button:active {
+            transform: translateY(0);
         }
 
-        /* Card Container Styling */
-        .block-container {
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-            max-width: 800px;
-            background-color: var(--card-bg);
-            border-radius: 18px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease;
-        }
-        
-        /* Input Fields */
+        /* Inputs & Selects */
         .stTextInput input, .stSelectbox div[data-baseweb="select"] > div {
-            color: var(--input-text) !important;
             background-color: var(--input-bg) !important;
-            border-color: var(--border-color) !important;
-        }
-        .stSelectbox div[data-baseweb="popover"] {
-             background-color: var(--card-bg) !important;
+            color: var(--text-main) !important;
+            border-radius: 12px;
+            border: 1px solid var(--card-border) !important;
+            padding: 0.5rem 1rem;
         }
 
-        /* Radio Button Active State */
-        div[role="radiogroup"] > label > div:first-of-type {
-            background-color: #015bad !important;
-            border-color: #015bad !important;
+        /* Radio Buttons - Clean up spacing */
+        .stRadio {
+            background-color: transparent;
+            padding: 10px 0;
         }
         
-        /* Dividers */
+        /* Custom Score Bar Styling */
+        .score-container {
+            background-color: var(--input-bg);
+            border-radius: 8px;
+            height: 12px;
+            width: 100%;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .score-fill {
+            height: 100%;
+            border-radius: 8px;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            transition: width 1s ease-in-out;
+        }
+
+        /* Info Cards in Results */
+        .info-card {
+            background-color: var(--input-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--card-border);
+        }
+        
+        /* Divider */
         hr {
-            border-color: var(--border-color) !important;
+            margin: 2rem 0;
+            border: 0;
+            border-top: 1px solid var(--card-border);
+            opacity: 0.5;
         }
-        
-        /* Expander Header */
-        .streamlit-expanderHeader {
-            background-color: transparent !important;
-            color: var(--text-main) !important;
+
+        /* Radio selection color */
+        div[role="radiogroup"] > label > div:first-of-type {
+            background-color: var(--primary) !important;
+            border-color: var(--primary) !important;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -177,7 +228,8 @@ MOTIVATION_QUESTIONS = [
 
 COMM_PROFILES = {
     "Director": {
-        "name": "Director Communicator – The Decisive Driver",
+        "name": "Director Communicator",
+        "tagline": "The Decisive Driver",
         "overview": "You move quickly toward action. In high-pressure moments, you’re often the one who steps in, organizes people, and pushes the team toward a clear decision. Your directness can bring structure and safety when things feel chaotic.",
         "conflictImpact": "Under stress, you may become more blunt, controlling, or impatient. Others may feel talked over or rushed, even when your goal is safety. When you slow your pace just enough to check in, your leadership becomes easier for people to trust and follow.",
         "traumaStrategy": "Your clear, firm presence can feel regulating for youth and staff when paired with calm tone and predictable follow-through. Short, concrete statements such as “Here’s the plan for the next 10 minutes…” help everyone re-orient after a tough moment.",
@@ -203,7 +255,8 @@ COMM_PROFILES = {
         },
     },
     "Encourager": {
-        "name": "Encourager Communicator – The Relational Energizer",
+        "name": "Encourager Communicator",
+        "tagline": "The Relational Energizer",
         "overview": "You bring warmth, optimism, and emotional presence. You notice when people need encouragement and often become the person youth and coworkers seek out when they’re struggling.",
         "conflictImpact": "Under stress, you may talk more, avoid hard truths, or personalize feedback. You might try to smooth things over quickly to keep relationships intact, even when deeper repair is needed.",
         "traumaStrategy": "Your ability to notice and name small wins is powerful for youth with trauma histories. Combine empathy with clear, consistent boundaries so that care doesn’t slide into inconsistency.",
@@ -229,7 +282,8 @@ COMM_PROFILES = {
         },
     },
     "Facilitator": {
-        "name": "Facilitator Communicator – The Calm Bridge",
+        "name": "Facilitator Communicator",
+        "tagline": "The Calm Bridge",
         "overview": "You listen deeply, notice different perspectives, and help people stay at the table when things are tense. You care about process and fairness, not just the final decision.",
         "conflictImpact": "Under stress, you may delay decisions or quietly absorb tension to keep the peace. You might say “it’s fine” when it isn’t, which can leave issues unresolved.",
         "traumaStrategy": "Your steady presence and ability to slow things down are powerful in a trauma-heavy environment. Naming what you see (“There’s a lot of tension in the room right now…”) can help others regulate and refocus.",
@@ -255,7 +309,8 @@ COMM_PROFILES = {
         },
     },
     "Tracker": {
-        "name": "Tracker Communicator – The Structured Guardian",
+        "name": "Tracker Communicator",
+        "tagline": "The Structured Guardian",
         "overview": "You notice patterns, details, and gaps in systems. You help keep routines, documentation, and safety steps on track, which protects youth and staff from unnecessary risk.",
         "conflictImpact": "Under stress, you may become more rigid or critical. You might focus so strongly on rules that others experience you as inflexible or harsh, even when your concern is safety.",
         "traumaStrategy": "Your consistency and attention to detail make the environment more predictable—something youth with trauma histories often need. When paired with warm tone and choice, your structure becomes a powerful form of care.",
@@ -284,7 +339,8 @@ COMM_PROFILES = {
 
 MOTIVATION_PROFILES = {
     "Growth": {
-        "name": "Growth Motivation – The Learner/Builder",
+        "name": "Growth Motivation",
+        "tagline": "The Learner/Builder",
         "summary": "You’re energized when you can see yourself developing. Stretch assignments, feedback, and new skills matter to you. Stagnation is draining.",
         "boosters": ["Clear opportunities to learn new skills tied to real work on the unit.", "Supportive coaching that notices progress, not just mistakes.", "Chances to step into new responsibilities with backup from your supervisor."],
         "killers": ["Feeling stuck in the same patterns with no development.", "Being asked to do more without any investment in your growth.", "Learning that feels disconnected from youth or Elmcrest’s mission."],
@@ -295,7 +351,8 @@ MOTIVATION_PROFILES = {
         },
     },
     "Purpose": {
-        "name": "Purpose Motivation – The Mission Keeper",
+        "name": "Purpose Motivation",
+        "tagline": "The Mission Keeper",
         "summary": "You’re driven by meaning and alignment. You want your daily work to match your values about safety, dignity, and justice for youth and staff.",
         "boosters": ["Clear connections between decisions and what’s best for youth and families.", "Spaces where it’s safe to raise ethical concerns without being dismissed.", "Chances to help shape practices to make them more trauma-informed and equitable."],
         "killers": ["Feeling that the system is asking you to act against your values.", "Policies that don’t make sense for the youth you serve.", "Being told “that’s just how it is” when you raise real concerns."],
@@ -306,7 +363,8 @@ MOTIVATION_PROFILES = {
         },
     },
     "Connection": {
-        "name": "Connection Motivation – The Community Builder",
+        "name": "Connection Motivation",
+        "tagline": "The Community Builder",
         "summary": "You’re most energized when relationships are strong and the team feels like a real community. Belonging fuels your resilience.",
         "boosters": ["Regular relational check-ins, not just task updates.", "Moments where team effort and mutual support are noticed and appreciated.", "Stable assignments that allow trust to build over time."],
         "killers": ["Persistent conflict or tension that never gets addressed.", "Isolation, working long stretches without feeling part of a team.", "Only hearing from others when something is wrong."],
@@ -317,7 +375,8 @@ MOTIVATION_PROFILES = {
         },
     },
     "Achievement": {
-        "name": "Achievement Motivation – The Results Architect",
+        "name": "Achievement Motivation",
+        "tagline": "The Results Architect",
         "summary": "You care about clear goals and concrete progress. You want to know what success looks like and see evidence that you’re getting there.",
         "boosters": ["Specific, realistic goals tied to youth outcomes or team functioning.", "Simple ways to track progress (checklists, brief run-downs, quick metrics).", "Recognition that names concrete contributions, not just general praise."],
         "killers": ["Constantly shifting expectations with no clear targets.", "Doing a lot of work that never gets acknowledged.", "Only hearing about what went wrong, never what improved."],
@@ -358,22 +417,15 @@ def normalize_role_key(role):
     return "YDP"
 
 def get_top_two(scores):
-    # scores is a dict like {'Director': 15, 'Tracker': 12, ...}
-    # Sort by score descending
     sorted_scores = sorted(scores.items(), key=lambda item: item[1], reverse=True)
     primary = sorted_scores[0][0] if len(sorted_scores) > 0 else None
     secondary = sorted_scores[1][0] if len(sorted_scores) > 1 else None
     return primary, secondary
 
 def submit_to_google_sheets(data):
-    # This URL is from your provided Google Apps Script deployment
     url = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
-    
     try:
-        # Python requests handles the POST gracefully, unlike browser fetch which has CORS issues
         response = requests.post(url, json=data)
-        
-        # Check for successful status (Google Scripts sometimes return 302 redirects which requests handles automatically)
         if response.status_code == 200:
             return True
         else:
@@ -387,7 +439,6 @@ def submit_to_google_sheets(data):
 
 if 'step' not in st.session_state:
     st.session_state.step = 'intro'
-    # Shuffle once and store in session state
     comm_q = COMMUNICATION_QUESTIONS.copy()
     motiv_q = MOTIVATION_QUESTIONS.copy()
     random.shuffle(comm_q)
@@ -398,31 +449,67 @@ if 'step' not in st.session_state:
     st.session_state.answers_motiv = {}
     st.session_state.user_info = {}
 
-# --- Views ---
+# --- Helper Views ---
 
-def show_header(subtitle):
+def show_brand_header(subtitle):
+    col1, col2 = st.columns([0.15, 0.85])
+    with col1:
+        st.markdown("""
+        <div style="
+            width: 55px; height: 55px; 
+            background: linear-gradient(135deg, #015bad, #51c3c5); 
+            border-radius: 12px; 
+            color: white; 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: 800; font-size: 1.2rem;
+            box-shadow: 0 4px 12px rgba(1, 91, 173, 0.25);">
+            EC
+        </div>
+        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown(f"""
+        <div style="display: flex; flex-direction: column; justify-content: center; height: 55px;">
+            <div style="color: #015bad; font-weight: 800; font-size: 1.5rem; line-height: 1.2;">ELMCREST COMPASS</div>
+            <div style="color: #64748b; font-size: 0.95rem; font-weight: 500;">{subtitle}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    st.markdown("<hr>", unsafe_allow_html=True)
+
+def draw_score_bar(label, value, max_value=25):
+    """Draws a custom HTML progress bar for scores"""
+    percentage = (value / max_value) * 100
     st.markdown(f"""
-    <div style="display: flex; align-items: center; margin-bottom: 20px;">
-        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #015bad, #51c3c5); border-radius: 8px; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px;">EC</div>
-        <div>
-            <div style="color: #015bad; font-weight: bold; font-size: 1.2rem;">ELMCREST COMPASS</div>
-            <div style="color: #666; font-size: 0.9rem;">{subtitle}</div>
+    <div style="margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.9rem; font-weight: 600;">
+            <span>{label}</span>
+            <span>{value}</span>
+        </div>
+        <div class="score-container">
+            <div class="score-fill" style="width: {percentage}%;"></div>
         </div>
     </div>
-    <hr style="border: 0; border-top: 1px dashed #ccc; margin: 20px 0;">
     """, unsafe_allow_html=True)
 
+# --- Main App ---
+
 if st.session_state.step == 'intro':
-    show_header("Communication & Motivation Snapshot")
-    st.markdown("### Welcome")
+    show_brand_header("Communication & Motivation Snapshot")
+    
+    st.markdown("### Welcome to your Compass")
     st.info("This assessment helps you understand your natural communication and motivation patterns at work. Your insights will shape a personalized profile built to support your growth.")
+    st.markdown("<br>", unsafe_allow_html=True)
 
     with st.form("intro_form"):
-        name = st.text_input("Name", placeholder="First and last name")
-        email = st.text_input("Email", placeholder="you@elmcrest.org")
-        role = st.selectbox("Current Role", ["Program Supervisor", "Shift Supervisor", "YDP"], help="This helps tailor examples to your relationships with youth, direct reports, and leadership.")
+        col1, col2 = st.columns(2)
+        with col1:
+            name = st.text_input("Full Name", placeholder="e.g. Jane Doe")
+        with col2:
+            email = st.text_input("Email Address", placeholder="e.g. jane@elmcrest.org")
+            
+        role = st.selectbox("Current Role", ["Program Supervisor", "Shift Supervisor", "YDP"], help="Tailors results to your specific leadership level.")
         
-        submitted = st.form_submit_button("Start Assessment")
+        st.markdown("<br>", unsafe_allow_html=True)
+        submitted = st.form_submit_button("Start Assessment →")
         if submitted:
             if not name or not email:
                 st.error("Please complete your name and email.")
@@ -432,59 +519,69 @@ if st.session_state.step == 'intro':
                 st.rerun()
 
 elif st.session_state.step == 'comm':
-    show_header("Part 1: Communication")
-    st.write("For each statement, choose how strongly it fits you most days at Elmcrest.")
+    show_brand_header("Part 1: Communication")
+    st.progress(33)
+    st.markdown("**Instructions:** Choose how strongly each statement fits you most days at Elmcrest.")
     
     with st.form("comm_form"):
         answers = {}
         for i, q in enumerate(st.session_state.shuffled_comm):
-            st.markdown(f"**{i+1}. {q['text']}**")
-            # 1=Strongly Disagree, 5=Strongly Agree
+            st.markdown(f"<div style='margin-top: 20px; font-weight: 500;'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
             val = st.radio(
-                "Scale", 
+                f"q_{i}", 
                 options=[1, 2, 3, 4, 5], 
                 horizontal=True, 
                 key=f"c_{q['id']}",
                 label_visibility="collapsed"
             )
-            st.markdown("<div style='display:flex; justify-content:space-between; font-size:0.8em; color:#666; margin-bottom:20px;'><span>Strongly Disagree</span><span>Strongly Agree</span></div>", unsafe_allow_html=True)
+            st.markdown("""
+            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-sub); margin-top:-5px; padding-bottom:10px; border-bottom:1px dashed var(--card-border);">
+                <span>Strongly Disagree</span><span>Strongly Agree</span>
+            </div>
+            """, unsafe_allow_html=True)
             answers[q['id']] = val
         
-        submitted = st.form_submit_button("Continue to Motivation")
+        st.markdown("<br>", unsafe_allow_html=True)
+        submitted = st.form_submit_button("Continue to Motivation →")
         if submitted:
             st.session_state.answers_comm = answers
             st.session_state.step = 'motiv'
             st.rerun()
 
 elif st.session_state.step == 'motiv':
-    show_header("Part 2: Motivation")
-    st.write("Focus on what keeps you engaged or drains you in the work.")
+    show_brand_header("Part 2: Motivation")
+    st.progress(66)
+    st.markdown("**Instructions:** Focus on what keeps you engaged or drains you in the work.")
 
     with st.form("motiv_form"):
         answers = {}
         for i, q in enumerate(st.session_state.shuffled_motiv):
-            st.markdown(f"**{i+1}. {q['text']}**")
+            st.markdown(f"<div style='margin-top: 20px; font-weight: 500;'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
             val = st.radio(
-                "Scale", 
+                f"q_m_{i}", 
                 options=[1, 2, 3, 4, 5], 
                 horizontal=True, 
                 key=f"m_{q['id']}",
                 label_visibility="collapsed"
             )
-            st.markdown("<div style='display:flex; justify-content:space-between; font-size:0.8em; color:#666; margin-bottom:20px;'><span>Strongly Disagree</span><span>Strongly Agree</span></div>", unsafe_allow_html=True)
+            st.markdown("""
+            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-sub); margin-top:-5px; padding-bottom:10px; border-bottom:1px dashed var(--card-border);">
+                <span>Strongly Disagree</span><span>Strongly Agree</span>
+            </div>
+            """, unsafe_allow_html=True)
             answers[q['id']] = val
             
-        submitted = st.form_submit_button("View My Profile")
+        st.markdown("<br>", unsafe_allow_html=True)
+        submitted = st.form_submit_button("Complete & View Profile →")
         if submitted:
             st.session_state.answers_motiv = answers
-            st.session_state.step = 'processing' # Intermediate step to handle calc
+            st.session_state.step = 'processing'
             st.rerun()
 
 elif st.session_state.step == 'processing':
     # Calculate Scores
     comm_scores = {k: 0 for k in COMM_PROFILES.keys()}
     for q in COMMUNICATION_QUESTIONS:
-        # Use get just in case, default to 3 (neutral) if something missed
         val = st.session_state.answers_comm.get(q['id'], 3)
         comm_scores[q['style']] += val
 
@@ -496,7 +593,7 @@ elif st.session_state.step == 'processing':
     p_comm, s_comm = get_top_two(comm_scores)
     p_motiv, s_motiv = get_top_two(motiv_scores)
     
-    # Store results in session
+    # Store results
     st.session_state.results = {
         "primaryComm": p_comm,
         "secondaryComm": s_comm,
@@ -506,7 +603,7 @@ elif st.session_state.step == 'processing':
         "motivScores": motiv_scores
     }
     
-    # Construct Payload exactly as Apps Script expects
+    # Payload
     payload = {
         "name": st.session_state.user_info['name'],
         "email": st.session_state.user_info['email'],
@@ -521,63 +618,83 @@ elif st.session_state.step == 'processing':
         }
     }
     
-    with st.spinner("Analyzing results and saving to Compass Database..."):
+    with st.spinner("Analyzing results..."):
         submit_to_google_sheets(payload)
+        time.sleep(1.5) # Slight artificial delay for UX smoothness
     
     st.session_state.step = 'results'
     st.rerun()
 
 elif st.session_state.step == 'results':
+    st.progress(100)
     res = st.session_state.results
     role = st.session_state.user_info['role']
     role_key = normalize_role_key(role)
     role_labels = ROLE_RELATIONSHIP_LABELS[role_key]
     
-    show_header("Your Elmcrest Profile")
+    show_brand_header(f"Profile for {st.session_state.user_info['name']}")
     
-    st.info("These results have been saved to the database. You can review them below.")
+    st.success("Analysis Complete! Your results have been saved to the Elmcrest database.")
 
-    # --- Communication Section ---
+    # --- Comm Section ---
     comm_prof = COMM_PROFILES[res['primaryComm']]
     
-    st.markdown(f"## 🗣️ Communication Style: **{comm_prof['name']}**")
-    st.write(comm_prof['overview'])
+    st.markdown(f"## 🗣️ Communication Style")
     
-    with st.expander("Detailed Role Tips", expanded=True):
-        tips = comm_prof['roleTips'][role_key]
-        st.markdown(f"**With {role_labels['directReportsLabel']}:** {tips['directReports']}")
-        st.markdown(f"**With youth:** {tips['youth']}")
-        st.markdown(f"**With your Supervisor:** {tips['supervisor']}")
-        st.markdown(f"**With Leadership:** {tips['leadership']}")
-        
-    st.markdown(f"**Under Stress:** {comm_prof['conflictImpact']}")
-    st.markdown(f"**Trauma Strategy:** {comm_prof['traumaStrategy']}")
-    
-    if res['secondaryComm']:
-        st.info(f"**Secondary Style:** {COMM_PROFILES[res['secondaryComm']]['name']}")
+    with st.container():
+        st.markdown(f"""
+        <div class="info-card">
+            <h2 style="margin-top:0;">{comm_prof['name']}</h2>
+            <div style="color: #015bad; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; font-size: 0.9rem;">{comm_prof['tagline']}</div>
+            <p>{comm_prof['overview']}</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    col1, col2 = st.columns([0.6, 0.4])
+    with col1:
+        with st.expander("Detailed Role Tips", expanded=True):
+            tips = comm_prof['roleTips'][role_key]
+            st.markdown(f"**With {role_labels['directReportsLabel']}:**\n{tips['directReports']}")
+            st.markdown(f"**With youth:**\n{tips['youth']}")
+            st.markdown(f"**With your Supervisor:**\n{tips['supervisor']}")
+            st.markdown(f"**With Leadership:**\n{tips['leadership']}")
+            
+        st.markdown(f"**⚠️ Under Stress:** {comm_prof['conflictImpact']}")
+        st.markdown(f"**🛡️ Trauma Strategy:** {comm_prof['traumaStrategy']}")
+
+    with col2:
+        st.markdown("### Score Breakdown")
+        for style, score in res['commScores'].items():
+            draw_score_bar(style, score)
 
     st.markdown("---")
 
     # --- Motivation Section ---
     mot_prof = MOTIVATION_PROFILES[res['primaryMotiv']]
     
-    st.markdown(f"## 🔋 Motivation Driver: **{mot_prof['name']}**")
-    st.write(mot_prof['summary'])
+    st.markdown(f"## 🔋 Motivation Driver")
     
-    col1, col2 = st.columns(2)
-    with col1:
-        st.success("**Boosters**")
+    with st.container():
+        st.markdown(f"""
+        <div class="info-card">
+            <h2 style="margin-top:0;">{mot_prof['name']}</h2>
+            <div style="color: #015bad; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; font-size: 0.9rem;">{mot_prof['tagline']}</div>
+            <p>{mot_prof['summary']}</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("### ✅ Boosters")
         for b in mot_prof['boosters']:
             st.markdown(f"- {b}")
-    with col2:
-        st.error("**Drainers**")
+    with c2:
+        st.markdown("### 🔻 Drainers")
         for k in mot_prof['killers']:
             st.markdown(f"- {k}")
-            
-    st.markdown(f"**Support needed:** {mot_prof['roleSupport'][role_key]}")
-    
-    if res['secondaryMotiv']:
-        st.info(f"**Secondary Driver:** {MOTIVATION_PROFILES[res['secondaryMotiv']]['name']}")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.info(f"**Support needed:** {mot_prof['roleSupport'][role_key]}")
 
     st.markdown("---")
 
@@ -585,16 +702,18 @@ elif st.session_state.step == 'results':
     int_key = f"{res['primaryComm']}-{res['primaryMotiv']}"
     if int_key in INTEGRATED_PROFILES:
         int_prof = INTEGRATED_PROFILES[int_key]
-        st.markdown(f"## 🔗 Integrated Profile: **{int_prof['title']}**")
+        st.markdown(f"## 🔗 Integrated Profile: {int_prof['title']}")
         st.write(int_prof['summary'])
         
-        st.markdown("#### Strengths")
-        for s in int_prof['strengths']:
-            st.markdown(f"✅ {s}")
-            
-        st.markdown("#### Watch-outs")
-        for w in int_prof['watchouts']:
-            st.markdown(f"⚠️ {w}")
+        ic1, ic2 = st.columns(2)
+        with ic1:
+            st.markdown("#### Key Strengths")
+            for s in int_prof['strengths']:
+                st.markdown(f"✅ {s}")
+        with ic2:
+            st.markdown("#### Watch-outs")
+            for w in int_prof['watchouts']:
+                st.markdown(f"⚠️ {w}")
 
     st.markdown("---")
     if st.button("Start Over"):
