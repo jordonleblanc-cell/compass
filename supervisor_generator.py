@@ -22,14 +22,14 @@ COMM_TRAITS = {
 # --- CONFLICT SCRIPTS (Expanded for Teaching Supervisors) ---
 CONFLICT_SCRIPTS = {
     "Director-Encourager": {
-        "tension": "The 'Head vs. Heart' Battle. The Director wants to solve the problem efficiently; the Encourager wants to heal the relationship. The Director thinks the Encourager is 'soft' or emotional; the Encourager thinks the Director is 'cold' or mean.",
+        "tension": "The 'Head vs. Heart' Battle. The Director wants to solve the problem efficiently; the Encourager wants to heal the relationship.",
         "prep": [
             "Tell the Director: 'If you win the logic argument but hurt their feelings, you lose the war. You must validate their emotion.'",
             "Tell the Encourager: 'The Director isn't attacking you personally; they are attacking the inefficiency. Don't withdraw.'"
         ],
         "protocol": [
             "1. Open by stating the shared goal (e.g., 'We both want a smooth shift').",
-            "2. Let the Encourager speak first about the *impact* of the friction. The Director must listen without interrupting.",
+            "2. Let the Encourager speak first about the *impact* of the friction.",
             "3. Ask the Director to restate what they heard (Validation Check).",
             "4. Let the Director define the *task* or *standard* that isn't being met.",
             "5. Ask the Encourager to agree to the standard, provided the delivery is respectful."
@@ -38,7 +38,7 @@ CONFLICT_SCRIPTS = {
         "script_b": "Encourager: 'I can enforce the rules, but I need you to stop correcting me in front of the kids.'"
     },
     "Director-Facilitator": {
-        "tension": "The 'Gas vs. Brake' Battle. The Director operates on 'Ready, Fire, Aim.' The Facilitator operates on 'Ready, Aim, Aim, Aim.' The Director feels held back; the Facilitator feels steamrolled.",
+        "tension": "The 'Gas vs. Brake' Battle. The Director operates on 'Ready, Fire, Aim.' The Facilitator operates on 'Ready, Aim, Aim, Aim.'",
         "prep": [
             "Tell the Director: 'Silence does not mean agreement. If you push too fast, they will shut down.'",
             "Tell the Facilitator: 'You cannot wait for 100% consensus. You need to articulate your specific risk, not just a vague feeling.'"
@@ -54,7 +54,7 @@ CONFLICT_SCRIPTS = {
         "script_b": "Facilitator: 'I am frustrated because we keep making the same mistakes by rushing.'"
     },
     "Director-Tracker": {
-        "tension": "The 'Vision vs. Reality' Battle. The Director says 'Just make it happen.' The Tracker asks 'But what about Regulation 14.B?'. The Director feels blocked by details; the Tracker feels their expertise is being ignored.",
+        "tension": "The 'Vision vs. Reality' Battle. The Director says 'Just make it happen.' The Tracker asks 'But what about Regulation 14.B?'.",
         "prep": [
             "Tell the Director: 'They are not trying to be difficult; they are trying to keep you out of jail/trouble. Listen to the risk.'",
             "Tell the Tracker: 'Start with 'Yes, if...' instead of 'No'. Show them the path to the goal, don't just put up a wall.'"
@@ -70,7 +70,7 @@ CONFLICT_SCRIPTS = {
         "script_b": "Tracker: 'I want to get there too, but I cannot sign off on a plan that violates safety protocols.'"
     },
     "Encourager-Tracker": {
-        "tension": "The 'Empathy vs. Policy' Battle. The Encourager bends rules to build rapport. The Tracker enforces rules to build safety. The Tracker sees the Encourager as chaotic/unsafe; the Encourager sees the Tracker as robotic/uncaring.",
+        "tension": "The 'Empathy vs. Policy' Battle. The Encourager bends rules to build rapport. The Tracker enforces rules to build safety.",
         "prep": [
             "Tell the Encourager: 'Structure is a form of care. Inconsistency creates anxiety for traumatized youth.'",
             "Tell the Tracker: 'Rules without relationship breeds rebellion. You need the Encourager's rapport to get the youth to comply.'"
@@ -86,7 +86,7 @@ CONFLICT_SCRIPTS = {
         "script_b": "Tracker: 'When you let it slide, you made me the bad guy for the next shift. We have to be consistent.'"
     },
     "Encourager-Facilitator": {
-        "tension": "The 'Nice-Off' (Stagnation). Both want harmony. The Facilitator focuses on fairness to the group; the Encourager focuses on the feelings of the individual. They will circle an issue for hours to avoid upsetting anyone.",
+        "tension": "The 'Nice-Off' (Stagnation). Both want harmony. Decisions can stall indefinitely because neither wants to upset anyone.",
         "prep": [
             "Supervisor Role: You must be the 'Bad Guy' who forces the conflict into the open.",
             "Warning: Watch out for them agreeing just to end the meeting. You need to dig for the disagreement."
@@ -101,7 +101,7 @@ CONFLICT_SCRIPTS = {
         "script_b": "Facilitator: 'But if we don't address it, the rest of the team feels it's unfair.'"
     },
     "Facilitator-Tracker": {
-        "tension": "The 'Analysis Paralysis' Loop. The Facilitator waits for consensus. The Tracker waits for more data. Nothing happens. The risk is total stagnation.",
+        "tension": "The 'Analysis Paralysis' Loop. The Facilitator waits for consensus. The Tracker waits for more data. Nothing happens.",
         "prep": [
             "Supervisor Role: You must set a hard deadline.",
             "Tell both: 'A good decision today is better than a perfect decision next week.'"
@@ -229,7 +229,7 @@ CAREER_PATHWAYS = {
         "Manager": {
             "shift": "From 'Compliance' to 'Culture'.",
             "why": "Trackers value efficiency over connection, risking a sterile, unhappy culture.",
-            "conversation": "Culture eats strategy for breakfast. If you prioritize efficiency over connection, you will have a compliant but brittle organization.",
+            "conversation": "Culture eats strategy (and checklists) for breakfast. If you prioritize efficiency over connection, you will have a compliant but brittle organization. You need to invest as much energy in 'how people feel' as 'what people do'.",
             "assignment_setup": "Task them with a retention or morale initiative.",
             "assignment_task": "Spend one week focusing solely on staff development/relationships. Delegate metrics to a deputy.",
             "success_indicators": "They had non-work conversations. Staff report feeling seen.",
@@ -244,28 +244,28 @@ COMM_PROFILES = {
         "overview": "This staff member communicates primarily as a Director, meaning they lead with clarity, structure, and urgency.",
         "supervising": "Be direct, concise, and outcome-focused. They respect leaders who get to the point. Define the 'what' clearly, but give autonomy on the 'how'.",
         "struggle_bullets": ["Decreased patience", "Over-assertiveness", "Fatigue/Irritability", "Rigid enforcement"],
-        "coaching": ["What are the risks of moving this fast?", "Who haven't we heard from yet?", "How can you frame this so the team feels supported?"],
+        "coaching": ["What are the risks of moving this fast?", "Who haven't we heard from yet?", "How can you frame this so the team feels supported?", "What is the difference between being 'right' and being 'effective'?", "If you had to achieve this result without giving a single order, how would you do it?"],
         "advancement": "Challenge them to lead through influence rather than authority. Help them practice patience."
     },
     "Encourager": {
         "overview": "This staff member communicates primarily as an Encourager, leading with warmth, optimism, and emotional intelligence.",
         "supervising": "Connect relationally before diving into tasks. Validate their emotional labor. Frame criticism around professional growth.",
         "struggle_bullets": ["Avoidance of conflict", "Disorganization", "Prioritizing being liked", "Emotional exhaustion"],
-        "coaching": ["How can you deliver this hard news while remaining kind?", "Are we prioritizing popularity over effectiveness?", "What boundaries do you need to set?"],
+        "coaching": ["How can you deliver this hard news while remaining kind?", "Are we prioritizing popularity over effectiveness?", "What boundaries do you need to set?", "If you avoid this conflict today, what is the cost to the team next week?", "How does holding this standard actually create safety for the youth?"],
         "advancement": "Help them master the operational side. Challenge them to see clarity and accountability as kindness."
     },
     "Facilitator": {
         "overview": "This staff member communicates primarily as a Facilitator, leading by listening, gathering perspectives, and seeking fairness.",
         "supervising": "Give them time to process. Ask for observations explicitly. Validate fairness but push for decisions.",
         "struggle_bullets": ["Analysis paralysis", "Passive-aggressiveness", "Saying 'it's fine' when it isn't", "Getting stuck in the middle"],
-        "coaching": ["If you had to decide right now, what would you do?", "What is the cost of waiting?", "Where are you holding tension?"],
+        "coaching": ["If you had to decide right now, what would you do?", "What is the cost of waiting?", "Where are you holding tension?", "Who specifically are you trying not to upset with this decision?", "How can you support the team's direction even if you don't fully agree?"],
         "advancement": "Encourage them to be more vocal and decisive. Help them be assertive without being aggressive."
     },
     "Tracker": {
         "overview": "This staff member communicates primarily as a Tracker, leading with details, data, and systems.",
         "supervising": "Provide clear expectations. Respecting their systems builds trust. Explain the 'why' behind changes.",
         "struggle_bullets": ["Rigidity/Perfectionism", "Getting stuck in weeds", "Coming across as cold", "Prioritizing policy over people"],
-        "coaching": ["Does this detail change the outcome?", "How can we meet the standard while keeping the relationship warm?", "What is the big picture goal?"],
+        "coaching": ["Does this detail change the outcome?", "How can we meet the standard while keeping the relationship warm?", "What is the big picture goal?", "If we follow the rule perfectly but lose the kid's trust, did we succeed?", "What is the 'Good Enough' version of this task?"],
         "advancement": "Help them delegate details. Teach them to distinguish between 'mission-critical' and 'preference'."
     }
 }
@@ -338,7 +338,6 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     
     blue = (1, 91, 173)
     black = (0, 0, 0)
-    gray = (100, 100, 100)
     
     # HEADER
     pdf.set_font("Arial", 'B', 20)
@@ -425,11 +424,9 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
 # --- MAIN APP LOGIC ---
 
-# Fetch data once
 staff_list = fetch_staff_data()
 df = pd.DataFrame(staff_list)
 
-# TABS
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📝 Guide Generator", 
     "🧬 Team DNA", 
@@ -451,33 +448,23 @@ with tab1:
     
     with subtab1:
         if not df.empty:
-            def reset_t1():
-                st.session_state.t1_staff_select = None
-
+            def reset_t1(): st.session_state.t1_staff_select = None
             staff_options = {f"{s['name']} ({s['role']})": s for s in staff_list}
             selected_staff_name = st.selectbox(
-                "Select Staff Member", 
-                options=list(staff_options.keys()), 
-                index=None, 
-                key="t1_staff_select",
-                placeholder="Choose a staff member..."
+                "Select Staff Member", options=list(staff_options.keys()), 
+                index=None, key="t1_staff_select", placeholder="Choose a staff member..."
             )
-            
             if selected_staff_name:
                 data = staff_options[selected_staff_name]
                 col1, col2, col3 = st.columns(3)
                 col1.metric("Role", data['role'])
                 col2.metric("Communication", data['p_comm'])
                 col3.metric("Motivation", data['p_mot'])
-                
                 if st.button("Generate Guide for " + data['name'], type="primary"):
                     pdf_bytes = create_supervisor_guide(
-                        data['name'], data['role'], 
-                        data['p_comm'], data['s_comm'], 
-                        data['p_mot'], data['s_mot']
+                        data['name'], data['role'], data['p_comm'], data['s_comm'], data['p_mot'], data['s_mot']
                     )
                     st.download_button(label="Download PDF Guide", data=pdf_bytes, file_name=f"Supervisor_Guide_{data['name'].replace(' ', '_')}.pdf", mime="application/pdf")
-                
                 st.markdown("---")
                 st.button("Reset Selection", key="reset_t1_db", on_click=reset_t1)
         else:
@@ -485,83 +472,58 @@ with tab1:
 
     with subtab2:
         with st.form("manual_form"):
-            col1, col2 = st.columns(2)
-            with col1:
+            c1, c2 = st.columns(2)
+            with c1:
                 m_name = st.text_input("Staff Name")
                 m_role = st.selectbox("Role", ["Program Supervisor", "Shift Supervisor", "YDP"])
-            with col2:
+            with c2:
                 m_p_comm = st.selectbox("Primary Communication", ["Director", "Encourager", "Facilitator", "Tracker"])
                 m_p_mot = st.selectbox("Primary Motivation", ["Growth", "Purpose", "Connection", "Achievement"])
-                
             m_submitted = st.form_submit_button("Generate Guide (Manual)")
-            
             if m_submitted and m_name:
                 pdf_bytes = create_supervisor_guide(m_name, m_role, m_p_comm, "None", m_p_mot, "None")
-                st.success(f"Guide generated for {m_name}")
                 st.download_button(label="Download PDF Guide", data=pdf_bytes, file_name=f"Supervisor_Guide_{m_name.replace(' ', '_')}.pdf", mime="application/pdf")
 
 # --- TAB 2: TEAM DNA ---
 with tab2:
     st.markdown("### 🧬 Team Dynamics Mapper")
-    st.write("Select multiple staff members to analyze the culture of a specific unit or team.")
-    
-    def reset_t2():
-        st.session_state.t2_team_select = []
-
+    def reset_t2(): st.session_state.t2_team_select = []
     if not df.empty:
         team_selection = st.multiselect("Build your Team", df['name'].tolist(), key="t2_team_select")
-        
         if team_selection:
             team_df = df[df['name'].isin(team_selection)]
             st.divider()
             c1, c2 = st.columns(2)
             with c1:
-                st.subheader("Communication Mix")
                 comm_counts = team_df['p_comm'].value_counts()
-                fig_team_comm = px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4)
-                st.plotly_chart(fig_team_comm, use_container_width=True)
-                
+                st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix"), use_container_width=True)
                 if not comm_counts.empty:
-                    dominant_style = comm_counts.idxmax()
-                    dom_pct = comm_counts.max() / len(team_df)
-                    if dom_pct > 0.5:
-                        st.warning(f"⚠️ **Echo Chamber Risk:** {int(dom_pct*100)}% of this team are **{dominant_style}s**.")
+                    dom_style = comm_counts.idxmax()
+                    if comm_counts.max() / len(team_df) > 0.5:
+                        st.warning(f"⚠️ **Echo Chamber Risk:** {int(comm_counts.max()/len(team_df)*100)}% of this team are **{dom_style}s**.")
             with c2:
-                st.subheader("Motivation Drivers")
                 mot_counts = team_df['p_mot'].value_counts()
-                fig_team_mot = px.bar(x=mot_counts.index, y=mot_counts.values)
-                st.plotly_chart(fig_team_mot, use_container_width=True)
-                if "Growth" in mot_counts and mot_counts["Growth"] > 1: st.success("💡 **High Growth Energy:** This team will love pilots and new initiatives.")
-                if "Connection" in mot_counts and mot_counts["Connection"] > 1: st.info("💡 **High Connection Energy:** This team needs time to process emotions together.")
-            
+                st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers"), use_container_width=True)
             st.markdown("---")
             st.button("Clear Team Selection", key="reset_btn_t2", on_click=reset_t2)
 
 # --- TAB 3: CONFLICT MEDIATOR ---
 with tab3:
     st.markdown("### ⚖️ Conflict Resolution Script")
-    st.write("Select two staff members who are struggling to collaborate.")
-    
-    def reset_t3():
-        st.session_state.p1 = None
-        st.session_state.p2 = None
-
+    def reset_t3(): st.session_state.p1 = None; st.session_state.p2 = None
     if not df.empty:
         c1, c2 = st.columns(2)
-        with c1:
-            p1_name = st.selectbox("Staff Member A", df['name'].unique(), index=None, key="p1", placeholder="Select first person...")
-        with c2:
-            p2_name = st.selectbox("Staff Member B", df['name'].unique(), index=None, key="p2", placeholder="Select second person...")
-            
+        with c1: p1_name = st.selectbox("Staff Member A", df['name'].unique(), index=None, key="p1", placeholder="Select first person...")
+        with c2: p2_name = st.selectbox("Staff Member B", df['name'].unique(), index=None, key="p2", placeholder="Select second person...")
+        
         if p1_name and p2_name and p1_name != p2_name:
             p1 = df[df['name'] == p1_name].iloc[0]
             p2 = df[df['name'] == p2_name].iloc[0]
-            st.divider()
-            st.subheader(f"The Clash: {p1['p_comm']} vs. {p2['p_comm']}")
-            
-            style1 = p1['p_comm']
-            style2 = p2['p_comm']
+            style1, style2 = p1['p_comm'], p2['p_comm']
             key = "-".join(sorted([style1, style2]))
+            
+            st.divider()
+            st.subheader(f"The Clash: {style1} vs. {style2}")
             
             if style1 == style2:
                 st.warning("Same-Style Conflict: These two are likely clashing because they are too similar (fighting for airtime) or amplifying each other's weaknesses.")
@@ -569,41 +531,28 @@ with tab3:
                 script = CONFLICT_SCRIPTS[key]
                 st.info(f"**Root Tension:** {script['tension']}")
                 
-                if 'mediator_guide' in script:
-                    with st.expander("🛡️ Supervisor Strategy (How to run this meeting)", expanded=True):
-                        st.write(script['mediator_guide'])
-                        
-                        st.markdown("**✅ Pre-Meeting Checklist:**")
-                        for item in script['prep']:
-                            st.markdown(f"- {item}")
-                        
-                        st.markdown("**📋 Meeting Protocol:**")
-                        for item in script['protocol']:
-                            st.markdown(f"- {item}")
+                with st.expander("🛡️ Supervisor Strategy (How to run this meeting)", expanded=True):
+                    if 'mediator_guide' in script: st.write(script['mediator_guide'])
+                    st.markdown("**✅ Pre-Meeting Checklist:**")
+                    for item in script['prep']: st.markdown(f"- {item}")
+                    st.markdown("**📋 Meeting Protocol:**")
+                    for item in script['protocol']: st.markdown(f"- {item}")
                 
-                st.divider()
                 st.markdown("#### 🗣️ What to say to them individually:")
-                
-                if style1 < style2:
-                    advice1 = script['advice_a']
-                    advice2 = script['advice_b']
-                    script1 = script['script_a']
-                    script2 = script['script_b']
+                # Correctly assign scripts based on who is who
+                is_p1_first_alpha = (style1 < style2)
+                if is_p1_first_alpha:
+                    d1, d2 = script['script_a'], script['script_b']
                 else:
-                    advice1 = script['advice_b']
-                    advice2 = script['advice_a']
-                    script1 = script['script_b']
-                    script2 = script['script_a']
+                    d1, d2 = script['script_b'], script['script_a']
                 
                 col_x, col_y = st.columns(2)
                 with col_x:
                     st.markdown(f"**To {p1_name} ({style1}):**")
-                    st.info(f"\"{advice1}\"")
-                    st.markdown(f"*Sample Line:* \"{script1.split(': ', 1)[1]}\"")
+                    st.success(f"\"{d1}\"")
                 with col_y:
                     st.markdown(f"**To {p2_name} ({style2}):**")
-                    st.info(f"\"{advice2}\"")
-                    st.markdown(f"*Sample Line:* \"{script2.split(': ', 1)[1]}\"")
+                    st.success(f"\"{d2}\"")
             
             st.markdown("---")
             st.button("Reset Conflict Tool", key="reset_btn_t3", on_click=reset_t3)
@@ -611,44 +560,30 @@ with tab3:
 # --- TAB 4: CAREER PATHFINDER ---
 with tab4:
     st.markdown("### 🚀 Career Gap Analysis")
-    st.write("Analyze readiness for promotion.")
-    
-    def reset_t4():
-        st.session_state.career = None
-        st.session_state.career_target = None
-
+    def reset_t4(): st.session_state.career = None; st.session_state.career_target = None
     if not df.empty:
-        col_a, col_b = st.columns(2)
-        with col_a:
-            candidate_name = st.selectbox("Select Candidate", df['name'].unique(), index=None, key="career", placeholder="Select candidate...")
-        with col_b:
-            target_role = st.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor", "Manager"], index=None, key="career_target", placeholder="Select target role...")
+        c1, c2 = st.columns(2)
+        with c1: candidate_name = st.selectbox("Select Candidate", df['name'].unique(), index=None, key="career", placeholder="Select candidate...")
+        with c2: target_role = st.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor", "Manager"], index=None, key="career_target", placeholder="Select target role...")
         
         if candidate_name and target_role:
             cand = df[df['name'] == candidate_name].iloc[0]
             style = cand['p_comm']
-            
             st.divider()
             st.markdown(f"**Candidate:** {cand['name']} ({style})")
-            st.markdown(f"**Target:** {target_role}")
-            
             path_data = CAREER_PATHWAYS.get(style, {}).get(target_role)
             
             if path_data:
                 st.info(f"💡 **The Core Shift:** {path_data['shift']}")
                 st.markdown(f"**Why it's hard for a {style}:** {path_data['why']}")
-                
                 st.divider()
-                
-                c1, c2 = st.columns([1, 1])
-                with c1:
+                c_a, c_b = st.columns([1, 1])
+                with c_a:
                     st.markdown("#### 🗣️ The Coaching Conversation")
                     st.write(path_data['conversation'])
-                    
                     if 'supervisor_focus' in path_data:
                         st.warning(f"👀 **What to Watch For:** {path_data['supervisor_focus']}")
-                        
-                with c2:
+                with c_b:
                     st.markdown("#### ✅ The Developmental Assignment")
                     with st.container(border=True):
                         st.write(f"**Setup:** {path_data['assignment_setup']}")
@@ -658,7 +593,6 @@ with tab4:
                         st.error(f"**🚩 Red flag:** {path_data['red_flags']}")
             else:
                 st.write("Standard advancement path.")
-            
             st.markdown("---")
             st.button("Reset Career Path", key="reset_btn_t4", on_click=reset_t4)
 
@@ -669,13 +603,10 @@ with tab5:
         c1, c2 = st.columns(2)
         with c1:
             st.subheader("Communication Styles")
-            fig_org_comm = px.pie(df, names='p_comm', color='p_comm', color_discrete_map={'Director':'#015bad', 'Encourager':'#b9dca4', 'Facilitator':'#51c3c5', 'Tracker':'#64748b'})
-            st.plotly_chart(fig_org_comm, use_container_width=True)
+            st.plotly_chart(px.pie(df, names='p_comm', color='p_comm', color_discrete_map={'Director':'#015bad', 'Encourager':'#b9dca4', 'Facilitator':'#51c3c5', 'Tracker':'#64748b'}), use_container_width=True)
         with c2:
             st.subheader("Motivation Drivers")
-            fig_org_mot = px.bar(df, x='p_mot', color='p_mot')
-            st.plotly_chart(fig_org_mot, use_container_width=True)
-        
+            st.plotly_chart(px.bar(df, x='p_mot', color='p_mot'), use_container_width=True)
         st.divider()
         if 'role' in df.columns:
             role_breakdown = pd.crosstab(df['role'], df['p_comm'])
