@@ -3,6 +3,7 @@ import random
 import requests
 import time
 from fpdf import FPDF
+import io
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -122,6 +123,25 @@ MOTIVATION_PROFILES = {
     "Achievement": {"name": "Achievement Motivation", "tagline": "The Results Architect", "summary": "Cares about clear goals and concrete progress.", "boosters": ["Clear metrics", "Checklists", "Recognition of output"], "killers": ["Vague goals", "Moving goalposts", "Lack of recognition"], "roleSupport": {"Program Supervisor": "Co-design metrics.", "Shift Supervisor": "Set unit goals.", "YDP": "Define 'a good shift' concretely."}}
 }
 
+INTEGRATED_PROFILES = {
+    "Director-Growth": {"title": "Director + Growth", "summary": "Driven to lead and improve. You push for results and personal development.", "strengths": ["Decisive", "Adaptable", "Ambitious"], "watchouts": ["Impatience with slow learners", "Moving too fast"]},
+    "Director-Purpose": {"title": "Director + Purpose", "summary": "Driven by a mission. You lead with conviction and urgency.", "strengths": ["Advocacy", "Clarity", "Integrity"], "watchouts": ["Righteous anger", "Burnout"]},
+    "Director-Connection": {"title": "Director + Connection", "summary": "Driven to lead the tribe. You protect the team and push for success.", "strengths": ["Protective", "Mobilizing", "Direct"], "watchouts": ["Overpowering", "Taking conflict personally"]},
+    "Director-Achievement": {"title": "Director + Achievement", "summary": "Driven to win. You love hitting targets and efficient execution.", "strengths": ["Execution", "Focus", "Speed"], "watchouts": ["Steamrolling", "Ignoring feelings"]},
+    "Encourager-Growth": {"title": "Encourager + Growth", "summary": "Driven to help people grow. You are a natural mentor and cheerleader.", "strengths": ["Mentorship", "Positivity", "Support"], "watchouts": ["Over-promising", "Avoiding hard feedback"]},
+    "Encourager-Purpose": {"title": "Encourager + Purpose", "summary": "Driven by heart. You care deeply about the people and the cause.", "strengths": ["Empathy", "Passion", "Inclusion"], "watchouts": ["Emotional exhaustion", "Taking things personally"]},
+    "Encourager-Connection": {"title": "Encourager + Connection", "summary": "Driven by harmony. You are the glue that holds the team together.", "strengths": ["Team building", "Conflict de-escalation", "Warmth"], "watchouts": ["Conflict avoidance", "Clique-forming"]},
+    "Encourager-Achievement": {"title": "Encourager + Achievement", "summary": "Driven to succeed together. You want the team to win and feel good.", "strengths": ["Celebration", "Motivation", "Collaboration"], "watchouts": ["People-pleasing", "Loss of focus"]},
+    "Facilitator-Growth": {"title": "Facilitator + Growth", "summary": "Driven to learn from everyone. You value diverse perspectives and evolution.", "strengths": ["Listening", "Synthesis", "Curiosity"], "watchouts": ["Analysis paralysis", "Indecision"]},
+    "Facilitator-Purpose": {"title": "Facilitator + Purpose", "summary": "Driven by fairness. You ensure the mission is equitable for all.", "strengths": ["Justice", "Mediation", "Stability"], "watchouts": ["Moralizing", "Slowness"]},
+    "Facilitator-Connection": {"title": "Facilitator + Connection", "summary": "Driven by consensus. You want everyone to feel included and safe.", "strengths": ["Diplomacy", "Safety", "Patience"], "watchouts": ["Bottlenecking", "Fear of rocking the boat"]},
+    "Facilitator-Achievement": {"title": "Facilitator + Achievement", "summary": "Driven by sustainable results. You want to win the right way.", "strengths": ["Process", "Sustainability", "Wisdom"], "watchouts": ["Over-complicating", "Delaying"]},
+    "Tracker-Growth": {"title": "Tracker + Growth", "summary": "Driven to optimize. You love finding better, safer ways to do things.", "strengths": ["Optimization", "Safety", "Precision"], "watchouts": ["Perfectionism", "Critique"]},
+    "Tracker-Purpose": {"title": "Tracker + Purpose", "summary": "Driven by duty. You protect the mission by protecting the details.", "strengths": ["Stewardship", "Compliance", "Reliability"], "watchouts": ["Rigidity", "Judgment"]},
+    "Tracker-Connection": {"title": "Tracker + Connection", "summary": "Driven by stability. You care for people by creating a safe environment.", "strengths": ["Consistency", "Loyalty", "Order"], "watchouts": ["Inflexibility", "Anxiety"]},
+    "Tracker-Achievement": {"title": "Tracker + Achievement", "summary": "Driven by accuracy. You want to hit the target exactly right.", "strengths": ["Quality control", "Focus", "Data"], "watchouts": ["Micromanagement", "Missing the forest for trees"]}
+}
+
 # --- Functions ---
 
 def normalize_role_key(role):
@@ -171,16 +191,41 @@ def send_email_via_smtp(to_email, subject, body):
         return False
 
 def generate_text_report(user_info, results, comm_prof, mot_prof, int_prof, role_key, role_labels):
-    # Text generation for email body
     lines = [f"ELMCREST COMPASS PROFILE FOR {user_info['name'].upper()}", "="*40, ""]
+    
+    # Comm
     lines.append(f"COMMUNICATION STYLE: {comm_prof['name']}")
+    lines.append(f"Tagline: {comm_prof['tagline']}")
     lines.append(f"Overview: {comm_prof['overview']}")
     lines.append(f"Under Stress: {comm_prof['conflictImpact']}")
+    lines.append(f"Trauma Strategy: {comm_prof['traumaStrategy']}")
     lines.append("")
+    lines.append("ROLE TIPS:")
+    tips = comm_prof['roleTips'][role_key]
+    lines.append(f"* With {role_labels['directReportsLabel']}: {tips['directReports']}")
+    lines.append(f"* With {role_labels['youthLabel']}: {tips['youth']}")
+    lines.append(f"* With {role_labels['supervisorLabel']}: {tips['supervisor']}")
+    lines.append(f"* With {role_labels['leadershipLabel']}: {tips['leadership']}")
+    lines.append("")
+    
+    # Motiv
     lines.append(f"MOTIVATION DRIVER: {mot_prof['name']}")
+    lines.append(f"Tagline: {mot_prof['tagline']}")
     lines.append(f"Summary: {mot_prof['summary']}")
-    lines.append("Boosters: " + ", ".join(mot_prof['boosters']))
-    lines.append("Drainers: " + ", ".join(mot_prof['killers']))
+    lines.append("Boosters (Energizers):")
+    for b in mot_prof['boosters']: lines.append(f"* {b}")
+    lines.append("Drainers (De-energizers):")
+    for k in mot_prof['killers']: lines.append(f"* {k}")
+    lines.append(f"Support Needed: {mot_prof['roleSupport'][role_key]}")
+    lines.append("")
+    
+    # Integrated
+    if int_prof:
+        lines.append(f"INTEGRATED PROFILE: {int_prof['title']}")
+        lines.append(int_prof['summary'])
+        lines.append("Strengths: " + ", ".join(int_prof['strengths']))
+        lines.append("Watch-outs: " + ", ".join(int_prof['watchouts']))
+        
     return "\n".join(lines)
 
 def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role_labels):
@@ -233,6 +278,15 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
     pdf.cell(0, 8, "Drainers (Avoid This):", ln=True)
     pdf.set_font("Arial", '', 11)
     for k in mot_prof['killers']: pdf.multi_cell(0, 5, clean_text(f"- {k}"))
+    
+    if int_prof:
+        pdf.ln(5)
+        pdf.set_font("Arial", 'B', 14)
+        pdf.set_text_color(1, 91, 173)
+        pdf.cell(0, 10, clean_text(f"Integrated: {int_prof['title']}"), ln=True)
+        pdf.set_font("Arial", '', 11)
+        pdf.set_text_color(0,0,0)
+        pdf.multi_cell(0, 5, clean_text(int_prof['summary']))
     
     return pdf.output(dest='S').encode('latin-1')
 
@@ -355,17 +409,20 @@ elif st.session_state.step == 'results':
     comm_prof = COMM_PROFILES[res['primaryComm']]
     mot_prof = MOTIVATION_PROFILES[res['primaryMotiv']]
     
+    # Get Integrated Profile
+    int_key = f"{res['primaryComm']}-{res['primaryMotiv']}"
+    int_prof = INTEGRATED_PROFILES.get(int_key)
+    
     # --- Buttons ---
     c1, c2 = st.columns(2)
     with c1:
-        pdf_data = create_pdf(user, res, comm_prof, mot_prof, None, role_key, role_labels)
+        pdf_data = create_pdf(user, res, comm_prof, mot_prof, int_prof, role_key, role_labels)
         st.download_button("📄 Download PDF", data=pdf_data, file_name="Elmcrest_Profile.pdf", mime="application/pdf")
     with c2:
-        if st.button("📧 Email Me Results"):
-            full_text = generate_text_report(user, res, comm_prof, mot_prof, None, role_key, role_labels)
-            # NOW USING PYTHON SMTP
+        if st.button("📧 Email Me Full Report"):
+            full_text = generate_text_report(user, res, comm_prof, mot_prof, int_prof, role_key, role_labels)
             if send_email_via_smtp(user['email'], "Your Elmcrest Compass Profile", full_text):
-                st.success("Email Sent Successfully!")
+                st.success("Full Report Sent Successfully!")
     
     st.divider()
     
@@ -391,6 +448,11 @@ elif st.session_state.step == 'results':
     with c_b:
         st.markdown("**🔻 Drainers**")
         for k in mot_prof['killers']: st.write(f"- {k}")
+    
+    if int_prof:
+        st.divider()
+        st.markdown(f"## 🔗 Integrated: {int_prof['title']}")
+        st.write(int_prof['summary'])
     
     st.markdown("---")
     if st.button("Start Over"):
