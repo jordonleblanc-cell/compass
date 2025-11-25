@@ -17,7 +17,6 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 def check_password():
-    # Defaults to 'elmcrest2025' if secret not set
     PASSWORD = st.secrets.get("ADMIN_PASSWORD", "elmcrest2025") 
     if st.session_state.password_input == PASSWORD:
         st.session_state.authenticated = True
@@ -29,10 +28,12 @@ if not st.session_state.authenticated:
     st.markdown("""
         <style>
         .stApp { background: radial-gradient(circle at center, #f1f5f9 0%, #cbd5e1 100%); }
+        [data-testid="stHeader"] { background: transparent; }
         .login-card {
             background: white; padding: 40px; border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center;
             max-width: 400px; margin: 100px auto;
+            color: #0f172a;
         }
         </style>
         <div class='login-card'>
@@ -59,26 +60,49 @@ BRAND_COLORS = {
     "light_gray": "#f8fafc"
 }
 
-# --- 3. CSS STYLING ---
+# --- 3. CSS STYLING (Light & Dark Mode Support) ---
 st.markdown(f"""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+        /* DEFINE THEMES */
         :root {{
             --primary: {BRAND_COLORS['blue']};
             --secondary: {BRAND_COLORS['teal']};
             --accent: {BRAND_COLORS['green']};
-            --text-main: {BRAND_COLORS['dark']};
-            --text-sub: {BRAND_COLORS['gray']};
+            
+            /* Light Mode Defaults */
+            --text-main: #0f172a;
+            --text-sub: #475569;
+            --bg-start: #f8fafc;
+            --bg-end: #e2e8f0;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 20px rgba(0,0,0,0.05);
+            --input-bg: #ffffff;
+        }}
+
+        @media (prefers-color-scheme: dark) {{
+            :root {{
+                /* Dark Mode Overrides */
+                --text-main: #f1f5f9;
+                --text-sub: #cbd5e1;
+                --bg-start: #0f172a;
+                --bg-end: #020617;
+                --card-bg: #1e293b;
+                --border-color: #334155;
+                --shadow: 0 4px 20px rgba(0,0,0,0.4);
+                --input-bg: #0f172a;
+            }}
         }}
 
         html, body, [class*="css"] {{
             font-family: 'Inter', sans-serif;
-            color: var(--text-main);
+            color: var(--text-main) !important;
         }}
         
         .stApp {{
-            background: radial-gradient(circle at top left, #f8fafc 0%, #ffffff 100%);
+            background: radial-gradient(circle at top left, var(--bg-start) 0%, var(--bg-end) 100%);
         }}
 
         h1, h2, h3, h4 {{
@@ -86,91 +110,111 @@ st.markdown(f"""
             font-weight: 700 !important;
             letter-spacing: -0.02em;
         }}
-
+        
+        /* Custom Cards */
+        .custom-card {{
+            background-color: var(--card-bg);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }}
+        
         /* Hero Section */
         .hero-box {{
             background: linear-gradient(135deg, #015bad 0%, #0f172a 100%);
             padding: 30px;
             border-radius: 16px;
-            color: white;
+            color: white !important;
             margin-bottom: 30px;
             box-shadow: 0 10px 30px rgba(1, 91, 173, 0.2);
         }}
-        .hero-title {{
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-            color: white !important;
-        }}
-        .hero-subtitle {{
-            font-size: 1.1rem;
-            opacity: 0.9;
-            font-weight: 400;
-            color: #e2e8f0 !important;
-            max-width: 800px;
-            line-height: 1.6;
-        }}
+        .hero-title {{ color: white !important; font-size: 2rem; font-weight: 800; margin-bottom:10px; }}
+        .hero-subtitle {{ color: #e2e8f0 !important; font-size: 1.1rem; opacity: 0.9; }}
 
-        /* Feature Cards in Hero */
+        /* Feature Cards */
         .feature-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 25px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 25px;
         }}
         .feature-card {{
             background: rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 10px;
+            padding: 15px; border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-            color: white;
+            backdrop-filter: blur(10px); color: white !important;
             transition: transform 0.2s;
         }}
-        .feature-card:hover {{
-            transform: translateY(-3px);
-            background: rgba(255,255,255,0.15);
-        }}
-        .feature-icon {{ font-size: 1.5rem; margin-bottom: 8px; }}
-        .feature-title {{ font-weight: 700; font-size: 1rem; margin-bottom: 4px; color: white !important; }}
-        .feature-desc {{ font-size: 0.85rem; opacity: 0.85; line-height: 1.4; color: #cbd5e1 !important; }}
+        .feature-card:hover {{ transform: translateY(-3px); background: rgba(255,255,255,0.15); }}
+        .feature-title {{ font-weight: 700; color: white !important; }}
+        .feature-desc {{ font-size: 0.85rem; color: #cbd5e1 !important; }}
 
         /* Tabs */
         .stTabs [data-baseweb="tab-list"] {{ gap: 8px; }}
         .stTabs [data-baseweb="tab"] {{
-            height: 50px;
-            background-color: white;
-            border-radius: 8px 8px 0 0;
-            border: 1px solid #e2e8f0;
-            border-bottom: none;
-            padding: 0 20px;
-            font-weight: 600;
+            height: 50px; background-color: var(--card-bg);
+            border-radius: 8px 8px 0 0; border: 1px solid var(--border-color);
+            border-bottom: none; padding: 0 20px; font-weight: 600;
+            color: var(--text-sub);
         }}
         .stTabs [aria-selected="true"] {{
-            background-color: #f1f5f9 !important;
+            background-color: var(--bg-start) !important;
             color: var(--primary) !important;
             border-top: 3px solid var(--primary) !important;
         }}
 
-        /* Button Styling */
+        /* Input Fields & Selectboxes */
+        .stTextInput input, .stSelectbox div[data-baseweb="select"] > div {{
+            background-color: var(--card-bg) !important;
+            color: var(--text-main) !important;
+            border-color: var(--border-color) !important;
+        }}
+        /* Dropdown popover background */
+        div[data-baseweb="popover"] {{
+            background-color: var(--card-bg) !important;
+        }}
+        div[data-baseweb="menu"] {{
+            background-color: var(--card-bg) !important;
+            color: var(--text-main) !important;
+        }}
+
+        /* Buttons */
         .stButton button {{
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white !important;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            box-shadow: 0 4px 10px rgba(1, 91, 173, 0.2);
+            color: white !important; border: none; border-radius: 8px;
+            font-weight: 600; box-shadow: 0 4px 10px rgba(1, 91, 173, 0.2);
         }}
         .stButton button:hover {{
-            box-shadow: 0 6px 15px rgba(1, 91, 173, 0.3);
-            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(1, 91, 173, 0.3); transform: translateY(-1px);
         }}
         
-        /* Dataframe */
+        /* Dataframes */
         div[data-testid="stDataFrame"] {{
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            overflow: hidden;
+            border: 1px solid var(--border-color);
+            border-radius: 12px; overflow: hidden;
+        }}
+        
+        /* Metric Boxes */
+        div[data-testid="stMetric"] {{
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: var(--shadow);
+        }}
+        div[data-testid="stMetricLabel"] {{ color: var(--text-sub) !important; }}
+        div[data-testid="stMetricValue"] {{ color: var(--primary) !important; }}
+        
+        /* Expander */
+        .streamlit-expanderHeader {{
+            background-color: var(--card-bg) !important;
+            color: var(--text-main) !important;
+            border: 1px solid var(--border-color);
+        }}
+        div[data-testid="stExpander"] {{
+            background-color: var(--card-bg) !important;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
         }}
     </style>
 """, unsafe_allow_html=True)
@@ -191,11 +235,7 @@ SUPERVISOR_CLASH_MATRIX = {
             "root_cause": "Value Mismatch: Utility vs. Affirmation.",
             "watch_fors": ["Encourager silent in meetings", "Director interrupting", "Encourager complaining of 'meanness'"],
             "intervention_steps": ["**Pre-Frame:** 'Efficiency without Empathy is Inefficiency.'", "**Translate:** Feelings are data about team health.", "**The Deal:** Listen for 5 mins before solving."],
-            "scripts": {
-                "To Director": "You are trying to fix the problem, but right now, the *relationship* is the problem.",
-                "To Encourager": "My brevity is not anger; it is urgency. I need you to tell me: 'I can help you win, but I need you to lower your volume.'",
-                "Joint": "We are speaking two different languages. I will validate your concern before we move to the next step."
-            }
+            "scripts": {"To Director": "You are trying to fix the problem, but right now, the *relationship* is the problem.", "To Encourager": "My brevity is not anger; it is urgency. I need you to tell me: 'I can help you win, but I need you to lower your volume.'", "Joint": "We are speaking two different languages. I will validate your concern before we move to the next step."}
         },
         "Facilitator": {"tension": "Gas vs. Brake", "root_cause": "Stagnation vs. Error", "watch_fors": ["Email commands", "Indecision"], "intervention_steps": ["Define Clock", "Define Veto", "Debrief"], "scripts": {"To Director": "Force = Compliance, not Buy-in.", "To Facilitator": "Silence = Agreement.", "Joint": "Set a timer."}},
         "Tracker": {"tension": "Vision vs. Obstacle", "root_cause": "Intuition vs. Handbook", "watch_fors": ["Quoting policy", "Bypassing"], "intervention_steps": ["Clarify Roles", "Yes If", "Risk Acceptance"], "scripts": {"To Director": "They are protecting you.", "To Tracker": "Start with solution.", "Joint": "Destination vs. Brakes."}},
@@ -250,7 +290,7 @@ CAREER_PATHWAYS = {
     }
 }
 
-# (PDF Dictionaries - Shortened for file size, full content generated in PDF function)
+# (PDF Dictionaries)
 COMM_PROFILES = {
     "Director": {"overview": "Leads with clarity, structure, and urgency.", "supervising": "Be direct, concise. Don't micromanage.", "struggle_bullets": ["Impatience", "Over-assertiveness", "Steamrolling"], "coaching": ["What are the risks of speed?", "Who haven't we heard from?"], "advancement": "Shift from Command to Influence."},
     "Encourager": {"overview": "Leads with warmth, optimism, and EQ.", "supervising": "Connect relationally first.", "struggle_bullets": ["Conflict avoidance", "Disorganization"], "coaching": ["Prioritizing popularity?", "Hard truths?"], "advancement": "Master operations/structure."},
@@ -349,30 +389,16 @@ header()
 
 # --- LANDING PAGE INFO ---
 st.markdown("""
-<div class="custom-card">
-    <h4>👋 Welcome to the Leadership Intelligence Hub</h4>
-    <p>This platform translates the <b>Elmcrest Compass</b> assessment data into actionable management strategies.</p>
-    <div class="tool-grid">
-        <div class="feature-card">
-            <div class="feature-icon">📝</div>
-            <div class="feature-title">Guide Generator</div>
-            <div class="feature-desc">Create 12-point coaching manuals.</div>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">🧬</div>
-            <div class="feature-title">Team DNA</div>
-            <div class="feature-desc">Analyze unit culture & blindspots.</div>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">⚖️</div>
-            <div class="feature-title">Conflict Mediator</div>
-            <div class="feature-desc">Scripts for tough conversations.</div>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">🚀</div>
-            <div class="feature-title">Career Pathfinder</div>
-            <div class="feature-desc">Promotion readiness tests.</div>
-        </div>
+<div class="hero-box">
+    <div class="hero-title">Elmcrest Leadership Intelligence</div>
+    <div class="hero-subtitle">
+        Your command center for staff development. Use assessment data to build balanced teams, resolve conflicts, and guide career growth.
+    </div>
+    <div class="feature-grid">
+        <div class="feature-card"><div class="feature-icon">📝</div><div class="feature-title">Guide Generator</div><div class="feature-desc">Create 12-point coaching manuals.</div></div>
+        <div class="feature-card"><div class="feature-icon">🧬</div><div class="feature-title">Team DNA</div><div class="feature-desc">Analyze unit culture & blindspots.</div></div>
+        <div class="feature-card"><div class="feature-icon">⚖️</div><div class="feature-title">Conflict Mediator</div><div class="feature-desc">Scripts for tough conversations.</div></div>
+        <div class="feature-card"><div class="feature-icon">🚀</div><div class="feature-title">Career Pathfinder</div><div class="feature-desc">Promotion readiness tests.</div></div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -483,11 +509,14 @@ with tab4:
                     with st.container(border=True):
                         st.markdown("##### 🗣️ The Conversation")
                         st.write(path['conversation'])
+                        st.warning(f"**Supervisor Watch Item:** {path.get('supervisor_focus')}")
                 with c_b:
                     with st.container(border=True):
-                        st.markdown("##### ✅ Assignment")
+                        st.markdown("##### ✅ Litmus Test Assignment")
+                        st.write(f"**Setup:** {path['assignment_setup']}")
                         st.write(f"**Task:** {path['assignment_task']}")
                         st.success(f"**Success:** {path['success_indicators']}")
+                        st.error(f"**Red Flag:** {path['red_flags']}")
             st.button("Reset", key="reset_t4", on_click=reset_t4)
 
 # --- TAB 5: PULSE ---
