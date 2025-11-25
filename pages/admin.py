@@ -8,19 +8,17 @@ import plotly.express as px
 st.set_page_config(
     page_title="Elmcrest Supervisor Platform",
     page_icon="📊",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
-# --- SECURITY: SIMPLE PASSWORD CHECK ---
-# Prevents staff from accessing supervisor tools
+# --- SECURITY: PASSWORD CHECK ---
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 def check_password():
-    # You can set this password in Streamlit Secrets or hardcode it here temporarily
-    # Recommended: st.secrets["ADMIN_PASSWORD"]
+    # Defaults to 'elmcrest2025' if secret not set
     PASSWORD = st.secrets.get("ADMIN_PASSWORD", "elmcrest2025") 
-    
     if st.session_state.password_input == PASSWORD:
         st.session_state.authenticated = True
         del st.session_state.password_input
@@ -28,12 +26,25 @@ def check_password():
         st.error("Incorrect password")
 
 if not st.session_state.authenticated:
-    st.markdown("### 🔒 Supervisor Access Only")
-    st.text_input("Enter Admin Password", type="password", key="password_input", on_change=check_password)
-    st.stop() # Stop execution here if not logged in
+    st.markdown("""
+        <style>
+        .stApp { background: radial-gradient(circle at center, #f1f5f9 0%, #cbd5e1 100%); }
+        .login-card {
+            background: white; padding: 40px; border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center;
+            max-width: 400px; margin: 100px auto;
+        }
+        </style>
+        <div class='login-card'>
+            <h2 style='color:#015bad;'>Supervisor Access</h2>
+            <p style='color:#64748b; margin-bottom:20px;'>Please enter your credentials to access the leadership dashboard.</p>
+        </div>
+    """, unsafe_allow_html=True)
+    st.text_input("Password", type="password", key="password_input", on_change=check_password)
+    st.stop()
 
 # ==========================================
-# SUPERVISOR TOOL LOGIC BEGINS HERE
+# SUPERVISOR TOOL LOGIC STARTS HERE
 # ==========================================
 
 # --- 2. CONSTANTS ---
@@ -67,7 +78,7 @@ st.markdown(f"""
         }}
         
         .stApp {{
-            background: radial-gradient(circle at top left, #f1f5f9 0%, #ffffff 100%);
+            background: radial-gradient(circle at top left, #f8fafc 0%, #ffffff 100%);
         }}
 
         h1, h2, h3, h4 {{
@@ -75,30 +86,91 @@ st.markdown(f"""
             font-weight: 700 !important;
             letter-spacing: -0.02em;
         }}
-        
-        .custom-card {{
-            background-color: white;
-            padding: 24px;
+
+        /* Hero Section */
+        .hero-box {{
+            background: linear-gradient(135deg, #015bad 0%, #0f172a 100%);
+            padding: 30px;
             border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0;
-            margin-bottom: 20px;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(1, 91, 173, 0.2);
         }}
-        
-        .tool-grid {{
+        .hero-title {{
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: white !important;
+        }}
+        .hero-subtitle {{
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 400;
+            color: #e2e8f0 !important;
+            max-width: 800px;
+            line-height: 1.6;
+        }}
+
+        /* Feature Cards in Hero */
+        .feature-grid {{
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
         }}
-        
+        .feature-card {{
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            transition: transform 0.2s;
+        }}
+        .feature-card:hover {{
+            transform: translateY(-3px);
+            background: rgba(255,255,255,0.15);
+        }}
+        .feature-icon {{ font-size: 1.5rem; margin-bottom: 8px; }}
+        .feature-title {{ font-weight: 700; font-size: 1rem; margin-bottom: 4px; color: white !important; }}
+        .feature-desc {{ font-size: 0.85rem; opacity: 0.85; line-height: 1.4; color: #cbd5e1 !important; }}
+
+        /* Tabs */
+        .stTabs [data-baseweb="tab-list"] {{ gap: 8px; }}
+        .stTabs [data-baseweb="tab"] {{
+            height: 50px;
+            background-color: white;
+            border-radius: 8px 8px 0 0;
+            border: 1px solid #e2e8f0;
+            border-bottom: none;
+            padding: 0 20px;
+            font-weight: 600;
+        }}
+        .stTabs [aria-selected="true"] {{
+            background-color: #f1f5f9 !important;
+            color: var(--primary) !important;
+            border-top: 3px solid var(--primary) !important;
+        }}
+
+        /* Button Styling */
         .stButton button {{
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white !important;
             border: none;
-            border-radius: 10px;
-            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
             font-weight: 600;
+            box-shadow: 0 4px 10px rgba(1, 91, 173, 0.2);
+        }}
+        .stButton button:hover {{
+            box-shadow: 0 6px 15px rgba(1, 91, 173, 0.3);
+            transform: translateY(-1px);
+        }}
+        
+        /* Dataframe */
+        div[data-testid="stDataFrame"] {{
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
         }}
     </style>
 """, unsafe_allow_html=True)
@@ -119,7 +191,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "root_cause": "Value Mismatch: Utility vs. Affirmation.",
             "watch_fors": ["Encourager silent in meetings", "Director interrupting", "Encourager complaining of 'meanness'"],
             "intervention_steps": ["**Pre-Frame:** 'Efficiency without Empathy is Inefficiency.'", "**Translate:** Feelings are data about team health.", "**The Deal:** Listen for 5 mins before solving."],
-            "scripts": {"To Director": "You are trying to fix the problem, but right now, the *relationship* is the problem.", "To Encourager": "My brevity is not anger; it is urgency.", "Joint": "We are speaking two different languages."}
+            "scripts": {
+                "To Director": "You are trying to fix the problem, but right now, the *relationship* is the problem.",
+                "To Encourager": "My brevity is not anger; it is urgency. I need you to tell me: 'I can help you win, but I need you to lower your volume.'",
+                "Joint": "We are speaking two different languages. I will validate your concern before we move to the next step."
+            }
         },
         "Facilitator": {"tension": "Gas vs. Brake", "root_cause": "Stagnation vs. Error", "watch_fors": ["Email commands", "Indecision"], "intervention_steps": ["Define Clock", "Define Veto", "Debrief"], "scripts": {"To Director": "Force = Compliance, not Buy-in.", "To Facilitator": "Silence = Agreement.", "Joint": "Set a timer."}},
         "Tracker": {"tension": "Vision vs. Obstacle", "root_cause": "Intuition vs. Handbook", "watch_fors": ["Quoting policy", "Bypassing"], "intervention_steps": ["Clarify Roles", "Yes If", "Risk Acceptance"], "scripts": {"To Director": "They are protecting you.", "To Tracker": "Start with solution.", "Joint": "Destination vs. Brakes."}},
@@ -142,7 +218,7 @@ SUPERVISOR_CLASH_MATRIX = {
         "Facilitator": {"tension": "Details vs Concepts", "root_cause": "Checklist vs Conversation", "watch_fors": ["Frustration", "Confusion"], "intervention_steps": ["Deliverable check", "Operationalize", "Collaborate"], "scripts": {"To Tracker": "Alignment is the deliverable.", "To Facilitator": "Define the to-do."}}
     }
 }
-# Fallback
+# Fallback for robust lookup
 for s in COMM_TRAITS:
     if s not in SUPERVISOR_CLASH_MATRIX: SUPERVISOR_CLASH_MATRIX[s] = {}
     for staff in COMM_TRAITS:
@@ -174,6 +250,7 @@ CAREER_PATHWAYS = {
     }
 }
 
+# (PDF Dictionaries - Shortened for file size, full content generated in PDF function)
 COMM_PROFILES = {
     "Director": {"overview": "Leads with clarity, structure, and urgency.", "supervising": "Be direct, concise. Don't micromanage.", "struggle_bullets": ["Impatience", "Over-assertiveness", "Steamrolling"], "coaching": ["What are the risks of speed?", "Who haven't we heard from?"], "advancement": "Shift from Command to Influence."},
     "Encourager": {"overview": "Leads with warmth, optimism, and EQ.", "supervising": "Connect relationally first.", "struggle_bullets": ["Conflict avoidance", "Disorganization"], "coaching": ["Prioritizing popularity?", "Hard truths?"], "advancement": "Master operations/structure."},
@@ -276,21 +353,25 @@ st.markdown("""
     <h4>👋 Welcome to the Leadership Intelligence Hub</h4>
     <p>This platform translates the <b>Elmcrest Compass</b> assessment data into actionable management strategies.</p>
     <div class="tool-grid">
-        <div>
-            <strong>📝 Guide Generator</strong><br>
-            <span style="font-size:0.9rem;color:#64748b;">Create a 12-point custom manual for managing a specific staff member.</span>
+        <div class="feature-card">
+            <div class="feature-icon">📝</div>
+            <div class="feature-title">Guide Generator</div>
+            <div class="feature-desc">Create 12-point coaching manuals.</div>
         </div>
-        <div>
-            <strong>🧬 Team DNA</strong><br>
-            <span style="font-size:0.9rem;color:#64748b;">Visualize the collective personality of a unit to spot blindspots.</span>
+        <div class="feature-card">
+            <div class="feature-icon">🧬</div>
+            <div class="feature-title">Team DNA</div>
+            <div class="feature-desc">Analyze unit culture & blindspots.</div>
         </div>
-        <div>
-            <strong>⚖️ Conflict Mediator</strong><br>
-            <span style="font-size:0.9rem;color:#64748b;">Get a specific script to resolve friction between staff members.</span>
+        <div class="feature-card">
+            <div class="feature-icon">⚖️</div>
+            <div class="feature-title">Conflict Mediator</div>
+            <div class="feature-desc">Scripts for tough conversations.</div>
         </div>
-        <div>
-            <strong>🚀 Career Pathfinder</strong><br>
-            <span style="font-size:0.9rem;color:#64748b;">Plan developmental assignments for promotion readiness.</span>
+        <div class="feature-card">
+            <div class="feature-icon">🚀</div>
+            <div class="feature-title">Career Pathfinder</div>
+            <div class="feature-desc">Promotion readiness tests.</div>
         </div>
     </div>
 </div>
@@ -301,6 +382,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs(["📝 Guide Generator", "🧬 Team DNA",
 
 # --- TAB 1: GUIDE ---
 with tab1:
+    st.markdown("#### 📄 Generate Supervisory Guides")
     sub1, sub2 = st.tabs(["Database", "Manual"])
     with sub1:
         if not df.empty:
@@ -395,23 +477,17 @@ with tab4:
             style = d['p_comm']
             path = CAREER_PATHWAYS.get(style, {}).get(role)
             if path:
-                st.divider()
-                st.markdown(f"**Current Style:** {style} $\\rightarrow$ **Target:** {role}")
-                st.info(f"**The Shift:** {path['shift']}")
-                st.markdown(f"*{path['why']}*")
+                st.info(f"**Shift:** {path['shift']}")
                 c_a, c_b = st.columns(2)
                 with c_a:
                     with st.container(border=True):
                         st.markdown("##### 🗣️ The Conversation")
                         st.write(path['conversation'])
-                        st.warning(f"**Supervisor Watch Item:** {path.get('supervisor_focus')}")
                 with c_b:
                     with st.container(border=True):
-                        st.markdown("##### ✅ Litmus Test Assignment")
-                        st.write(f"**Setup:** {path['assignment_setup']}")
+                        st.markdown("##### ✅ Assignment")
                         st.write(f"**Task:** {path['assignment_task']}")
                         st.success(f"**Success:** {path['success_indicators']}")
-                        st.error(f"**Red Flag:** {path['red_flags']}")
             st.button("Reset", key="reset_t4", on_click=reset_t4)
 
 # --- TAB 5: PULSE ---
