@@ -12,6 +12,13 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# --- SESSION STATE FOR NAVIGATION ---
+if "current_view" not in st.session_state:
+    st.session_state.current_view = "Guide Generator"
+
+def set_view(view_name):
+    st.session_state.current_view = view_name
+
 # --- SECURITY: PASSWORD CHECK ---
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
@@ -134,55 +141,39 @@ st.markdown(f"""
         .hero-title {{ color: white !important; font-size: 2rem; font-weight: 800; margin-bottom:10px; }}
         .hero-subtitle {{ color: #e2e8f0 !important; font-size: 1.1rem; opacity: 0.9; }}
 
-        /* Feature Cards */
-        .feature-grid {{
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 25px;
+        /* Navigation Bar (Radio styled as tabs) */
+        div[role="radiogroup"] {{
+            background-color: var(--card-bg);
+            padding: 5px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
         }}
-        .feature-card {{
-            background: rgba(255,255,255,0.1);
-            padding: 15px; border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px); color: white !important;
-            transition: transform 0.2s;
-        }}
-        .feature-card:hover {{ transform: translateY(-3px); background: rgba(255,255,255,0.15); }}
-        .feature-title {{ font-weight: 700; color: white !important; }}
-        .feature-desc {{ font-size: 0.85rem; color: #cbd5e1 !important; }}
-
-        /* Tabs */
-        .stTabs [data-baseweb="tab-list"] {{ gap: 8px; }}
-        .stTabs [data-baseweb="tab"] {{
-            height: 50px; background-color: var(--card-bg);
-            border-radius: 8px 8px 0 0; border: 1px solid var(--border-color);
-            border-bottom: none; padding: 0 20px; font-weight: 600;
+        div[role="radiogroup"] label {{
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background 0.2s;
             color: var(--text-sub);
+            font-weight: 600;
         }}
-        .stTabs [aria-selected="true"] {{
-            background-color: var(--bg-start) !important;
-            color: var(--primary) !important;
-            border-top: 3px solid var(--primary) !important;
+        div[role="radiogroup"] label:hover {{
+            background-color: rgba(1, 91, 173, 0.05);
         }}
+        /* Selected Tab Styling handled by Streamlit's internal classes, we rely on theme color here */
 
-        /* Input Fields & Selectboxes */
-        .stTextInput input, .stSelectbox div[data-baseweb="select"] > div {{
-            background-color: var(--card-bg) !important;
-            color: var(--text-main) !important;
-            border-color: var(--border-color) !important;
+        /* Card Buttons (The 4 main options) */
+        .card-btn-container {{
+            height: 100%;
         }}
-        /* Dropdown popover background */
-        div[data-baseweb="popover"] {{
-            background-color: var(--card-bg) !important;
-        }}
-        div[data-baseweb="menu"] {{
-            background-color: var(--card-bg) !important;
-            color: var(--text-main) !important;
-        }}
-
-        /* Buttons */
         .stButton button {{
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white !important; border: none; border-radius: 8px;
+            color: white !important; border: none; border-radius: 12px;
             font-weight: 600; box-shadow: 0 4px 10px rgba(1, 91, 173, 0.2);
+            height: 100%;
+            min-height: 60px;
         }}
         .stButton button:hover {{
             box-shadow: 0 6px 15px rgba(1, 91, 173, 0.3); transform: translateY(-1px);
@@ -290,7 +281,7 @@ CAREER_PATHWAYS = {
     }
 }
 
-# (PDF Dictionaries)
+# (PDF Dictionaries - Shortened for file size, full content generated in PDF function)
 COMM_PROFILES = {
     "Director": {"overview": "Leads with clarity, structure, and urgency.", "supervising": "Be direct, concise. Don't micromanage.", "struggle_bullets": ["Impatience", "Over-assertiveness", "Steamrolling"], "coaching": ["What are the risks of speed?", "Who haven't we heard from?"], "advancement": "Shift from Command to Influence."},
     "Encourager": {"overview": "Leads with warmth, optimism, and EQ.", "supervising": "Connect relationally first.", "struggle_bullets": ["Conflict avoidance", "Disorganization"], "coaching": ["Prioritizing popularity?", "Hard truths?"], "advancement": "Master operations/structure."},
@@ -378,37 +369,51 @@ def reset_t2(): st.session_state.t2_team_select = []
 def reset_t3(): st.session_state.p1 = None; st.session_state.p2 = None
 def reset_t4(): st.session_state.career = None; st.session_state.career_target = None
 
-# --- UI HEADER ---
-def header():
-    col1, col2 = st.columns([0.1, 0.9])
-    with col1: st.markdown("<div style='width:60px;height:60px;background:linear-gradient(135deg,#015bad,#51c3c5);border-radius:14px;color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.4rem;box-shadow:0 4px 10px rgba(1,91,173,0.3);'>EC</div>", unsafe_allow_html=True)
-    with col2: st.markdown("<h2 style='margin:0;padding-top:10px;'>Elmcrest Supervisor Platform</h2><p style='margin:0;color:#64748b;'>Leadership Intelligence Hub</p>", unsafe_allow_html=True)
-    st.markdown("---")
-
-header()
-
-# --- LANDING PAGE INFO ---
+# --- HERO SECTION (LANDING PAGE) ---
 st.markdown("""
 <div class="hero-box">
     <div class="hero-title">Elmcrest Leadership Intelligence</div>
     <div class="hero-subtitle">
-        Your command center for staff development. Use assessment data to build balanced teams, resolve conflicts, and guide career growth.
-    </div>
-    <div class="feature-grid">
-        <div class="feature-card"><div class="feature-icon">📝</div><div class="feature-title">Guide Generator</div><div class="feature-desc">Create 12-point coaching manuals.</div></div>
-        <div class="feature-card"><div class="feature-icon">🧬</div><div class="feature-title">Team DNA</div><div class="feature-desc">Analyze unit culture & blindspots.</div></div>
-        <div class="feature-card"><div class="feature-icon">⚖️</div><div class="feature-title">Conflict Mediator</div><div class="feature-desc">Scripts for tough conversations.</div></div>
-        <div class="feature-card"><div class="feature-icon">🚀</div><div class="feature-title">Career Pathfinder</div><div class="feature-desc">Promotion readiness tests.</div></div>
+        Your command center for staff development. Select a tool below to begin.
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# --- TABS ---
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["📝 Guide Generator", "🧬 Team DNA", "⚖️ Conflict Mediator", "🚀 Career Pathfinder", "📈 Org Pulse"])
+# --- NAVIGATION MENU ---
+# Using columns and buttons as clickable cards to switch views
+nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
 
-# --- TAB 1: GUIDE ---
-with tab1:
-    st.markdown("#### 📄 Generate Supervisory Guides")
+with nav_col1:
+    if st.button("📝 Guide Generator", use_container_width=True):
+        set_view("Guide Generator")
+    st.caption("Create 12-point coaching manuals.")
+
+with nav_col2:
+    if st.button("🧬 Team DNA", use_container_width=True):
+        set_view("Team DNA")
+    st.caption("Analyze unit culture & blindspots.")
+
+with nav_col3:
+    if st.button("⚖️ Conflict Mediator", use_container_width=True):
+        set_view("Conflict Mediator")
+    st.caption("Scripts for tough conversations.")
+
+with nav_col4:
+    if st.button("🚀 Career Pathfinder", use_container_width=True):
+        set_view("Career Pathfinder")
+    st.caption("Promotion readiness tests.")
+
+# Org Pulse is accessed separately or can be added as a 5th column
+if st.button("📈 Organization Pulse (See All Data)", use_container_width=True):
+    set_view("Org Pulse")
+
+st.markdown("---")
+
+# --- VIEW CONTROLLER ---
+# Render content based on current_view state
+
+if st.session_state.current_view == "Guide Generator":
+    st.subheader("📝 Guide Generator")
     sub1, sub2 = st.tabs(["Database", "Manual"])
     with sub1:
         if not df.empty:
@@ -438,9 +443,8 @@ with tab1:
                 pdf = create_supervisor_guide(mn, mr, mpc, None, mpm, None)
                 st.download_button("Download PDF", pdf, "guide.pdf", "application/pdf")
 
-# --- TAB 2: TEAM DNA ---
-with tab2:
-    st.markdown("#### 🧬 Team Analysis")
+elif st.session_state.current_view == "Team DNA":
+    st.subheader("🧬 Team DNA")
     if not df.empty:
         teams = st.multiselect("Select Team Members", df['name'].tolist(), key="t2_team_select")
         if teams:
@@ -456,9 +460,8 @@ with tab2:
                 st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
             st.button("Clear", on_click=reset_t2)
 
-# --- TAB 3: CONFLICT ---
-with tab3:
-    st.markdown("#### ⚖️ Conflict Coaching")
+elif st.session_state.current_view == "Conflict Mediator":
+    st.subheader("⚖️ Conflict Mediator")
     if not df.empty:
         c1, c2 = st.columns(2)
         p1 = c1.selectbox("Supervisor", df['name'].unique(), index=None, key="p1")
@@ -473,7 +476,7 @@ with tab3:
             
             if s1 in SUPERVISOR_CLASH_MATRIX and s2 in SUPERVISOR_CLASH_MATRIX[s1]:
                 clash = SUPERVISOR_CLASH_MATRIX[s1][s2]
-                with st.expander("🔍 **Root Cause Analysis**", expanded=True):
+                with st.expander("🔍 Root Cause Analysis", expanded=True):
                     st.markdown(f"**The Dynamic:** {clash['tension']}")
                     st.markdown(f"**Root Cause:** {clash['root_cause']}")
                 c_a, c_b = st.columns(2)
@@ -490,9 +493,8 @@ with tab3:
             else: st.info("Same-style match. Focus on not amplifying weaknesses.")
             st.button("Reset", key="reset_t3", on_click=reset_t3)
 
-# --- TAB 4: CAREER ---
-with tab4:
-    st.markdown("#### 🚀 Career Pathfinder")
+elif st.session_state.current_view == "Career Pathfinder":
+    st.subheader("🚀 Career Pathfinder")
     if not df.empty:
         c1, c2 = st.columns(2)
         cand = c1.selectbox("Candidate", df['name'].unique(), index=None, key="career")
@@ -519,9 +521,8 @@ with tab4:
                         st.error(f"**Red Flag:** {path['red_flags']}")
             st.button("Reset", key="reset_t4", on_click=reset_t4)
 
-# --- TAB 5: PULSE ---
-with tab5:
-    st.markdown("#### 📈 Org Pulse")
+elif st.session_state.current_view == "Org Pulse":
+    st.subheader("📈 Organization Pulse")
     if not df.empty:
         c1, c2, c3 = st.columns(3)
         top_comm = df['p_comm'].mode()[0]
