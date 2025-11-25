@@ -3,6 +3,8 @@ import requests
 import pandas as pd
 from fpdf import FPDF
 import plotly.express as px
+import time
+import random
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
@@ -24,6 +26,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 def check_password():
+    # Defaults to 'elmcrest2025' if secret not set
     PASSWORD = st.secrets.get("ADMIN_PASSWORD", "elmcrest2025") 
     if st.session_state.password_input == PASSWORD:
         st.session_state.authenticated = True
@@ -89,7 +92,6 @@ st.markdown(f"""
             --border-color: #e2e8f0;
             --shadow: 0 4px 20px rgba(0,0,0,0.05);
             --input-bg: #ffffff;
-            --btn-text: #ffffff;
         }}
 
         @media (prefers-color-scheme: dark) {{
@@ -145,20 +147,19 @@ st.markdown(f"""
         .hero-subtitle {{ color: #e2e8f0 !important; font-size: 1.1rem; opacity: 0.9; max-width: 800px; line-height: 1.6; }}
 
         /* NAVIGATION BUTTONS AS CARDS */
-        /* We target the buttons inside the navigation columns specifically */
         div[data-testid="column"] .stButton button {{
             background-color: var(--card-bg);
             background-image: none;
             color: var(--text-main) !important;
             border: 1px solid var(--border-color);
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            height: 140px; /* Make them tall like cards */
+            height: 140px;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
             justify-content: center;
             padding: 20px;
-            white-space: pre-wrap; /* Allow newlines */
+            white-space: pre-wrap;
             text-align: left;
             transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
         }}
@@ -168,16 +169,6 @@ st.markdown(f"""
             box-shadow: 0 8px 15px rgba(0,0,0,0.1);
             border-color: var(--primary);
             color: var(--primary) !important;
-        }}
-        
-        div[data-testid="column"] .stButton button:active {{
-            background-color: var(--input-bg);
-        }}
-
-        /* Standard Buttons (Generate, Reset, etc.) */
-        /* We use a specific selector or just let them be default primary style */
-        .stButton button:not([style*="height: 140px"]) {{
-             /* Standard button styling fallback or overrides if needed for other buttons */
         }}
         
         /* Tabs */
@@ -203,6 +194,13 @@ st.markdown(f"""
         div[data-baseweb="popover"] {{ background-color: var(--card-bg) !important; }}
         div[data-baseweb="menu"] {{ background-color: var(--card-bg) !important; color: var(--text-main) !important; }}
 
+        /* Standard Buttons (Generate, Reset, etc.) */
+        .stButton button:not([style*="height: 140px"]) {{
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white !important; border: none; border-radius: 8px;
+            font-weight: 600; box-shadow: 0 4px 10px rgba(1, 91, 173, 0.2);
+        }}
+        
         /* Dataframes */
         div[data-testid="stDataFrame"] {{
             border: 1px solid var(--border-color);
@@ -231,11 +229,17 @@ st.markdown(f"""
             border: 1px solid var(--border-color);
             border-radius: 8px;
         }}
+        
+        /* Chat Message */
+        .stChatMessage {{
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. CONTENT DICTIONARIES (Full Content) ---
-# (Included for completeness so the file runs standalone)
+# --- 4. CONTENT DICTIONARIES (FULL) ---
 
 COMM_TRAITS = {
     "Director": {"focus": "Action & Speed", "blindspot": "Patience & Consensus", "needs": "Clarity & Autonomy"},
@@ -248,39 +252,44 @@ SUPERVISOR_CLASH_MATRIX = {
     "Director": {
         "Encourager": {
             "tension": "The 'Bulldozer vs. Doormat' Dynamic.",
-            "root_cause": "Value Mismatch: Utility vs. Affirmation.",
-            "watch_fors": ["Encourager silent in meetings", "Director interrupting", "Encourager complaining of 'meanness'"],
+            "psychology": "Value Mismatch: Utility vs. Affirmation. You value usefulness; they value being valued. When you skip the 'human' part to get to work, they feel dehumanized.",
+            "watch_fors": ["Encourager stops contributing in meetings (silent withdrawal)", "Director starts interrupting or finishing sentences", "Encourager complains to peers that Director is 'mean'"],
             "intervention_steps": ["**Pre-Frame:** 'Efficiency without Empathy is Inefficiency.'", "**Translate:** Feelings are data about team health.", "**The Deal:** Listen for 5 mins before solving."],
-            "scripts": {"To Director": "You are trying to fix the problem, but right now, the *relationship* is the problem.", "To Encourager": "My brevity is not anger; it is urgency. I need you to tell me: 'I can help you win, but I need you to lower your volume.'", "Joint": "We are speaking two different languages. I will validate your concern before we move to the next step."}
+            "scripts": {
+                "To Director": "You are trying to fix the problem, but right now, the *relationship* is the problem. Stop solving and start listening.",
+                "To Encourager": "My brevity is not anger; it is urgency. I need you to tell me: 'I can help you win, but I need you to lower your volume.'",
+                "Joint": "We are speaking two different languages. I am speaking 'Task'; you are speaking 'Team'. Both are valid. I will validate your concern before we move to the next step."
+            }
         },
-        "Facilitator": {"tension": "Gas vs. Brake", "root_cause": "Stagnation vs. Error", "watch_fors": ["Email commands", "Indecision"], "intervention_steps": ["Define Clock", "Define Veto", "Debrief"], "scripts": {"To Director": "Force = Compliance, not Buy-in.", "To Facilitator": "Silence = Agreement.", "Joint": "Set a timer."}},
-        "Tracker": {"tension": "Vision vs. Obstacle", "root_cause": "Intuition vs. Handbook", "watch_fors": ["Quoting policy", "Bypassing"], "intervention_steps": ["Clarify Roles", "Yes If", "Risk Acceptance"], "scripts": {"To Director": "They are protecting you.", "To Tracker": "Start with solution.", "Joint": "Destination vs. Brakes."}},
-        "Director": {"tension": "King vs. King", "root_cause": "Dominance/Control", "watch_fors": ["Interruptions", "Debates"], "intervention_steps": ["Separate Lanes", "Truce", "Commit"], "scripts": {"To Director": "Fighting to be right vs effective.", "To Other": "Strip the tone.", "Joint": "Stop fighting for the wheel."}}
+        "Facilitator": {"tension": "Gas vs. Brake", "psychology": "Risk Perception: Stagnation vs. Error. You fear doing nothing; they fear doing the wrong thing.", "watch_fors": ["Email commands to avoid meetings", "Indecision from Facilitator", "Director rolling eyes"], "intervention_steps": ["Define Clock", "Define Veto", "Debrief"], "scripts": {"To Director": "Force = Compliance, not Buy-in.", "To Facilitator": "Silence = Agreement. Speak up.", "Joint": "Set a timer for discussion."}},
+        "Tracker": {"tension": "Vision vs. Obstacle", "psychology": "Authority Source: Intuition vs. Handbook.", "watch_fors": ["Quoting policy numbers", "Bypassing the Tracker"], "intervention_steps": ["Clarify Roles", "Yes If", "Risk Acceptance"], "scripts": {"To Director": "They are protecting you from liability.", "To Tracker": "Start with the solution, not the problem.", "Joint": "Director sets destination; Tracker checks brakes."}},
+        "Director": {"tension": "King vs. King", "psychology": "Dominance: Both define safety as Control.", "watch_fors": ["Interruptions", "Public debates", "Refusal to implement"], "intervention_steps": ["Separate Lanes", "Truce", "Commit"], "scripts": {"To Director": "Fighting to be right vs effective.", "To Other": "Strip the tone.", "Joint": "Stop fighting for the wheel."}}
     },
     "Encourager": {
-        "Director": {"tension": "Sensitivity Gap", "root_cause": "External vs Internal Validation", "watch_fors": ["Apologizing", "Venting"], "intervention_steps": ["Headline First", "Explain Why", "Scheduled Venting"], "scripts": {"To Encourager": "Translate feelings to business risk.", "To Director": "Please/Thank you buys speed.", "Joint": "Timeline vs Communication Plan."}},
-        "Facilitator": {"tension": "Polite Stagnation", "root_cause": "Rejection vs Unfairness", "watch_fors": ["Endless meetings", "Passive language"], "intervention_steps": ["Name Fear", "Assign Bad Guy", "Script It"], "scripts": {"To Encourager": "Protecting feelings hurts program.", "To Facilitator": "Consensus search is procrastination.", "Joint": "Who delivers the news?"}},
-        "Tracker": {"tension": "Rigidity vs Flow", "root_cause": "Connection vs Consistency", "watch_fors": ["Secret deals", "Public policing"], "intervention_steps": ["Why of Rules", "Why of Exceptions", "Hybrid"], "scripts": {"To Encourager": "Bending rules makes Tracker the bad guy.", "To Tracker": "Right policy, cold delivery."}},
-        "Encourager": {"tension": "Echo Chamber", "root_cause": "Emotional Contagion", "watch_fors": ["Venting only", "Us vs Them"], "intervention_steps": ["5 Min Rule", "Pivot", "Data"], "scripts": {"To Encourager": "We are spinning.", "Joint": "Challenge each other."}}
+        "Director": {"tension": "Sensitivity Gap", "psychology": "Validation Style: External vs Internal.", "watch_fors": ["Apologizing before asking", "Venting to peers", "Director avoiding meetings"], "intervention_steps": ["Headline First", "Explain Why", "Scheduled Venting"], "scripts": {"To Encourager": "Translate feelings to business risk.", "To Director": "Please/Thank you buys speed.", "Joint": "Timeline vs Communication Plan."}},
+        "Facilitator": {"tension": "Polite Stagnation", "psychology": "Conflict Avoidance: Rejection vs Unfairness.", "watch_fors": ["Endless meetings", "Passive language", "Resentment"], "intervention_steps": ["Name Fear", "Assign Bad Guy", "Script It"], "scripts": {"To Encourager": "Protecting feelings hurts program.", "To Facilitator": "Consensus search is procrastination.", "Joint": "Who delivers the news?"}},
+        "Tracker": {"tension": "Rigidity vs Flow", "psychology": "Safety Source: Connection vs Consistency.", "watch_fors": ["Secret deals", "Public policing"], "intervention_steps": ["Why of Rules", "Why of Exceptions", "Hybrid"], "scripts": {"To Encourager": "Bending rules makes Tracker the bad guy.", "To Tracker": "Right policy, cold delivery."}},
+        "Encourager": {"tension": "Echo Chamber", "psychology": "Emotional Contagion.", "watch_fors": ["Venting only", "Us vs Them narratives"], "intervention_steps": ["5 Min Rule", "Pivot", "Data"], "scripts": {"To Encourager": "We are spinning.", "Joint": "Challenge each other."}}
     },
     "Facilitator": {
-        "Director": {"tension": "Steamroll", "root_cause": "External vs Internal Processing", "watch_fors": ["Silence", "Assumed Agreement"], "intervention_steps": ["Interrupt", "Pre-Meeting", "Frame Risk"], "scripts": {"To Director": "Moving too fast.", "To Facilitator": "Speak up."}},
-        "Tracker": {"tension": "Details Loop", "root_cause": "Horizontal vs Vertical Scope", "watch_fors": ["Email chains", "Overtime meetings"], "intervention_steps": ["Concept First", "Detail Second", "Parking Lot"], "scripts": {"To Tracker": "30,000 ft view.", "To Facilitator": "Testing the idea."}},
-        "Encourager": {"tension": "Fairness vs Feelings", "root_cause": "System vs Person", "watch_fors": ["Exceptions", "Inequity"], "intervention_steps": ["Validate Intent", "Explain Inequity", "Standard"], "scripts": {"To Encourager": "Fairness scales.", "To Facilitator": "Validate heart first."}}
+        "Director": {"tension": "Steamroll", "psychology": "Processing: External vs Internal.", "watch_fors": ["Silence", "Assumed Agreement"], "intervention_steps": ["Interrupt", "Pre-Meeting", "Frame Risk"], "scripts": {"To Director": "Moving too fast.", "To Facilitator": "Speak up."}},
+        "Tracker": {"tension": "Details Loop", "psychology": "Scope: Horizontal vs Vertical.", "watch_fors": ["Email chains", "Overtime meetings"], "intervention_steps": ["Concept First", "Detail Second", "Parking Lot"], "scripts": {"To Tracker": "30,000 ft view.", "To Facilitator": "Testing the idea."}},
+        "Encourager": {"tension": "Fairness vs Feelings", "psychology": "System vs Person.", "watch_fors": ["Exceptions", "Inequity"], "intervention_steps": ["Validate Intent", "Explain Inequity", "Standard"], "scripts": {"To Encourager": "Fairness scales.", "To Facilitator": "Validate heart first."}}
     },
     "Tracker": {
-        "Director": {"tension": "Micromanagement Trap", "root_cause": "Verification vs Competence", "watch_fors": ["Corrections", "Avoidance"], "intervention_steps": ["Pick Battles", "Sandbox", "Solution First"], "scripts": {"To Director": "Compliance safety.", "To Tracker": "Stop correcting spelling."}},
-        "Encourager": {"tension": "Rules vs Relationship", "root_cause": "Safety source mismatch", "watch_fors": ["Public correction", "Resentment"], "intervention_steps": ["Explain Why", "Connect First", "Hybrid"], "scripts": {"To Tracker": "Connect then correct.", "To Encourager": "Rules protect safety."}},
-        "Facilitator": {"tension": "Details vs Concepts", "root_cause": "Checklist vs Conversation", "watch_fors": ["Frustration", "Confusion"], "intervention_steps": ["Deliverable check", "Operationalize", "Collaborate"], "scripts": {"To Tracker": "Alignment is the deliverable.", "To Facilitator": "Define the to-do."}}
+        "Director": {"tension": "Micromanagement Trap", "psychology": "Trust: Verification vs Competence.", "watch_fors": ["Corrections", "Avoidance"], "intervention_steps": ["Pick Battles", "Sandbox", "Solution First"], "scripts": {"To Director": "Compliance safety.", "To Tracker": "Stop correcting spelling."}},
+        "Encourager": {"tension": "Rules vs Relationship", "psychology": "Safety source mismatch.", "watch_fors": ["Public correction", "Resentment"], "intervention_steps": ["Explain Why", "Connect First", "Hybrid"], "scripts": {"To Tracker": "Connect then correct.", "To Encourager": "Rules protect safety."}},
+        "Facilitator": {"tension": "Details vs Concepts", "psychology": "Checklist vs Conversation.", "watch_fors": ["Frustration", "Confusion"], "intervention_steps": ["Deliverable check", "Operationalize", "Collaborate"], "scripts": {"To Tracker": "Alignment is the deliverable.", "To Facilitator": "Define the to-do."}}
     }
 }
-# Fallback
+
+# Fallback for robust lookup
 for s in COMM_TRAITS:
     if s not in SUPERVISOR_CLASH_MATRIX: SUPERVISOR_CLASH_MATRIX[s] = {}
     for staff in COMM_TRAITS:
         if staff not in SUPERVISOR_CLASH_MATRIX[s]:
             SUPERVISOR_CLASH_MATRIX[s][staff] = {
-                "tension": "Differing perspectives.", "root_cause": "Priorities.", "watch_fors": [], "intervention_steps": ["Listen", "Align"], "scripts": {"To Supervisor": "Align.", "To Staff": "Align.", "Joint": "Align."}
+                "tension": "Differing perspectives.", "psychology": "Priorities.", "watch_fors": [], "intervention_steps": ["Listen", "Align"], "scripts": {"To Supervisor": "Align.", "To Staff": "Align.", "Joint": "Align."}
             }
 
 CAREER_PATHWAYS = {
@@ -306,6 +315,7 @@ CAREER_PATHWAYS = {
     }
 }
 
+# (PDF Dictionaries - Full Text)
 COMM_PROFILES = {
     "Director": {"overview": "Leads with clarity, structure, and urgency.", "supervising": "Be direct, concise. Don't micromanage.", "struggle_bullets": ["Impatience", "Over-assertiveness", "Steamrolling"], "coaching": ["What are the risks of speed?", "Who haven't we heard from?"], "advancement": "Shift from Command to Influence."},
     "Encourager": {"overview": "Leads with warmth, optimism, and EQ.", "supervising": "Connect relationally first.", "struggle_bullets": ["Conflict avoidance", "Disorganization"], "coaching": ["Prioritizing popularity?", "Hard truths?"], "advancement": "Master operations/structure."},
@@ -383,17 +393,27 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     
     return pdf.output(dest='S').encode('latin-1')
 
-# --- 6. MAIN APP LOGIC ---
+# --- ROLEPLAY BOT ---
+def get_bot_response(style, user_input):
+    responses = {
+        "Director": ["I don't have time for details, just give me the bottom line.", "This meeting is taking too long. What's the decision?", "I'm focused on the result. Why talk about feelings?", "I'm moving forward unless you have a concrete objection."],
+        "Encourager": ["I feel like you're being a bit harsh.", "I'm worried the team will be upset.", "Can we check in on how everyone is doing?", "I don't want to be the bad guy."],
+        "Facilitator": ["I think we need to hear from everyone first.", "Is that fair to the whole group?", "Can we pause and think about this?", "I don't want to rush into a mistake."],
+        "Tracker": ["But the policy manual says we can't.", "I need to see the data before I agree.", "This feels chaotic. Where is the checklist?", "I'm not comfortable moving forward without a procedure."]
+    }
+    return random.choice(responses.get(style, ["I see."]))
+
+# --- MAIN APP LOGIC ---
 staff_list = fetch_staff_data()
 df = pd.DataFrame(staff_list)
 
 # Reset Helpers
 def reset_t1(): st.session_state.t1_staff_select = None
 def reset_t2(): st.session_state.t2_team_select = []
-def reset_t3(): st.session_state.p1 = None; st.session_state.p2 = None
+def reset_t3(): st.session_state.p1 = None; st.session_state.p2 = None; st.session_state.sim_messages = []
 def reset_t4(): st.session_state.career = None; st.session_state.career_target = None
 
-# --- HERO SECTION (LANDING PAGE) ---
+# --- HERO SECTION ---
 st.markdown("""
 <div class="hero-box">
     <div class="hero-title">Elmcrest Leadership Intelligence</div>
@@ -403,7 +423,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# --- NAVIGATION MENU ---
+# --- NAVIGATION BUTTONS ---
 nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
 
 with nav_col1:
@@ -422,7 +442,6 @@ with nav_col4:
     if st.button("🚀 Career Pathfinder\n\nPromotion readiness tests.", use_container_width=True):
         set_view("Career Pathfinder")
 
-# Org Pulse Button
 st.markdown("###")
 if st.button("📈 Organization Pulse (See All Data)", use_container_width=True):
     set_view("Org Pulse")
@@ -446,13 +465,6 @@ if st.session_state.current_view == "Guide Generator":
                 if st.button("Generate Guide", type="primary"):
                     pdf = create_supervisor_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
                     st.download_button("Download PDF", pdf, f"Guide_{d['name']}.pdf", "application/pdf")
-                    
-                    # Instant View
-                    st.divider()
-                    st.markdown("### Quick Preview")
-                    c = COMM_PROFILES[d['p_comm']]; m = MOTIVATION_PROFILES[d['p_mot']]
-                    st.info(f"**Supervising:** {c['supervising']}")
-                    st.success(f"**Motivating:** {m['motivating']}")
                 st.button("Reset", on_click=reset_t1)
     with sub2:
         with st.form("manual"):
@@ -474,8 +486,6 @@ elif st.session_state.current_view == "Team DNA":
             with c1:
                 comm_counts = tdf['p_comm'].value_counts()
                 st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
-                present = set(tdf['p_comm'].unique()); missing = set(COMM_TRAITS.keys()) - present
-                if missing: st.error(f"🚫 **Blindspot Alert:** This team lacks **{', '.join(missing)}** energy.")
             with c2:
                 mot_counts = tdf['p_mot'].value_counts()
                 st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
@@ -486,8 +496,8 @@ elif st.session_state.current_view == "Conflict Mediator":
     st.subheader("⚖️ Conflict Mediator")
     if not df.empty:
         c1, c2 = st.columns(2)
-        p1 = c1.selectbox("Supervisor", df['name'].unique(), index=None, key="p1")
-        p2 = c2.selectbox("Staff", df['name'].unique(), index=None, key="p2")
+        p1 = c1.selectbox("Select Yourself (Supervisor)", df['name'].unique(), index=None, key="p1")
+        p2 = c2.selectbox("Select Staff Member", df['name'].unique(), index=None, key="p2")
         
         if p1 and p2 and p1 != p2:
             d1 = df[df['name']==p1].iloc[0]; d2 = df[df['name']==p2].iloc[0]
@@ -497,21 +507,37 @@ elif st.session_state.current_view == "Conflict Mediator":
             st.subheader(f"{s1} (Sup) vs. {s2} (Staff)")
             
             if s1 in SUPERVISOR_CLASH_MATRIX and s2 in SUPERVISOR_CLASH_MATRIX[s1]:
-                clash = SUPERVISOR_CLASH_MATRIX[s1][s2]
-                with st.expander("🔍 Root Cause Analysis", expanded=True):
-                    st.markdown(f"**The Dynamic:** {clash['tension']}")
-                    st.markdown(f"**Root Cause:** {clash['root_cause']}")
+                data = SUPERVISOR_CLASH_MATRIX[s1][s2]
+                
+                with st.expander("🔥 The Dynamic (Read First)", expanded=True):
+                    st.markdown(f"**{data['tension']}**")
+                    st.markdown(f"**Root Cause:** {data['psychology']}")
+                    st.markdown("**👀 Watch For:**")
+                    for w in data['watch_fors']: st.markdown(f"- {w}")
+
                 c_a, c_b = st.columns(2)
                 with c_a:
-                    st.markdown("##### 🚩 Watch For")
-                    for w in clash['watch_fors']: st.write(f"• {w}")
-                    st.markdown("##### 🛠️ Intervention Steps")
-                    for i in clash['intervention_steps']: st.info(i)
+                    st.markdown("#### 🛠️ Intervention Steps")
+                    for step in data['intervention_steps']: st.markdown(step)
                 with c_b:
-                    st.markdown("##### 🗣️ Coaching Scripts")
-                    st.success(f"**You Say:** \"{clash['scripts'].get('To '+s1, '...')}\"")
-                    st.warning(f"**They Hear:** \"{clash['scripts'].get('To '+s2, '...')}\"")
-                    st.info(f"**Joint Goal:** \"{clash['scripts'].get('Joint', '...')}\"")
+                    st.markdown("#### 🗣️ Coaching Scripts")
+                    st.success(f"**You Say:** \"{data['scripts'].get('To '+s1, '...')}\"")
+                    st.warning(f"**They Hear:** \"{data['scripts'].get('To '+s2, '...')}\"")
+                    st.info(f"**Joint Goal:** \"{data['scripts'].get('Joint', '...')}\"")
+                
+                # ROLEPLAY SIMULATOR
+                st.divider()
+                st.markdown(f"#### 🤖 Roleplay: Practice with a virtual {s2}")
+                if "sim_messages" not in st.session_state: st.session_state.sim_messages = []
+                for msg in st.session_state.sim_messages:
+                    with st.chat_message(msg["role"]): st.markdown(msg["content"])
+                if prompt := st.chat_input("Type your opening line..."):
+                    st.session_state.sim_messages.append({"role": "user", "content": prompt})
+                    with st.chat_message("user"): st.markdown(prompt)
+                    bot_reply = get_bot_response(s2, prompt)
+                    st.session_state.sim_messages.append({"role": "assistant", "content": bot_reply})
+                    with st.chat_message("assistant"): st.markdown(bot_reply)
+
             else: st.info("Same-style match. Focus on not amplifying weaknesses.")
             st.button("Reset", key="reset_t3", on_click=reset_t3)
 
@@ -534,13 +560,11 @@ elif st.session_state.current_view == "Career Pathfinder":
                     with st.container(border=True):
                         st.markdown("##### 🗣️ The Conversation")
                         st.write(path['conversation'])
-                        st.warning(f"**Supervisor Watch Item:** {path.get('supervisor_focus')}")
                 with c_b:
                     with st.container(border=True):
                         st.markdown("##### ✅ Assignment")
                         st.write(f"**Task:** {path['assignment_task']}")
                         st.success(f"**Success:** {path['success_indicators']}")
-                        st.error(f"**Red Flag:** {path['red_flags']}")
             st.button("Reset", key="reset_t4", on_click=reset_t4)
 
 # 5. ORG PULSE
