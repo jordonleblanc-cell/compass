@@ -12,7 +12,52 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. CONSTANTS & STYLING (Moved to Top for Login Page) ---
+# --- SESSION STATE FOR NAVIGATION ---
+if "current_view" not in st.session_state:
+    st.session_state.current_view = "Guide Generator"
+
+def set_view(view_name):
+    st.session_state.current_view = view_name
+
+# --- SECURITY: PASSWORD CHECK ---
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+def check_password():
+    PASSWORD = st.secrets.get("ADMIN_PASSWORD", "elmcrest2025") 
+    if st.session_state.password_input == PASSWORD:
+        st.session_state.authenticated = True
+        del st.session_state.password_input
+    else:
+        st.error("Incorrect password")
+
+if not st.session_state.authenticated:
+    st.markdown("""
+        <style>
+        .stApp { background: radial-gradient(circle at center, #f1f5f9 0%, #cbd5e1 100%); }
+        [data-testid="stHeader"] { background: transparent; }
+        .login-card {
+            background: white; padding: 40px; border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center;
+            max-width: 400px; margin: 100px auto;
+            border: 1px solid #e2e8f0;
+        }
+        .login-title { color: #015bad; font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
+        .login-subtitle { color: #64748b; margin-bottom: 20px; }
+        </style>
+        <div class='login-card'>
+            <div class='login-title'>Supervisor Access</div>
+            <div class='login-subtitle'>Please enter your credentials to access the leadership dashboard.</div>
+        </div>
+    """, unsafe_allow_html=True)
+    st.text_input("Password", type="password", key="password_input", on_change=check_password)
+    st.stop()
+
+# ==========================================
+# SUPERVISOR TOOL LOGIC STARTS HERE
+# ==========================================
+
+# --- 2. CONSTANTS ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
 
 BRAND_COLORS = {
@@ -24,6 +69,7 @@ BRAND_COLORS = {
     "light_gray": "#f8fafc"
 }
 
+# --- 3. CSS STYLING (Light & Dark Mode Support) ---
 st.markdown(f"""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -43,6 +89,7 @@ st.markdown(f"""
             --border-color: #e2e8f0;
             --shadow: 0 4px 20px rgba(0,0,0,0.05);
             --input-bg: #ffffff;
+            --btn-text: #ffffff;
         }}
 
         @media (prefers-color-scheme: dark) {{
@@ -74,20 +121,6 @@ st.markdown(f"""
             letter-spacing: -0.02em;
         }}
         
-        /* Login Card */
-        .login-card {{
-            background-color: var(--card-bg);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            text-align: center;
-            max-width: 400px;
-            margin: 100px auto;
-            border: 1px solid var(--border-color);
-        }}
-        .login-title {{ color: var(--primary); font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }}
-        .login-subtitle {{ color: var(--text-sub); margin-bottom: 20px; }}
-
         /* Custom Cards */
         .custom-card {{
             background-color: var(--card-bg);
@@ -102,30 +135,51 @@ st.markdown(f"""
         /* Hero Section */
         .hero-box {{
             background: linear-gradient(135deg, #015bad 0%, #0f172a 100%);
-            padding: 30px;
+            padding: 40px 30px;
             border-radius: 16px;
             color: white !important;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(1, 91, 173, 0.2);
         }}
-        .hero-title {{ color: white !important; font-size: 2rem; font-weight: 800; margin-bottom:10px; }}
-        .hero-subtitle {{ color: #e2e8f0 !important; font-size: 1.1rem; opacity: 0.9; }}
+        .hero-title {{ color: white !important; font-size: 2.2rem; font-weight: 800; margin-bottom:10px; }}
+        .hero-subtitle {{ color: #e2e8f0 !important; font-size: 1.1rem; opacity: 0.9; max-width: 800px; line-height: 1.6; }}
 
-        /* Feature Cards */
-        .feature-grid {{
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 25px;
+        /* NAVIGATION BUTTONS AS CARDS */
+        /* We target the buttons inside the navigation columns specifically */
+        div[data-testid="column"] .stButton button {{
+            background-color: var(--card-bg);
+            background-image: none;
+            color: var(--text-main) !important;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            height: 140px; /* Make them tall like cards */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 20px;
+            white-space: pre-wrap; /* Allow newlines */
+            text-align: left;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
         }}
-        .feature-card {{
-            background: rgba(255,255,255,0.1);
-            padding: 15px; border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px); color: white !important;
-            transition: transform 0.2s;
-        }}
-        .feature-card:hover {{ transform: translateY(-3px); background: rgba(255,255,255,0.15); }}
-        .feature-title {{ font-weight: 700; color: white !important; }}
-        .feature-desc {{ font-size: 0.85rem; color: #cbd5e1 !important; }}
 
+        div[data-testid="column"] .stButton button:hover {{
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+            color: var(--primary) !important;
+        }}
+        
+        div[data-testid="column"] .stButton button:active {{
+            background-color: var(--input-bg);
+        }}
+
+        /* Standard Buttons (Generate, Reset, etc.) */
+        /* We use a specific selector or just let them be default primary style */
+        .stButton button:not([style*="height: 140px"]) {{
+             /* Standard button styling fallback or overrides if needed for other buttons */
+        }}
+        
         /* Tabs */
         .stTabs [data-baseweb="tab-list"] {{ gap: 8px; }}
         .stTabs [data-baseweb="tab"] {{
@@ -149,16 +203,6 @@ st.markdown(f"""
         div[data-baseweb="popover"] {{ background-color: var(--card-bg) !important; }}
         div[data-baseweb="menu"] {{ background-color: var(--card-bg) !important; color: var(--text-main) !important; }}
 
-        /* Buttons */
-        .stButton button {{
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white !important; border: none; border-radius: 8px;
-            font-weight: 600; box-shadow: 0 4px 10px rgba(1, 91, 173, 0.2);
-        }}
-        .stButton button:hover {{
-            box-shadow: 0 6px 15px rgba(1, 91, 173, 0.3); transform: translateY(-1px);
-        }}
-        
         /* Dataframes */
         div[data-testid="stDataFrame"] {{
             border: 1px solid var(--border-color);
@@ -190,36 +234,8 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. SECURITY: PASSWORD CHECK ---
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-
-def check_password():
-    PASSWORD = st.secrets.get("ADMIN_PASSWORD", "elmcrest2025") 
-    if st.session_state.password_input == PASSWORD:
-        st.session_state.authenticated = True
-        del st.session_state.password_input
-    else:
-        st.error("Incorrect password")
-
-if not st.session_state.authenticated:
-    st.markdown("""
-        <div class='login-card'>
-            <div class='login-title'>Supervisor Access</div>
-            <div class='login-subtitle'>Please enter your credentials to access the leadership dashboard.</div>
-        </div>
-    """, unsafe_allow_html=True)
-    st.text_input("Password", type="password", key="password_input", on_change=check_password)
-    st.stop()
-
-# --- 4. SESSION STATE FOR NAVIGATION ---
-if "current_view" not in st.session_state:
-    st.session_state.current_view = "Guide Generator"
-
-def set_view(view_name):
-    st.session_state.current_view = view_name
-
-# --- 5. CONTENT DICTIONARIES ---
+# --- 4. CONTENT DICTIONARIES (Full Content) ---
+# (Included for completeness so the file runs standalone)
 
 COMM_TRAITS = {
     "Director": {"focus": "Action & Speed", "blindspot": "Patience & Consensus", "needs": "Clarity & Autonomy"},
@@ -258,7 +274,7 @@ SUPERVISOR_CLASH_MATRIX = {
         "Facilitator": {"tension": "Details vs Concepts", "root_cause": "Checklist vs Conversation", "watch_fors": ["Frustration", "Confusion"], "intervention_steps": ["Deliverable check", "Operationalize", "Collaborate"], "scripts": {"To Tracker": "Alignment is the deliverable.", "To Facilitator": "Define the to-do."}}
     }
 }
-# Fallback for robust lookup
+# Fallback
 for s in COMM_TRAITS:
     if s not in SUPERVISOR_CLASH_MATRIX: SUPERVISOR_CLASH_MATRIX[s] = {}
     for staff in COMM_TRAITS:
@@ -290,7 +306,6 @@ CAREER_PATHWAYS = {
     }
 }
 
-# (PDF Dictionaries)
 COMM_PROFILES = {
     "Director": {"overview": "Leads with clarity, structure, and urgency.", "supervising": "Be direct, concise. Don't micromanage.", "struggle_bullets": ["Impatience", "Over-assertiveness", "Steamrolling"], "coaching": ["What are the risks of speed?", "Who haven't we heard from?"], "advancement": "Shift from Command to Influence."},
     "Encourager": {"overview": "Leads with warmth, optimism, and EQ.", "supervising": "Connect relationally first.", "struggle_bullets": ["Conflict avoidance", "Disorganization"], "coaching": ["Prioritizing popularity?", "Hard truths?"], "advancement": "Master operations/structure."},
@@ -383,13 +398,7 @@ st.markdown("""
 <div class="hero-box">
     <div class="hero-title">Elmcrest Leadership Intelligence</div>
     <div class="hero-subtitle">
-        Your command center for staff development. Use assessment data to build balanced teams, resolve conflicts, and guide career growth.
-    </div>
-    <div class="feature-grid">
-        <div class="feature-card"><div class="feature-icon">📝</div><div class="feature-title">Guide Generator</div><div class="feature-desc">Create 12-point coaching manuals.</div></div>
-        <div class="feature-card"><div class="feature-icon">🧬</div><div class="feature-title">Team DNA</div><div class="feature-desc">Analyze unit culture & blindspots.</div></div>
-        <div class="feature-card"><div class="feature-icon">⚖️</div><div class="feature-title">Conflict Mediator</div><div class="feature-desc">Scripts for tough conversations.</div></div>
-        <div class="feature-card"><div class="feature-icon">🚀</div><div class="feature-title">Career Pathfinder</div><div class="feature-desc">Promotion readiness tests.</div></div>
+        Your command center for staff development. Select a tool below to begin.
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -398,22 +407,23 @@ st.markdown("""
 nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
 
 with nav_col1:
-    if st.button("📝 Guide Generator", use_container_width=True):
+    if st.button("📝 Guide Generator\n\nCreate 12-point coaching manuals.", use_container_width=True):
         set_view("Guide Generator")
 
 with nav_col2:
-    if st.button("🧬 Team DNA", use_container_width=True):
+    if st.button("🧬 Team DNA\n\nAnalyze unit culture & blindspots.", use_container_width=True):
         set_view("Team DNA")
 
 with nav_col3:
-    if st.button("⚖️ Conflict Mediator", use_container_width=True):
+    if st.button("⚖️ Conflict Mediator\n\nScripts for tough conversations.", use_container_width=True):
         set_view("Conflict Mediator")
 
 with nav_col4:
-    if st.button("🚀 Career Pathfinder", use_container_width=True):
+    if st.button("🚀 Career Pathfinder\n\nPromotion readiness tests.", use_container_width=True):
         set_view("Career Pathfinder")
 
 # Org Pulse Button
+st.markdown("###")
 if st.button("📈 Organization Pulse (See All Data)", use_container_width=True):
     set_view("Org Pulse")
 
@@ -436,6 +446,13 @@ if st.session_state.current_view == "Guide Generator":
                 if st.button("Generate Guide", type="primary"):
                     pdf = create_supervisor_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
                     st.download_button("Download PDF", pdf, f"Guide_{d['name']}.pdf", "application/pdf")
+                    
+                    # Instant View
+                    st.divider()
+                    st.markdown("### Quick Preview")
+                    c = COMM_PROFILES[d['p_comm']]; m = MOTIVATION_PROFILES[d['p_mot']]
+                    st.info(f"**Supervising:** {c['supervising']}")
+                    st.success(f"**Motivating:** {m['motivating']}")
                 st.button("Reset", on_click=reset_t1)
     with sub2:
         with st.form("manual"):
@@ -517,11 +534,13 @@ elif st.session_state.current_view == "Career Pathfinder":
                     with st.container(border=True):
                         st.markdown("##### 🗣️ The Conversation")
                         st.write(path['conversation'])
+                        st.warning(f"**Supervisor Watch Item:** {path.get('supervisor_focus')}")
                 with c_b:
                     with st.container(border=True):
                         st.markdown("##### ✅ Assignment")
                         st.write(f"**Task:** {path['assignment_task']}")
                         st.success(f"**Success:** {path['success_indicators']}")
+                        st.error(f"**Red Flag:** {path['red_flags']}")
             st.button("Reset", key="reset_t4", on_click=reset_t4)
 
 # 5. ORG PULSE
