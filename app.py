@@ -109,17 +109,38 @@ st.markdown("""
         /* Centered Radio Buttons */
         .stRadio {
             background-color: transparent;
-            padding: 15px 0;
+            padding: 10px 0 0 0; /* Reduced padding */
             display: flex;
             justify-content: center;
         }
         .stRadio [role="radiogroup"] {
             justify-content: space-between;
             width: 100%;
+            max-width: 400px; /* Limit width for better alignment */
+            margin: 0 auto;
         }
         div[role="radiogroup"] > label > div:first-of-type {
             background-color: var(--primary) !important;
             border-color: var(--primary) !important;
+        }
+        
+        /* Assessment Question Styling */
+        .question-text {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-main);
+        }
+        
+        /* Labels for Scale */
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            max-width: 420px;
+            margin: 0 auto;
+            padding-top: 5px;
         }
 
         /* Custom Cards & Bars */
@@ -469,14 +490,36 @@ elif st.session_state.step == 'comm':
     with st.form("comm_form"):
         answers = {}
         for i, q in enumerate(st.session_state.shuffled_comm):
-            st.markdown(f"<div style='margin-top:20px;font-weight:500;'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
-            answers[q['id']] = st.radio(f"q_{i}", [1,2,3,4,5], horizontal=True, index=None, key=f"c_{q['id']}", label_visibility="collapsed")
-            st.markdown("<div style='display:flex;justify-content:space-between;font-size:0.75rem;color:#94a3b8;border-bottom:1px dashed #e2e8f0;padding-bottom:10px;'><span>Strongly Disagree</span><span>Strongly Agree</span></div>", unsafe_allow_html=True)
+            # Card-like container for each question
+            with st.container(border=True):
+                st.markdown(f"<div class='question-text'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
+                
+                # Radio buttons
+                answers[q['id']] = st.radio(
+                    f"q_{i}", 
+                    options=[1, 2, 3, 4, 5], 
+                    horizontal=True, 
+                    index=None, 
+                    key=f"c_{q['id']}", 
+                    label_visibility="collapsed"
+                )
+                
+                # Scale labels inside the card
+                st.markdown("""
+                <div class="scale-labels">
+                    <span>Strongly Disagree</span>
+                    <span>Neutral</span>
+                    <span>Strongly Agree</span>
+                </div>
+                """, unsafe_allow_html=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Validation Logic
         if st.form_submit_button("Continue to Motivation →"):
-            missed = [q['id'] for q in st.session_state.shuffled_comm if answers[q['id']] is None]
-            if missed: st.error(f"Please answer all questions. ({len(missed)} missing)")
+            missed = [q['id'] for q in st.session_state.shuffled_comm if answers.get(q['id']) is None]
+            if missed:
+                st.error(f"Please answer all questions. You missed {len(missed)} questions.")
             else:
                 st.session_state.answers_comm = answers
                 st.session_state.step = 'motiv'
@@ -491,14 +534,36 @@ elif st.session_state.step == 'motiv':
     with st.form("motiv_form"):
         answers = {}
         for i, q in enumerate(st.session_state.shuffled_motiv):
-            st.markdown(f"<div style='margin-top:20px;font-weight:500;'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
-            answers[q['id']] = st.radio(f"mq_{i}", [1,2,3,4,5], horizontal=True, index=None, key=f"m_{q['id']}", label_visibility="collapsed")
-            st.markdown("<div style='display:flex;justify-content:space-between;font-size:0.75rem;color:#94a3b8;border-bottom:1px dashed #e2e8f0;padding-bottom:10px;'><span>Strongly Disagree</span><span>Strongly Agree</span></div>", unsafe_allow_html=True)
+            # Card-like container for each question
+            with st.container(border=True):
+                st.markdown(f"<div class='question-text'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
+                
+                # Radio buttons
+                answers[q['id']] = st.radio(
+                    f"mq_{i}", 
+                    options=[1, 2, 3, 4, 5], 
+                    horizontal=True, 
+                    index=None, 
+                    key=f"m_{q['id']}", 
+                    label_visibility="collapsed"
+                )
+                
+                # Scale labels inside the card
+                st.markdown("""
+                <div class="scale-labels">
+                    <span>Strongly Disagree</span>
+                    <span>Neutral</span>
+                    <span>Strongly Agree</span>
+                </div>
+                """, unsafe_allow_html=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Validation Logic
         if st.form_submit_button("Complete & View Profile →"):
-            missed = [q['id'] for q in st.session_state.shuffled_motiv if answers[q['id']] is None]
-            if missed: st.error(f"Please answer all questions. ({len(missed)} missing)")
+            missed = [q['id'] for q in st.session_state.shuffled_motiv if answers.get(q['id']) is None]
+            if missed:
+                st.error(f"Please answer all questions. You missed {len(missed)} questions.")
             else:
                 st.session_state.answers_motiv = answers
                 st.session_state.step = 'processing'
