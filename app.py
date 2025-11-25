@@ -9,9 +9,9 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 # --- 1. CONFIGURATION ---
-st.set_page_config(page_title="Elmcrest Compass", page_icon="🧭", layout="centered")
+st.set_page_config(page_title="Elmcrest Compass", page_icon="🧭", layout="centered", initial_sidebar_state="collapsed")
 
-# --- 2. CSS STYLING (Modern Glassmorphism) ---
+# --- 2. CSS STYLING (Modern Glassmorphism + Hidden Sidebar) ---
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -40,6 +40,9 @@ st.markdown("""
                 --input-bg: #0f172a;
             }
         }
+
+        /* HIDE DEFAULT STREAMLIT SIDEBAR NAV */
+        [data-testid="stSidebarNav"] {display: none;}
 
         html, body, [class*="css"] {
             font-family: 'Inter', sans-serif;
@@ -109,15 +112,15 @@ st.markdown("""
         /* Centered Radio Buttons */
         .stRadio {
             background-color: transparent;
-            padding: 0;
+            padding: 10px 0 0 0;
             display: flex;
             justify-content: center;
-            align-items: center;
         }
         .stRadio [role="radiogroup"] {
             justify-content: space-between;
             width: 100%;
-            margin-top: 4px;
+            max-width: 400px;
+            margin: 0 auto;
         }
         div[role="radiogroup"] > label > div:first-of-type {
             background-color: var(--primary) !important;
@@ -126,22 +129,21 @@ st.markdown("""
         
         /* Assessment Question Styling */
         .question-text {
-            font-size: 1rem;
-            font-weight: 500;
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 5px;
             color: var(--text-main);
-            line-height: 1.4;
         }
         
         /* Labels for Scale */
         .scale-labels {
             display: flex;
             justify-content: space-between;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--text-sub);
-            margin-bottom: -8px;
-            padding-left: 4px;
-            padding-right: 4px;
-            font-weight: 500;
+            max-width: 420px;
+            margin: 0 auto;
+            padding-top: 5px;
         }
 
         /* Custom Cards & Bars */
@@ -481,6 +483,11 @@ if st.session_state.step == 'intro':
                 st.session_state.user_info = {"name": name, "email": email, "role": role}
                 st.session_state.step = 'comm'
                 st.rerun()
+    
+    # ADMIN BUTTON
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    if st.button("🔒 Supervisor Access"):
+        st.switch_page("pages/admin.py")
 
 # --- COMM ---
 elif st.session_state.step == 'comm':
