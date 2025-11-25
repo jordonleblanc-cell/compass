@@ -12,95 +12,91 @@ GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyK
 
 # --- 3. CONTENT DICTIONARIES ---
 
-# Defined at the top to prevent NameErrors
+# Simple traits for quick logic lookups
 COMM_TRAITS = {
-    "Director": {"focus": "Action & Speed", "blindspot": "Patience & Consensus", "needs": "Clarity & Autonomy"},
-    "Encourager": {"focus": "Morale & Harmony", "blindspot": "Hard Truths & Conflict", "needs": "Validation & Connection"},
-    "Facilitator": {"focus": "Fairness & Process", "blindspot": "Decisiveness & Speed", "needs": "Time & Perspective"},
-    "Tracker": {"focus": "Details & Safety", "blindspot": "Flexibility & Big Picture", "needs": "Structure & Logic"}
+    "Director": {"focus": "Action & Speed", "blindspot": "Patience & Consensus"},
+    "Encourager": {"focus": "Morale & Harmony", "blindspot": "Hard Truths & Conflict"},
+    "Facilitator": {"focus": "Fairness & Process", "blindspot": "Decisiveness & Speed"},
+    "Tracker": {"focus": "Details & Safety", "blindspot": "Flexibility & Big Picture"}
 }
 
-# --- SUPERVISOR CLASH MATRIX (Expanded) ---
+# --- SUPERVISOR CLASH MATRIX (Deep Dive Edition) ---
 SUPERVISOR_CLASH_MATRIX = {
     "Director": {
         "Encourager": {
-            "tension": "The 'Bulldozer vs. Doormat' Dynamic. The Director pushes for results; the Encourager withdraws to protect themselves. The Director interprets withdrawal as incompetence; the Encourager interprets directness as hostility.",
-            "root_cause": "Value Mismatch: The Director values **Utility** (is this useful?). The Encourager values **Affirmation** (am I valued?). When the Director skips the 'human' part to get to work, the Encourager feels dehumanized.",
+            "tension": "The 'Bulldozer vs. Doormat' Dynamic. You push for results; they withdraw to protect the relationship. You interpret withdrawal as incompetence; they interpret directness as hostility.",
+            "root_cause": "Value Mismatch: You value **Utility** (is this useful?). They value **Affirmation** (am I valued?). When you skip the 'human' part to get to work, they feel dehumanized.",
             "watch_fors": [
                 "The Encourager stops contributing in meetings (silent withdrawal).",
-                "The Director starts interrupting or finishing the Encourager's sentences.",
-                "The Encourager complains to peers that the Director is 'mean' or 'doesn't care'.",
-                "The Director complains that the Encourager is 'too sensitive' or 'needy'."
+                "You start interrupting or finishing their sentences.",
+                "They complain to peers that you are 'mean' or 'don't care'."
             ],
             "intervention_steps": [
-                "**Step 1: Pre-Frame.** Tell the Director that 'Efficiency without Empathy is Inefficiency.' If they break the relationship, the work stops.",
-                "**Step 2: The Translate.** In the meeting, translate the Encourager's feelings into data. 'When they say they are stressed, they are telling you the team is about to break.'",
-                "**Step 3: The Deal.** The Director agrees to listen for 5 minutes without solving. The Encourager agrees to move to action steps once heard."
+                "**Step 1: Pre-Frame.** Remind yourself: 'Efficiency without Empathy is Inefficiency.' If you break the relationship, the work stops.",
+                "**Step 2: The Translate.** Translate their feelings into data. 'When they say they are stressed, they are telling me the team is about to break.'",
+                "**Step 3: The Deal.** Agree to listen for 5 minutes without solving. Ask them to move to action steps once heard."
             ],
             "scripts": {
-                "To Director": "You are trying to fix the problem, but right now, the *relationship* is the problem. You cannot optimize a broken machine. Stop solving and start listening. Ask: 'How is this landing with you?' and wait.",
-                "To Encourager": "The Director's brevity is not anger; it is urgency. They are stressed about the goal. You don't need to protect yourself from them; you need to tell them clearly: 'I can help you win, but I need you to lower your volume so I can think.'",
-                "Joint": "We are speaking two different languages. [Director] is speaking 'Task'; [Encourager] is speaking 'Team'. Both are valid. [Director], please validate [Encourager]'s concern before we move to the next step."
+                "To Director": "You are trying to fix the problem, but right now, the *relationship* is the problem. You cannot optimize a broken machine. Stop solving and start listening.",
+                "To Encourager": "My brevity is not anger; it is urgency. I am stressed about the goal. You don't need to protect yourself; you need to tell me: 'I can help you win, but I need you to lower your volume so I can think.'",
+                "Joint": "We are speaking two different languages. I am speaking 'Task'; you are speaking 'Team'. Both are valid. I will validate your concern before we move to the next step."
             }
         },
         "Facilitator": {
-            "tension": "The 'Gas vs. Brake' Dynamic. The Director wants to decide *now*. The Facilitator wants to ensure the process is fair and everyone is heard. The Director feels obstructed; the Facilitator feels steamrolled.",
-            "root_cause": "Risk Perception: The Director fears **Stagnation** (doing nothing). The Facilitator fears **Error** (doing the wrong thing and upsetting the group).",
+            "tension": "The 'Gas vs. Brake' Dynamic. You want to decide *now*. They want to ensure the process is fair. You feel obstructed; they feel steamrolled.",
+            "root_cause": "Risk Perception: You fear **Stagnation** (doing nothing). They fear **Error** (doing the wrong thing and upsetting the group).",
             "watch_fors": [
-                "The Director issues a command via email to avoid a meeting.",
-                "The Facilitator keeps saying 'We need to talk about this' but never decides.",
-                "The Director visibly rolls eyes when the Facilitator asks for 'thoughts'.",
-                "Decisions are made by the Director but passively resisted/ignored by the team."
+                "You issue commands via email to avoid a meeting.",
+                "They keep saying 'We need to talk about this' but never decide.",
+                "You visibly roll your eyes when they ask for 'thoughts'."
             ],
             "intervention_steps": [
-                "**Step 1: Define the Clock.** The Facilitator needs time; the Director needs a deadline. Negotiate it.",
-                "**Step 2: Define the Veto.** Tell the Facilitator they have a 'Red Flag' right. If they see a major risk, they can stop the Director. Otherwise, the Director drives.",
-                "**Step 3: The debrief.** After the action, review: 'Did we move too fast? Or did we wait too long?'"
+                "**Step 1: Define the Clock.** They need time; you need a deadline. Negotiate it.",
+                "**Step 2: Define the Veto.** Tell them they have a 'Red Flag' right. If they see a major risk, they can stop you. Otherwise, you drive.",
+                "**Step 3: The Debrief.** After the action, review: 'Did we move too fast? Or did we wait too long?'"
             ],
             "scripts": {
-                "To Director": "If you force this decision now, you get compliance, not buy-in. Compliance falls apart when you leave the room. Give them 24 hours to process, and you will get a better result.",
-                "To Facilitator": "Silence looks like agreement to a Director. If you disagree, you must say 'Stop'. If you just say 'I'm not sure', they will keep moving. Be direct: 'We cannot do X because Y.'",
-                "Joint": "We have a pace mismatch. [Director] wants to sprint; [Facilitator] wants to survey the route. We are going to set a timer. We will survey for 30 minutes, and then we will sprint. Agreed?"
+                "To Director": "If I force this decision now, I get compliance, not buy-in. Compliance falls apart when I leave the room. Give them 24 hours to process.",
+                "To Facilitator": "Silence looks like agreement to me. If you disagree, you must say 'Stop'. If you just say 'I'm not sure', I will keep moving. Be direct: 'We cannot do X because Y.'",
+                "Joint": "We have a pace mismatch. I want to sprint; you want to survey the route. We are going to set a timer. We will survey for 30 minutes, and then we will sprint. Agreed?"
             }
         },
         "Tracker": {
-            "tension": "The 'Vision vs. Obstacle' Dynamic. The Director acts on gut/vision. The Tracker acts on data/policy. The Director sees the Tracker as the 'Department of No'. The Tracker sees the Director as a liability lawsuit waiting to happen.",
-            "root_cause": "Authority Source: The Director trusts **Intuition**. The Tracker trusts **The Handbook**. They are fighting over what is 'True'.",
+            "tension": "The 'Vision vs. Obstacle' Dynamic. You act on gut/vision. They act on data/policy. You see them as the 'Department of No'. They see you as a liability lawsuit waiting to happen.",
+            "root_cause": "Authority Source: You trust **Intuition**. They trust **The Handbook**. You are fighting over what is 'True'.",
             "watch_fors": [
-                "The Tracker quoting policy numbers in arguments.",
-                "The Director saying 'Ask for forgiveness, not permission.'",
-                "The Tracker hoarding information or access to prove a point.",
-                "The Director bypassing the Tracker to get things done."
+                "They quote policy numbers in arguments.",
+                "You say 'Ask for forgiveness, not permission.'",
+                "You bypass them to get things done."
             ],
             "intervention_steps": [
-                "**Step 1: Clarify Roles.** Director owns the 'What' (Destination). Tracker owns the 'How' (Safe Route).",
-                "**Step 2: The 'Yes, If' Rule.** Coach the Tracker to never say 'No'. Instead say: 'Yes, we can do that, *if* we sign this waiver/change this budget.'",
-                "**Step 3: Risk Acceptance.** The Director must explicitly state: 'I accept the risk of deviating from the standard here.'"
+                "**Step 1: Clarify Roles.** You own the 'What' (Destination). They own the 'How' (Safe Route).",
+                "**Step 2: The 'Yes, If' Rule.** Coach them to never say 'No'. Instead say: 'Yes, we can do that, *if* we sign this waiver/change this budget.'",
+                "**Step 3: Risk Acceptance.** You must explicitly state: 'I accept the risk of deviating from the standard here.'"
             ],
             "scripts": {
-                "To Director": "They aren't trying to annoy you; they are trying to protect you. When you ignore their data, you tell them their job doesn't matter. Ask them: 'How do we do this legally?'",
-                "To Tracker": "You are right about the rules, but you are losing the influence. Start with the solution. Say: 'I can get you to that goal, but we have to take this side road to stay compliant.'",
-                "Joint": "We are on the same team. [Director] sets the destination. [Tracker] checks the brakes. [Director], you cannot drive the car if the brakes are cut. [Tracker], you cannot keep the car in the garage forever."
+                "To Director": "They aren't trying to annoy me; they are trying to protect me. I will ask them: 'How do we do this legally?'",
+                "To Tracker": "You are right about the rules, but you are losing influence. Start with the solution. Say: 'I can get you there, but we have to take this side road.'",
+                "Joint": "I set the destination. You check the brakes. We need both. I cannot drive the car if the brakes are cut, but we cannot keep the car in the garage forever."
             }
         },
         "Director": {
             "tension": "The 'King vs. King' Dynamic. Two alphas. High conflict, high volume, low listening. Both think they are the smartest person in the room. It becomes about ego, not the work.",
             "root_cause": "Dominance: Both define safety as **Control**. When the other person takes control, they feel unsafe/disrespected.",
             "watch_fors": [
-                "Interruptions and talking over each other.",
-                "Public debates that feel like combat.",
+                "Interruptions and public debates.",
                 "Refusal to implement the other's idea.",
                 "The team looking awkward while 'Mom and Dad fight'."
             ],
             "intervention_steps": [
-                "**Step 1: Separate Lanes.** They cannot drive the same car. Give them distinct domains where they have total authority.",
-                "**Step 2: The Truce.** Acknowledge the power struggle explicitly. 'You are both fighting for the wheel.'",
+                "**Step 1: Separate Lanes.** We cannot drive the same car. Give distinct domains of authority.",
+                "**Step 2: The Truce.** Acknowledge the power struggle explicitly. 'We are both fighting for the wheel.'",
                 "**Step 3: Disagree and Commit.** Once a decision is made by the final authority, the debate ends."
             ],
             "scripts": {
-                "To Director A": "You are fighting to be right, not to be effective. Is this the hill you want to die on? Let them have this win so you can bank capital for the next one.",
-                "To Director B": "You are reacting to their tone, not their idea. If you strip away the aggression, is their idea actually wrong?",
-                "Joint": "We have two strong leaders here. We are wasting energy fighting each other. [Name], you own [Project A]. [Name], you own [Project B]. Stay out of each other's lanes."
+                "To Director A": "You are fighting to be right, not effective. Is this the hill you want to die on?",
+                "To Director B": "Strip away the tone. Is their idea actually wrong?",
+                "Joint": "We have two strong leaders here. Stop fighting for the same wheel. You own Project A, you own Project B. Stay out of each other's lanes."
             }
         }
     },
@@ -110,19 +106,19 @@ SUPERVISOR_CLASH_MATRIX = {
             "root_cause": "Validation Style: You need **External** validation (words). They rely on **Internal** validation (results). You are starving for something they don't know how to cook.",
             "watch_fors": [
                 "You apologizing before asking for something.",
-                "You venting to peers about how 'mean' the Director is.",
-                "The Director avoiding meetings with you because 'it takes too long'.",
+                "You venting to peers about how 'mean' they are.",
+                "They avoid meetings with you because 'it takes too long'.",
                 "You feeling exhausted/crying after supervision."
             ],
             "intervention_steps": [
-                "**Step 1: The Headline.** Coach the Encourager to start with the conclusion, then the feelings. 'We need to fire Bob because he hurt the team.'",
-                "**Step 2: The 'Why'.** Coach the Director to explain the *reason* for their speed, so the Encourager doesn't invent a story that they are angry.",
-                "**Step 3: Scheduled Venting.** Give the Encourager 5 mins to process feelings, then hard pivot to tasks."
+                "**Step 1: The Headline.** Start with the conclusion, then the feelings. 'We need to fire Bob because he hurt the team.'",
+                "**Step 2: The 'Why'.** Ask them to explain the *reason* for their speed, so you don't invent a story that they are angry.",
+                "**Step 3: Scheduled Venting.** Ask for 5 mins to process feelings, then promise to hard pivot to tasks."
             ],
             "scripts": {
-                "To Encourager": "I need you to translate your intuition into business risks. Don't say 'I feel bad about this.' Say 'If we do this, the team morale will drop and turnover will spike.' That is language the Director hears.",
-                "To Director": "You are crushing them. You don't need to be their therapist, but you do need to be polite. 'Please' and 'Thank you' buy you speed. Use them.",
-                "Joint": "We need to balance the 'What' and the 'Who'. [Director], you own the timeline. [Encourager], you own the communication plan to the staff. Make sure the message lands softly."
+                "To Encourager": "I need to translate my intuition into business risks. Don't say 'I feel bad', say 'Morale will drop'.",
+                "To Director": "You are crushing me. 'Please' and 'Thank you' buy you speed. Use them.",
+                "Joint": "You own the timeline. I own the communication plan to the staff. Make sure the message lands softly."
             }
         },
         "Facilitator": {
@@ -140,9 +136,9 @@ SUPERVISOR_CLASH_MATRIX = {
                 "**Step 3: Script the Hard Conversation.** Don't let them ad-lib; write the script together."
             ],
             "scripts": {
-                "To Encourager": "You are protecting [Person]'s feelings at the expense of the team's safety. That isn't kindness; it's enabling. We need to have the hard talk.",
-                "To Facilitator": "We have heard enough perspectives. The data is in. The search for consensus is now just procrastination. Make the call.",
-                "Joint": "We are being too nice. The team needs clarity, not just support. Who is going to deliver the news? Let's practice it right now."
+                "To Encourager": "I am protecting feelings at the expense of the program. That isn't kindness.",
+                "To Facilitator": "The search for consensus is now procrastination. Make the call.",
+                "Joint": "We are being too nice. Who is going to deliver the news?"
             }
         },
         "Tracker": {
@@ -150,18 +146,18 @@ SUPERVISOR_CLASH_MATRIX = {
             "root_cause": "Safety Source: You find safety in **Connection**. They find safety in **Consistency**. Your exception to the rule threatens their safety.",
             "watch_fors": [
                 "You making 'secret deals' with staff/youth to bypass rules.",
-                "The Tracker policing you publicly.",
+                "They police you publicly.",
                 "You feeling judged; them feeling undermined.",
                 "Inconsistent application of consequences."
             ],
             "intervention_steps": [
-                "**Step 1: The 'Why' of Rules.** Show the Encourager that rules protect the most vulnerable youth by creating predictability.",
-                "**Step 2: The 'Why' of Exceptions.** Show the Tracker that rigid rules break rapport, which causes danger.",
+                "**Step 1: The 'Why' of Rules.** Remind yourself that rules protect the most vulnerable youth by creating predictability.",
+                "**Step 2: The 'Why' of Exceptions.** Show them that rigid rules break rapport, which causes danger.",
                 "**Step 3: The Hybrid.** 'We follow the rule (Tracker), but we deliver it with maximum empathy (Encourager).'"
             ],
             "scripts": {
-                "To Encourager": "When you bend the rule, you don't just help that kid; you make the Tracker the 'bad guy' for the next shift. We have to be a united front.",
-                "To Tracker": "You are right about the policy, but your delivery is cold. If they don't trust us, they won't follow the rule. Let the Encourager do the talking, but you check the plan."
+                "To Encourager": "When I bend the rule, I make you the 'bad guy'. We must be united.",
+                "To Tracker": "You are right about the policy, but your delivery is cold. Let me do the talking."
             }
         },
         "Encourager": {
@@ -179,29 +175,29 @@ SUPERVISOR_CLASH_MATRIX = {
                 "**Step 3: External Data.** Bring in a chart/checklist to force a reality check beyond feelings."
             ],
             "scripts": {
-                "To Encourager A": "I love our connection. But we are spinning. Let's put our feelings in a box for 10 minutes and just solve the logistics.",
-                "Joint": "We are great at supporting each other. Now we need to be great at challenging each other. Who is going to play 'Devil's Advocate' today?"
+                "To Encourager A": "We are spinning. Let's put feelings in a box and solve the logistics.",
+                "Joint": "We support each other well. Now we need to challenge each other."
             }
         }
     },
     "Facilitator": {
         "Director": {
-            "tension": "The 'Steamroll'. You are trying to gather input; they just bark orders. You feel disrespected and silenced. You worry they are running the program off a cliff.",
-            "root_cause": "Decision Style: You process **Externally** (group talk). They process **Internally** (gut check). By the time you ask a question, they have already moved on.",
+            "tension": "The 'Steamroll'. They demand a decision. You freeze because you haven't heard from everyone. They interpret your silence as agreement. You feel unsafe speaking up.",
+            "root_cause": "Processing: You process **Externally** (group talk). They process **Internally** (gut check).",
             "watch_fors": [
                 "You staying silent in meetings then complaining later.",
-                "The Director looking bored while you talk.",
-                "You asking 'Does everyone agree?' and the Director saying 'Moving on.'",
+                "They look bored while you talk.",
+                "You asking 'Does everyone agree?' and them saying 'Moving on.'",
                 "The team looking confused about who is in charge."
             ],
             "intervention_steps": [
-                "**Step 1: Interrupt.** You must learn to interrupt the Director. 'Hold on, I need to add a risk factor.'",
-                "**Step 2: The Pre-Meeting.** Brief the Director beforehand. 'I am going to ask for feedback on X. Please don't answer first.'",
-                "**Step 3: The Frame.** Frame your process as 'Risk Management' (which Directors value) not 'Inclusion' (which they might not)."
+                "**Step 1: Interrupt.** Learn to say 'Hold on'.",
+                "**Step 2: Pre-Meeting.** Brief them beforehand.",
+                "**Step 3: The Frame.** Frame process as risk management."
             ],
             "scripts": {
-                "To Director": "You are moving too fast. If you want this to stick, you have to let me get the team on board. Give me 10 minutes to facilitate.",
-                "To Facilitator": "You are giving away your power. When you ask 'What do you think?', the Director will always answer. Instead say: 'I want to hear from [Specific Person].'"
+                "To Director": "You are moving too fast. Let me get the team on board so it sticks.",
+                "To Facilitator": "I am giving away power. I must speak up."
             }
         },
         "Tracker": {
@@ -214,13 +210,13 @@ SUPERVISOR_CLASH_MATRIX = {
                 "Great ideas dying in the 'how-to' phase."
             ],
             "intervention_steps": [
-                "**Step 1: Concept First.** 'We are not discussing the form yet. Do we agree on the goal?'",
-                "**Step 2: Detail Second.** 'Now that we agree, Tracker, please build the checklist.'",
-                "**Step 3: The Parking Lot.** Park detailed questions until the end of the meeting."
+                "**Step 1: Concept First.** Agree on goal.",
+                "**Step 2: Detail Second.** Build checklist.",
+                "**Step 3: Parking Lot.** Park details till end."
             ],
             "scripts": {
-                "To Tracker": "We are at the 30,000-foot view right now. I need you to fly up here with me for 5 minutes. We will land and check the tires later.",
-                "To Facilitator": "The Tracker isn't trying to kill your idea; they are trying to see how it works. Give them a specific task so they feel useful."
+                "To Tracker": "We are at 30,000 feet. Fly with me for 5 mins.",
+                "To Facilitator": "Tracker isn't killing the idea; they are testing it."
             }
         }
     },
@@ -230,18 +226,18 @@ SUPERVISOR_CLASH_MATRIX = {
             "root_cause": "Trust: You trust **Verification**. They trust **Competence**. You verify by checking; they verify by doing.",
             "watch_fors": [
                 "You sending emails with 'Corrections'.",
-                "The Director avoiding you.",
+                "They avoid you.",
                 "You feeling anxious that 'it's all going to fall apart'.",
-                "The Director withholding info so you don't 'slow them down'."
+                "They withhold info so you don't 'slow them down'."
             ],
             "intervention_steps": [
-                "**Step 1: Pick your Battles.** Differentiate between 'Safety Critical' (Intervene) and 'Preference' (Let it go).",
-                "**Step 2: The Sandbox.** Give the Director a space where they can break things safely.",
-                "**Step 3: Solution-First.** Don't say 'We can't.' Say 'We can, IF we do X.'"
+                "**Step 1: Pick Battles.** Safety vs. Preference.",
+                "**Step 2: The Sandbox.** Safe space to break things.",
+                "**Step 3: Solution-First.** 'We can, IF...'"
             ],
             "scripts": {
-                "To Director": "I am not trying to stop you. I am trying to make sure you don't get fired for a compliance error. Let me handle the paperwork so you can handle the people.",
-                "To Tracker": "You are right, but you are annoying. Stop correcting their spelling and start correcting their liability risks. Focus on the big stuff."
+                "To Director": "I'm ensuring you don't get fired for compliance. Let me handle paperwork.",
+                "To Tracker": "I must stop correcting spelling. Focus on liability risks."
             }
         }
     }
@@ -252,13 +248,12 @@ for s in COMM_TRAITS:
     for staff in COMM_TRAITS:
         if staff not in SUPERVISOR_CLASH_MATRIX[s]:
             SUPERVISOR_CLASH_MATRIX[s][staff] = {
-                "tension": "General Style Difference.",
-                "root_cause": "Different communication priorities.",
+                "tension": "Differing perspectives on work and communication.",
+                "root_cause": "Different priorities.",
                 "watch_fors": ["Misunderstanding intent", "Frustration in meetings"],
                 "intervention_steps": ["Listen first", "Clarify goals"],
-                "scripts": {"To Director": "Let's align on the goal.", "To Encourager": "Let's align on the goal.", "Joint": "Let's align."}
+                "scripts": {"To Director": "Let's align.", "To Encourager": "Let's align.", "Joint": "Let's align."}
             }
-
 
 # (A) COMMUNICATION PROFILES (Detailed Structure for PDF & Screen)
 COMM_PROFILES = {
@@ -483,7 +478,7 @@ CAREER_PATHWAYS = {
             "shift": "From 'Doing' to 'Enabling'.",
             "why": "Directors act fast. They see a problem and fix it. As a Shift Sup, if they fix everything, their team learns nothing. They become the bottleneck.",
             "conversation": "You have high capacity and speed, which is a gift. To succeed as a Shift Supervisor, you have to resist the urge to 'rescue' the shift by doing everything yourself. Your success is no longer defined by how many tasks *you* complete, but by how confident your team feels completing theirs.",
-            "assignment_setup": "Assign them to lead a shift where they are physically restricted to the office or a central hub (unless safety dictates otherwise).",
+            "assignment_setup": "Assign them to lead a shift where they are physically restricted to the office or a central hub (unless absolute safety dictates otherwise).",
             "assignment_task": "They must run the shift entirely through verbal direction and delegation to peers. They cannot touch paperwork or intervene in minor conflicts.",
             "success_indicators": "Did they let a staff member struggle through a task without jumping in? Did they give clear verbal instructions? Did they debrief afterwards?",
             "red_flags": "They ran out of the office to 'just do it quick'. They complain that their team is 'too slow'. They took over the radio.",
@@ -633,6 +628,129 @@ def fetch_staff_data():
         st.error(f"Error connecting to database: {e}")
         return []
 
+# --- PDF Generator ---
+def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    
+    blue = (1, 91, 173)
+    black = (0, 0, 0)
+    gray = (100, 100, 100)
+    
+    # HEADER
+    pdf.set_font("Arial", 'B', 20)
+    pdf.set_text_color(*blue)
+    pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align='C')
+    
+    pdf.set_font("Arial", '', 12)
+    pdf.set_text_color(*black)
+    pdf.cell(0, 8, clean_text(f"For: {name} ({role})"), ln=True, align='C')
+    pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C')
+    pdf.ln(5)
+    
+    # Retrieve Data
+    c = COMM_PROFILES.get(p_comm, COMM_PROFILES["Director"])
+    m = MOTIVATION_PROFILES.get(p_mot, MOTIVATION_PROFILES["Achievement"])
+
+    def add_heading(title):
+        pdf.set_font("Arial", 'B', 12)
+        pdf.set_text_color(*blue)
+        pdf.set_fill_color(240, 245, 250)
+        pdf.cell(0, 8, title, ln=True, fill=True)
+        pdf.ln(2)
+
+    def add_body(content):
+        pdf.set_font("Arial", '', 11)
+        pdf.set_text_color(*black)
+        pdf.multi_cell(0, 6, clean_text(content))
+        pdf.ln(3)
+
+    def add_bullets(items):
+        pdf.set_font("Arial", '', 11)
+        pdf.set_text_color(*black)
+        for item in items:
+            pdf.multi_cell(0, 6, clean_text(f"- {item}"))
+        pdf.ln(3)
+
+    # 1. Communication Profile
+    add_heading(f"1. Communication Profile: {p_comm}")
+    add_body(c['s1_profile']['text'])
+    add_bullets(c['s1_profile']['bullets'])
+
+    # 2. Supervising Their Communication
+    add_heading("2. Supervising Their Communication")
+    add_body(c['s2_supervising']['text'])
+    add_bullets(c['s2_supervising']['bullets'])
+
+    # 3. Motivation Profile
+    add_heading(f"3. Motivation Profile: {p_mot}")
+    add_body(m['s3_profile']['text'])
+    add_bullets(m['s3_profile']['bullets'])
+
+    # 4. Motivating This Staff Member
+    add_heading("4. Motivating This Staff Member")
+    add_body(m['s4_motivating']['text'])
+    add_bullets(m['s4_motivating']['bullets'])
+
+    # 5. Integrated Leadership Profile
+    add_heading("5. Integrated Leadership Profile")
+    # Extract dynamic text fragments
+    comm_snippet = c['s1_profile']['text'].split(".")[1] # e.g., "They lead with clarity..."
+    motiv_snippet = m['s3_profile']['text'].split(".")[1] # e.g., "This staff member is energized by..."
+    
+    integrated_text = (
+        f"This staff member operates at the intersection of {p_comm} energy and {p_mot} drive. "
+        f"{comm_snippet} At the same time, {motiv_snippet} "
+        f"They are at their best when they can communicate via {p_comm} channels to achieve {p_mot}-aligned outcomes."
+    )
+    add_body(integrated_text)
+
+    # 6. How You Can Best Support Them
+    add_heading("6. How You Can Best Support Them")
+    add_body(m['s6_support']['text'])
+    add_bullets(m['s6_support']['bullets'])
+
+    # 7. What They Look Like When Thriving
+    add_heading("7. What They Look Like When Thriving")
+    add_body(m['s7_thriving']['text'])
+    add_bullets(m['s7_thriving']['bullets'])
+
+    # 8. What They Look Like When Struggling
+    add_heading("8. What They Look Like When Struggling")
+    add_body(c['s8_struggling']['text'])
+    add_bullets(c['s8_struggling']['bullets'])
+
+    # 9. Supervisory Interventions
+    add_heading("9. Supervisory Interventions")
+    intervention_text = "When this staff member is struggling, use these targeted interventions:"
+    add_body(intervention_text)
+    
+    # Dynamic Intervention Bullets
+    interventions = [
+        f"Validate their Motivation ({p_mot}) before correcting behavior.",
+        f"Address the Stress Response: Gently point out if they are becoming {c['s8_struggling']['bullets'][0].lower()}.",
+        "Re-align Expectations: Ensure they know exactly what success looks like in this specific situation.",
+        "Check for Burnout: Are they over-functioning in their style?"
+    ]
+    add_bullets(interventions)
+
+    # 10. What You Should Celebrate
+    add_heading("10. What You Should Celebrate")
+    add_body(m['s10_celebrate']['text'])
+    add_bullets(m['s10_celebrate']['bullets'])
+
+    # 11. Coaching Questions
+    add_heading("11. Coaching Questions")
+    add_bullets(c['s11_coaching'])
+
+    # 12. Helping Them Prepare for Advancement
+    add_heading("12. Helping Them Prepare for Advancement")
+    add_body(c['s12_advancement']['text'])
+    add_bullets(c['s12_advancement']['bullets'])
+
+    return pdf.output(dest='S').encode('latin-1')
+
 # --- DISPLAY GUIDE ON SCREEN ---
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     c = COMM_PROFILES.get(p_comm, COMM_PROFILES["Director"])
@@ -664,13 +782,12 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     
     # 5 Integrated
     st.subheader("5. Integrated Leadership Profile")
-    comm_key = c['s1_profile']['text'].split('.')[1]
-    motiv_key = m['s3_profile']['text'].split('.')[2] if len(m['s3_profile']['text'].split('.')) > 2 else m['s3_profile']['text']
+    comm_snippet = c['s1_profile']['text'].split(".")[1]
+    motiv_snippet = m['s3_profile']['text'].split(".")[1]
     integrated_text = (
         f"This staff member operates at the intersection of {p_comm} energy and {p_mot} drive. "
-        f"{comm_key} At the same time, {motiv_key} "
-        f"This combination creates a unique leadership style: they will pursue their goal of {p_mot} using the tools of a {p_comm}. "
-        "When these align, they are unstoppable. When they conflict, frustration mounts quickly."
+        f"{comm_snippet} At the same time, {motiv_snippet} "
+        f"This combination creates a unique leadership style: they will pursue their goal of {p_mot} using the tools of a {p_comm}."
     )
     st.write(integrated_text)
     
@@ -695,8 +812,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     interventions = [
         f"Validate their Motivation ({p_mot}) before correcting behavior.",
         f"Address the Stress Response: Gently point out if they are becoming {c['s8_struggling']['bullets'][0].lower()}.",
-        "Re-align Expectations: Ensure they know exactly what success looks like in this specific situation.",
-        "Check for Burnout: Are they over-functioning in their style?"
+        "Re-align Expectations: Ensure they know exactly what success looks like in this specific situation."
     ]
     for i in interventions: st.markdown(f"- {i}")
     
@@ -714,149 +830,12 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.write(c['s12_advancement']['text'])
     for b in c['s12_advancement']['bullets']: st.markdown(f"- {b}")
 
-# --- PDF Generator ---
-def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    
-    blue = (1, 91, 173)
-    black = (0, 0, 0)
-    
-    # HEADER
-    pdf.set_font("Arial", 'B', 20)
-    pdf.set_text_color(*blue)
-    pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align='C')
-    
-    pdf.set_font("Arial", '', 12)
-    pdf.set_text_color(*black)
-    pdf.cell(0, 8, clean_text(f"For: {name} ({role})"), ln=True, align='C')
-    pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C')
-    pdf.ln(5)
-    
-    # Fetch Data
-    c = COMM_PROFILES.get(p_comm, COMM_PROFILES["Director"])
-    m = MOTIVATION_PROFILES.get(p_mot, MOTIVATION_PROFILES["Achievement"])
-
-    def add_section(title, content_dict, is_bullets_only=False):
-        pdf.set_font("Arial", 'B', 14)
-        pdf.set_text_color(*blue)
-        pdf.set_fill_color(240, 245, 250)
-        pdf.cell(0, 8, title, ln=True, fill=True)
-        pdf.ln(3)
-        
-        pdf.set_text_color(*black)
-        pdf.set_font("Arial", '', 11)
-        
-        if not is_bullets_only and 'text' in content_dict:
-            pdf.multi_cell(0, 5, clean_text(content_dict['text']))
-            pdf.ln(3)
-            
-        if 'bullets' in content_dict:
-            for b in content_dict['bullets']:
-                pdf.set_font("Arial", 'B', 14) # Bullet symbol
-                pdf.cell(5, 5, chr(149), 0, 0)
-                pdf.set_font("Arial", '', 11)
-                pdf.multi_cell(0, 5, clean_text(b))
-        pdf.ln(5)
-
-    # 1. Communication Profile
-    add_section(f"1. Communication Profile: {p_comm}", c['s1_profile'])
-
-    # 2. Supervising Their Communication
-    add_section("2. Supervising Their Communication", c['s2_supervising'])
-
-    # 3. Motivation Profile
-    add_section(f"3. Motivation Profile: {p_mot}", m['s3_profile'])
-
-    # 4. Motivating This Staff Member
-    add_section("4. Motivating This Staff Member", m['s4_motivating'])
-
-    # 5. Integrated Leadership Profile
-    pdf.set_font("Arial", 'B', 14)
-    pdf.set_text_color(*blue)
-    pdf.set_fill_color(240, 245, 250)
-    pdf.cell(0, 8, "5. Integrated Leadership Profile", ln=True, fill=True)
-    pdf.ln(3)
-    pdf.set_text_color(*black)
-    pdf.set_font("Arial", '', 11)
-    
-    # Dynamic Synthesis
-    comm_key = c['s1_profile']['text'].split('.')[1] # Grab the descriptor sentence
-    motiv_key = m['s3_profile']['text'].split('.')[2] # Grab the descriptor sentence
-    integrated_text = (
-        f"This staff member operates at the intersection of {p_comm} energy and {p_mot} drive. "
-        f"{comm_key} At the same time, {motiv_key} "
-        f"This combination creates a unique leadership style: they will pursue their goal of {p_mot} using the tools of a {p_comm}. "
-        "When these align, they are unstoppable. When they conflict (e.g., a Director who wants 'Growth' but is stuck in repetitive tasks), frustration mounts quickly."
-    )
-    pdf.multi_cell(0, 5, clean_text(integrated_text))
-    pdf.ln(5)
-
-    # 6. How You Can Best Support Them
-    add_section("6. How You Can Best Support Them", m['s6_support'])
-
-    # 7. What They Look Like When Thriving
-    add_section("7. What They Look Like When Thriving", m['s7_thriving'])
-
-    # 8. What They Look Like When Struggling
-    add_section("8. What They Look Like When Struggling", c['s8_struggling'])
-
-    # 9. Supervisory Interventions
-    pdf.set_font("Arial", 'B', 14)
-    pdf.set_text_color(*blue)
-    pdf.set_fill_color(240, 245, 250)
-    pdf.cell(0, 8, "9. Supervisory Interventions", ln=True, fill=True)
-    pdf.ln(3)
-    pdf.set_text_color(*black)
-    pdf.set_font("Arial", '', 11)
-    
-    intervention_intro = "When this staff member is struggling, use these targeted interventions:"
-    pdf.multi_cell(0, 5, intervention_intro)
-    pdf.ln(2)
-    
-    interventions = [
-        f"Validate their Motivation ({p_mot}) before correcting behavior.",
-        f"Address the Stress Response: Gently point out if they are becoming {c['s8_struggling']['bullets'][0]}.",
-        "Re-align Expectations: Ensure they know exactly what success looks like in this specific situation.",
-        "Check for Burnout: Are they over-functioning in their style (e.g., too much talking, too much controlling)?"
-    ]
-    for i in interventions:
-        pdf.set_font("Arial", 'B', 14)
-        pdf.cell(5, 5, chr(149), 0, 0)
-        pdf.set_font("Arial", '', 11)
-        pdf.multi_cell(0, 5, clean_text(i))
-    pdf.ln(5)
-
-    # 10. What You Should Celebrate
-    add_section("10. What You Should Celebrate", m['s10_celebrate'])
-
-    # 11. Coaching Questions
-    pdf.set_font("Arial", 'B', 14)
-    pdf.set_text_color(*blue)
-    pdf.set_fill_color(240, 245, 250)
-    pdf.cell(0, 8, "11. Coaching Questions", ln=True, fill=True)
-    pdf.ln(3)
-    pdf.set_text_color(*black)
-    pdf.set_font("Arial", '', 11)
-    for q in c['s11_coaching']:
-        pdf.set_font("Arial", 'B', 14)
-        pdf.cell(5, 5, chr(149), 0, 0)
-        pdf.set_font("Arial", '', 11)
-        pdf.multi_cell(0, 5, clean_text(q))
-    pdf.ln(5)
-
-    # 12. Helping Them Prepare for Advancement
-    add_section("12. Helping Them Prepare for Advancement", c['s12_advancement'])
-
-    return pdf.output(dest='S').encode('latin-1')
-
 # --- MAIN APP LOGIC ---
 
 staff_list = fetch_staff_data()
 df = pd.DataFrame(staff_list)
 
-# RESET FUNCTIONS (Defined at module level for safety)
+# RESET FUNCTIONS
 def reset_t1(): st.session_state.t1_staff_select = None
 def reset_t2(): st.session_state.t2_team_select = []
 def reset_t3(): st.session_state.p1 = None; st.session_state.p2 = None
@@ -885,11 +864,8 @@ with tab1:
         if not df.empty:
             staff_options = {f"{s['name']} ({s['role']})": s for s in staff_list}
             selected_staff_name = st.selectbox(
-                "Select Staff Member", 
-                options=list(staff_options.keys()), 
-                index=None, 
-                key="t1_staff_select",
-                placeholder="Choose a staff member..."
+                "Select Staff Member", options=list(staff_options.keys()), 
+                index=None, key="t1_staff_select", placeholder="Choose a staff member..."
             )
             
             if selected_staff_name:
@@ -900,7 +876,7 @@ with tab1:
                 col3.metric("Motivation", data['p_mot'])
                 
                 if st.button("Generate Guide for " + data['name'], type="primary"):
-                    # Generate PDF Logic
+                    # PDF Logic
                     pdf_bytes = create_supervisor_guide(
                         data['name'], data['role'], 
                         data['p_comm'], data['s_comm'], 
@@ -908,7 +884,7 @@ with tab1:
                     )
                     st.download_button(label="Download PDF Guide", data=pdf_bytes, file_name=f"Supervisor_Guide_{data['name'].replace(' ', '_')}.pdf", mime="application/pdf")
                     
-                    # DISPLAY ON SCREEN
+                    # Screen Display
                     st.divider()
                     display_guide(data['name'], data['role'], data['p_comm'], data['s_comm'], data['p_mot'], data['s_mot'])
 
@@ -933,7 +909,7 @@ with tab1:
                 pdf_bytes = create_supervisor_guide(m_name, m_role, m_p_comm, "None", m_p_mot, "None")
                 st.download_button(label="Download PDF Guide", data=pdf_bytes, file_name=f"Supervisor_Guide_{m_name.replace(' ', '_')}.pdf", mime="application/pdf")
                 
-                # DISPLAY ON SCREEN
+                # Screen Display
                 st.divider()
                 display_guide(m_name, m_role, m_p_comm, "None", m_p_mot, "None")
 
@@ -978,23 +954,24 @@ with tab3:
             st.divider()
             st.subheader(f"Dynamic: {sup_style} (You) vs. {staff_style} (Staff)")
             
-            if sup_style == staff_style:
-                st.warning("⚠️ **Same-Style Blindspot:** You both communicate the same way.")
-            elif sup_style in SUPERVISOR_CLASH_MATRIX and staff_style in SUPERVISOR_CLASH_MATRIX[sup_style]:
+            if sup_style in SUPERVISOR_CLASH_MATRIX and staff_style in SUPERVISOR_CLASH_MATRIX[sup_style]:
                 data = SUPERVISOR_CLASH_MATRIX[sup_style][staff_style]
                 
                 with st.expander("🔥 The Dynamic (Read First)", expanded=True):
                     st.write(data['tension'])
                     st.markdown("**✅ Pre-Meeting Mindset:**")
-                    for item in data['prep']: st.markdown(f"- {item}")
-                    st.markdown("**📋 Step-by-Step Protocol:**")
-                    for item in data['protocol']: st.markdown(f"- {item}")
-                
-                st.divider()
-                st.markdown("#### 🗣️ 1:1 Script Options")
-                st.info(f"**To You:** {data['scripts'].get('To Director') or data['scripts'].get('To Encourager') or data['scripts'].get('To Facilitator') or data['scripts'].get('To Tracker')}")
-                st.warning(f"**To Them:** {data['scripts'].get('To Encourager') or data['scripts'].get('To Director') or data['scripts'].get('To Facilitator') or data['scripts'].get('To Tracker')}")
-                st.success(f"**Joint:** {data['scripts']['Joint']}")
+                    for item in data['intervention_steps']: st.markdown(f"- {item}")
+
+                c_a, c_b = st.columns(2)
+                with c_a:
+                    st.markdown("#### 🛑 Self-Check")
+                    st.write(f"**Watch For:**")
+                    for w in data['watch_fors']: st.markdown(f"- {w}")
+                with c_b:
+                    st.markdown("#### 🗣️ 1:1 Script Options")
+                    st.info(f"**To You:** {data['scripts'].get('To Director') or data['scripts'].get('To Encourager') or data['scripts'].get('To Facilitator') or data['scripts'].get('To Tracker')}")
+                    st.warning(f"**To Them:** {data['scripts'].get('To Encourager') or data['scripts'].get('To Director') or data['scripts'].get('To Facilitator') or data['scripts'].get('To Tracker')}")
+                    st.success(f"**Joint:** {data['scripts']['Joint']}")
             
             st.markdown("---")
             st.button("Reset Conflict Tool", key="reset_btn_t3", on_click=reset_t3)
@@ -1002,44 +979,33 @@ with tab3:
 # --- TAB 4: CAREER PATHFINDER ---
 with tab4:
     st.markdown("### 🚀 Career Gap Analysis")
-    
     if not df.empty:
-        col_a, col_b = st.columns(2)
-        with col_a:
-            candidate_name = st.selectbox("Select Candidate", df['name'].unique(), index=None, key="career", placeholder="Select candidate...")
-        with col_b:
-            target_role = st.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor", "Manager"], index=None, key="career_target", placeholder="Select target role...")
+        c1, c2 = st.columns(2)
+        with c1: candidate_name = st.selectbox("Select Candidate", df['name'].unique(), index=None, key="career", placeholder="Select candidate...")
+        with c2: target_role = st.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor", "Manager"], index=None, key="career_target", placeholder="Select target role...")
         
         if candidate_name and target_role:
             cand = df[df['name'] == candidate_name].iloc[0]
             style = cand['p_comm']
-            
-            st.divider()
-            st.markdown(f"**Candidate:** {cand['name']} ({style})")
-            st.markdown(f"**Target:** {target_role}")
-            
             path_data = CAREER_PATHWAYS.get(style, {}).get(target_role)
             
             if path_data:
-                st.info(f"💡 **The Core Shift:** {path_data['shift']}")
-                st.markdown(f"**Why it's hard for a {style}:** {path_data['why']}")
+                st.info(f"💡 **The Shift:** {path_data['shift']}")
                 
-                st.divider()
-                
-                c1, c2 = st.columns([1, 1])
-                with c1:
+                c_a, c_b = st.columns([1, 1])
+                with c_a:
                     st.markdown("#### 🗣️ The Coaching Conversation")
                     st.write(path_data['conversation'])
                     if 'supervisor_focus' in path_data:
                         st.warning(f"👀 **Supervisor Focus:**\n\n{path_data['supervisor_focus']}")
-                with c2:
+                with c_b:
                     st.markdown("#### ✅ The Developmental Assignment")
                     with st.container(border=True):
                         st.write(f"**Setup:** {path_data['assignment_setup']}")
                         st.write(f"**The Task:** {path_data['assignment_task']}")
                         st.divider()
-                        st.success(f"**🏆 Success looks like:** {path_data['success_indicators']}")
-                        st.error(f"**🚩 Red flag:** {path_data['red_flags']}")
+                        st.success(f"**🏆 Success:** {path_data['success_indicators']}")
+                        st.error(f"**🚩 Red Flag:** {path_data['red_flags']}")
             else:
                 st.write("Standard advancement path.")
             
@@ -1051,19 +1017,9 @@ with tab5:
     st.markdown("### 📈 Organization Pulse")
     if not df.empty:
         c1, c2 = st.columns(2)
-        with c1:
-            st.subheader("Communication Styles")
-            fig_org_comm = px.pie(df, names='p_comm', color='p_comm', color_discrete_map={'Director':'#015bad', 'Encourager':'#b9dca4', 'Facilitator':'#51c3c5', 'Tracker':'#64748b'})
-            st.plotly_chart(fig_org_comm, use_container_width=True)
-        with c2:
-            st.subheader("Motivation Drivers")
-            fig_org_mot = px.bar(df, x='p_mot', color='p_mot')
-            st.plotly_chart(fig_org_mot, use_container_width=True)
-        
-        st.divider()
+        with c1: st.plotly_chart(px.pie(df, names='p_comm', title="Communication Styles"), use_container_width=True)
+        with c2: st.plotly_chart(px.bar(df, x='p_mot', title="Motivation Drivers"), use_container_width=True)
         if 'role' in df.columns:
-            role_breakdown = pd.crosstab(df['role'], df['p_comm'])
-            st.dataframe(role_breakdown.style.background_gradient(cmap="Blues"), use_container_width=True)
-            st.info("Tip: If 'Shift Supervisors' are mostly 'Encouragers' but 'Program Supervisors' are mostly 'Directors', expect friction during hand-offs.")
+            st.dataframe(pd.crosstab(df['role'], df['p_comm']).style.background_gradient(cmap="Blues"), use_container_width=True)
     else:
         st.warning("No data available.")
