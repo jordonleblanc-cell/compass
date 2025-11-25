@@ -36,18 +36,73 @@ def check_password():
 if not st.session_state.authenticated:
     st.markdown("""
         <style>
-        .stApp { background: radial-gradient(circle at center, #f1f5f9 0%, #cbd5e1 100%); }
-        [data-testid="stHeader"] { background: transparent; }
-        .login-card {
-            background: white; padding: 40px; border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center;
-            max-width: 400px; margin: 100px auto;
-            border: 1px solid #e2e8f0;
-            color: #0f172a;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        /* Default (Light Mode) Variables */
+        :root {
+            --login-bg: radial-gradient(circle at center, #f1f5f9 0%, #cbd5e1 100%);
+            --card-bg: #ffffff;
+            --text-title: #015bad;
+            --text-body: #0f172a;
+            --text-sub: #64748b;
+            --input-bg: #ffffff;
+            --border-color: #e2e8f0;
         }
-        .login-title { color: #015bad; font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
-        .login-subtitle { color: #64748b; margin-bottom: 20px; }
+
+        /* Dark Mode Overrides */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --login-bg: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+                --card-bg: #1e293b;
+                --text-title: #51c3c5; /* Teal for contrast on dark */
+                --text-body: #f1f5f9;
+                --text-sub: #94a3b8;
+                --input-bg: #0f172a;
+                --border-color: #334155;
+            }
+        }
+
+        .stApp { background: var(--login-bg); }
+        [data-testid="stHeader"] { background: transparent; }
+        
+        .login-card {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: center;
+            max-width: 400px;
+            margin: 100px auto;
+            border: 1px solid var(--border-color);
+        }
+        
+        .login-title {
+            color: var(--text-title);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .login-subtitle {
+            color: var(--text-sub);
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 20px;
+        }
+        
+        /* Force input styling to match theme */
+        .stTextInput input {
+            background-color: var(--input-bg) !important;
+            color: var(--text-body) !important;
+            border: 1px solid var(--border-color) !important;
+        }
+        
+        /* Hide the default label to keep card clean */
+        .stTextInput label {
+            display: none;
+        }
         </style>
+        
         <div class='login-card'>
             <div class='login-title'>Supervisor Access</div>
             <div class='login-subtitle'>Please enter your credentials to access the leadership dashboard.</div>
@@ -486,9 +541,8 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# --- NAVIGATION BUTTONS ---
+# --- NAVIGATION ---
 nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
-
 with nav_col1:
     if st.button("📝 Guide Generator\n\nCreate 12-point coaching manuals.", use_container_width=True): set_view("Guide Generator")
 with nav_col2:
@@ -557,7 +611,6 @@ elif st.session_state.current_view == "Team DNA":
                             st.info(f"**🎉 Team Building Idea:** {guide.get('team_building')}")
                     else:
                         # BALANCED CULTURE
-                        guide = TEAM_CULTURE_GUIDE.get("Balanced", {})
                         st.info("**Balanced Culture:** No single style dominates. This reduces blindspots but may increase friction.")
                         with st.expander("📖 Managing a Balanced Team", expanded=True):
                              st.markdown("""**The Balanced Friction:**
@@ -590,14 +643,12 @@ elif st.session_state.current_view == "Team DNA":
                     dom_mot = mot_counts.idxmax()
                     st.markdown("---")
                     st.subheader(f"⚠️ Motivation Gap: {dom_mot} Driven")
-                    if dom_mot == "Connection":
-                        st.warning("This team is driven by **Relationships**. If you manage them with cold metrics and checklists, they will disengage. You must lead with warmth.")
-                    elif dom_mot == "Achievement":
-                        st.warning("This team is driven by **Winning**. If goals are vague or accomplishments aren't recognized, they will leave. You must lead with clear scoreboards.")
-                    elif dom_mot == "Growth":
-                        st.warning("This team is driven by **Learning**. If they feel stagnant, they will quit. You must provide new challenges and training.")
-                    elif dom_mot == "Purpose":
-                        st.warning("This team is driven by **Mission**. If you focus only on policy compliance, they will rebel. You must connect every task to the 'Why'.")
+                    if dom_mot in MOTIVATION_GAP_GUIDE:
+                         gap_data = MOTIVATION_GAP_GUIDE[dom_mot]
+                         st.warning(f"**Risk:** {gap_data['risk']}")
+                         with st.expander("📚 Motivation Playbook", expanded=True):
+                             st.markdown(f"**Symptoms:** {gap_data['symptoms']}")
+                             st.markdown(f"**Strategy:**\n{gap_data['strategy']}")
             
             st.button("Clear", on_click=reset_t2)
 
