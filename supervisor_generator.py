@@ -37,29 +37,21 @@ st.markdown(f"""
             --text-sub: {BRAND_COLORS['gray']};
         }}
 
-        /* GLOBAL FONT & BACKGROUND */
         html, body, [class*="css"] {{
             font-family: 'Inter', sans-serif;
             color: var(--text-main);
         }}
         
-        /* MAIN APP CONTAINER */
         .stApp {{
             background: radial-gradient(circle at top left, #f1f5f9 0%, #ffffff 100%);
         }}
 
-        /* HEADERS */
         h1, h2, h3, h4 {{
             color: var(--primary) !important;
             font-weight: 700 !important;
             letter-spacing: -0.02em;
         }}
         
-        h1 {{ font-size: 2.2rem !important; }}
-        h2 {{ font-size: 1.5rem !important; margin-top: 1.5rem !important; }}
-        h3 {{ font-size: 1.2rem !important; margin-top: 1rem !important; }}
-
-        /* CUSTOM CARDS */
         .custom-card {{
             background-color: white;
             padding: 24px;
@@ -68,20 +60,38 @@ st.markdown(f"""
             border: 1px solid #e2e8f0;
             margin-bottom: 20px;
         }}
+        
+        /* Grid for Landing Page */
+        .tool-grid {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }}
+        @media (max-width: 768px) {{
+            .tool-grid {{ grid-template-columns: 1fr; }}
+        }}
 
-        /* METRIC CONTAINERS */
-        div[data-testid="stMetric"] {{
-            background-color: white;
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        /* Tabs */
+        .stTabs [data-baseweb="tab-list"] {{
+            gap: 24px;
+            background-color: transparent;
+            margin-top: 20px;
+        }}
+        .stTabs [data-baseweb="tab"] {{
+            height: 50px;
+            white-space: pre-wrap;
+            border-radius: 8px;
+            color: var(--text-sub);
+            font-weight: 600;
+        }}
+        .stTabs [aria-selected="true"] {{
+            background-color: rgba(1, 91, 173, 0.1) !important;
+            color: var(--primary) !important;
+            border-bottom: 2px solid var(--primary);
         }}
         
-        div[data-testid="stMetricLabel"] {{ font-size: 0.9rem !important; color: var(--text-sub) !important; }}
-        div[data-testid="stMetricValue"] {{ font-size: 1.8rem !important; color: var(--primary) !important; font-weight: 700 !important; }}
-
-        /* BUTTONS */
+        /* Buttons & Inputs */
         .stButton button {{
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white !important;
@@ -97,52 +107,15 @@ st.markdown(f"""
             box-shadow: 0 6px 16px rgba(1, 91, 173, 0.25);
             opacity: 0.95;
         }}
-
-        /* TABS */
-        .stTabs [data-baseweb="tab-list"] {{
-            gap: 24px;
-            background-color: transparent;
-        }}
-        .stTabs [data-baseweb="tab"] {{
-            height: 50px;
-            white-space: pre-wrap;
-            border-radius: 8px;
-            color: var(--text-sub);
-            font-weight: 600;
-        }}
-        .stTabs [aria-selected="true"] {{
-            background-color: rgba(1, 91, 173, 0.1) !important;
-            color: var(--primary) !important;
-            border-bottom: 2px solid var(--primary);
-        }}
-
-        /* ALERTS & INFO BOXES */
-        .stAlert {{
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }}
-        
-        /* DATAFRAME */
-        div[data-testid="stDataFrame"] {{
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            overflow: hidden;
-        }}
-
-        /* EXPANDERS */
-        .streamlit-expanderHeader {{
+        .stTextInput input, .stSelectbox [data-baseweb="select"] {{
             background-color: white;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 1px solid #e2e8f0;
-            font-weight: 600;
-            color: var(--text-main);
         }}
     </style>
 """, unsafe_allow_html=True)
 
 # --- 4. CONTENT DICTIONARIES ---
-# (Data remains the same, ensuring stability)
 
 COMM_TRAITS = {
     "Director": {"focus": "Action & Speed", "blindspot": "Patience & Consensus", "needs": "Clarity & Autonomy"},
@@ -164,7 +137,6 @@ SUPERVISOR_CLASH_MATRIX = {
                 "Joint": "We are speaking two different languages. I will validate your concern before we move to the next step."
             }
         },
-        # ... (Rest of matrix logic preserved from previous successful versions)
         "Facilitator": {"tension": "Gas vs. Brake", "root_cause": "Stagnation vs. Error", "watch_fors": ["Email commands", "Indecision"], "intervention_steps": ["Define Clock", "Define Veto", "Debrief"], "scripts": {"To Director": "Force = Compliance, not Buy-in.", "To Facilitator": "Silence = Agreement.", "Joint": "Set a timer."}},
         "Tracker": {"tension": "Vision vs. Obstacle", "root_cause": "Intuition vs. Handbook", "watch_fors": ["Quoting policy", "Bypassing"], "intervention_steps": ["Clarify Roles", "Yes If", "Risk Acceptance"], "scripts": {"To Director": "They are protecting you.", "To Tracker": "Start with solution.", "Joint": "Destination vs. Brakes."}},
         "Director": {"tension": "King vs. King", "root_cause": "Dominance/Control", "watch_fors": ["Interruptions", "Debates"], "intervention_steps": ["Separate Lanes", "Truce", "Commit"], "scripts": {"To Director": "Fighting to be right vs effective.", "To Other": "Strip the tone.", "Joint": "Stop fighting for the wheel."}}
@@ -186,7 +158,7 @@ SUPERVISOR_CLASH_MATRIX = {
         "Facilitator": {"tension": "Details vs Concepts", "root_cause": "Checklist vs Conversation", "watch_fors": ["Frustration", "Confusion"], "intervention_steps": ["Deliverable check", "Operationalize", "Collaborate"], "scripts": {"To Tracker": "Alignment is the deliverable.", "To Facilitator": "Define the to-do."}}
     }
 }
-# Fallback for robust lookup
+# Fallback
 for s in COMM_TRAITS:
     if s not in SUPERVISOR_CLASH_MATRIX: SUPERVISOR_CLASH_MATRIX[s] = {}
     for staff in COMM_TRAITS:
@@ -218,7 +190,7 @@ CAREER_PATHWAYS = {
     }
 }
 
-# (PDF Dictionaries - Shortened placeholders for code stability, logic uses full text in PDF func)
+# (PDF Dictionaries - Shortened for file size, full content generated in PDF function)
 COMM_PROFILES = {
     "Director": {"overview": "Leads with clarity, structure, and urgency.", "supervising": "Be direct, concise. Don't micromanage.", "struggle_bullets": ["Impatience", "Over-assertiveness", "Steamrolling"], "coaching": ["What are the risks of speed?", "Who haven't we heard from?"], "advancement": "Shift from Command to Influence."},
     "Encourager": {"overview": "Leads with warmth, optimism, and EQ.", "supervising": "Connect relationally first.", "struggle_bullets": ["Conflict avoidance", "Disorganization"], "coaching": ["Prioritizing popularity?", "Hard truths?"], "advancement": "Master operations/structure."},
@@ -306,19 +278,46 @@ def reset_t2(): st.session_state.t2_team_select = []
 def reset_t3(): st.session_state.p1 = None; st.session_state.p2 = None
 def reset_t4(): st.session_state.career = None; st.session_state.career_target = None
 
-# --- UI ---
+# --- UI HEADER ---
 def header():
     col1, col2 = st.columns([0.1, 0.9])
-    with col1: st.markdown("<div style='background:#015bad;color:white;padding:10px;border-radius:10px;text-align:center;font-weight:bold;font-size:1.2rem;'>EC</div>", unsafe_allow_html=True)
-    with col2: st.markdown("## Elmcrest Supervisor Platform")
+    with col1: st.markdown("<div style='width:60px;height:60px;background:linear-gradient(135deg,#015bad,#51c3c5);border-radius:14px;color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.4rem;box-shadow:0 4px 10px rgba(1,91,173,0.3);'>EC</div>", unsafe_allow_html=True)
+    with col2: st.markdown("<h2 style='margin:0;padding-top:10px;'>Elmcrest Supervisor Platform</h2><p style='margin:0;color:#64748b;'>Leadership Intelligence Hub</p>", unsafe_allow_html=True)
     st.markdown("---")
 
 header()
+
+# --- LANDING PAGE INFO ---
+st.markdown("""
+<div class="custom-card">
+    <h4>👋 Welcome to the Leadership Intelligence Hub</h4>
+    <p>This platform translates the <b>Elmcrest Compass</b> assessment data into actionable management strategies.</p>
+    <div class="tool-grid">
+        <div>
+            <strong>📝 Guide Generator</strong><br>
+            <span style="font-size:0.9rem;color:#64748b;">Create a 12-point custom manual for managing a specific staff member.</span>
+        </div>
+        <div>
+            <strong>🧬 Team DNA</strong><br>
+            <span style="font-size:0.9rem;color:#64748b;">Visualize the collective personality of a unit to spot blindspots.</span>
+        </div>
+        <div>
+            <strong>⚖️ Conflict Mediator</strong><br>
+            <span style="font-size:0.9rem;color:#64748b;">Get a specific script to resolve friction between staff members.</span>
+        </div>
+        <div>
+            <strong>🚀 Career Pathfinder</strong><br>
+            <span style="font-size:0.9rem;color:#64748b;">Plan developmental assignments for promotion readiness.</span>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# --- TABS ---
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["📝 Guide Generator", "🧬 Team DNA", "⚖️ Conflict Mediator", "🚀 Career Pathfinder", "📈 Org Pulse"])
 
 # --- TAB 1: GUIDE ---
 with tab1:
-    st.markdown("#### 📄 Generate Supervisory Guides")
     sub1, sub2 = st.tabs(["Database", "Manual"])
     with sub1:
         if not df.empty:
@@ -338,7 +337,6 @@ with tab1:
                     c = COMM_PROFILES[d['p_comm']]; m = MOTIVATION_PROFILES[d['p_mot']]
                     st.info(f"**Supervising:** {c['supervising']}")
                     st.success(f"**Motivating:** {m['motivating']}")
-                    st.warning(f"**Watch For:** {', '.join(c['struggle_bullets'][:2])}")
                 st.button("Reset", on_click=reset_t1)
     with sub2:
         with st.form("manual"):
@@ -360,16 +358,11 @@ with tab2:
             with c1:
                 comm_counts = tdf['p_comm'].value_counts()
                 st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
-                
-                # Blindspot Logic
-                present = set(tdf['p_comm'].unique())
-                missing = set(COMM_TRAITS.keys()) - present
+                present = set(tdf['p_comm'].unique()); missing = set(COMM_TRAITS.keys()) - present
                 if missing: st.error(f"🚫 **Blindspot Alert:** This team lacks **{', '.join(missing)}** energy.")
-                
             with c2:
                 mot_counts = tdf['p_mot'].value_counts()
                 st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
-            
             st.button("Clear", on_click=reset_t2)
 
 # --- TAB 3: CONFLICT ---
@@ -389,26 +382,21 @@ with tab3:
             
             if s1 in SUPERVISOR_CLASH_MATRIX and s2 in SUPERVISOR_CLASH_MATRIX[s1]:
                 clash = SUPERVISOR_CLASH_MATRIX[s1][s2]
-                
                 with st.expander("🔍 **Root Cause Analysis**", expanded=True):
                     st.markdown(f"**The Dynamic:** {clash['tension']}")
                     st.markdown(f"**Root Cause:** {clash['root_cause']}")
-                    
                 c_a, c_b = st.columns(2)
                 with c_a:
                     st.markdown("##### 🚩 Watch For")
                     for w in clash['watch_fors']: st.write(f"• {w}")
                     st.markdown("##### 🛠️ Intervention Steps")
                     for i in clash['intervention_steps']: st.info(i)
-                
                 with c_b:
                     st.markdown("##### 🗣️ Coaching Scripts")
                     st.success(f"**You Say:** \"{clash['scripts'].get('To '+s1, '...')}\"")
                     st.warning(f"**They Hear:** \"{clash['scripts'].get('To '+s2, '...')}\"")
                     st.info(f"**Joint Goal:** \"{clash['scripts'].get('Joint', '...')}\"")
-            else:
-                st.info("Same-style match. Focus on not amplifying weaknesses.")
-            
+            else: st.info("Same-style match. Focus on not amplifying weaknesses.")
             st.button("Reset", key="reset_t3", on_click=reset_t3)
 
 # --- TAB 4: CAREER ---
@@ -423,21 +411,17 @@ with tab4:
             d = df[df['name']==cand].iloc[0]
             style = d['p_comm']
             path = CAREER_PATHWAYS.get(style, {}).get(role)
-            
             if path:
                 st.divider()
                 st.markdown(f"**Current Style:** {style} $\\rightarrow$ **Target:** {role}")
-                
                 st.info(f"**The Shift:** {path['shift']}")
                 st.markdown(f"*{path['why']}*")
-                
                 c_a, c_b = st.columns(2)
                 with c_a:
                     with st.container(border=True):
                         st.markdown("##### 🗣️ The Conversation")
                         st.write(path['conversation'])
                         st.warning(f"**Supervisor Watch Item:** {path.get('supervisor_focus')}")
-                
                 with c_b:
                     with st.container(border=True):
                         st.markdown("##### ✅ Litmus Test Assignment")
@@ -445,7 +429,6 @@ with tab4:
                         st.write(f"**Task:** {path['assignment_task']}")
                         st.success(f"**Success:** {path['success_indicators']}")
                         st.error(f"**Red Flag:** {path['red_flags']}")
-            
             st.button("Reset", key="reset_t4", on_click=reset_t4)
 
 # --- TAB 5: PULSE ---
@@ -455,24 +438,12 @@ with tab5:
         c1, c2, c3 = st.columns(3)
         top_comm = df['p_comm'].mode()[0]
         top_mot = df['p_mot'].mode()[0]
-        
         c1.metric("Dominant Style", top_comm)
         c2.metric("Top Driver", top_mot)
         c3.metric("Total Staff", len(df))
-        
         st.divider()
         c_a, c_b = st.columns(2)
-        with c_a:
-            st.plotly_chart(px.pie(df, names='p_comm', title="Communication Styles", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
-        with c_b:
-            # Pipeline Chart
-            if 'role' in df.columns:
-                st.plotly_chart(px.histogram(df, x="role", color="p_comm", title="Leadership Pipeline (Comm Style by Role)", color_discrete_map={'Director':BRAND_COLORS['blue'], 'Encourager':BRAND_COLORS['green'], 'Facilitator':BRAND_COLORS['teal'], 'Tracker':BRAND_COLORS['gray']}), use_container_width=True)
-        
-        st.markdown("##### 🌡️ Cultural Risk Assessment")
-        if top_comm == "Director" and top_mot == "Achievement":
-            st.error("🚨 **High Burnout Risk:** Dominant 'Director/Achievement' culture. We execute fast but may lack empathy. **Action:** Intentionally reward 'Connection' behaviors.")
-        elif top_comm == "Encourager" and top_mot == "Connection":
-            st.warning("⚠️ **Nice-Guy Risk:** Dominant 'Encourager/Connection' culture. High morale but low accountability. **Action:** Standardize audit processes.")
-        else:
-            st.info(f"Culture is anchored in **{top_comm}** communication and **{top_mot}** motivation.")
+        with c_a: st.plotly_chart(px.pie(df, names='p_comm', title="Communication Styles", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
+        with c_b: 
+            if 'role' in df.columns: st.plotly_chart(px.histogram(df, x="role", color="p_comm", title="Leadership Pipeline (Comm Style by Role)", color_discrete_map={'Director':BRAND_COLORS['blue'], 'Encourager':BRAND_COLORS['green'], 'Facilitator':BRAND_COLORS['teal'], 'Tracker':BRAND_COLORS['gray']}), use_container_width=True)
+    else: st.warning("No data available.")
