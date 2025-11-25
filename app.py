@@ -109,15 +109,15 @@ st.markdown("""
         /* Centered Radio Buttons */
         .stRadio {
             background-color: transparent;
-            padding: 10px 0 0 0; /* Reduced padding */
+            padding: 0;
             display: flex;
             justify-content: center;
+            align-items: center;
         }
         .stRadio [role="radiogroup"] {
             justify-content: space-between;
             width: 100%;
-            max-width: 400px; /* Limit width for better alignment */
-            margin: 0 auto;
+            margin-top: 4px;
         }
         div[role="radiogroup"] > label > div:first-of-type {
             background-color: var(--primary) !important;
@@ -126,21 +126,22 @@ st.markdown("""
         
         /* Assessment Question Styling */
         .question-text {
-            font-size: 1.05rem;
-            font-weight: 600;
-            margin-bottom: 5px;
+            font-size: 1rem;
+            font-weight: 500;
             color: var(--text-main);
+            line-height: 1.4;
         }
         
         /* Labels for Scale */
         .scale-labels {
             display: flex;
             justify-content: space-between;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-sub);
-            max-width: 420px;
-            margin: 0 auto;
-            padding-top: 5px;
+            margin-bottom: -8px;
+            padding-left: 4px;
+            padding-right: 4px;
+            font-weight: 500;
         }
 
         /* Custom Cards & Bars */
@@ -492,26 +493,26 @@ elif st.session_state.step == 'comm':
         for i, q in enumerate(st.session_state.shuffled_comm):
             # Card-like container for each question
             with st.container(border=True):
-                st.markdown(f"<div class='question-text'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
+                col_q, col_a = st.columns([0.6, 0.4], gap="medium")
                 
-                # Radio buttons
-                answers[q['id']] = st.radio(
-                    f"q_{i}", 
-                    options=[1, 2, 3, 4, 5], 
-                    horizontal=True, 
-                    index=None, 
-                    key=f"c_{q['id']}", 
-                    label_visibility="collapsed"
-                )
+                with col_q:
+                    st.markdown(f"<div class='question-text' style='display:flex;align-items:center;height:100%;'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
                 
-                # Scale labels inside the card
-                st.markdown("""
-                <div class="scale-labels">
-                    <span>Strongly Disagree</span>
-                    <span>Neutral</span>
-                    <span>Strongly Agree</span>
-                </div>
-                """, unsafe_allow_html=True)
+                with col_a:
+                    st.markdown("""
+                    <div class="scale-labels">
+                        <span>Disagree</span>
+                        <span>Agree</span>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    answers[q['id']] = st.radio(
+                        f"q_{i}", 
+                        options=[1, 2, 3, 4, 5], 
+                        horizontal=True, 
+                        index=None, 
+                        key=f"c_{q['id']}", 
+                        label_visibility="collapsed"
+                    )
         
         st.markdown("<br>", unsafe_allow_html=True)
         
@@ -536,26 +537,26 @@ elif st.session_state.step == 'motiv':
         for i, q in enumerate(st.session_state.shuffled_motiv):
             # Card-like container for each question
             with st.container(border=True):
-                st.markdown(f"<div class='question-text'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
+                col_q, col_a = st.columns([0.6, 0.4], gap="medium")
                 
-                # Radio buttons
-                answers[q['id']] = st.radio(
-                    f"mq_{i}", 
-                    options=[1, 2, 3, 4, 5], 
-                    horizontal=True, 
-                    index=None, 
-                    key=f"m_{q['id']}", 
-                    label_visibility="collapsed"
-                )
+                with col_q:
+                    st.markdown(f"<div class='question-text' style='display:flex;align-items:center;height:100%;'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
                 
-                # Scale labels inside the card
-                st.markdown("""
-                <div class="scale-labels">
-                    <span>Strongly Disagree</span>
-                    <span>Neutral</span>
-                    <span>Strongly Agree</span>
-                </div>
-                """, unsafe_allow_html=True)
+                with col_a:
+                    st.markdown("""
+                    <div class="scale-labels">
+                        <span>Disagree</span>
+                        <span>Agree</span>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    answers[q['id']] = st.radio(
+                        f"mq_{i}", 
+                        options=[1, 2, 3, 4, 5], 
+                        horizontal=True, 
+                        index=None, 
+                        key=f"m_{q['id']}", 
+                        label_visibility="collapsed"
+                    )
         
         st.markdown("<br>", unsafe_allow_html=True)
         
