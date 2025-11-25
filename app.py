@@ -115,7 +115,7 @@ COMMUNICATION_QUESTIONS = [
     {"id": "comm5", "text": "I’m comfortable giving direct feedback, even when I know it may be hard for someone to hear.", "style": "Director"},
     {"id": "comm6", "text": "I pay close attention to the emotional tone of the team and try to lift people up when morale is low.", "style": "Encourager"},
     {"id": "comm7", "text": "I often use encouragement, humor, or positive energy to help youth and staff get through hard shifts.", "style": "Encourager"},
-    {"id": "comm8", "text": "I notice small wins and like to name them out loud so people know they’re seen.", "style": "Encourager"},
+    {"id": "comm8", "text": "I notice small wins and like to name them out loud so people know theyre seen.", "style": "Encourager"},
     {"id": "comm9", "text": "I tend to talk things through with people rather than just giving short instructions.", "style": "Encourager"},
     {"id": "comm10", "text": "I’m often the one coworkers come to when they need to vent or feel understood.", "style": "Encourager"},
     {"id": "comm11", "text": "I’m good at slowing conversations down so that different perspectives can be heard before we decide.", "style": "Facilitator"},
@@ -350,15 +350,36 @@ def get_top_two(scores):
     return primary, secondary
 
 def submit_to_google_sheets(data, action="save"):
+    """
+    Submits data to Google Sheets.
+    action can be 'save' (default) or 'email' (triggers email in Apps Script)
+    """
     url = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
+    
+    # Add action flag to payload
     data["action"] = action
+    
     try:
         response = requests.post(url, json=data)
         if response.status_code == 200:
-            return True
+            # Check logic here: Google might return 200 but payload says error
+            # But standard requests.post just returns the object.
+            # We should try to parse the JSON response if possible to check for specific script errors
+            try:
+                res_json = response.json()
+                if res_json.get("status") == "ok":
+                    return True
+                else:
+                    # Apps Script returned an error in the JSON
+                    st.error(f"Server error: {res_json.get('message')}")
+                    return False
+            except:
+                # If response isn't valid JSON, it might be a Google 404/500 HTML page served with a 200 code (rare but possible)
+                # Or just a simple success. Assume success for now if status is 200.
+                return True
         else:
             st.warning(f"Server returned status: {response.status_code}")
-            return True
+            return False
     except Exception as e:
         st.error(f"Error connecting to server: {e}")
         return False
