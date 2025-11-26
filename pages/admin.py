@@ -148,12 +148,12 @@ if not st.session_state.authenticated:
 # SUPERVISOR TOOL LOGIC STARTS HERE
 # ==========================================
 
+# --- 5. DATA DICTIONARIES (DEFINED AT TOP LEVEL) ---
+
 COMM_TRAITS = ["Director", "Encourager", "Facilitator", "Tracker"]
 MOTIV_TRAITS = ["Achievement", "Growth", "Purpose", "Connection"]
 
-# --- 5. DATA DICTIONARIES ---
-
-# (A) CONFLICT MATRIX (EXPANDED DEEP DIVE & SCRIPTS)
+# (D) CONFLICT MATRIX (EXPANDED DEEP DIVE & SCRIPTS)
 SUPERVISOR_CLASH_MATRIX = {
     "Director": {
         "Encourager": {
@@ -191,7 +191,7 @@ SUPERVISOR_CLASH_MATRIX = {
             """,
             "watch_fors": [
                 "**Email Commands:** You issue commands via email to avoid a meeting because you know it will drag on. This alienates the team and makes the Facilitator feel bypassed.",
-                "**The 'We Need to Talk' Loop:** They keep saying 'We need to talk about this' but never actually make a decision, trapping the team in perpetual processing.",
+                "**The Loop:** They keep saying 'We need to talk about this' but never actually make a decision. They are stuck in the process loop.",
                 "**Eye Rolling:** You visibly check out or roll your eyes when they ask for 'thoughts' from the group, signaling that their process is invalid.",
                 "**Passive Resistance:** Decisions are made by you but passively resisted or ignored by the team because the Facilitator didn't buy in and quietly signaled that it wasn't a 'real' decision."
             ],
@@ -229,7 +229,7 @@ SUPERVISOR_CLASH_MATRIX = {
             "scripts": {
                 "Opening": "I need your help figuring out *how* to do this legally, not *if* we should do it.",
                 "The Ask": "I want to get to [Goal]. What is the safest, compliant way to get there fast?",
-                "The Pivot": "I hear the risk. I am choosing to accept that risk. Please document that I made this call.",
+                "The Pivot": "I hear the risk you are raising. I am choosing to accept that risk. Please document that I made this call.",
                 "Crisis": "The procedure doesn't cover this situation. We are using common sense for the next hour. I will sign off on it.",
                 "Feedback": "They are protecting you from liability. Their 'no' is actually care. Assume positive intent."
             }
@@ -261,7 +261,7 @@ SUPERVISOR_CLASH_MATRIX = {
             }
         }
     },
-    # Fallbacks for other combinations to prevent errors
+    # Fallbacks for other combinations
 }
 
 # Helper to ensure robust lookup
@@ -277,7 +277,7 @@ for s in COMM_TRAITS:
                 "scripts": {"Joint": "Let's align on the goal first."}
             }
 
-# (B) TEAM CULTURE GUIDE
+# (A) TEAM CULTURE GUIDE
 TEAM_CULTURE_GUIDE = {
     "Director": {
         "title": "The 'Action' Culture",
@@ -316,20 +316,36 @@ TEAM_CULTURE_GUIDE = {
     }
 }
 
-# (C) MISSING VOICE GUIDE
+# (B) MISSING VOICE GUIDE
 MISSING_VOICE_GUIDE = {
-    "Director": {"risk": "**Risk of Stagnation.** Without Director energy, this team may talk in circles, create perfect plans that never launch, or prioritize comfort over results. You risk becoming a 'social club' that doesn't achieve outcomes.", "fix": "**Supervisor Strategy:** You must be the driver. Set hard deadlines. Interrupt circular conversations. Be the 'bad guy' who demands output. End every meeting with 'Who is doing What by When?'"},
-    "Encourager": {"risk": "**Risk of Burnout & Coldness.** Without Encourager energy, this team becomes transactional. Staff feel like cogs in a machine. You will likely see high turnover because no one feels 'seen' or 'cared for' personally.", "fix": "**Supervisor Strategy:** You must prioritize the 'Human Element'. Start meetings with personal check-ins. Schedule fun (yes, mandatory fun). Manually recognize effort, not just results. Send handwritten notes."},
-    "Facilitator": {"risk": "**Risk of Tunnel Vision.** Without Facilitator energy, the loudest voices will dominate. You will have 'Blind spots' because no one is stepping back to ask 'What about X?'. Dissent will be crushed or ignored.", "fix": "**Supervisor Strategy:** You must slow down the room. Use 'Round Robin' turn-taking so quiet people speak. Ask 'Who disagrees?' before moving on. Actively solicit the minority opinion."},
-    "Tracker": {"risk": "**Risk of Chaos & Liability.** Without Tracker energy, details will slip. Documentation will fail. Safety risks will be missed until they become accidents. The program will feel chaotic and reactive.", "fix": "**Supervisor Strategy:** You must be the auditor. Bring the checklist. Don't assume it's done; check it. Create visual trackers on the wall. Ask 'What is the backup plan?' repeatedly."}
+    "Director": {"risk": "**Risk of Stagnation.** Without Director energy, this team may talk in circles, create perfect plans that never launch, or prioritize comfort over results. You risk becoming a 'social club' that doesn't achieve outcomes. Problems are admired, not solved.", "fix": "**Supervisor Strategy:** You must be the driver. Set hard deadlines. Interrupt circular conversations. Be the 'bad guy' who demands output. End every meeting with 'Who is doing What by When?'"},
+    "Encourager": {"risk": "**Risk of Burnout & Coldness.** Without Encourager energy, this team becomes transactional. Staff feel like cogs in a machine. You will likely see high turnover because no one feels 'seen' or 'cared for' personally. Burnout happens silently.", "fix": "**Supervisor Strategy:** You must prioritize the 'Human Element'. Start meetings with personal check-ins. Schedule fun (yes, mandatory fun). Manually recognize effort, not just results. Send handwritten notes."},
+    "Facilitator": {"risk": "**Risk of Tunnel Vision.** Without Facilitator energy, the loudest voices will dominate. You will have 'Blind spots' because no one is stepping back to ask 'What about X?'. Dissent will be crushed or ignored. Decisions will be fast but often wrong or poorly implemented.", "fix": "**Supervisor Strategy:** You must slow down the room. Use 'Round Robin' turn-taking so quiet people speak. Ask 'Who disagrees?' before moving on. Actively solicit the minority opinion."},
+    "Tracker": {"risk": "**Risk of Chaos & Liability.** Without Tracker energy, details will slip. Documentation will fail. Safety risks will be missed until they become accidents. The program will feel chaotic and reactive. Great ideas will launch but fail due to poor logistics.", "fix": "**Supervisor Strategy:** You must be the auditor. Bring the checklist. Don't assume it's done; check it. Create visual trackers on the wall. Ask 'What is the backup plan?' repeatedly."}
 }
 
-# (D) MOTIVATION GAP GUIDE
+# (C) MOTIVATION GAP GUIDE
 MOTIVATION_GAP_GUIDE = {
-    "Growth": {"title": "The Stagnation Trap", "description": "Boredom.", "strategy": "Force Evolution."},
-    "Purpose": {"title": "The Mercenary Trap", "description": "Just a job.", "strategy": "Re-Connect the Dots."},
-    "Connection": {"title": "The Silo Trap", "description": "Isolation.", "strategy": "Manufacture Belonging."},
-    "Achievement": {"title": "The Apathy Trap", "description": "No score.", "strategy": "Keep Score."}
+    "Growth": {
+        "title": "The Stagnation Trap",
+        "description": "This team is content with the status quo. They do the job well enough, but they aren't looking to improve. They resist new training or changes to protocol because 'it works fine now.' High performers will get bored and leave.",
+        "strategy": "**Supervisor Strategy: Force Evolution.**\n* **The ' Pilot' Approach:** Frame every change as a '30-day experiment' rather than a permanent shift to lower resistance.\n* **External Stimulus:** Bring in outside speakers or send them to visit other high-performing units to spark curiosity.\n* **Career Pathing:** Even if they don't ask, map out a growth plan for them."
+    },
+    "Purpose": {
+        "title": "The Mercenary Trap",
+        "description": "This team treats the work as 'just a job.' They clock in and clock out. They follow the rules but lack heart. They may be cynical about the organization's mission or leadership. Quality of care drops because no one goes the extra mile.",
+        "strategy": "**Supervisor Strategy: Re-Connect the Dots.**\n* **Mission Moments:** Start every meeting with a specific story of a youth who was helped. Make the impact visible.\n* **The 'Why' Behind the 'What':** Never give a task without explaining how it helps the client. 'We clean the van so the kids feel dignified,' not 'because I said so.'\n* **Validate Frustration:** Acknowledge system failures so they know you aren't blind, then pivot to 'how do we help anyway?'"
+    },
+    "Connection": {
+        "title": "The Silo Trap",
+        "description": "This team works independently but not cooperatively. There is low trust. People hoard information or throw each other under the bus. Turnover is high because there is no social glue holding them there when the work gets hard.",
+        "strategy": "**Supervisor Strategy: Manufacture Belonging.**\n* **Shared Suffering/Success:** Create goals that can ONLY be hit if they work together (e.g., a unit-wide incentive).\n* **Forced Collision:** Assign tasks to pairs of people who don't normally interact.\n* **Rituals:** Create non-work traditions (Friday donuts, birthday cards) that signal 'we are a tribe'."
+    },
+    "Achievement": {
+        "title": "The Apathy Trap",
+        "description": "This team doesn't know if they are winning or losing, so they stop trying. They feel like effort doesn't matter because outcomes are vague. They drift through shifts without urgency or focus.",
+        "strategy": "**Supervisor Strategy: Keep Score.**\n* **Visual Scoreboards:** Put a chart on the wall tracking *something* (attendance, cleanliness, incidents). Humans naturally want to improve a number they can see.\n* **Micro-Wins:** Define what a 'good shift' looks like concretely. Give high-fives at the end of the day for hitting it.\n* **Gamification:** Turn mundane tasks into a friendly competition."
+    }
 }
 
 # --- 5a. PROFILE CONTENT ---
@@ -485,6 +501,7 @@ FULL_MOTIV_PROFILES = {
 
 # --- 5c. GENERATOR FUNCTION ---
 def generate_profile_content(comm, motiv):
+    
     # This dictionary holds the specific text for the 16 combinations
     combo_key = f"{comm}-{motiv}"
     
@@ -600,7 +617,6 @@ def generate_profile_content(comm, motiv):
         "coaching": questions
     }
 
-# --- 5. HELPER FUNCTIONS ---
 def clean_text(text):
     if not text: return ""
     return str(text).replace('\u2018', "'").replace('\u2019', "'").encode('latin-1', 'replace').decode('latin-1')
