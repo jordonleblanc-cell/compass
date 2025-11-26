@@ -99,8 +99,8 @@ st.markdown(f"""
         .streamlit-expanderHeader {{ background-color: var(--card-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-color); }}
         div[data-testid="stExpander"] {{ background-color: var(--card-bg) !important; border: 1px solid var(--border-color); border-radius: 8px; }}
         
-        /* Login Specifics */
-        .login-card {
+        /* Login Specifics - FIXED BRACES HERE */
+        .login-card {{
             background-color: var(--card-bg);
             padding: 40px;
             border-radius: 20px;
@@ -111,11 +111,11 @@ st.markdown(f"""
             border: 1px solid var(--border-color);
             color: var(--text-main);
             backdrop-filter: blur(12px);
-        }
-        .login-title { color: var(--primary) !important; font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
-        .login-subtitle { color: var(--text-sub) !important; margin-bottom: 20px; }
-        .back-link { text-decoration: none; color: var(--text-sub); font-weight: 600; transition: color 0.2s; }
-        .back-link:hover { color: var(--primary); }
+        }}
+        .login-title {{ color: var(--primary) !important; font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }}
+        .login-subtitle {{ color: var(--text-sub) !important; margin-bottom: 20px; }}
+        .back-link {{ text-decoration: none; color: var(--text-sub); font-weight: 600; transition: color 0.2s; }}
+        .back-link:hover {{ color: var(--primary); }}
     </style>
 """, unsafe_allow_html=True)
 
