@@ -19,59 +19,6 @@ if "current_view" not in st.session_state:
 def set_view(view_name):
     st.session_state.current_view = view_name
 
-# --- SECURITY: PASSWORD CHECK ---
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-
-def check_password():
-    # Looks for password in secrets.toml, defaults to "elmcrest2025" if not found
-    PASSWORD = st.secrets.get("ADMIN_PASSWORD", "elmcrest2025") 
-    if st.session_state.password_input == PASSWORD:
-        st.session_state.authenticated = True
-        del st.session_state.password_input
-    else:
-        st.error("Incorrect password")
-
-if not st.session_state.authenticated:
-    st.markdown("""
-        <style>
-        .stApp { background: radial-gradient(circle at center, #f1f5f9 0%, #cbd5e1 100%); }
-        [data-testid="stHeader"] { background: transparent; }
-        
-        /* HIDE SIDEBAR NAVIGATION HERE TOO */
-        [data-testid="stSidebarNav"] {display: none;}
-        section[data-testid="stSidebar"] {display: none;}
-
-        .login-card {
-            background: white; padding: 40px; border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center;
-            max-width: 400px; margin: 100px auto;
-            border: 1px solid #e2e8f0;
-            color: #0f172a;
-        }
-        .login-title { color: #015bad; font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
-        .login-subtitle { color: #64748b; margin-bottom: 20px; }
-        </style>
-        
-        <!-- Back Button for Login Screen -->
-        <div style="position: absolute; top: 20px; left: 20px;">
-            <a href="/" target="_self" style="text-decoration: none; color: #64748b; font-weight: 600;">← Back</a>
-        </div>
-
-        <div class='login-card'>
-            <div class='login-title'>Supervisor Access</div>
-            <div class='login-subtitle'>Please enter your credentials to access the leadership dashboard.</div>
-        </div>
-    """, unsafe_allow_html=True)
-    st.text_input("Password", type="password", key="password_input", on_change=check_password)
-    if st.button("← Back to Compass"):
-        st.switch_page("app.py")
-    st.stop()
-
-# ==========================================
-# SUPERVISOR TOOL LOGIC STARTS HERE
-# ==========================================
-
 # --- 2. CONSTANTS ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
 
@@ -84,7 +31,7 @@ BRAND_COLORS = {
     "light_gray": "#f8fafc"
 }
 
-# --- 3. CSS STYLING ---
+# --- 3. CSS STYLING (Moved Up for Login Page Access) ---
 st.markdown(f"""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -151,10 +98,59 @@ st.markdown(f"""
         div[data-testid="stDataFrame"] {{ border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }}
         .streamlit-expanderHeader {{ background-color: var(--card-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-color); }}
         div[data-testid="stExpander"] {{ background-color: var(--card-bg) !important; border: 1px solid var(--border-color); border-radius: 8px; }}
+        
+        /* Login Specifics */
+        .login-card {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            max-width: 400px;
+            margin: 100px auto;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            backdrop-filter: blur(12px);
+        }
+        .login-title { color: var(--primary) !important; font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
+        .login-subtitle { color: var(--text-sub) !important; margin-bottom: 20px; }
+        .back-link { text-decoration: none; color: var(--text-sub); font-weight: 600; transition: color 0.2s; }
+        .back-link:hover { color: var(--primary); }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. CONTENT DICTIONARIES ---
+# --- 4. SECURITY: PASSWORD CHECK ---
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+def check_password():
+    # Looks for password in secrets.toml, defaults to "elmcrest2025" if not found
+    PASSWORD = st.secrets.get("ADMIN_PASSWORD", "elmcrest2025") 
+    if st.session_state.password_input == PASSWORD:
+        st.session_state.authenticated = True
+        del st.session_state.password_input
+    else:
+        st.error("Incorrect password")
+
+if not st.session_state.authenticated:
+    # Back Button for Login Screen
+    st.markdown("""
+        <div style="position: absolute; top: 20px; left: 20px;">
+            <a href="/" target="_self" class="back-link">← Back</a>
+        </div>
+        <div class='login-card'>
+            <div class='login-title'>Supervisor Access</div>
+            <div class='login-subtitle'>Please enter your credentials to access the leadership dashboard.</div>
+        </div>
+    """, unsafe_allow_html=True)
+    st.text_input("Password", type="password", key="password_input", on_change=check_password)
+    st.stop()
+
+# ==========================================
+# SUPERVISOR TOOL LOGIC STARTS HERE
+# ==========================================
+
+# --- 5. CONTENT DICTIONARIES ---
 
 COMM_TRAITS = {
     "Director": {"focus": "Action & Speed", "blindspot": "Patience & Consensus", "needs": "Clarity & Autonomy"},
@@ -883,4 +879,3 @@ elif st.session_state.current_view == "Org Pulse":
         with c_b: 
             if 'role' in df.columns: st.plotly_chart(px.histogram(df, x="role", color="p_comm", title="Leadership Pipeline", color_discrete_map={'Director':BRAND_COLORS['blue'], 'Encourager':BRAND_COLORS['green'], 'Facilitator':BRAND_COLORS['teal'], 'Tracker':BRAND_COLORS['gray']}), use_container_width=True)
     else: st.warning("No data available.")
-        
