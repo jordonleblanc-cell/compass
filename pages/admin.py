@@ -155,7 +155,7 @@ MOTIV_TRAITS = ["Achievement", "Growth", "Purpose", "Connection"]
 
 FULL_COMM_PROFILES = {
     "Director": {
-        "description": "This staff member communicates primarily as a **Director**. They lead with clarity, structure, and urgency. They prioritize efficiency and competence, often serving as the 'spine' of the team during chaos.\n\nThey view problems as obstacles to be removed quickly rather than processed emotionally. While this decisiveness is a huge asset in a crisis, it can sometimes steamroll slower processors or make the staff member appear unapproachable or impatient.",
+        "description": "This staff member communicates primarily as a **Director**. They lead with clarity, structure, and urgency, often serving as the 'spine' of the team during chaos. They prioritize efficiency and competence, viewing problems as obstacles to be removed quickly rather than processed emotionally.\n\nWhen communication is flowing well, they are decisive and clear. However, they may inadvertently steamroll others or move faster than the team can follow, creating a wake of confusion or resentment if not managed carefully.",
         "desc_bullets": [
             "**Clarity:** They speak in headlines, not paragraphs.",
             "**Speed:** They prefer quick decisions over long debates.",
@@ -170,7 +170,7 @@ FULL_COMM_PROFILES = {
         "questions": ["Where are you moving too fast for the team?", "Who haven't you heard from on this issue?", "How does your tone land when you are stressed?"]
     },
     "Encourager": {
-        "description": "This staff member communicates primarily as an **Encourager**. They lead with empathy, warmth, and emotional presence. They act as the 'glue' of the team, ensuring people feel seen and safe. They are often the first to notice when morale is low.\n\nTheir communication style is highly relational, which helps in de-escalation but can sometimes make it harder for them to deliver difficult feedback or hold firm boundaries under stress. They may avoid conflict to preserve harmony.",
+        "description": "This staff member communicates primarily as an **Encourager**. They lead with empathy, warmth, and emotional presence. They act as the 'glue' of the team, ensuring people feel seen and safe. They are often the first to notice when morale is low or when a specific staff member is struggling.\n\nTheir communication style is highly relational, which helps in de-escalation but can sometimes make it harder for them to deliver difficult feedback or hold firm boundaries under stress. They may avoid conflict to preserve harmony.",
         "desc_bullets": [
             "**Warmth:** They lead with relationship and connection.",
             "**Empathy:** They naturally validate feelings before facts.",
@@ -185,7 +185,7 @@ FULL_COMM_PROFILES = {
         "questions": ["Where are you avoiding a hard conversation?", "Are you prioritizing being liked over being effective?", "What boundaries do you need to set today?"]
     },
     "Facilitator": {
-        "description": "This staff member communicates primarily as a **Facilitator**. They lead by listening, building consensus, and ensuring fairness. They are the 'calm bridge' who de-escalates tension and ensures all voices are heard before a decision is made.\n\nThey add immense value by preventing rash decisions and ensuring buy-in. However, they can struggle with 'analysis paralysis' or delay necessary actions because they are waiting for everyone to agree, which is not always possible.",
+        "description": "This staff member communicates primarily as a **Facilitator**. They lead by listening, building consensus, and ensuring fairness across the board. They are the 'calm bridge' who de-escalates tension and ensures all voices are heard before a decision is made.\n\nThey add immense value by preventing rash decisions and ensuring buy-in. However, they can struggle with 'analysis paralysis' or delay necessary actions because they are waiting for everyone to agree, which is not always possible.",
         "desc_bullets": [
             "**Listening:** They ensure everyone has a say.",
             "**Consensus:** They prefer decisions that everyone can live with.",
@@ -224,13 +224,13 @@ FULL_MOTIV_PROFILES = {
             "**Completion:** They get energy from finishing tasks.",
             "**Efficiency:** They hate wasted time."
         ],
-        "strategies": "Set clear, measurable goals. Use visual trackers or dashboards. Celebrate 'wins' explicitly and publicly. Give them projects where they can own the result from start to finish.",
+        "strategies": "Set clear, measurable goals. Use visual trackers or dashboards. Celebrate 'wins' explicitly and publicly. Give them projects where they can own the result from start to finish. Avoid vague feedback like 'good job'; instead say 'You hit X target, which improved Y.'",
         "strategies_bullets": [
             "**Visual Goals:** Use charts or checklists they can mark off.",
             "**Public Wins:** Acknowledge their success in front of peers.",
             "**Autonomy:** Give them the 'what' and let them decide the 'how'."
         ],
-        "celebrate": "Celebrate concrete outcomes, finished projects, improved metrics, and their reliability in getting things done. They want to be recognized for their competence.",
+        "celebrate": "Celebrate concrete outcomes, finished projects, improved metrics, and their reliability in getting things done. They want to be recognized for their competence and output.",
         "celebrate_bullets": [
             "**Outcomes:** 'You hit 100% on documentation.'",
             "**Reliability:** 'I know I can count on you to finish this.'",
@@ -245,7 +245,7 @@ FULL_MOTIV_PROFILES = {
             "**Future-Focused:** They are thinking about their next step.",
             "**Feedback:** They crave coaching, not just praise."
         ],
-        "strategies": "Feed their curiosity. Assign them 'stretch' projects that require new skills. Frame feedback as 'coaching' for their future career. Connect mundane tasks to their long-term professional development.",
+        "strategies": "Feed their curiosity. Assign them 'stretch' projects that require new skills. Frame feedback as 'coaching' for their future career. Connect mundane tasks to their long-term professional development. Ask them: 'What do you want to learn next?'",
         "strategies_bullets": [
             "**Stretch Assignments:** Give them tasks slightly above their current skill level.",
             "**Career Pathing:** Regularly discuss their professional future.",
@@ -287,7 +287,7 @@ FULL_MOTIV_PROFILES = {
             "**Harmony:** Conflict feels dangerous and draining.",
             "**Support:** They are motivated by helping their peers."
         ],
-        "strategies": "Prioritize face time. Check in on them as a person, not just an employee. Build team rituals (food, shout-outs). Ensure they don't work in a silo.",
+        "strategies": "Prioritize face time. Check in on them as a person, not just an employee. Build team rituals (food, shout-outs). Ensure they don't work in a silo. When giving feedback, reassure them of their belonging in the team.",
         "strategies_bullets": [
             "**Face Time:** Prioritize in-person or video check-ins.",
             "**Team Rituals:** Include them in team bonding activities.",
