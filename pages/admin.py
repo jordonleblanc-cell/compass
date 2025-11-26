@@ -124,6 +124,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 def check_password():
+    # Looks for password in secrets.toml, defaults to "elmcrest2025" if not found
     PASSWORD = st.secrets.get("ADMIN_PASSWORD", "elmcrest2025") 
     if st.session_state.password_input == PASSWORD:
         st.session_state.authenticated = True
@@ -132,6 +133,7 @@ def check_password():
         st.error("Incorrect password")
 
 if not st.session_state.authenticated:
+    # Back Button for Login Screen
     st.markdown("""
         <div style="position: absolute; top: 20px; left: 20px;">
             <a href="/" target="_self" class="back-link">← Back</a>
@@ -151,7 +153,7 @@ if not st.session_state.authenticated:
 COMM_TRAITS = ["Director", "Encourager", "Facilitator", "Tracker"]
 MOTIV_TRAITS = ["Achievement", "Growth", "Purpose", "Connection"]
 
-# --- 5. DATA DICTIONARIES (DEFINED AT TOP LEVEL) ---
+# --- 5. EXTENDED CONTENT DICTIONARIES ---
 
 # (A) TEAM CULTURE GUIDE
 TEAM_CULTURE_GUIDE = {
@@ -195,29 +197,29 @@ TEAM_CULTURE_GUIDE = {
 # (B) MISSING VOICE GUIDE
 MISSING_VOICE_GUIDE = {
     "Director": {
-        "risk": "**The 'Nice' Stagnation.** Without Director energy, this team may talk in circles, create perfect plans that never launch, or prioritize comfort over results. You risk becoming a 'social club' that doesn't achieve outcomes. Problems are admired, not solved.",
+        "risk": "**Risk of Stagnation.** Without Director energy, this team may talk in circles, create perfect plans that never launch, or prioritize comfort over results. You risk becoming a 'social club' that doesn't achieve outcomes. Problems are admired, not solved.",
         "fix": "**Supervisor Strategy: Be the Driver.**\n* **Set Hard Deadlines:** Do not ask 'when will this be done?'. Say 'This is due Friday.'\n* **Interrupt Loops:** When conversation circles, interrupt with: 'What is the specific next action?'\n* **Assign Owners:** Never end a meeting without names attached to tasks. You must provide the urgency they lack."
     },
     "Encourager": {
-        "risk": "**The Cold Machine.** Without Encourager energy, this team becomes transactional and efficient but soulless. Staff feel like cogs in a machine. You will likely see high turnover because no one feels 'seen' or 'cared for' personally. Burnout happens silently.",
+        "risk": "**Risk of Burnout & Coldness.** Without Encourager energy, this team becomes transactional and efficient but soulless. Staff feel like cogs in a machine. You will likely see high turnover because no one feels 'seen' or 'cared for' personally. Burnout happens silently.",
         "fix": "**Supervisor Strategy: Be the Heart.**\n* **The 5-Minute Rule:** Spend the first 5 minutes of every meeting on non-work connection. No exceptions.\n* **Manual Appreciation:** You must schedule reminders to send thank-you notes or verbal praise, as it won't happen naturally.\n* **Wellness Checks:** Ask 'How are you doing?' and wait for the real answer."
     },
     "Facilitator": {
-        "risk": "**Tunnel Vision & Bulldozing.** Without Facilitator energy, the loudest voices will dominate. You will have 'Blind spots' because no one is stepping back to ask 'What about X?'. Dissent will be crushed or ignored. Decisions will be fast but often wrong or poorly implemented.",
+        "risk": "**Risk of Tunnel Vision.** Without Facilitator energy, the loudest voices will dominate. You will have 'Blind spots' because no one is stepping back to ask 'What about X?'. Dissent will be crushed or ignored. Decisions will be fast but often wrong or poorly implemented.",
         "fix": "**Supervisor Strategy: Be the Brake.**\n* **Round Robin:** Force a mechanism where everyone speaks once before anyone speaks twice.\n* **The 'Pre-Mortem':** Before finalizing a plan, ask: 'If this fails, why did it fail?' forcing them to slow down and look for gaps.\n* **Check for Buy-In:** Explicitly ask the quietest people for their opinion."
     },
     "Tracker": {
-        "risk": "**Chaos & Liability.** Without Tracker energy, details will slip. Documentation will fail. Safety risks will be missed until they become accidents. The program will feel chaotic and reactive. Great ideas will launch but fail due to poor logistics.",
+        "risk": "**Risk of Chaos & Liability.** Without Tracker energy, details will slip. Documentation will fail. Safety risks will be missed until they become accidents. The program will feel chaotic and reactive. Great ideas will launch but fail due to poor logistics.",
         "fix": "**Supervisor Strategy: Be the Auditor.**\n* **Bring the Checklist:** You must be the one who asks 'Is the paperwork done?' and 'Who is locking the door?'.\n* **Visual Tracking:** Put goals and compliance metrics on the wall. Make the data visible.\n* **The 'How' Question:** When they have a big idea, you ask: 'Walk me through the specific steps to make that happen.'"
     }
 }
 
-# (C) MOTIVATION GAP GUIDE (EXPANDED)
+# (C) MOTIVATION GAP GUIDE
 MOTIVATION_GAP_GUIDE = {
     "Growth": {
         "title": "The Stagnation Trap",
         "description": "This team is content with the status quo. They do the job well enough, but they aren't looking to improve. They resist new training or changes to protocol because 'it works fine now.' High performers will get bored and leave.",
-        "strategy": "**Supervisor Strategy: Force Evolution.**\n* **The 'Pilot' Approach:** Frame every change as a '30-day experiment' rather than a permanent shift to lower resistance.\n* **External Stimulus:** Bring in outside speakers or send them to visit other high-performing units to spark curiosity.\n* **Career Pathing:** Even if they don't ask, map out a growth plan for them."
+        "strategy": "**Supervisor Strategy: Force Evolution.**\n* **The ' Pilot' Approach:** Frame every change as a '30-day experiment' rather than a permanent shift to lower resistance.\n* **External Stimulus:** Bring in outside speakers or send them to visit other high-performing units to spark curiosity.\n* **Career Pathing:** Even if they don't ask, map out a growth plan for them."
     },
     "Purpose": {
         "title": "The Mercenary Trap",
@@ -236,15 +238,16 @@ MOTIVATION_GAP_GUIDE = {
     }
 }
 
+# 5a. COMMUNICATION PROFILES (Expanded)
 FULL_COMM_PROFILES = {
     "Director": {
-        "description": "This staff member communicates primarily as a **Director**. They lead with clarity, structure, and urgency. They prioritize efficiency and competence, often serving as the 'spine' of the team during chaos.\n\nThey view problems as obstacles to be removed quickly rather than processed emotionally. While this decisiveness is a huge asset in a crisis, it can sometimes steamroll slower processors or make the staff member appear unapproachable or impatient.",
+        "description": "This staff member communicates primarily as a **Director**. They lead with clarity, structure, and urgency, often serving as the 'spine' of the team during chaos. They prioritize efficiency and competence, viewing problems as obstacles to be removed quickly rather than processed emotionally.\n\nWhen communication is flowing well, they are decisive and clear. However, they may inadvertently steamroll others or move faster than the team can follow, creating a wake of confusion or resentment if not managed carefully.",
         "desc_bullets": [
             "**Clarity:** They speak in headlines, not paragraphs.",
             "**Speed:** They prefer quick decisions over long debates.",
             "**Conflict:** They are comfortable with direct conflict if it solves a problem."
         ],
-        "supervising": "To supervise a Director effectively, match their directness. Do not 'sandwich' feedback; give it to them straight. They respect competence and strength, so avoiding hard conversations will cause you to lose credibility.\n\nIt is also critical to help them build patience for process. Frame relationship-building not as 'fluff' but as a strategic tool for efficiency. Help them see that taking time to listen actually speeds up adoption of their ideas.",
+        "supervising": "To supervise a Director effectively, you must match their directness. Do not 'sandwich' feedback; give it to them straight. They respect competence and strength, so avoiding hard conversations will cause you to lose credibility with them.\n\nFrame relationship-building not as 'fluff' but as a strategic tool for efficiency. Help them see that taking time to listen actually speeds up adoption of their ideas.",
         "supervising_bullets": [
             "**Be Concise:** Get to the bottom line quickly.",
             "**Focus on Outcomes:** Explain 'what' needs to happen, let them figure out 'how'.",
@@ -299,6 +302,7 @@ FULL_COMM_PROFILES = {
     }
 }
 
+# 5b. MOTIVATION PROFILES (Expanded)
 FULL_MOTIV_PROFILES = {
     "Achievement": {
         "description": "Their primary motivator is **Achievement**. They thrive when they can see progress, check boxes, and win. They hate stagnation and ambiguity. They want to know they are doing a good job based on objective evidence, not just feelings.\n\nUnderstanding this means realizing they will work incredibly hard if they can see the scoreboard, but they will burn out if the goalposts keep moving or if success is never defined. They need to feel like they are winning.",
@@ -322,7 +326,7 @@ FULL_MOTIV_PROFILES = {
         "questions": ["How are you defining success today beyond just metrics?", "Are you celebrating the small wins?", "Who helped you win this week?"]
     },
     "Growth": {
-        "description": "Their primary motivator is **Growth**. They thrive when they are learning, stretching, and mastering new skills. They hate feeling stuck or bored. They view their role as a stepping stone to greater competence.\n\nThey are energized by feedback, provided it is constructive and helps them level up. If they feel they aren't growing, they will likely disengage or leave. They need to see a path forward.",
+        "description": "Their primary motivator is **Growth**. They thrive when they are learning, stretching, and mastering new skills. They hate feeling stuck or bored. They view their role as a stepping stone to greater competence and are constantly looking for the 'next level.'\n\nThey are energized by feedback, provided it is constructive and helps them level up. If they feel they aren't growing, they will likely disengage or leave. They need to see a path forward.",
         "desc_bullets": [
             "**Curiosity:** They always want to know 'why' and 'how'.",
             "**Future-Focused:** They are thinking about their next step.",
@@ -343,13 +347,13 @@ FULL_MOTIV_PROFILES = {
         "questions": ["What are you learning from this struggle?", "Are you expecting too much too soon from others?", "How are you feeding your own curiosity?"]
     },
     "Purpose": {
-        "description": "Their primary motivator is **Purpose**. They thrive when they feel their work aligns with deep values and makes a real difference for kids. They hate bureaucracy that feels meaningless or performative.\n\nThey will endure difficult conditions if they believe the 'Why' is noble, but they will rebel against policies that feel unjust. They need to feel they are part of a cause, not just a company.",
+        "description": "Their primary motivator is **Purpose**. They thrive when they feel their work aligns with deep values and makes a real difference for kids. They hate bureaucracy that feels meaningless or performative.\n\nThey will endure difficult conditions if they believe the 'Why' is noble, but they will rebel against policies that feel unjust. They need to feel they are part of a cause, not just a company. They are often the conscience of the team.",
         "desc_bullets": [
             "**Values-Driven:** Decisions must align with their moral compass.",
             "**Advocacy:** They fight for the underdog.",
             "**Meaning:** They need to see the human impact of their work."
         ],
-        "strategies": "Connect every rule to a 'Why.' Validate their passion for justice and advocacy. Share specific stories of their impact on youth. When assigning tasks, explain how this helps the youth or the mission.",
+        "strategies": "Connect every rule to a 'Why.' Validate their passion for justice and advocacy. Share specific stories of their impact on youth. When assigning tasks, explain how this helps the youth or the mission. Allow them space to voice ethical concerns without judgment.",
         "strategies_bullets": [
             "**The Why:** Always explain the mission behind the mandate.",
             "**Storytelling:** Share stories of life-change, not just data.",
@@ -364,7 +368,7 @@ FULL_MOTIV_PROFILES = {
         "questions": ["How does this boring task connect to the mission?", "Where are you feeling moral distress?", "How can you advocate effectively right now?"]
     },
     "Connection": {
-        "description": "Their primary motivator is **Connection**. They thrive when they feel part of a tight-knit team. They hate isolation and unresolved conflict. For them, the 'who' is more important than the 'what.'\n\nIf the team is fractured, their performance will suffer, no matter how clear the tasks are. They need to feel a sense of belonging and safety within the group to function at their best.",
+        "description": "Their primary motivator is **Connection**. They thrive when they feel part of a tight-knit team. They hate isolation and unresolved conflict. For them, the 'who' is more important than the 'what.'\n\nIf the team is fractured, their performance will suffer, no matter how clear the tasks are. They need to feel a sense of belonging and safety within the group to function at their best. They are often the barometer for team culture.",
         "desc_bullets": [
             "**Belonging:** Being part of the tribe is safety.",
             "**Harmony:** Conflict feels dangerous and draining.",
