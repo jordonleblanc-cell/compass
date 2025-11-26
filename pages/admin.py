@@ -155,7 +155,7 @@ MOTIV_TRAITS = ["Achievement", "Growth", "Purpose", "Connection"]
 
 FULL_COMM_PROFILES = {
     "Director": {
-        "description": "This staff member communicates primarily as a **Director**. They lead with clarity, structure, and urgency, often serving as the 'spine' of the team during chaos. They prioritize efficiency and competence, viewing problems as obstacles to be removed quickly rather than processed emotionally.\n\nWhen communication is flowing well, they are decisive and clear. However, they may inadvertently steamroll others or move faster than the team can follow, creating a wake of confusion or resentment if not managed carefully.",
+        "description": "This staff member communicates primarily as a **Director**. They lead with clarity, structure, and urgency. They prioritize efficiency and competence, often serving as the 'spine' of the team during chaos.\n\nThey view problems as obstacles to be removed quickly rather than processed emotionally. While this decisiveness is a huge asset in a crisis, it can sometimes steamroll slower processors or make the staff member appear unapproachable or impatient.",
         "desc_bullets": [
             "**Clarity:** They speak in headlines, not paragraphs.",
             "**Speed:** They prefer quick decisions over long debates.",
@@ -185,13 +185,13 @@ FULL_COMM_PROFILES = {
         "questions": ["Where are you avoiding a hard conversation?", "Are you prioritizing being liked over being effective?", "What boundaries do you need to set today?"]
     },
     "Facilitator": {
-        "description": "This staff member communicates primarily as a **Facilitator**. They lead by listening, building consensus, and ensuring fairness across the board. They are the 'calm bridge' who de-escalates tension and ensures all voices are heard before a decision is made.\n\nThey add immense value by preventing rash decisions and ensuring buy-in. However, they can struggle with 'analysis paralysis' or delay necessary actions because they are waiting for everyone to agree, which is not always possible.",
+        "description": "This staff member communicates primarily as a **Facilitator**. They lead by listening, building consensus, and ensuring fairness across the board. They are the 'calm bridge' who de-escalates tension and ensures all voices are heard before a decision is made.\n\nThey add immense value by preventing rash decisions and ensuring buy-in. However, they can struggle with 'analysis paralysis' or delay necessary actions because they are waiting for everyone to agree, which is not always possible in a crisis environment.",
         "desc_bullets": [
             "**Listening:** They ensure everyone has a say.",
             "**Consensus:** They prefer decisions that everyone can live with.",
             "**Process:** They value the 'how' as much as the 'what'."
         ],
-        "supervising": "Give them time to process. Do not demand immediate decisions on complex issues if possible. They need to weigh the options. Reinforce that their slowness is a strength (deliberation), but help them define a 'hard stop' for decision making.\n\nEncourage them to speak first in meetings to prevent them from simply harmonizing with the loudest voice in the room.",
+        "supervising": "Give them time to process. Do not demand immediate decisions on complex issues if possible. They need to weigh the options. Reinforce that their slowness is a strength (deliberation), but help them define a 'hard stop' for decision making.\n\nEncourage them to speak first in meetings to prevent them from simply harmonizing with the loudest voice in the room. Validate their desire for fairness while pushing them to be decisive.",
         "supervising_bullets": [
             "**Advance Notice:** Give them time to think before a meeting.",
             "**Deadlines:** Set clear 'decision dates' to prevent endless debate.",
@@ -218,7 +218,7 @@ FULL_COMM_PROFILES = {
 
 FULL_MOTIV_PROFILES = {
     "Achievement": {
-        "description": "Their primary motivator is **Achievement**. They thrive when they can see progress, check boxes, and win. They hate stagnation and ambiguity. They want to know they are doing a good job based on objective evidence, not just feelings.\n\nUnderstanding this means realizing they will work incredibly hard if they can see the scoreboard, but they will burn out if the goalposts keep moving or if success is never defined.",
+        "description": "Their primary motivator is **Achievement**. They thrive when they can see progress, check boxes, and win. They hate stagnation and ambiguity. They want to know they are doing a good job based on objective evidence, not just feelings.\n\nUnderstanding this means realizing they will work incredibly hard if they can see the scoreboard, but they will burn out if the goalposts keep moving or if success is never defined. They need to feel like they are winning.",
         "desc_bullets": [
             "**Scoreboard:** They need to know if they are winning or losing.",
             "**Completion:** They get energy from finishing tasks.",
@@ -239,7 +239,7 @@ FULL_MOTIV_PROFILES = {
         "questions": ["How are you defining success today beyond just metrics?", "Are you celebrating the small wins?", "Who helped you win this week?"]
     },
     "Growth": {
-        "description": "Their primary motivator is **Growth**. They thrive when they are learning, stretching, and mastering new skills. They hate feeling stuck or bored. They view their role as a stepping stone to greater competence.\n\nThey are energized by feedback, provided it is constructive and helps them level up. If they feel they aren't growing, they will likely disengage or leave.",
+        "description": "Their primary motivator is **Growth**. They thrive when they are learning, stretching, and mastering new skills. They hate feeling stuck or bored. They view their role as a stepping stone to greater competence.\n\nThey are energized by feedback, provided it is constructive and helps them level up. If they feel they aren't growing, they will likely disengage or leave. They need to see a path forward.",
         "desc_bullets": [
             "**Curiosity:** They always want to know 'why' and 'how'.",
             "**Future-Focused:** They are thinking about their next step.",
@@ -272,7 +272,7 @@ FULL_MOTIV_PROFILES = {
             "**Storytelling:** Share stories of life-change, not just data.",
             "**Ethics:** Allow space for them to voice moral concerns."
         ],
-        "celebrate": "Celebrate their advocacy for youth, their integrity, ethical decision making, and specific 'mission moments' where they changed a life.",
+        "celebrate": "Celebrate their advocacy for youth, their integrity, ethical decision making, and specific 'mission moments' where they changed a life. Validate their heart.",
         "celebrate_bullets": [
             "**Advocacy:** 'Thank you for speaking up for that youth.'",
             "**Integrity:** 'I admire how you stood by your values.'",
@@ -307,45 +307,43 @@ FULL_MOTIV_PROFILES = {
 def generate_profile_content(comm, motiv):
     
     # This dictionary holds the specific text for the 16 combinations
-    # We define a "smart generator" structure for brevity in code, but rich in output
-    
     combo_key = f"{comm}-{motiv}"
     
     # Logic to generate "Thriving" descriptions
-    thriving_desc = f"When this staff member is thriving, they seamlessly blend the strengths of the {comm} style with the drive of {motiv}. They are operating in their zone of genius, where their communication style feels authentic and their motivational needs are being fully met by the environment."
+    thriving_desc = f"When this staff member is thriving, they seamlessly blend the strengths of the {comm} style with the drive of {motiv}. They are operating in their zone of genius, where their communication style feels authentic and their motivational needs are being fully met by the environment. They feel both competent and connected, leading to high performance and sustainability."
     
     # Logic to generate "Struggling" descriptions
-    struggling_desc = f"When struggling, the shadow sides of the {comm} and {motiv} traits collide. They may feel that their need for {motiv} is being blocked, causing them to double down on {comm} behaviors in unhealthy ways (e.g., becoming rigid, withdrawing, or over-functioning)."
+    struggling_desc = f"When struggling, the shadow sides of the {comm} and {motiv} traits collide. They may feel that their need for {motiv} is being blocked, causing them to double down on {comm} behaviors in unhealthy ways (e.g., becoming rigid, withdrawing, or over-functioning). They likely feel misunderstood or undervalued."
 
     # Specific Bullets for Integrated Profiles (Mix of Comm + Motiv traits)
     thriving_bullets = []
     struggling_bullets = []
     
     if comm == "Director":
-        thriving_bullets.append("**Decisive Action:** They move the team forward with clarity and speed.")
-        struggling_bullets.append("**Steamrolling:** They may bypass others' input to get results quickly.")
+        thriving_bullets.append("**Decisive Action:** You will see them moving the team forward with clarity and speed, removing obstacles quickly.")
+        struggling_bullets.append("**Steamrolling:** You will see them bypassing others' input to get results quickly, leaving staff feeling unheard.")
     elif comm == "Encourager":
-        thriving_bullets.append("**High Morale:** They keep the team's energy and hope alive.")
-        struggling_bullets.append("**Conflict Avoidance:** They may hide hard truths to keep the peace.")
+        thriving_bullets.append("**High Morale:** You will see them keeping the team's energy and hope alive, even during difficult shifts.")
+        struggling_bullets.append("**Conflict Avoidance:** You will see them hiding hard truths or delaying feedback to keep the peace.")
     elif comm == "Facilitator":
-        thriving_bullets.append("**Inclusive Decisions:** They ensure everyone is heard and on board.")
-        struggling_bullets.append("**Indecision:** They may stall out waiting for total consensus.")
+        thriving_bullets.append("**Inclusive Decisions:** You will see them ensuring everyone is heard and on board before moving forward.")
+        struggling_bullets.append("**Indecision:** You will see them stalling out, waiting for total consensus that may never come.")
     elif comm == "Tracker":
-        thriving_bullets.append("**Reliable Systems:** They create safety through order and consistency.")
-        struggling_bullets.append("**Rigidity:** They may quote the rulebook instead of solving the human problem.")
+        thriving_bullets.append("**Reliable Systems:** You will see them creating safety through order, consistency, and impeccable follow-through.")
+        struggling_bullets.append("**Rigidity:** You will see them quoting the rulebook instead of solving the human problem in front of them.")
         
     if motiv == "Achievement":
-        thriving_bullets.append("**Goal Crushing:** They consistently hit targets and improve metrics.")
-        struggling_bullets.append("**Burnout:** They push themselves and others past reasonable limits.")
+        thriving_bullets.append("**Goal Crushing:** You will see them consistently hitting targets and improving metrics week over week.")
+        struggling_bullets.append("**Burnout:** You will see them pushing themselves and others past reasonable limits to hit a number.")
     elif motiv == "Growth":
-        thriving_bullets.append("**Continuous Improvement:** They are constantly learning and upgrading skills.")
-        struggling_bullets.append("**Boredom:** They check out if the work feels repetitive or stagnant.")
+        thriving_bullets.append("**Continuous Improvement:** You will see them constantly learning, upgrading skills, and asking 'why'.")
+        struggling_bullets.append("**Boredom:** You will see them checking out or becoming cynical if the work feels repetitive or stagnant.")
     elif motiv == "Purpose":
-        thriving_bullets.append("**Mission Alignment:** They act as a moral compass for the team.")
-        struggling_bullets.append("**Moral Outrage:** They become resentful if asked to do 'meaningless' tasks.")
+        thriving_bullets.append("**Mission Alignment:** You will see them acting as a moral compass, reminding the team why the work matters.")
+        struggling_bullets.append("**Moral Outrage:** You will see them becoming resentful or defiant if asked to do 'meaningless' tasks.")
     elif motiv == "Connection":
-        thriving_bullets.append("**Team Cohesion:** They foster a deep sense of belonging.")
-        struggling_bullets.append("**Personalization:** They take feedback or team friction as a personal attack.")
+        thriving_bullets.append("**Team Cohesion:** You will see them fostering a deep sense of belonging and mutual support on the unit.")
+        struggling_bullets.append("**Personalization:** You will see them taking general feedback or team friction as a personal attack.")
 
     # Add a 3rd unique bullet based on the combo
     thriving_bullets.append(f"**{comm}-{motiv} Synergy:** They use {comm} skills to satisfy their {motiv} drive.")
@@ -370,6 +368,26 @@ def generate_profile_content(comm, motiv):
         "Tracker-Purpose": "The 'Guardian'. Uses rules to protect the mission. Safety is their love language.",
         "Tracker-Connection": "The 'Reliable Rock'. Shows care through consistency. Builds trust by being steady."
     }
+    
+    # Integrated Questions Lookup
+    integrated_qs_map = {
+         "Director-Achievement": ["How are you defining success today?", "What is one win you can celebrate right now?", "Are you driving the team too hard?", "What is the cost of speed right now?"],
+         "Director-Growth": ["What is one way you can slow down for others?", "How are you measuring your own growth beyond just speed?", "Are you leaving the team behind?", "Is this change necessary right now?"],
+         "Director-Purpose": ["Where do you feel the system is failing your values?", "How can you advocate without burning bridges?", "Is this a hill worth dying on?", "How does flexibility serve the mission here?"],
+         "Director-Connection": ["Are you avoiding this conversation to be kind, or to be safe?", "How can you be direct and caring at the same time?", "Are you protecting them from growth?", "How is the team reacting to your directness?"],
+         "Encourager-Achievement": ["How can you celebrate effort, not just the result?", "Are you taking their failure personally?", "Is the team winning, or just happy?", "What helps you stay motivated when results are slow?"],
+         "Encourager-Growth": ["Who are you working harder than right now?", "How can you give feedback that helps them grow?", "Are you enabling or empowering?", "What is one hard truth they need to hear?"],
+         "Encourager-Purpose": ["What emotional weight are you carrying that isn't yours?", "How does holding this boundary actually help the youth?", "Are you taking care of yourself?", "Where is your empathy causing burnout?"],
+         "Encourager-Connection": ["Are you prioritizing peace or safety?", "How can you lean into conflict to build stronger connection?", "What is the cost of avoiding this issue?", "Who is being hurt by the lack of boundaries?"],
+         "Facilitator-Achievement": ["How can you be clearer about what you need?", "Are you apologizing for having standards?", "What needs to move faster?", "Where are you holding back your authority?"],
+         "Facilitator-Growth": ["Where are you hesitating to lead?", "How can you be kind and firm at the same time?", "Are you waiting too long to act?", "What is the risk of doing nothing?"],
+         "Facilitator-Purpose": ["What moral tension are you holding right now?", "How can you speak up for your values effectively?", "Are you staying neutral when you should take a stand?", "How does your silence impact the team?"],
+         "Facilitator-Connection": ["What boundaries do you need to set to protect your energy?", "Are you listening too much and leading too little?", "Who is taking care of you?", "Is your silence creating confusion?"],
+         "Tracker-Achievement": ["How can you measure effort, not just outcome?", "Are you valuing the data more than the person?", "Where is flexibility needed right now?", "How can you support the person, not just the process?"],
+         "Tracker-Growth": ["Are you focusing on the system or the person?", "What is 'good enough' for today?", "Are you correcting or coaching?", "How can you make it safe to make mistakes?"],
+         "Tracker-Purpose": ["How can you protect the mission without being rigid?", "Are you using rules to manage your anxiety?", "Is this rule serving the child right now?", "How can you explain the 'why' behind the rule?"],
+         "Tracker-Connection": ["How can you show care in a way they understand?", "Are you doing too much for others?", "Do they know you care?", "Where do you need help carrying the load?"]
+    }
 
     # 10 Coaching Questions Assembly
     questions = []
@@ -378,12 +396,7 @@ def generate_profile_content(comm, motiv):
     # 3 from Motivation
     if motiv in FULL_MOTIV_PROFILES: questions += FULL_MOTIV_PROFILES[motiv]["questions"]
     # 4 Integrated Questions
-    questions += [
-        f"How is your {comm} style helping you achieve your {motiv} goals right now?",
-        f"Is your need for {motiv} causing you to over-use your {comm} strengths?",
-        "What is the hardest thing you have to do this week, and what support do you need?",
-        "Where are you feeling the most pressure between what you want and what the job needs?"
-    ]
+    questions += integrated_qs_map.get(combo_key, ["What do you need right now?", "Where are you stuck?", "How can I help?", "What is the goal?"])
 
     return {
         "s1": FULL_COMM_PROFILES[comm]["description"],
@@ -396,13 +409,13 @@ def generate_profile_content(comm, motiv):
         "s4_b": FULL_MOTIV_PROFILES[motiv]["strategies_bullets"],
         "s5": f"This staff member leads with a **{comm}** style driven by **{motiv}**. {summaries.get(combo_key, '')}\n\nThey bring a unique strength to the team: the ability to communicate via {comm} channels to achieve {motiv}-aligned outcomes. However, they may struggle when the environment blocks their drive or misinterprets their style.",
         "s6": f"Support them by honoring their **{comm}** need for communication style and their **{motiv}** need for reward. Ensure they feel seen for both their impact and their intent.\n\nSpecifically, give them opportunities to use their natural style to achieve things that matter to them.",
-        "s6_b": [f"Honor {comm} strengths", f"Feed {motiv} needs", "Provide clear feedback"],
+        "s6_b": [f"**Honor:** Validate their {comm} strengths publicly.", f"**Feed:** Ensure their {motiv} needs are met weekly.", "**Clear Feedback:** Be specific about what they are doing right."],
         "s7": thriving_desc,
         "s7_b": thriving_bullets,
         "s8": struggling_desc,
         "s8_b": struggling_bullets,
         "s9": f"When this staff member is struggling, address their **{motiv}** need first. If they are a {comm}, they are likely stressed by a loss of control or connection.\n\nRe-align expectations and help them regulate by returning to their core strengths.",
-        "s9_b": ["Address stress root causes", "Re-align goals", "Coach on communication style"],
+        "s9_b": ["**Address Root Cause:** Look for the blocked motivation.", "**Re-align Goals:** Make sure they see a path to success.", "**Coach on Style:** Help them adjust their communication volume."],
         "s10": FULL_MOTIV_PROFILES[motiv]["celebrate"],
         "s10_b": FULL_MOTIV_PROFILES[motiv]["celebrate_bullets"],
         "coaching": questions
@@ -474,21 +487,21 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf.ln(4)
 
     # 12. Advancement
-    adv_text = "Help them master the operational side. Challenge them to see clarity and accountability as kindness."
-    adv_bullets = ["Master operations", "See accountability as kindness"]
+    adv_text = "Help them master the operational side. Challenge them to see clarity and accountability as kindness.\n\nTo advance, they must move beyond their natural strengths and develop their blind spots. This requires intentional coaching and 'safe failure' opportunities."
+    adv_bullets = ["**Master Operations:** Ensure they can handle the boring parts of the job.", "**See Accountability as Kindness:** Reframe tough conversations as care.", "**Expand Range:** Practice communication styles that aren't natural to them."]
     
     if p_comm == "Director": 
-        adv_text = "Shift from doing to enabling. Challenge them to sit on their hands and let the team fail safely to learn. They need to move from being the hero to being the guide."
-        adv_bullets = ["Delegate effectively", "Allow safe failure", "Focus on strategy vs tactics"]
+        adv_text = "Shift from doing to enabling. Challenge them to sit on their hands and let the team fail safely to learn. They need to move from being the hero to being the guide.\n\nTheir natural instinct is to take over when things get slow or messy. Advancement requires them to tolerate the messiness of other people's learning curves."
+        adv_bullets = ["**Delegate Effectively:** Give away tasks they are good at.", "**Allow Safe Failure:** Let the team struggle so they can learn.", "**Focus on Strategy:** Move from the 'how' to the 'why'."]
     elif p_comm == "Encourager": 
-        adv_text = "Master structure and operations. Challenge them to see that holding a boundary is a form of kindness. They need to learn that being 'nice' isn't always being 'kind'."
-        adv_bullets = ["Master structure", "Hold boundaries", "Separate niceness from kindness"]
+        adv_text = "Master structure and operations. Challenge them to see that holding a boundary is a form of kindness. They need to learn that being 'nice' isn't always being 'kind'.\n\nThey naturally lean into relationships. Advancement requires them to lean into the structural and operational pillars of leadership without losing their heart."
+        adv_bullets = ["**Master Structure:** Become proficient in audits and schedules.", "**Hold Boundaries:** Practice saying 'no' without apologizing.", "**Separate Niceness from Kindness:** Delivering hard news is a leadership duty."]
     elif p_comm == "Facilitator": 
-        adv_text = "Develop executive presence. Challenge them to make the 51% decision when consensus isn't possible. They need to get comfortable with not everyone agreeing."
-        adv_bullets = ["Executive presence", "Decisive action", "Limit consensus-seeking"]
+        adv_text = "Develop executive presence. Challenge them to make the 51% decision when consensus isn't possible. They need to get comfortable with not everyone agreeing.\n\nThey naturally seek harmony and input. Advancement requires them to become comfortable with the loneliness of making the final call when the team is divided."
+        adv_bullets = ["**Executive Presence:** Speak first in meetings sometimes.", "**Decisive Action:** Make calls without 100% consensus.", "**Limit Consensus-Seeking:** Know when to stop voting and start doing."]
     elif p_comm == "Tracker": 
-        adv_text = "Develop intuition and flexibility. Challenge them to prioritize relationships over rigid compliance. They need to learn to read the room, not just the rulebook."
-        adv_bullets = ["Develop intuition", "Prioritize relationships", "Flexibility"]
+        adv_text = "Develop intuition and flexibility. Challenge them to prioritize relationships over rigid compliance. They need to learn to read the room, not just the rulebook.\n\nThey naturally lean into safety and rules. Advancement requires them to understand the 'spirit of the law' and to build relational capital that allows them to lead people, not just processes."
+        adv_bullets = ["**Develop Intuition:** Trust their gut in gray areas.", "**Prioritize Relationships:** Spend time connecting without an agenda.", "**Flexibility:** Know which glass balls cannot drop and which rubber balls can bounce."]
     
     add_section("12. Helping Them Prepare for Advancement", adv_text, adv_bullets)
 
@@ -535,20 +548,21 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.markdown("<br>", unsafe_allow_html=True)
     
     # 12. Advancement logic for display
-    adv_text = "Help them master the operational side."
-    adv_bullets = ["Master operations"]
+    adv_text = "Help them master the operational side. Challenge them to see clarity and accountability as kindness.\n\nTo advance, they must move beyond their natural strengths and develop their blind spots. This requires intentional coaching and 'safe failure' opportunities."
+    adv_bullets = ["**Master Operations:** Ensure they can handle the boring parts of the job.", "**See Accountability as Kindness:** Reframe tough conversations as care.", "**Expand Range:** Practice communication styles that aren't natural to them."]
+    
     if p_comm == "Director": 
-        adv_text = "Shift from doing to enabling. Challenge them to sit on their hands and let the team fail safely to learn. They need to move from being the hero to being the guide."
-        adv_bullets = ["Delegate effectively", "Allow safe failure", "Focus on strategy vs tactics"]
+        adv_text = "Shift from doing to enabling. Challenge them to sit on their hands and let the team fail safely to learn. They need to move from being the hero to being the guide.\n\nTheir natural instinct is to take over when things get slow or messy. Advancement requires them to tolerate the messiness of other people's learning curves."
+        adv_bullets = ["**Delegate Effectively:** Give away tasks they are good at.", "**Allow Safe Failure:** Let the team struggle so they can learn.", "**Focus on Strategy:** Move from the 'how' to the 'why'."]
     elif p_comm == "Encourager": 
-        adv_text = "Master structure and operations. Challenge them to see that holding a boundary is a form of kindness. They need to learn that being 'nice' isn't always being 'kind'."
-        adv_bullets = ["Master structure", "Hold boundaries", "Separate niceness from kindness"]
+        adv_text = "Master structure and operations. Challenge them to see that holding a boundary is a form of kindness. They need to learn that being 'nice' isn't always being 'kind'.\n\nThey naturally lean into relationships. Advancement requires them to lean into the structural and operational pillars of leadership without losing their heart."
+        adv_bullets = ["**Master Structure:** Become proficient in audits and schedules.", "**Hold Boundaries:** Practice saying 'no' without apologizing.", "**Separate Niceness from Kindness:** Delivering hard news is a leadership duty."]
     elif p_comm == "Facilitator": 
-        adv_text = "Develop executive presence. Challenge them to make the 51% decision when consensus isn't possible. They need to get comfortable with not everyone agreeing."
-        adv_bullets = ["Executive presence", "Decisive action", "Limit consensus-seeking"]
+        adv_text = "Develop executive presence. Challenge them to make the 51% decision when consensus isn't possible. They need to get comfortable with not everyone agreeing.\n\nThey naturally seek harmony and input. Advancement requires them to become comfortable with the loneliness of making the final call when the team is divided."
+        adv_bullets = ["**Executive Presence:** Speak first in meetings sometimes.", "**Decisive Action:** Make calls without 100% consensus.", "**Limit Consensus-Seeking:** Know when to stop voting and start doing."]
     elif p_comm == "Tracker": 
-        adv_text = "Develop intuition and flexibility. Challenge them to prioritize relationships over rigid compliance. They need to learn to read the room, not just the rulebook."
-        adv_bullets = ["Develop intuition", "Prioritize relationships", "Flexibility"]
+        adv_text = "Develop intuition and flexibility. Challenge them to prioritize relationships over rigid compliance. They need to learn to read the room, not just the rulebook.\n\nThey naturally lean into safety and rules. Advancement requires them to understand the 'spirit of the law' and to build relational capital that allows them to lead people, not just processes."
+        adv_bullets = ["**Develop Intuition:** Trust their gut in gray areas.", "**Prioritize Relationships:** Spend time connecting without an agenda.", "**Flexibility:** Know which glass balls cannot drop and which rubber balls can bounce."]
 
     show_section("12. Helping Them Prepare for Advancement", adv_text, adv_bullets)
 
