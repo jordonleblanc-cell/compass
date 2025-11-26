@@ -124,7 +124,6 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 def check_password():
-    # Looks for password in secrets.toml, defaults to "elmcrest2025" if not found
     PASSWORD = st.secrets.get("ADMIN_PASSWORD", "elmcrest2025") 
     if st.session_state.password_input == PASSWORD:
         st.session_state.authenticated = True
@@ -133,7 +132,6 @@ def check_password():
         st.error("Incorrect password")
 
 if not st.session_state.authenticated:
-    # Back Button for Login Screen
     st.markdown("""
         <div style="position: absolute; top: 20px; left: 20px;">
             <a href="/" target="_self" class="back-link">← Back</a>
@@ -155,446 +153,252 @@ if not st.session_state.authenticated:
 COMM_TRAITS = ["Director", "Encourager", "Facilitator", "Tracker"]
 MOTIV_TRAITS = ["Achievement", "Growth", "Purpose", "Connection"]
 
+# 5a. COMMUNICATION PROFILES (Expanded)
 FULL_COMM_PROFILES = {
     "Director": {
-        "description": "This staff member communicates primarily as a Director. They lead with clarity, structure, and urgency. They influence the emotional tone of the unit by providing a strong 'spine' during chaos. They are decisive and often view problems as things to be solved quickly rather than processed emotionally.",
-        "supervising_tips": "Match their directness. Do not 'sandwich' feedback; give it to them straight. Reinforce their strength in crisis while helping them build patience for process. Frame relationship-building not as 'fluff' but as a strategy for efficiency."
+        "description": "This staff member communicates primarily as a **Director**. They lead with clarity, structure, and urgency, often serving as the 'spine' of the team during chaos. They prioritize efficiency and competence, viewing problems as obstacles to be removed quickly rather than processed emotionally.\n\nWhen communication is flowing well, they are decisive and clear. However, they may inadvertently steamroll others or move faster than the team can follow, creating a wake of confusion or resentment if not managed carefully.",
+        "desc_bullets": ["Leads with 'the plan' rather than 'the feeling'", "High tolerance for conflict if it solves the problem", "Values brevity and bottom-line results", "Can appear impatient with long processing times"],
+        "supervising": "To supervise them effectively, you must match their directness. Do not 'sandwich' feedback; give it to them straight. They respect competence and strength, so avoiding hard conversations will cause you to lose credibility with them.\n\nFrame relationship-building not as 'fluff' but as a strategic tool for efficiency. Help them see that taking time to listen actually speeds up adoption of their ideas.",
+        "supervising_bullets": ["Be concise and clear in your directions", "Focus on outcomes rather than methods", "Respect their autonomy and need for speed", "Don't micromanage unless safety is at risk"],
+        "questions": ["Where are you moving too fast for the team?", "Who haven't you heard from on this issue?", "How does your tone land when you are stressed?"]
     },
     "Encourager": {
-        "description": "This staff member communicates primarily as an Encourager. They lead with empathy, warmth, and emotional presence. They act as the 'glue' of the team, ensuring people feel seen and safe. They are often the first to notice when morale is low.",
-        "supervising_tips": "Start every interaction with connection before content. Validate their intent ('I know you care deeply') before correcting impact. Help them separate their personal worth from the team's happiness."
+        "description": "This staff member communicates primarily as an **Encourager**. They lead with empathy, warmth, and emotional presence, acting as the 'glue' that holds the team together during stress. They are highly attuned to the emotional climate of the unit and often serve as the first line of defense against low morale.\n\nThey prioritize relationships above all else, which makes them excellent at de-escalation but can lead to conflict avoidance. They may struggle to deliver hard news or hold firm boundaries if they fear it will damage their connection with others.",
+        "desc_bullets": ["High emotional intelligence", "Values harmony and connection", "Avoids conflict to keep the peace", "Often serves as the team's confidant"],
+        "supervising": "Start every interaction with connection before content. If you jump straight to business, they may feel you are cold or angry. Validate their positive intent ('I know you care deeply') before correcting the impact of their behavior.\n\nHelp them separate their personal worth from the team's happiness. They need to know they are valued even when they make mistakes or when the team is unhappy.",
+        "supervising_bullets": ["Connect personally before correcting professionally", "Validate their feelings and intent", "Provide reassurance during hard feedback", "Focus on 'we' language to build partnership"],
+        "questions": ["Where are you avoiding a hard conversation?", "Are you prioritizing being liked over being effective?", "What boundaries do you need to set today?"]
     },
     "Facilitator": {
-        "description": "This staff member communicates primarily as a Facilitator. They lead by listening, building consensus, and ensuring fairness. They are the 'calm bridge' who de-escalates tension and ensures all voices are heard before a decision is made.",
-        "supervising_tips": "Give them time to process. Do not demand immediate decisions on complex issues. Reinforce that their slowness is a strength (deliberation), but help them define a 'hard stop' for decision making."
+        "description": "This staff member communicates primarily as a **Facilitator**. They lead by listening, building consensus, and ensuring fairness across the board. They are the 'calm bridge' who de-escalates tension and ensures all voices are heard before a decision is made.\n\nThey add immense value by preventing rash decisions and ensuring buy-in. However, they can struggle with 'analysis paralysis' or delay necessary actions because they are waiting for everyone to agree, which is not always possible.",
+        "desc_bullets": ["Calm, steady presence", "Excellent listener", "Values fairness and process", "Seeks consensus before acting"],
+        "supervising": "Give them time to process. Do not demand immediate decisions on complex issues if possible. They need to weigh the options. Reinforce that their slowness is a strength (deliberation), but help them define a 'hard stop' for decision making.\n\nEncourage them to speak first in meetings to prevent them from simply harmonizing with the loudest voice in the room.",
+        "supervising_bullets": ["Give advance notice for changes", "Allow processing time before demanding answers", "Ask for their opinion explicitly", "Create a safe space for dissent"],
+        "questions": ["Where do you need to make a 51% decision?", "Are you waiting for consensus that isn't coming?", "What is the cost of delaying this decision?"]
     },
     "Tracker": {
-        "description": "This staff member communicates primarily as a Tracker. They lead with details, accuracy, and safety. They find comfort in rules and consistency. They protect the agency and youth by noticing the small risks that others miss.",
-        "supervising_tips": "Provide clear, written expectations. Do not be vague. Honor their need for 'the plan.' When plans change, explain the 'why' clearly so they don't feel the change is arbitrary or unsafe."
+        "description": "This staff member communicates primarily as a **Tracker**. They lead with details, accuracy, and safety. They find comfort in rules and consistency, protecting the agency and youth by noticing the small risks that others miss. They are often the 'historian' of the unit.\n\nWhile they provide critical structure, they can become rigid or hyper-critical when stressed. They may view rule-bending as a moral failing rather than a situational necessity, which can create friction with more flexible staff.",
+        "desc_bullets": ["Detail-oriented and precise", "Values structure and rules", "Risk-averse and safety-conscious", "Critical thinker who spots errors"],
+        "supervising": "Provide clear, written expectations. Do not be vague. Honor their need for 'the plan.' When plans change, explain the 'why' clearly so they don't feel the change is arbitrary or unsafe.\n\nThey respect competence and consistency. If you are disorganized, you may lose their trust. Help them distinguish between 'safety-critical' rules and 'preferences' where they can flex.",
+        "supervising_bullets": ["Provide written details and instructions", "Be consistent in your own leadership", "Explain the 'why' behind changes", "Respect the rules they are trying to uphold"],
+        "questions": ["Are you focusing on the rule or the relationship?", "What is 'good enough' for right now?", "How can you show flexibility without losing safety?"]
     }
 }
 
+# 5b. MOTIVATION PROFILES (Expanded)
 FULL_MOTIV_PROFILES = {
     "Achievement": {
-        "description": "Their primary motivator is Achievement. They thrive when they can see progress, check boxes, and win. They hate stagnation and ambiguity. Understanding this means realizing they will work incredibly hard if they can see the scoreboard, but they will burn out if the goalposts keep moving.",
-        "strategies": "Set clear, measurable goals. Use visual trackers or dashboards. Celebrate 'wins' explicitly and publicly. Give them projects where they can own the result from start to finish.",
-        "celebrate": "Concrete outcomes, finished projects, metrics improved, reliability."
+        "description": "Their primary motivator is **Achievement**. They thrive when they can see progress, check boxes, and win. They hate stagnation and ambiguity. They want to know they are doing a good job based on objective evidence, not just feelings.\n\nUnderstanding this means realizing they will work incredibly hard if they can see the scoreboard, but they will burn out if the goalposts keep moving or if success is never defined.",
+        "desc_bullets": ["Driven by clear goals", "Loves checking boxes", "Competitor mindset", "Results-oriented"],
+        "strategies": "Set clear, measurable goals. Use visual trackers or dashboards. Celebrate 'wins' explicitly and publicly. Give them projects where they can own the result from start to finish. Avoid vague feedback like 'good job'; instead say 'You hit X target, which improved Y.'",
+        "strategies_bullets": ["Use visual trackers for progress", "Define 'Done' clearly", "Celebrate wins publicly", "Give autonomy over the 'how'"],
+        "celebrate": "Celebrate concrete outcomes, finished projects, improved metrics, and their reliability in getting things done.",
+        "celebrate_bullets": ["Metrics improved", "Deadlines met", "Projects completed", "Reliability under pressure"],
+        "questions": ["How are you defining success today beyond just metrics?", "Are you celebrating the small wins?", "Who helped you win this week?"]
     },
     "Growth": {
-        "description": "Their primary motivator is Growth. They thrive when they are learning, stretching, and mastering new skills. They hate feeling stuck or bored. They view their role as a stepping stone to greater competence.",
-        "strategies": "Feed their curiosity. Assign them 'stretch' projects that require new skills. Frame feedback as 'coaching' for their future career. Connect mundane tasks to their long-term professional development.",
-        "celebrate": "New skills learned, adaptability, taking on new challenges, personal development."
+        "description": "Their primary motivator is **Growth**. They thrive when they are learning, stretching, and mastering new skills. They hate feeling stuck or bored. They view their role as a stepping stone to greater competence and are constantly looking for the 'next level.'\n\nThey are energized by feedback, provided it is constructive and helps them level up. If they feel they aren't growing, they will likely disengage or leave.",
+        "desc_bullets": ["Learner mindset", "Seeks challenges", "Future-focused", "Curious and inquisitive"],
+        "strategies": "Feed their curiosity. Assign them 'stretch' projects that require new skills. Frame feedback as 'coaching' for their future career. Connect mundane tasks to their long-term professional development. Ask them: 'What do you want to learn next?'",
+        "strategies_bullets": ["Assign stretch projects", "Provide mentorship opportunities", "Discuss career pathing regularly", "Offer training and development"],
+        "celebrate": "Celebrate new skills learned, adaptability, taking on new challenges, and their personal development trajectory.",
+        "celebrate_bullets": ["Skills mastered", "Adaptability in crisis", "Initiative to learn", "Personal growth milestones"],
+        "questions": ["What are you learning from this struggle?", "Are you expecting too much too soon from others?", "How are you feeding your own curiosity?"]
     },
     "Purpose": {
-        "description": "Their primary motivator is Purpose. They thrive when they feel their work aligns with deep values and makes a real difference for kids. They hate bureaucracy that feels meaningless.",
-        "strategies": "Connect every rule to a 'Why'. Validate their passion for justice and advocacy. Share specific stories of their impact on youth. Allow them space to voice ethical concerns.",
-        "celebrate": "Advocacy for youth, integrity, ethical decision making, mission moments."
+        "description": "Their primary motivator is **Purpose**. They thrive when they feel their work aligns with deep values and makes a real difference for kids. They hate bureaucracy that feels meaningless or performative.\n\nThey will endure difficult conditions if they believe the 'Why' is noble, but they will rebel against policies that feel unjust. They need to feel they are part of a cause, not just a company.",
+        "desc_bullets": ["Values-driven", "Mission-focused", "Advocate for the vulnerable", "Ethical and principled"],
+        "strategies": "Connect every rule to a 'Why.' Validate their passion for justice and advocacy. Share specific stories of their impact on youth. When assigning tasks, explain how this helps the youth or the mission. Allow them space to voice ethical concerns without judgment.",
+        "strategies_bullets": ["Explain the 'Why' behind tasks", "Share impact stories", "Validate their advocacy", "Connect daily work to mission"],
+        "celebrate": "Celebrate their advocacy for youth, their integrity, ethical decision making, and specific 'mission moments' where they changed a life.",
+        "celebrate_bullets": ["Advocacy wins", "Ethical choices", "Client impact stories", "Integrity in difficult moments"],
+        "questions": ["How does this boring task connect to the mission?", "Where are you feeling moral distress?", "How can you advocate effectively right now?"]
     },
     "Connection": {
-        "description": "Their primary motivator is Connection (Relationships). They thrive when they feel part of a tight-knit team. They hate isolation and unresolved conflict. For them, the 'who' is more important than the 'what.'",
-        "strategies": "Prioritize face time. Check in on them as a person, not just an employee. Build team rituals (food, shout-outs). Ensure they don't work in a silo.",
-        "celebrate": "Team cohesion, supporting peers, morale building, conflict resolution."
+        "description": "Their primary motivator is **Connection**. They thrive when they feel part of a tight-knit team. They hate isolation and unresolved conflict. For them, the 'who' is more important than the 'what.'\n\nIf the team is fractured, their performance will suffer, no matter how clear the tasks are. They need to feel a sense of belonging and safety within the group to function at their best.",
+        "desc_bullets": ["Team-oriented", "Relational", "Values belonging", "Harmony-seeker"],
+        "strategies": "Prioritize face time. Check in on them as a person, not just an employee. Build team rituals (food, shout-outs). Ensure they don't work in a silo. When giving feedback, reassure them of their belonging in the team.",
+        "strategies_bullets": ["Personal check-ins", "Team rituals and bonding", "Face-to-face time", "Reassurance of belonging"],
+        "celebrate": "Celebrate team cohesion, their support of peers, morale building, and their role in conflict resolution.",
+        "celebrate_bullets": ["Team building efforts", "Supporting peers", "Positive attitude", "Conflict repair"],
+        "questions": ["Who do you need to check in with today?", "Are you taking this team conflict personally?", "How can you build belonging in this meeting?"]
     }
 }
 
-# FULL PROFILES FOR ALL 16 COMBINATIONS
-FULL_INTEGRATED_PROFILES = {
-    "Director-Achievement": {
-        "summary": "Results-focused and decisive. Wants to see tangible improvements in safety and outcomes. Takes charge to get there. They are excellent at operationalizing goals.",
-        "support": "Partner to define realistic pacing. Set process goals (we did the steps) not just outcome goals (the kid behaved).",
-        "thriving": "- Sets clear goals\n- Helps staff understand success\n- Moves metrics in the right direction\n- High follow-through",
-        "struggling": "- Treats trauma behavior as a problem to 'solve' quickly\n- Micromanages peers\n- Judges self harshly when metrics dip",
-        "interventions": "Contextualize metrics. Celebrate the 'small wins' so they don't burn out chasing perfection.",
-        "coaching": ["How are you defining success today?", "What is one win you can celebrate right now?"]
-    },
-    "Director-Growth": {
-        "summary": "Leads with decisive action and is hungry to improve. They want the unit to run well and want to keep leveling up their own skills. They are the 'General' who is always studying battle strategy.",
-        "support": "Ask for a small number of focused projects rather than trying to fix everything at once. Co-design development goals.",
-        "thriving": "- Quick to turn learning into practice\n- Coaches peers effectively\n- Refines decisions based on new data",
-        "struggling": "- Moves faster than the team can handle\n- Becomes impatient with 'slow' learners\n- Defaults to control in crisis",
-        "interventions": "Slow down. Focus on one change at a time. Ask: 'Who is left behind by this speed?'",
-        "coaching": ["What is one way you can slow down for others?", "How are you measuring your own growth beyond just speed?"]
-    },
-    "Director-Purpose": {
-        "summary": "Driven to make clear, firm decisions that align with deep values. Cares about order, but also about justice and integrity. They use their strength to fight for what is right.",
-        "support": "Share your top core values so they understand your decisions. Translate clinical values into concrete rules.",
-        "thriving": "- Advocates strongly for youth safety\n- Holds boundaries even when unpopular\n- Seen as a moral anchor",
-        "struggling": "- Becomes rigid or righteous when values are threatened\n- Excessive frustration with 'the system'\n- Moral outrage",
-        "interventions": "Validate the value (e.g. safety) before asking for flexibility. Help them pick battles.",
-        "coaching": ["Where do you feel the system is failing your values?", "How can you advocate without burning bridges?"]
-    },
-    "Director-Connection": {
-        "summary": "Wants the team to feel supported but communicates with directness. Balances being the 'Boss' and the 'Friend'. They are a 'Protective Captain' who leads firmly to keep the tribe safe.",
-        "support": "Script phrases that are both firm and relational. Schedule short relational touchpoints during tough weeks.",
-        "thriving": "- Anchors the team in crisis while checking on feelings\n- Firm but not distant\n- Protective of the team",
-        "struggling": "- Holds back hard conversations to avoid being 'mean'\n- Swings between 'all business' and 'all buddy'\n- Personalizes conflict",
-        "interventions": "Role-play the 'Hard Conversation' so they feel safe being direct. Remind them that clarity is kindness.",
-        "coaching": ["Are you avoiding this conversation to be kind, or to be safe?", "How can you be direct and caring at the same time?"]
-    },
-    "Encourager-Achievement": {
-        "summary": "Wants people to feel good and do well. Motivated when encouragement translates into visible progress. They want the team to be happy AND winning.",
-        "support": "Define realistic progress for complex youth. Build in micro-celebrations.",
-        "thriving": "- Celebrates wins constantly\n- Makes goals feel inspiring\n- Energizes the team to try new things",
-        "struggling": "- Pushes too hard on 'potential'\n- Feels personally failed when goals aren't met\n- Focuses only on big wins",
-        "interventions": "Redefine success: 'Success is sticking to the plan, not fixing the kid'.",
-        "coaching": ["How can you celebrate effort, not just the result?", "Are you taking their failure personally?"]
-    },
-    "Encourager-Growth": {
-        "summary": "Loves helping people grow. Brings energy and hope. Believes staff and youth can change and wants to support that process. They are a natural mentor.",
-        "support": "Help them choose a small number of people to invest in so they don't spread thin. Pair encouragement with specific targets.",
-        "thriving": "- Natural mentor\n- Youth feel believed in\n- Invests in peer development",
-        "struggling": "- Overcommits emotional energy\n- Avoids sharp feedback to spare feelings\n- Discouraged when others don't grow",
-        "interventions": "Teach them to give 'Radical Candor'. Remind them they can't grow *for* other people.",
-        "coaching": ["Who are you working harder than right now?", "How can you give feedback that helps them grow?"]
-    },
-    "Encourager-Purpose": {
-        "summary": "Fueled by connection and meaning. Wants youth/staff to feel valued and respected. Keeps the 'Why' alive. They are the 'Heart of the Mission'.",
-        "support": "Regular debriefs to process emotional load. Use values-based language for accountability.",
-        "thriving": "- Catches when people feel unseen\n- Translates clinical concepts into human terms\n- Safe harbor for staff",
-        "struggling": "- Carries heavy emotional weight\n- Struggles to enforce consequences on 'sad' cases\n- Heartbroken by outcomes",
-        "interventions": "Focus on 'Boundaries as Care'. Help them release what they cannot control.",
-        "coaching": ["What emotional weight are you carrying that isn't yours?", "How does holding this boundary actually help the youth?"]
-    },
-    "Encourager-Connection": {
-        "summary": "A community builder. Thrives on 'we are in this together'. Makes staff feel less alone in the hard work. They prioritize harmony above all else.",
-        "support": "Practice scripts that connect and correct simultaneously. Plan for hard conversations in advance.",
-        "thriving": "- Makes staff feel safe\n- De-escalates through relationship\n- Repairs team conflict",
-        "struggling": "- Avoids addressing harm to keep the peace\n- Takes tension personally\n- Prioritizes harmony over safety",
-        "interventions": "Challenge them: 'Is avoiding this conflict actually helping the team, or hurting safety?'",
-        "coaching": ["Are you prioritizing peace or safety?", "How can you lean into conflict to build stronger connection?"]
-    },
-    "Facilitator-Achievement": {
-        "summary": "Steady and gentle, but wants to get things done. Wants progress without crushing people. They move slowly but steadily.",
-        "support": "Practice: 'I care about you, and this expectation is important.' Use clear follow-ups.",
-        "thriving": "- Paces goals well\n- Helps staff understand improvement is a journey\n- Calm approach to metrics",
-        "struggling": "- Apologizes for having expectations\n- Quietly frustrated when others fail\n- Under-communicates urgency",
-        "interventions": "Teach them that clear expectations reduce anxiety. Ambiguity is not kindness.",
-        "coaching": ["How can you be clearer about what you need?", "Are you apologizing for having standards?"]
-    },
-    "Facilitator-Growth": {
-        "summary": "Creates calm space for growth. Patient, reflective, and interested in long-term development. They create safe spaces for staff to make mistakes and learn.",
-        "support": "Practice naming care and expectations in the same sentence. Break growth steps into small actions.",
-        "thriving": "- Excellent reflective supervisor\n- Safe for youth to open up to\n- Paces change sustainably",
-        "struggling": "- Avoids sharp expectations\n- Underestimates need for structure\n- Overthinks instead of acting",
-        "interventions": "Push for the 'Decisive Moment'. Help them value their authority as a tool for growth.",
-        "coaching": ["Where are you hesitating to lead?", "How can you be kind and firm at the same time?"]
-    },
-    "Facilitator-Purpose": {
-        "summary": "Steady presence with a deep sense of right. Cares about emotional safety and ethical practice. They are the 'Moral Compass'.",
-        "support": "Use supervision to talk about moral tension. Encourage them to voice concerns early.",
-        "thriving": "- Maintains respectful climate\n- Holds space for hard feelings\n- Strong moral anchor",
-        "struggling": "- Quietly carries moral distress\n- Stays neutral too long\n- Stuck when leadership disagrees with values",
-        "interventions": "Encourage them to be the 'Voice of Conscience' loudly, not just quietly.",
-        "coaching": ["What moral tension are you holding right now?", "How can you speak up for your values effectively?"]
-    },
-    "Facilitator-Connection": {
-        "summary": "The calm, relational glue. Makes it easier for people to stay in the work and not shut down. They are the 'Peacemaker'.",
-        "support": "Script accountability conversations. Set boundaries on how much emotional processing they do for others.",
-        "thriving": "- Helps peers feel understood\n- De-escalates steady\n- Fosters help-seeking culture",
-        "struggling": "- Absorbs emotional labor\n- Struggles to set limits\n- Listens when they should be deciding",
-        "interventions": "Validate their role as 'Stabilizer' but require them to also be 'Director' when safety is at risk.",
-        "coaching": ["What boundaries do you need to set to protect your energy?", "Are you listening too much and leading too little?"]
-    },
-    "Tracker-Achievement": {
-        "summary": "Wants strong results via good systems. Motivated by making things run better and seeing the numbers. They are the 'Architect'.",
-        "support": "Pair data shares with appreciation. Contextualize metrics so they aren't personal verdicts.",
-        "thriving": "- Strong at tracking metrics\n- Clear sense of 'good'\n- Insists on consistent routines",
-        "struggling": "- Impatient with struggle\n- Focuses on reporting over empathy\n- Ties self-worth to numbers",
-        "interventions": "Humanize the data. 'The chart is just a tool, not the goal.' Focus on effort.",
-        "coaching": ["How can you measure effort, not just outcome?", "Are you valuing the data more than the person?"]
-    },
-    "Tracker-Growth": {
-        "summary": "Loves accurate info and improvement. Wants systems and documentation to keep getting better. They are the 'Technical Expert'.",
-        "support": "Pick a few key processes to improve. Pair process changes with relational steps.",
-        "thriving": "- Notices patterns in incidents\n- Keeps documentation tight\n- Helps peers improve process",
-        "struggling": "- Frustrated by details others miss\n- Over-focuses on systems over people\n- Hesitates in crisis",
-        "interventions": "Help them zoom out. 'Perfection is the enemy of good'. Focus on 'Good Enough' for now.",
-        "coaching": ["Are you focusing on the system or the person?", "What is 'good enough' for today?"]
-    },
-    "Tracker-Purpose": {
-        "summary": "Wants things done right because it matters for kids. Standards come from responsibility. They are the 'Guardian'.",
-        "support": "Process the heavy sense of responsibility. Share the 'Why' behind standards with staff.",
-        "thriving": "- Protects youth via safety checks\n- Notices small risks\n- Translates values into concrete practice",
-        "struggling": "- Intolerant of carelessness\n- Distressed by shortcuts\n- Leans on rules when anxious",
-        "interventions": "Remind them: 'You are responsible for the process, not the outcome.' Release the weight.",
-        "coaching": ["How can you protect the mission without being rigid?", "Are you using rules to manage your anxiety?"]
-    },
-    "Tracker-Connection": {
-        "summary": "Cares about getting it right and caring for people. Wants a competent, cohesive team. They are the 'Reliable Rock'.",
-        "support": "Add relational check-ins before details. Share tasks instead of hoarding them.",
-        "thriving": "- Gives grounded, specific support\n- Consistency feels safe to youth\n- Safe person for technical questions",
-        "struggling": "- Assumes people know they care (they don't)\n- Becomes the 'Do-Everything' person\n- Burnout risk",
-        "interventions": "Force delegation. 'If you do it for them, you rob them of the learning'.",
-        "coaching": ["How can you show care in a way they understand?", "Are you doing too much for others?"]
-    }
-}
-
-# (A) TEAM CULTURE GUIDE
-TEAM_CULTURE_GUIDE = {
-    "Director": {
-        "title": "The 'Action' Culture",
-        "impact_analysis": "**What it feels like:** This unit operates like a high-stakes trading floor. The energy is intense, fast, and results-oriented. Decisions are made quickly, often by the loudest voice. Competence is the primary currency of trust.\n\n**The Good:** You will rarely miss a deadline. Crises are handled with military precision. Productivity is high.\n**The Bad:** You risk 'Burnout by Urgency.' Quiet staff members will be steamrolled and stop contributing. You may solve the wrong problems very quickly because no one paused to ask 'Why?'.",
-        "management_strategy": "**Your Role: The 'Governor'.** Your team has a heavy gas pedal; you must be the brake and the steering wheel.\n* **Slow them down:** Do not reward speed for speed's sake. Praise thoroughness.\n* **Protect the minority:** Actively solicit the opinion of the quietest person in the room.\n* **Enforce breaks:** This culture treats exhaustion as a badge of honor. You must mandate rest.",
-        "meeting_protocol": "1. **The Devil's Advocate Rule:** Assign one person per meeting to specifically challenge the speed of the decision. Ask: 'What happens if we wait 24 hours?'\n2. **Forced Silence:** Implement a '2-minute silence' after a proposal is made to allow internal processors time to think before the Directors dominate the verbal space.\n3. **The 'Who' Check:** End every meeting by asking, 'Who might feel hurt or left out by this decision?'",
-        "team_building": "Strategic games, escape rooms, competitions (with caution)."
-    },
-    "Encourager": {
-        "title": "The 'Family' Culture",
-        "impact_analysis": "**What it feels like:** This unit feels like a family gathering. There is laughter, food, and deep personal connection. People feel safe, seen, and cared for. Staff retention is often high because people don't want to leave their friends.\n\n**The Good:** High psychological safety and trust. Staff support each other through personal crises. Resilience in hard times.\n**The Bad:** The 'Nice Guy Trap.' Bad behavior is tolerated because no one wants to be 'mean.' Accountability is viewed as aggression. Decisions are made based on what makes people happy, not what is effective.",
-        "management_strategy": "**Your Role: The 'Bad Guy'.** They have enough warmth; they need you to provide the spine.\n* **Normalize Conflict:** Teach them that disagreement is not disrespect.\n* **Separate Friends from Work:** Remind them that 'liking' someone doesn't mean letting them slide on safety protocols.\n* **Focus on the 'Who':** Frame accountability as 'protecting the team' rather than 'punishing the individual.'",
-        "meeting_protocol": "1. **The 'Blockers' Agenda:** Start meetings with 'What is broken?' instead of 'How are we doing?'. Force negative feedback into the open.\n2. **Data-Driven Reviews:** Use dashboards to review performance. It depersonalizes the feedback. 'The chart says we are late' is easier for an Encourager to hear than 'You are late.'\n3. **Time-Box Venting:** Allow exactly 10 minutes for feelings/venting at the start, then physically set a timer to pivot to tasks.",
-        "team_building": "Potlucks, appreciation circles, storytelling. Focus on connection and shared history."
-    },
-    "Facilitator": {
-        "title": "The 'Consensus' Culture",
-        "impact_analysis": "**What it feels like:** This unit feels like a democratic senate. Every voice is heard, every angle is considered, and fairness is the ultimate goal. There is a deep sense of stability and equity.\n\n**The Good:** High buy-in. Few errors because decisions are vetted thoroughly. An equitable environment where no one is left behind.\n**The Bad:** Analysis Paralysis. This team struggles to move during a crisis. They will form a committee to decide where to order lunch. They risk 'death by meeting,' where the process of deciding becomes more important than the decision itself.",
-        "management_strategy": "**Your Role: The 'Closer'.** They have enough inputs; they need you to force the output.\n* **Set the Deadline:** Do not ask 'When should we decide?'. Tell them 'We decide on Tuesday.'\n* **Define 'Consensus':** Teach them that consensus means 'I can live with it,' not 'I love it.'\n* **Authorize Imperfection:** Give them permission to make mistakes. They are terrified of being wrong.",
-        "meeting_protocol": "1. **The 'Disagree & Commit' Rule:** Establish a norm that once a decision is made, debate ends. No meeting-after-the-meeting.\n2. **Hard Deadlines:** Set the decision date BEFORE the discussion starts.\n3. **Opt-Out Rights:** Allow people to skip meetings if they trust the group to decide. Reduce the committee bloat.",
-        "team_building": "Collaborative problem solving (e.g., Desert Survival). Activities where the group must agree to win."
-    },
-    "Tracker": {
-        "title": "The 'Safety' Culture",
-        "impact_analysis": "**What it feels like:** This unit feels like a well-oiled machine or a laboratory. Everything has a place, a time, and a label. Documentation is impeccable. Risks are anticipated and managed before they happen.\n\n**The Good:** Safety and reliability. You never have to worry about an audit. Shifts run like clockwork.\n**The Bad:** Rigidity. This team struggles when the 'Plan' fails. They may quote the policy manual while a kid is in crisis, prioritizing the rule over the relationship. Innovation is low because 'we've always done it this way.'",
-        "management_strategy": "**Your Role: The 'Visionary'.** They are looking at their feet (the steps); you must make them look at the horizon (the goal).\n* **Challenge the Rule:** Regularly ask 'Does this rule still serve us?'\n* **Humanize the Data:** Remind them that every number on the spreadsheet represents a human being.\n* **Encourage Flex:** Reward them for adapting to a crisis, not just for following the script.",
-        "meeting_protocol": "1. **The 'Intent' Explain:** Trackers must explain the *intent* behind a rule (e.g., 'Safety') not just the rule itself.\n2. **Pilot Programs:** Frame innovation as a 'Controlled Experiment.' Trackers hate chaos, but they love data collection. Let them 'test' a new idea to gather data.\n3. **The Human Impact:** End every meeting by asking: 'How will this decision make the youth/staff *feel*?'",
-        "team_building": "Logic puzzles, building projects (Lego), process improvement workshops. Avoid 'vague' creative tasks."
-    }
-}
-
-# (B) MISSING VOICE GUIDE
-MISSING_VOICE_GUIDE = {
-    "Director": {"risk": "**Risk of Stagnation.** Without Director energy, this team may talk in circles, create perfect plans that never launch, or prioritize comfort over results. You risk becoming a 'social club' that doesn't achieve outcomes.", "fix": "**Supervisor Strategy:** You must be the driver. Set hard deadlines. Interrupt circular conversations. Be the 'bad guy' who demands output. End every meeting with 'Who is doing What by When?'"},
-    "Encourager": {"risk": "**Risk of Burnout & Coldness.** Without Encourager energy, this team becomes transactional. Staff feel like cogs in a machine. You will likely see high turnover because no one feels 'seen' or 'cared for' personally.", "fix": "**Supervisor Strategy:** You must prioritize the 'Human Element'. Start meetings with personal check-ins. Schedule fun (yes, mandatory fun). Manually recognize effort, not just results. Send handwritten notes."},
-    "Facilitator": {"risk": "**Risk of Tunnel Vision.** Without Facilitator energy, the loudest voices will dominate. You will have 'Blind spots' because no one is stepping back to ask 'What about X?'. Dissent will be crushed or ignored.", "fix": "**Supervisor Strategy:** You must slow down the room. Use 'Round Robin' turn-taking so quiet people speak. Ask 'Who disagrees?' before moving on. Actively solicit the minority opinion."},
-    "Tracker": {"risk": "**Risk of Chaos & Liability.** Without Tracker energy, details will slip. Documentation will fail. Safety risks will be missed until they become accidents. The program will feel chaotic and reactive.", "fix": "**Supervisor Strategy:** You must be the auditor. Bring the checklist. Don't assume it's done; check it. Create visual trackers on the wall. Ask 'What is the backup plan?' repeatedly."}
-}
-
-# (C) MOTIVATION GAP GUIDE (Expanded)
-MOTIVATION_GAP_GUIDE = {
-    "Growth": {
-        "title": "The Restless Team",
-        "description": "This team is driven by progress, competence, and future potential. They view the job as a stepping stone. If they aren't learning, they are leaving.",
-        "risk": "Boredom & Stagnation. If the work becomes repetitive without new challenges, they will disengage or find a new job that offers 'growth'.",
-        "symptoms": "High turnover among top performers. Complaints about 'doing the same thing every day'. Disengagement during routine tasks.",
-        "strategy": "**Feed the Beast.**\n* **Rotate Roles:** Don't let them do the same task for 6 months. Rotate 'Shift Lead', 'Safety Captain', etc.\n* **The 'Pilot' Frame:** Frame boring changes as 'Experiments' they get to lead and evaluate.\n* **Career Pathing:** Talk about their next job explicitly. 'Doing this well helps you get to [Goal].'"
-    },
-    "Purpose": {
-        "title": "The Crusader Team",
-        "description": "This team is driven by the mission, justice, and 'The Why'. They will endure hard conditions if they believe it matters. They rebel against anything that feels bureaucratic or heartless.",
-        "risk": "Cynicism & Burnout. If they feel the agency cares more about liability/paperwork than the kids, they will become toxic/cynical defenders of the youth against management.",
-        "symptoms": "Moral outrage at policy changes. Refusal to do paperwork ('It takes time away from kids'). Us vs. Them mentality with Admin.",
-        "strategy": "**Connect the Dots.**\n* **Mission Moments:** Start every meeting with a client success story.\n* **Explain the Why:** Never give a raw order. Always link compliance to client advocacy. 'This form gets the kid funding.'\n* **Validate Passion:** When they push back, say 'I love that you care so much', then redirect."
-    },
-    "Connection": {
-        "title": "The Relational Team",
-        "description": "This team is driven by belonging, mutual support, and 'feeling' good. They work for each other. If the team is tight, they can handle anything.",
-        "risk": "Cliques & Drama. If the relational glue fails (conflict) or if they feel isolated by management, productivity halts. They prioritize harmony over accountability.",
-        "symptoms": "High interpersonal drama or gossip. Productivity drops when a specific friend is absent. Resistance to new staff who 'don't fit in'.",
-        "strategy": "**Shepherd the Flock.**\n* **Relationship First:** Do not start a meeting with tasks. Start with a check-in.\n* **Repair Conflict:** You cannot ignore interpersonal friction; it stops the work. Mediate immediately.\n* **Visual Belonging:** Swag, team photos, inside jokes—these matter to them."
-    },
-    "Achievement": {
-        "title": "The Winning Team",
-        "description": "This team is driven by clarity, goals, and winning. They want to know the score. They hate ambiguity and moving goalposts.",
-        "risk": "Frustration & Checking Out. If success isn't defined, they feel like they are losing. They hate inefficiency and 'endless talking' without action.",
-        "symptoms": "Checking out during long discussions. Asking 'Is this on the test/evaluation?'. Frustration with peers who are 'slow' or 'emotional'.",
-        "strategy": "**Keep Score.**\n* **Gamify:** Use leaderboards, checklists, or visual trackers for shift tasks.\n* **Definition of Done:** Be hyper-specific about expectations. 'Clean the room' is bad; 'Floor swept, beds made' is good.\n* **Cut the Fluff:** Keep meetings short and action-oriented."
-    }
-}
-
-# (D) CONFLICT MATRIX
-SUPERVISOR_CLASH_MATRIX = {
-    "Director": {
-        "Encourager": {
-            "tension": "Bulldozer vs. Doormat", 
-            "psychology": "This conflict stems from a fundamental mismatch in **Currency**. You value **Utility** (is this useful?), while they value **Affirmation** (am I valued?). When you skip the 'human connection' to get straight to work, the Encourager feels dehumanized and unsafe. You interpret their subsequent withdrawal as incompetence or lack of focus, but it is actually a stress response to your intensity. They withdraw to protect themselves.",
-            "watch_fors": ["The Encourager stops contributing in meetings (silent withdrawal).", "You start interrupting or finishing their sentences because they take too long.", "They complain to peers that you are 'mean', 'cold', or 'don't care'.", "You feel exhausted by their constant need for what you perceive as 'hand-holding'."],
-            "intervention_steps": ["**1. Pre-Frame (Mindset):** Remind yourself: 'Efficiency without Empathy is Inefficiency.' If you break the relationship, the work stops. You must invest 5 minutes to save 5 hours of friction.", "**2. The Translate (Action):** In the meeting, translate their feelings into data. 'When they say they are stressed, they are giving me data about team risk.'", "**3. The Deal (Closing):** Explicitly agree to a protocol: You will listen for 5 minutes without solving, if they agree to move to action steps immediately after."],
-            "scripts": {
-                "To Director": "Stop solving, start listening. You are trying to fix the problem, but right now the relationship IS the problem.",
-                "To Encourager": "My brevity is not anger; it is urgency. I value you, I am just stressed about the goal.",
-                "Joint": "We speak different languages. Director speaks Task; Encourager speaks Team. Both are valid."
-            }
+# 5c. INTEGRATED PROFILES (Expanded & 10 Coaching Questions Logic)
+def get_integrated_data(comm, motiv):
+    # BASE DATA FOR EACH COMBINATION
+    profiles = {
+        "Director-Achievement": {
+            "summary": "This staff member leads with a high-drive, decisive style to achieve concrete wins. They are the 'General' of the unit. They want to win, and they want to do it fast. They are excellent at operationalizing goals but may run over people to get there.\n\nThey are at their best when the objective is clear and the timeline is tight. They struggle when the work requires slow, relational tending without immediate visible results.",
+            "support": "Partner to define realistic pacing. Set process goals (we did the steps) not just outcome goals (the kid behaved). Contextualize metrics so they aren't personal verdicts.",
+            "thriving": "- High follow-through on tasks\n- Sets clear goals for the team\n- Moves metrics in the right direction\n- Decisive in crisis",
+            "struggling": "- Treats trauma behavior as a problem to 'solve' quickly\n- Micromanages peers\n- Judges self harshly when metrics dip\n- Becomes impatient with 'slow' staff",
+            "interventions": "Contextualize metrics. Celebrate the 'small wins' so they don't burn out chasing perfection. Remind them that relationships are the vehicle for results.",
+            "integrated_questions": ["How are you defining success today?", "What is one win you can celebrate right now?", "Are you driving the team too hard?", "What is the cost of speed right now?"]
         },
-        "Facilitator": {
-            "tension": "Gas vs. Brake",
-            "psychology": "This conflict is about **Risk Perception**. You fear **Stagnation** (doing nothing); they fear **Error** (doing the wrong thing). You operate on 'Ready, Fire, Aim'; they operate on 'Ready, Aim, Aim...'. You feel slowed down and obstructed; they feel steamrolled and unsafe.",
-            "watch_fors": ["You issue commands via email to avoid a meeting.", "They keep saying 'We need to talk about this' but never decide.", "You visibly roll your eyes when they ask for 'thoughts'.", "Decisions are made by you but passively resisted/ignored by the team."],
-            "intervention_steps": ["**1. Define the Clock:** They need time; you need a deadline. Negotiate it upfront. 'We will discuss for 30 mins, then decide.'", "**2. Define the Veto:** Tell them they have a 'Red Flag' right. If they see a major risk, they can stop you. Otherwise, you drive.", "**3. The Debrief:** After the action, review: 'Did we move too fast? Or did we wait too long?' This builds trust for next time."],
-            "scripts": {"To Director": "Force = Compliance, not Buy-in. If you push now, they will nod yes but do nothing.", "To Facilitator": "Silence = Agreement. If you disagree, you must speak up.", "Joint": "We have a pace mismatch. We are going to set a timer for discussion, then we decide."}
+        "Director-Growth": {
+            "summary": "This staff member leads with decisive action and is hungry to improve. They are a restless improver. They lead by pushing the pace of change and expecting everyone to level up. They can be impatient with stagnation.\n\nThey are excellent change agents but risk leaving their team behind. They need to learn that not everyone moves at their speed.",
+            "support": "Ask for a small number of focused projects rather than trying to fix everything at once. Co-design development goals. Give them autonomy to pilot new ideas.",
+            "thriving": "- Quick to turn learning into practice\n- Coaches peers effectively\n- Refines decisions based on new data\n- Innovative problem solver",
+            "struggling": "- Moves faster than the team can handle\n- Becomes impatient with 'slow' learners\n- Defaults to control in crisis\n- Changes things too often",
+            "interventions": "Slow down. Focus on one change at a time. Ask: 'Who is left behind by this speed?' Help them pace their ambition.",
+            "integrated_questions": ["What is one way you can slow down for others?", "How are you measuring your own growth beyond just speed?", "Are you leaving the team behind?", "Is this change necessary right now?"]
         },
-        "Tracker": {
-            "tension": "Vision vs. Obstacle",
-            "psychology": "This is a clash of **Authority Sources**. You trust **Intuition** and results; they trust **The Handbook** and process. You say 'Make it happen'; they say 'But Regulation 14.B says...'. You feel they are the 'Department of No'; they feel you are a liability lawsuit waiting to happen.",
-            "watch_fors": ["They quote policy numbers in arguments.", "You say 'Ask for forgiveness, not permission.'", "They hoard information or access to prove a point.", "You bypass them to get things done, creating compliance risks."],
-            "intervention_steps": ["**1. Clarify Roles:** You own the 'What' (Destination). They own the 'How' (Safe Route).", "**2. The 'Yes, If' Rule:** Coach them to never say 'No'. Instead say: 'Yes, we can do that, *if* we sign this waiver/change this budget.'", "**3. Risk Acceptance:** You must explicitly state: 'I accept the risk of deviating from the standard here.' This relieves their anxiety."],
-            "scripts": {"To Director": "They are protecting you from liability.", "To Tracker": "Start with the solution, not the problem.", "Joint": "Director sets destination; Tracker checks brakes."}
+        "Director-Purpose": {
+            "summary": "This staff member is driven to make clear, firm decisions that align with deep values. They are a 'Warrior for the Cause.' They use their strength to fight for what is right. They are fierce advocates but can be rigid if they feel the mission is compromised.\n\nThey will go to the mat for a kid, but they may burn bridges with administration in the process if they feel ignored.",
+            "support": "Share your top core values so they understand your decisions. Translate clinical values into concrete rules. Allow them space to advocate before deciding.",
+            "thriving": "- Advocates strongly for youth safety\n- Holds boundaries even when unpopular\n- Seen as a moral anchor\n- Protects the team from bad policy",
+            "struggling": "- Becomes rigid or righteous when values are threatened\n- Excessive frustration with 'the system'\n- Moral outrage\n- Refusal to compromise",
+            "interventions": "Validate the value (e.g. safety) before asking for flexibility. Help them pick battles. Connect compliance to client care.",
+            "integrated_questions": ["Where do you feel the system is failing your values?", "How can you advocate without burning bridges?", "Is this a hill worth dying on?", "How does flexibility serve the mission here?"]
         },
-        "Director": {
-            "tension": "King vs. King",
-            "psychology": "This is a pure **Dominance** struggle. Both of you define safety as **Control**. When the other person takes control, you feel unsafe or disrespected. The conversation becomes a debate about who is right rather than what is best.",
-            "watch_fors": ["Interruptions and talking over each other.", "Public debates that feel like combat.", "Refusal to implement the other's idea.", "The team looking awkward while 'Mom and Dad fight'."],
-            "intervention_steps": ["**1. Separate Lanes:** You cannot drive the same car. Give them distinct domains where they have total authority.", "**2. The Truce:** Acknowledge the power struggle explicitly. 'We are both fighting for the wheel.'", "**3. Disagree and Commit.** Once a decision is made by the final authority, the debate ends."],
-            "scripts": {"To Director": "Fighting to be right vs effective.", "To Other": "Strip the tone.", "Joint": "Stop fighting for the wheel."}
-        }
-    },
-    "Encourager": {
-        "Director": {
-            "tension": "Sensitivity Gap",
-            "psychology": "Mismatch in **Validation Style**. You need **External** validation (words/affirmation); they rely on **Internal** validation (results). You feel personally attacked by their brevity. They feel annoyed by your 'fluff'. You over-explain to get validation; they tune out.",
-            "watch_fors": ["You apologizing before asking for something.", "You venting to peers about how 'mean' they are.", "They avoid meetings with you because 'it takes too long'.", "You feeling exhausted/crying after supervision."],
-            "intervention_steps": ["**1. The Headline:** Start with the conclusion, then the feelings. 'We need to fire Bob because he hurt the team.'", "**2. The 'Why':** Ask them to explain the *reason* for their speed, so you don't invent a story that they are angry.", "**3. Scheduled Venting.** Ask for 5 mins to process feelings, then promise to hard pivot to tasks."],
-            "scripts": {"To Encourager": "Translate feelings to risk.", "To Director": "Kindness buys speed.", "Joint": "Timeline vs Plan."}
+        "Director-Connection": {
+            "summary": "This staff member wants the team to feel supported but communicates with directness. They are a 'Protective Captain.' They lead the team firmly but doing so to protect the 'tribe.' They want the team to be strong and successful together.\n\nThey can confuse the team by switching between 'Authoritarian' and 'Best Friend' depending on their stress level.",
+            "support": "Script phrases that are both firm and relational. Schedule short relational touchpoints during tough weeks. Reassure them that directness doesn't mean disconnection.",
+            "thriving": "- Anchors the team in crisis while checking on feelings\n- Firm but not distant\n- Protective of the team\n- Clear communication",
+            "struggling": "- Holds back hard conversations to avoid being 'mean'\n- Swings between 'all business' and 'all buddy'\n- Personalizes conflict\n- Over-protects the team",
+            "interventions": "Role-play the 'Hard Conversation' so they feel safe being direct. Remind them that clarity is kindness. Validate their intent to protect.",
+            "integrated_questions": ["Are you avoiding this conversation to be kind, or to be safe?", "How can you be direct and caring at the same time?", "Are you protecting them from growth?", "How is the team reacting to your directness?"]
         },
-        "Facilitator": {
-            "tension": "Polite Stagnation",
-            "psychology": "This is **Conflict Avoidance**. You fear **Rejection**; they fear **Unfairness**. You want to protect the individual; they want to be fair to the group. You both avoid conflict, so decisions stall indefinitely because neither wants to be the 'bad guy'.",
-            "watch_fors": ["Endless meetings where everyone agrees but nothing changes.", "Problems being 'managed' rather than 'solved'.", "Using passive language: 'It would be nice if...' instead of 'You must...'.", "Resentment building because no one is leading."],
-            "intervention_steps": ["**1. Name the Fear:** 'We are scared to upset [Person], so we are hurting the program.'", "**2. Assign the 'Bad Guy':** Supervisor acts as the heavy: 'Blame me. Say I ordered it.'", "**3. Script the Hard Conversation.** Don't let them ad-lib; write the script together."],
-            "scripts": {"To Encourager": "Protecting feelings hurts program.", "Joint": "Who delivers the news?"}
+        "Encourager-Achievement": {
+            "summary": "This staff member wants the team to feel good *and* win. They are the 'Coach' who cheers the loudest. They want people to feel good and do well. Motivated when encouragement translates into visible progress.\n\nThey struggle deeply when the team is happy but losing (poor outcomes). They may feel like a personal failure if the vibe is good but the metrics are bad.",
+            "support": "Define realistic progress for complex youth. Build in micro-celebrations. Help them see that 'good vibes' aren't the only metric of success.",
+            "thriving": "- Celebrates wins constantly\n- Makes goals feel inspiring\n- Energizes the team to try new things\n- High morale and high effort",
+            "struggling": "- Pushes too hard on 'potential'\n- Feels personally failed when goals aren't met\n- Focuses only on big wins\n- Burnout from cheering",
+            "interventions": "Redefine success: 'Success is sticking to the plan, not fixing the kid'. Help them separate their worth from the outcome.",
+            "integrated_questions": ["How can you celebrate effort, not just the result?", "Are you taking their failure personally?", "Is the team winning, or just happy?", "What helps you stay motivated when results are slow?"]
         },
-        "Tracker": {
-            "tension": "Rigidity vs Flow",
-            "psychology": "Mismatch in **Safety Source**. You find safety in **Connection**; they find safety in **Consistency**. You bend rules to help people; they enforce rules to protect people. They think you are unsafe; you think they are cold.",
-            "watch_fors": ["You making 'secret deals' with staff/youth to bypass rules.", "They police you publicly.", "You feeling judged; them feeling undermined.", "Inconsistent application of consequences."],
-            "intervention_steps": ["**1. The 'Why' of Rules.** Remind yourself that rules protect the most vulnerable youth by creating predictability.", "**2. The 'Why' of Exceptions.** Show them that rigid rules break rapport, which causes danger.", "**3. The Hybrid.** 'We follow the rule (Tracker), but we deliver it with maximum empathy (Encourager).'"],
-            "scripts": {"To Encourager": "Bending rules makes Tracker the bad guy.", "To Tracker": "Right policy, cold delivery."}
+        "Encourager-Growth": {
+            "summary": "This staff member loves helping people grow. They are a 'Natural Mentor.' They use their warmth to help people grow. They are excellent with new staff but may struggle to give hard feedback that might hurt feelings.\n\nThey see potential in everyone, sometimes to a fault. They may keep investing in staff or youth who are not showing signs of change, leading to exhaustion.",
+            "support": "Help them choose a small number of people to invest in so they don't spread thin. Pair encouragement with specific targets. Validate their mentorship role.",
+            "thriving": "- Natural mentor\n- Youth feel believed in\n- Invests in peer development\n- Creates a culture of learning",
+            "struggling": "- Overcommits emotional energy\n- Avoids sharp feedback to spare feelings\n- Discouraged when others don't grow\n- Burnout",
+            "interventions": "Teach them to give 'Radical Candor'. Remind them they can't grow *for* other people. Set boundaries on their time.",
+            "integrated_questions": ["Who are you working harder than right now?", "How can you give feedback that helps them grow?", "Are you enabling or empowering?", "What is one hard truth they need to hear?"]
         },
-        "Encourager": {
-            "tension": "Echo Chamber",
-            "psychology": "This is **Emotional Contagion**. You amplify each other's feelings. Stress becomes shared panic. Joy becomes a party. There is no grounding force, leading to high warmth but low accountability.",
-            "watch_fors": ["Supervision turning into a venting session.", "Lack of clear action items.", "Creating 'Us vs. Them' narratives about other departments.", "Ignoring metrics/data because 'we feel like we're doing good'."],
-            "intervention_steps": ["**1. The 5-Minute Rule:** Only 5 minutes of venting allowed.", "**2. The Pivot:** 'I hear that is hard. What is the first step to fixing it?'", "**3. External Data:** Bring in a chart/checklist to force a reality check beyond feelings."],
-            "scripts": {"To Encourager": "We are spinning.", "Joint": "Challenge each other."}
-        }
-    },
-    "Facilitator": {
-        "Director": {
-            "tension": "Steamroll",
-            "psychology": "Mismatch in **Processing**. You process **Externally** (group talk). They process **Internally** (gut check). By the time you ask a question, they have already moved on. You feel disrespected and silenced.",
-            "watch_fors": ["You staying silent in meetings then complaining later.", "They look bored while you talk.", "You asking 'Does everyone agree?' and them saying 'Moving on.'", "The team looking confused about who is in charge."],
-            "intervention_steps": ["**1. Interrupt:** Learn to say 'Hold on'.", "**2. Pre-Meeting:** Brief them beforehand. 'I am going to ask for feedback on X. Please don't answer first.'", "**3. The Frame:** Frame process as 'Risk Management' (which Directors value) not 'Inclusion' (which they might not)."],
-            "scripts": {"To Director": "Moving too fast.", "To Facilitator": "Speak up."}
+        "Encourager-Purpose": {
+            "summary": "This staff member is fueled by connection and meaning. They are the 'Heart of the Mission.' They keep the emotional flame alive. They are deeply impacted by youth suffering and need help with emotional boundaries.\n\nThey are the soul of the unit but can be crushed by the weight of the trauma they witness.",
+            "support": "Regular debriefs to process emotional load. Use values-based language for accountability. Connect their daily care to the big picture.",
+            "thriving": "- Catches when people feel unseen\n- Translates clinical concepts into human terms\n- Safe harbor for staff\n- High empathy",
+            "struggling": "- Carries heavy emotional weight\n- Struggles to enforce consequences on 'sad' cases\n- Heartbroken by outcomes\n- Enmeshment",
+            "interventions": "Focus on 'Boundaries as Care'. Help them release what they cannot control. Validate their heart but reinforce structure.",
+            "integrated_questions": ["What emotional weight are you carrying that isn't yours?", "How does holding this boundary actually help the youth?", "Are you taking care of yourself?", "Where is your empathy causing burnout?"]
         },
-        "Tracker": {
-            "tension": "Details Loop",
-            "psychology": "Mismatch in **Scope**. You are **Horizontal** (scanning everyone). They are **Vertical** (drilling down). You want to talk about the *concept*; they want to talk about the *form*. You get bogged down in logistics before agreeing on the idea.",
-            "watch_fors": ["Long email chains about minor details.", "Meetings running overtime.", "You feeling nitpicked; them feeling vague.", "Great ideas dying in the 'how-to' phase."],
-            "intervention_steps": ["**1. Concept First.** 'We are not discussing the form yet. Do we agree on the goal?'", "**2. Detail Second.** 'Now that we agree, please build the checklist.'", "**3. The Parking Lot.** Park detailed questions until the end of the meeting."],
-            "scripts": {"To Tracker": "30k view.", "To Facilitator": "Testing idea."}
+        "Encourager-Connection": {
+            "summary": "This staff member is a community builder. They are the ultimate 'Team Builder.' They prioritize harmony above all else. They create a safe culture but may avoid conflict to a fault.\n\nThey are terrified of breaking the bond, so they may tolerate bad behavior from staff or youth rather than risk an uncomfortable interaction.",
+            "support": "Practice scripts that connect and correct simultaneously. Plan for hard conversations in advance. check in on *them* personally.",
+            "thriving": "- Makes staff feel safe\n- De-escalates through relationship\n- Repairs team conflict\n- Strong sense of 'family'",
+            "struggling": "- Avoids addressing harm to keep the peace\n- Takes tension personally\n- Prioritizes harmony over safety\n- Cliques",
+            "interventions": "Challenge them: 'Is avoiding this conflict actually helping the team, or hurting safety?' Push for brave conversations.",
+            "integrated_questions": ["Are you prioritizing peace or safety?", "How can you lean into conflict to build stronger connection?", "What is the cost of avoiding this issue?", "Who is being hurt by the lack of boundaries?"]
         },
-        "Encourager": {
-            "tension": "Fairness vs Feelings",
-            "psychology": "Mismatch in **Focus**. You focus on the **System** (Fairness); they focus on the **Person** (Feelings). You might struggle to rein them in when they over-function for a client, creating inequity in the program.",
-            "watch_fors": ["They want an exception; you want a precedent.", "You feel they are playing favorites.", "They feel you are being too clinical."],
-            "intervention_steps": ["**1. Validate Intent.** 'I see how much you care about [Youth]. Your heart is in the right place.'", "**2. Explain Inequity.** 'However, if we make a special exception for him, it creates unfairness for the other 10 kids.'", "**3. Return to Standard.** 'We need a solution that is fair to everyone.'"],
-            "scripts": {"To Encourager": "Fairness scales.", "To Facilitator": "Validate heart first."}
+        "Facilitator-Achievement": {
+            "summary": "This staff member is steady and gentle, but wants to get things done. They want to reach goals without leaving anyone behind. They move slowly but steadily. They are annoyed by inefficiency but won't voice it loudly.\n\nThey are the 'Quiet Mover.' They don't make a lot of noise, but they want progress. They can become passive-aggressive if others block that progress.",
+            "support": "Practice: 'I care about you, and this expectation is important.' Use clear follow-ups. Validate their methodical approach.",
+            "thriving": "- Paces goals well\n- Helps staff understand improvement is a journey\n- Calm approach to metrics\n- Steady progress",
+            "struggling": "- Apologizes for having expectations\n- Quietly frustrated when others fail\n- Under-communicates urgency\n- Passive-aggressive",
+            "interventions": "Teach them that clear expectations reduce anxiety. Ambiguity is not kindness. Give them permission to lead.",
+            "integrated_questions": ["How can you be clearer about what you need?", "Are you apologizing for having standards?", "What needs to move faster?", "Where are you holding back your authority?"]
         },
-        "Facilitator": {
-            "tension": "The Committee",
-            "psychology": "Diffusion of Responsibility. No one drives. Endless meetings. Great process, low output. You both listen, nod, and validate, but no one directs. The team feels heard but leaderless.",
-            "watch_fors": ["Conversations go in circles.", "Everyone feels good but nothing gets done.", "Conflict is buried under politeness."],
-            "intervention_steps": ["**1. Designate Driver.** 'I am facilitating; you are deciding.'", "**2. Time Limit.** Force a vote at 45 mins.", "**3. Vote.** Use a thumb vote to force positions."],
-            "scripts": {"Joint": "We are spinning. Who is deciding?"}
-        }
-    },
-    "Tracker": {
-        "Director": {
-            "tension": "Micromanagement",
-            "psychology": "Mismatch in **Trust**. You trust **Verification**; they trust **Competence**. You verify by checking; they verify by doing. You see their broad strokes as reckless. You ask 10 questions; they get annoyed.",
-            "watch_fors": ["You sending emails with 'Corrections'.", "They avoid you.", "You feeling anxious that 'it's all going to fall apart'.", "They withhold info so you don't 'slow them down'."],
-            "intervention_steps": ["**1. Pick Battles.** Differentiate between 'Safety Critical' (Intervene) and 'Preference' (Let it go).", "**2. The Sandbox.** Give them a space where they can break things safely.", "**3. Solution-First.** Don't say 'We can't.' Say 'We can, IF we do X.'"],
-            "scripts": {"To Director": "Compliance safety.", "To Tracker": "Stop correcting spelling."}
+        "Facilitator-Growth": {
+            "summary": "This staff member creates calm space for growth. They facilitate learning. They create safe spaces for staff to make mistakes and learn. They are patient teachers but need to ensure they don't tolerate incompetence too long.\n\nThey are the 'Patient Gardener.' They believe things grow in their own time, but in a crisis, they may need to prune faster than they are comfortable with.",
+            "support": "Practice naming care and expectations in the same sentence. Break growth steps into small actions. Validate their patience.",
+            "thriving": "- Excellent reflective supervisor\n- Safe for youth to open up to\n- Paces change sustainably\n- Deep listener",
+            "struggling": "- Avoids sharp expectations\n- Underestimates need for structure\n- Overthinks instead of acting\n- Paralysis",
+            "interventions": "Push for the 'Decisive Moment'. Help them value their authority as a tool for growth. Set deadlines for decisions.",
+            "integrated_questions": ["Where are you hesitating to lead?", "How can you be kind and firm at the same time?", "Are you waiting too long to act?", "What is the risk of doing nothing?"]
         },
-        "Encourager": {
-            "tension": "Rules vs Relationship",
-            "psychology": "Mismatch in **Priorities**. You see their exceptions as chaos. They feel judged by your clipboard. You risk becoming the 'Principal' to their 'Cool Teacher'. They think you care more about the paperwork than the people.",
-            "watch_fors": ["You correct them publicly; they shut down.", "You quote policy; they quote feelings.", "Resentment builds over 'nitpicking'."],
-            "intervention_steps": ["**1. Connect Before Correct.** Did I say hello before I pointed out the error?", "**2. The 'Why':** Is this rule critical for safety? Explain that.", "**3. Effectiveness:** Am I being right or being effective?"],
-            "scripts": {"To Tracker": "Connect then correct.", "To Encourager": "Rules protect."}
+        "Facilitator-Purpose": {
+            "summary": "This staff member is a steady presence with a deep sense of right. They are the 'Moral Compass.' They ensure decisions are fair and just. They will slow down a process to ensure it aligns with values.\n\nThey are the conscience of the team. They won't shout, but they will stubbornly refuse to move if something feels unethical.",
+            "support": "Use supervision to talk about moral tension. Encourage them to voice concerns early. validate their ethical lens.",
+            "thriving": "- Maintains respectful climate\n- Holds space for hard feelings\n- Strong moral anchor\n- Fairness advocate",
+            "struggling": "- Quietly carries moral distress\n- Stays neutral too long\n- Stuck when leadership disagrees with values\n- Withdrawal",
+            "interventions": "Encourage them to be the 'Voice of Conscience' loudly, not just quietly. Help them navigate grey areas.",
+            "integrated_questions": ["What moral tension are you holding right now?", "How can you speak up for your values effectively?", "Are you staying neutral when you should take a stand?", "How does your silence impact the team?"]
         },
-        "Facilitator": {
-            "tension": "Details vs Concepts",
-            "psychology": "Mismatch in **Output**. You want a **Checklist**; they want a **Conversation**. You get frustrated when meetings end without a clear 'To-Do' list. They feel you are rushing the relational process.",
-            "watch_fors": ["You check your watch while they talk.", "They feel you are transactional.", "You leave meetings confused about next steps."],
-            "intervention_steps": ["**1. Self-Check.** Am I being too rigid? Sometimes the 'deliverable' is just alignment.", "**2. Operationalize.** I can help them turn their ideas into steps.", "**3. Collaborate.** Ask permission to capture next steps."],
-            "scripts": {"To Tracker": "Alignment is deliverable.", "To Facilitator": "Define to-do."}
+        "Facilitator-Connection": {
+            "summary": "This staff member is the calm, relational glue. They are the 'Peacemaker.' They ensure the team stays cohesive. They absorb a lot of emotional toxicity to keep the peace and risk burnout.\n\nThey are the shock absorber for the unit. Everyone feels better after talking to them, but they often feel worse.",
+            "support": "Script accountability conversations. Set boundaries on how much emotional processing they do for others. Protect their peace.",
+            "thriving": "- Helps peers feel understood\n- De-escalates steady\n- Fosters help-seeking culture\n- Low drama",
+            "struggling": "- Absorbs emotional labor\n- Struggles to set limits\n- Listens when they should be deciding\n- Compassion fatigue",
+            "interventions": "Validate their role as 'Stabilizer' but require them to also be 'Director' when safety is at risk. Mandate self-care.",
+            "integrated_questions": ["What boundaries do you need to set to protect your energy?", "Are you listening too much and leading too little?", "Who is taking care of you?", "Is your silence creating confusion?"]
         },
-        "Tracker": {
-            "tension": "The Audit",
-            "psychology": "Perfectionism loop. Missing the forest for the trees.",
-            "watch_fors": ["Formatting wars", "Lost purpose"], 
-            "intervention_steps": ["**1. Zoom Out.**", "**2. 'Good Enough'.**", "**3. Client Outcome.**"],
-            "scripts": {"Joint": "Does this change the result?"}
+        "Tracker-Achievement": {
+            "summary": "This staff member wants strong results via good systems. They are the 'Architect.' They build systems to ensure success. They love data and dislike chaos. They effectively turn vague goals into concrete plans.\n\nThey believe that if you follow the process, you get the result. They get very frustrated when people improvise and break the system.",
+            "support": "Pair data shares with appreciation. Contextualize metrics so they aren't personal verdicts. Give them ownership of the 'How'.",
+            "thriving": "- Strong at tracking metrics\n- Clear sense of 'good'\n- Insists on consistent routines\n- Reliable results",
+            "struggling": "- Impatient with struggle\n- Focuses on reporting over empathy\n- Ties self-worth to numbers\n- Rigid",
+            "interventions": "Humanize the data. 'The chart is just a tool, not the goal.' Focus on effort. Encourage flexibility.",
+            "integrated_questions": ["How can you measure effort, not just outcome?", "Are you valuing the data more than the person?", "Where is flexibility needed right now?", "How can you support the person, not just the process?"]
+        },
+        "Tracker-Growth": {
+            "summary": "This staff member loves accurate info and improvement. They are the 'Technical Expert.' They master the details and expect others to study the craft. They improve the unit by refining processes.\n\nThey are the master craftsman. They want everyone to take the work as seriously as they do.",
+            "support": "Pick a few key processes to improve. Pair process changes with relational steps. Validate their expertise.",
+            "thriving": "- Notices patterns in incidents\n- Keeps documentation tight\n- Helps peers improve process\n- Subject matter expert",
+            "struggling": "- Frustrated by details others miss\n- Over-focuses on systems over people\n- Hesitates in crisis\n- Perfectionism",
+            "interventions": "Help them zoom out. 'Perfection is the enemy of good'. Focus on 'Good Enough' for now. Delegate the mess.",
+            "integrated_questions": ["Are you focusing on the system or the person?", "What is 'good enough' for today?", "Are you correcting or coaching?", "How can you make it safe to make mistakes?"]
+        },
+        "Tracker-Purpose": {
+            "summary": "This staff member wants things done right because it matters for kids. They are the 'Guardian.' They use rules to protect the mission. They believe safety is the highest form of care. They can be rigid about compliance.\n\nThey see rules as sacred vows to the clients. Breaking a rule isn't just an error; it's a betrayal.",
+            "support": "Process the heavy sense of responsibility. Share the 'Why' behind standards with staff. Connect rules to safety.",
+            "thriving": "- Protects youth via safety checks\n- Notices small risks\n- Translates values into concrete practice\n- Safe environment",
+            "struggling": "- Intolerant of carelessness\n- Distressed by shortcuts\n- Leans on rules when anxious\n- Policing others",
+            "interventions": "Remind them: 'You are responsible for the process, not the outcome.' Release the weight. Focus on intent.",
+            "integrated_questions": ["How can you protect the mission without being rigid?", "Are you using rules to manage your anxiety?", "Is this rule serving the child right now?", "How can you explain the 'why' behind the rule?"]
+        },
+        "Tracker-Connection": {
+            "summary": "This staff member cares about getting it right and caring for people. They are the 'Reliable Rock.' They show care by being consistent. They aren't warm and fuzzy, but they are always there. They build trust through stability.\n\nThey show love by doing the paperwork correctly so you don't have to. They feel unloved when you don't notice.",
+            "support": "Add relational check-ins before details. Share tasks instead of hoarding them. Notice their quiet reliability.",
+            "thriving": "- Gives grounded, specific support\n- Consistency feels safe to youth\n- Safe person for technical questions\n- Steady",
+            "struggling": "- Assumes people know they care (they don't)\n- Becomes the 'Do-Everything' person\n- Burnout risk\n- Resentment",
+            "interventions": "Force delegation. 'If you do it for them, you rob them of the learning'. Encourage verbalizing care.",
+            "integrated_questions": ["How can you show care in a way they understand?", "Are you doing too much for others?", "Do they know you care?", "Where do you need help carrying the load?"]
         }
     }
-}
-# Fallback for robust lookup
-for s in COMM_TRAITS:
-    if s not in SUPERVISOR_CLASH_MATRIX: SUPERVISOR_CLASH_MATRIX[s] = {}
-    for staff in COMM_TRAITS:
-        if staff not in SUPERVISOR_CLASH_MATRIX[s]:
-            SUPERVISOR_CLASH_MATRIX[s][staff] = {"tension": "Perspective difference", "psychology": "Priorities", "watch_fors": [], "intervention_steps": ["Listen", "Align"], "scripts": {"Joint": "Align"}}
 
-# (E) CAREER PATHWAYS
-CAREER_PATHWAYS = {
-    "Director": {
-        "Shift Supervisor": {"shift": "Doing -> Enabling", "why": "Directors act fast. As a Shift Sup, if you fix everything, your team learns nothing.", "conversation": "Sit on your hands. Success is team confidence.", "assignment_setup": "Lead shift from office.", "assignment_task": "Verbal direction only.", "success_indicators": "Clear verbal commands.", "red_flags": "Running out to fix it.", "debrief_questions": ["How hard was it to not jump in?", "Who stepped up?"], "supervisor_focus": "Hero Mode"},
-        "Program Supervisor": {"shift": "Command -> Influence", "why": "Can't order peers. Need political capital.", "conversation": "Slow down to build relationships.", "assignment_setup": "Peer project.", "assignment_task": "Cross-dept interview.", "success_indicators": "Incorporated feedback.", "red_flags": "100% own idea.", "debrief_questions": ["What did you learn about their constraints?"], "supervisor_focus": "Patience"},
-        "Manager": {"shift": "Tactical -> Strategic", "why": "Prevent fires.", "conversation": "Reliance on systems.", "assignment_setup": "Strategic plan.", "assignment_task": "Data/Budget projection.", "success_indicators": "Systems thinking.", "red_flags": "Last minute.", "debrief_questions": ["What data did you use?"], "supervisor_focus": "Horizon check"}
-    },
-    "Encourager": {
-        "Shift Supervisor": {"shift": "Friend -> Guardian", "why": "Accountability is kindness.", "conversation": "Be a guardian of the standard.", "assignment_setup": "Policy reset.", "assignment_task": "Lead accountability meeting.", "success_indicators": "No apologies.", "red_flags": "Joking.", "debrief_questions": ["Did you feel the urge to apologize?"], "supervisor_focus": "Apology Language"},
-        "Program Supervisor": {"shift": "Vibe -> Structure", "why": "Structure protects.", "conversation": "Master boring parts.", "assignment_setup": "Audit.", "assignment_task": "Present data.", "success_indicators": "Accurate.", "red_flags": "Delegating.", "debrief_questions": ["How does this data help the team?"], "supervisor_focus": "Organization"},
-        "Manager": {"shift": "Caregiver -> Director", "why": "Weight too heavy.", "conversation": "Set boundaries.", "assignment_setup": "Resource conflict.", "assignment_task": "Deliver No.", "success_indicators": "Holding line.", "red_flags": "Caving.", "debrief_questions": ["How did you handle their disappointment?"], "supervisor_focus": "Burnout"}
-    },
-    "Facilitator": {
-        "Shift Supervisor": {"shift": "Peer -> Decider", "why": "Consensus isn't safe.", "conversation": "Make 51% decision.", "assignment_setup": "Crisis drill.", "assignment_task": "Immediate calls.", "success_indicators": "Direct commands.", "red_flags": "Seeking consensus.", "debrief_questions": ["Where did you hesitate?"], "supervisor_focus": "Speed"},
-        "Program Supervisor": {"shift": "Mediator -> Visionary", "why": "Lead from front.", "conversation": "Inject vision.", "assignment_setup": "Culture initiative.", "assignment_task": "Present as direction.", "success_indicators": "Declarative.", "red_flags": "Asking permission.", "debrief_questions": ["Did you ask for permission or support?"], "supervisor_focus": "The Buffer"},
-        "Manager": {"shift": "Process -> Outcome", "why": "Fairness stalls.", "conversation": "Outcome over comfort.", "assignment_setup": "Unpopular policy.", "assignment_task": "Implement.", "success_indicators": "On time.", "red_flags": "Delays.", "debrief_questions": ["How did you handle the complaints?"], "supervisor_focus": "Conflict Tolerance"}
-    },
-    "Tracker": {
-        "Shift Supervisor": {"shift": "Executor -> Overseer", "why": "Micromanagement burns.", "conversation": "Trust team.", "assignment_setup": "Hands-off day.", "assignment_task": "Supervise verbally.", "success_indicators": "Hands in pockets.", "red_flags": "Grabbing pen.", "debrief_questions": ["What did they do differently than you would have?"], "supervisor_focus": "Micromanagement"},
-        "Program Supervisor": {"shift": "Black/White -> Gray", "why": "Rules don't cover all.", "conversation": "Develop intuition.", "assignment_setup": "Complex complaint.", "assignment_task": "Principle decision.", "success_indicators": "Sensible exception.", "red_flags": "Freezing.", "debrief_questions": ["What principle guided your decision?"], "supervisor_focus": "Rigidity"},
-        "Manager": {"shift": "Compliance -> Culture", "why": "Efficiency breaks culture.", "conversation": "Invest in feelings.", "assignment_setup": "Retention.", "assignment_task": "Relationships.", "success_indicators": "Non-work chats.", "red_flags": "Checklist morale.", "debrief_questions": ["What did you learn about them personally?"], "supervisor_focus": "Human Element"}
-    }
-}
+    key = f"{comm}-{motiv}"
+    data = profiles.get(key, profiles["Director-Achievement"])
 
-# --- 6. HELPER FUNCTIONS ---
-
-# 6a. PROFILE CONTENT GENERATOR (Fixes the missing function error)
-def generate_profile_content(comm, motiv):
-    """
-    Generates the 10-section deep dive content for any Comm/Motiv combination.
-    Using data extracted from the full profile definitions.
-    """
-    # Data lookup with fallbacks
-    comm_data = FULL_COMM_PROFILES.get(comm, FULL_COMM_PROFILES['Director'])
-    motiv_data = FULL_MOTIV_PROFILES.get(motiv, FULL_MOTIV_PROFILES['Achievement'])
+    # 10 Coaching Questions Assembly
+    questions = []
     
-    # Integrated Profile Lookup
-    combo_key = f"{comm}-{motiv}"
-    combo_data = FULL_INTEGRATED_PROFILES.get(combo_key, {
-        "summary": "Leads with their communication style to meet their motivational needs.",
-        "support": "Balance their need for results with support.",
-        "thriving": "High performance and engagement.",
-        "struggling": "Stress behavior and withdrawal.",
-        "interventions": "Address the root cause of stress.",
-        "coaching": ["How can you balance your style with the team's needs?"]
-    })
+    # 3 from Comm Style
+    if comm in FULL_COMM_PROFILES:
+        questions += FULL_COMM_PROFILES[comm]["questions"]
+    
+    # 3 from Motivation
+    if motiv in FULL_MOTIV_PROFILES:
+        questions += FULL_MOTIV_PROFILES[motiv]["questions"]
 
-    # Construct the return object
+    # 4 from Integrated (defined above)
+    if "integrated_questions" in data:
+        questions += data["integrated_questions"]
+    
+    # Fallback if missing
+    while len(questions) < 10:
+        questions.append("What support do you need right now?")
+
     return {
-        "s1": comm_data['description'],
-        "s2": comm_data['supervising_tips'],
-        "s3": motiv_data['description'],
-        "s4": motiv_data['strategies'],
-        "s5": combo_data['summary'],
-        "s6": combo_data['support'],
-        "s7": combo_data['thriving'],
-        "s8": combo_data['struggling'],
-        "s9": combo_data['interventions'],
-        "s10": motiv_data['celebrate'],
-        "coaching": combo_data.get('coaching', [])
+        "s1": FULL_COMM_PROFILES.get(comm, {}).get("description", ""),
+        "s2": FULL_COMM_PROFILES.get(comm, {}).get("supervising", ""),
+        "s3": FULL_MOTIV_PROFILES.get(motiv, {}).get("description", ""),
+        "s4": FULL_MOTIV_PROFILES.get(motiv, {}).get("strategies", ""),
+        "s5": data['summary'],
+        "s6": data['support'],
+        "s7": data['thriving'],
+        "s8": data['struggling'],
+        "s9": data['interventions'],
+        "s10": FULL_MOTIV_PROFILES.get(motiv, {}).get("celebrate", ""),
+        "coaching": questions,
+        # Bullet lists
+        "comm_bullets": FULL_COMM_PROFILES.get(comm, {}).get("desc_bullets", []),
+        "sup_bullets": FULL_COMM_PROFILES.get(comm, {}).get("supervising_bullets", []),
+        "motiv_bullets": FULL_MOTIV_PROFILES.get(motiv, {}).get("desc_bullets", []),
+        "strat_bullets": FULL_MOTIV_PROFILES.get(motiv, {}).get("strategies_bullets", []),
+        "cel_bullets": FULL_MOTIV_PROFILES.get(motiv, {}).get("celebrate_bullets", [])
     }
 
 def clean_text(text):
@@ -623,35 +427,68 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # Generate Data
     data = generate_profile_content(p_comm, p_mot)
 
-    def add_section(title, body):
+    def add_section(title, body, bullets=None):
         pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
         pdf.cell(0, 8, title, ln=True, fill=True); pdf.ln(2)
         pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
-        # Clean markdown for PDF
+        
+        # Body Paragraph
         clean_body = body.replace("**", "").replace("* ", "- ")
         pdf.multi_cell(0, 5, clean_text(clean_body))
+        
+        # Bullet Points
+        if bullets:
+            pdf.ln(1)
+            for b in bullets:
+                pdf.cell(5, 5, "-", 0, 0)
+                pdf.multi_cell(0, 5, clean_text(b))
+        
+        # Handle embedded bullets in summary strings
+        if "\n-" in body:
+            pass 
+             
         pdf.ln(4)
 
-    add_section(f"1. Communication Profile: {p_comm}", data['s1'])
-    add_section("2. Supervising Their Communication", data['s2'])
-    add_section(f"3. Motivation Profile: {p_mot}", data['s3'])
-    add_section("4. Motivating This Staff Member", data['s4'])
+    # 1. Communication Profile
+    add_section(f"1. Communication Profile: {p_comm}", data['s1'], data['comm_bullets'])
+    
+    # 2. Supervising Their Communication
+    add_section("2. Supervising Their Communication", data['s2'], data['sup_bullets'])
+    
+    # 3. Motivation Profile
+    add_section(f"3. Motivation Profile: {p_mot}", data['s3'], data['motiv_bullets'])
+    
+    # 4. Motivating This Staff Member
+    add_section("4. Motivating This Staff Member", data['s4'], data['strat_bullets'])
+    
+    # 5. Integrated Leadership Profile
     add_section("5. Integrated Leadership Profile", data['s5'])
+    
+    # 6. How You Can Best Support Them
     add_section("6. How You Can Best Support Them", data['s6'])
+    
+    # 7. Thriving Signs
     add_section("7. What They Look Like When Thriving", data['s7'])
+    
+    # 8. Struggling Signs
     add_section("8. What They Look Like When Struggling", data['s8'])
+    
+    # 9. Interventions
     add_section("9. Supervisory Interventions", data['s9'])
-    add_section("10. What You Should Celebrate", data['s10'])
+    
+    # 10. Celebrate
+    add_section("10. What You Should Celebrate", data['s10'], data['cel_bullets'])
 
-    if 'coaching' in data and isinstance(data['coaching'], list):
+    # 11. Coaching Questions
+    if 'coaching' in data:
         pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
         pdf.cell(0, 8, "11. Coaching Questions", ln=True, fill=True); pdf.ln(2)
         pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
-        for q in data['coaching']:
-            pdf.multi_cell(0, 5, clean_text(f"- {q}"))
+        for i, q in enumerate(data['coaching']):
+            pdf.multi_cell(0, 5, clean_text(f"{i+1}. {q}"))
         pdf.ln(4)
 
-    # Add Advancement Section (Generic for now based on comm style)
+    # 12. Advancement
     adv_text = "Help them master the operational side. Challenge them to see clarity and accountability as kindness."
     if p_comm == "Director": adv_text = "Shift from doing to enabling. Challenge them to sit on their hands and let the team fail safely to learn."
     elif p_comm == "Encourager": adv_text = "Master structure and operations. Challenge them to see that holding a boundary is a form of kindness."
@@ -669,15 +506,19 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     
     st.subheader(f"1. Communication Profile: {p_comm}")
     st.write(data['s1'])
+    for b in data['comm_bullets']: st.markdown(f"- {b}")
     
     st.subheader("2. Supervising Their Communication")
     st.write(data['s2'])
+    for b in data['sup_bullets']: st.markdown(f"- {b}")
     
     st.subheader(f"3. Motivation Profile: {p_mot}")
     st.write(data['s3'])
+    for b in data['motiv_bullets']: st.markdown(f"- {b}")
     
     st.subheader("4. Motivating This Staff Member")
     st.write(data['s4'])
+    for b in data['strat_bullets']: st.markdown(f"- {b}")
     
     st.subheader("5. Integrated Leadership Profile")
     st.info(data['s5'])
@@ -688,21 +529,21 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     c1, c2 = st.columns(2)
     with c1:
         st.subheader("7. Thriving")
-        st.success(data['s7'])
+        st.success(data['s7']) 
     with c2:
         st.subheader("8. Struggling")
-        st.error(data['s8'])
+        st.error(data['s8']) 
     
     st.subheader("9. Supervisory Interventions")
     st.write(data['s9'])
     
     st.subheader("10. What You Should Celebrate")
     st.write(data['s10'])
+    for b in data['cel_bullets']: st.markdown(f"- {b}")
     
-    if 'coaching' in data and isinstance(data['coaching'], list):
-        st.subheader("11. Coaching Questions")
-        for q in data['coaching']:
-            st.write(f"- {q}")
+    st.subheader("11. Coaching Questions")
+    for i, q in enumerate(data['coaching']):
+        st.write(f"{i+1}. {q}")
             
     st.subheader("12. Helping Them Prepare for Advancement")
     adv_text = "Help them master the operational side. Challenge them to see clarity and accountability as kindness."
