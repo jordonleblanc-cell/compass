@@ -4,6 +4,7 @@ import pandas as pd
 from fpdf import FPDF
 import plotly.express as px
 import time
+import json
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
@@ -933,6 +934,13 @@ elif st.session_state.current_view == "Team DNA":
 elif st.session_state.current_view == "Conflict Mediator":
     st.subheader("⚖️ Conflict Mediator")
     if not df.empty:
+        # Sidebar for API Key
+        with st.sidebar:
+            gemini_key = st.text_input("🔑 Gemini API Key (Optional)", type="password", help="Get a key at aistudio.google.com to enable the smart chatbot.")
+            if not gemini_key:
+                # Try to get from secrets if not input
+                gemini_key = st.secrets.get("GEMINI_API_KEY", "")
+
         c1, c2 = st.columns(2)
         p1 = c1.selectbox("Select Yourself (Supervisor)", df['name'].unique(), index=None, key="p1")
         p2 = c2.selectbox("Select Staff Member", df['name'].unique(), index=None, key="p2")
@@ -969,7 +977,11 @@ elif st.session_state.current_view == "Conflict Mediator":
             st.markdown("---")
             with st.container(border=True):
                 st.subheader("🤖 AI Supervisor Assistant")
-                st.caption(f"Ask questions about managing **{p2}** based on their profile ({s2} x {m2}).")
+                if gemini_key:
+                    st.caption(f"Powered by Gemini 1.5 Flash | Ask specific questions about managing **{p2}** ({s2} x {m2}).")
+                else:
+                    st.caption("Basic Mode | Add an API Key in the sidebar to unlock full AI capabilities.")
+                
                 st.info("⬇️ **Type your question in the chat bar at the bottom of the screen.**")
                 
                 # Initialize history specifically for this view if not present
@@ -981,19 +993,56 @@ elif st.session_state.current_view == "Conflict Mediator":
                     with st.chat_message(message["role"]):
                         st.markdown(message["content"])
 
-                # Logic Engine for No-API Chat
-                def get_smart_response(query, comm_style, motiv_driver):
+                # -------------------------------------------
+                # LOGIC ENGINE: HYBRID (Rule-Based + Gemini)
+                # -------------------------------------------
+                def get_smart_response(query, comm_style, motiv_driver, key):
+                    # Prepare Context Data
+                    comm_data = FULL_COMM_PROFILES.get(comm_style, {})
+                    mot_data = FULL_MOTIV_PROFILES.get(motiv_driver, {})
+                    
+                    # If API Key exists, use Gemini
+                    if key:
+                        try:
+                            # Context Prompt Construction
+                            system_prompt = f"""
+                            You are an expert Leadership Coach for a youth care agency.
+                            You are advising a Supervisor on how to manage a staff member named {p2}.
+                            
+                            Here is the Staff Member's Profile:
+                            - **Communication Style:** {comm_style} ({comm_data.get('description', '')})
+                            - **Core Motivation:** {motiv_driver} ({mot_data.get('description', '')})
+                            - **Thriving Behaviors:** {comm_data.get('desc_bullets', [])}
+                            - **Stress Behaviors:** They may become rigid, withdrawn, or aggressive when their need for {motiv_driver} is blocked.
+                            
+                            **Your Goal:** Answer the user's question specifically tailored to this profile.
+                            Do not give generic advice. Use the profile data to explain WHY the staff member acts this way and HOW to reach them.
+                            Be concise, practical, and empathetic.
+                            """
+                            
+                            # API Call to Gemini 1.5 Flash (Standard Endpoint)
+                            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
+                            payload = {
+                                "contents": [{
+                                    "parts": [{"text": system_prompt + "\n\nUser Question: " + query}]
+                                }]
+                            }
+                            headers = {'Content-Type': 'application/json'}
+                            response = requests.post(url, headers=headers, data=json.dumps(payload))
+                            
+                            if response.status_code == 200:
+                                return response.json()['candidates'][0]['content']['parts'][0]['text']
+                            else:
+                                return f"⚠️ **AI Error:** {response.text}. Falling back to basic database."
+                        
+                        except Exception as e:
+                            return f"⚠️ **Connection Error:** {str(e)}. Falling back to basic database."
+
+                    # FALLBACK: Rule-Based Logic (No API Key)
                     query = query.lower()
                     response = ""
                     
-                    # Context 1: Communication
-                    comm_data = FULL_COMM_PROFILES.get(comm_style, {})
-                    
-                    # Context 2: Motivation
-                    mot_data = FULL_MOTIV_PROFILES.get(motiv_driver, {})
-                    
-                    # General Profile Query
-                    if "who is" in query or "tell me about" in query or "profile" in query or "style" in query:
+                    if "who is" in query or "tell me about" in query or "profile" in query:
                          response += f"**Profile Overview:** {p2} is a **{comm_style}** driven by **{motiv_driver}**.\n\n"
                          response += f"**Communication Style:** {comm_data.get('description', '')}\n\n"
                          response += f"**Core Driver:** {mot_data.get('description', '')}"
@@ -1006,31 +1055,17 @@ elif st.session_state.current_view == "Conflict Mediator":
                         for b in mot_data.get('desc_bullets', []):
                             response += f"- {b}\n"
 
-                    elif "weakness" in query or "struggle" in query or "bad at" in query:
-                         response += f"**Potential Blindspots:** \n"
-                         response += f"- A {comm_style} might struggle with: {comm_data.get('supervising_bullets', [''])[2]}\n" # Heuristic
-                         response += f"- When their need for {motiv_driver} isn't met, they might disengage."
-
                     elif "feedback" in query or "critical" in query or "correct" in query:
                         response += f"**On giving feedback to a {comm_style}:** {comm_data.get('supervising', 'Be clear.')}\n\n"
                         response += f"**Motivation Tip:** Frame the feedback in a way that doesn't block their drive for {motiv_driver}. "
                         if motiv_driver == "Connection": response += "Reassure them that the relationship is safe."
                         elif motiv_driver == "Achievement": response += "Focus on how fixing this helps them win."
                     
-                    elif "motivate" in query or "burnout" in query or "tired" in query:
+                    elif "motivate" in query or "burnout" in query:
                         response += f"**To motivate a {motiv_driver} driver:** {mot_data.get('strategies', 'Ask them what they need.')}\n\n"
-                        response += f"**Watch out for:** A {comm_style} under stress may become rigid or withdrawn."
                     
-                    elif "meeting" in query or "talk" in query:
-                        response += f"**Meeting Strategy:** As a {comm_style}, they appreciate {comm_data.get('desc_bullets', ['clarity'])[0]}. "
-                        response += f"Ensure the meeting connects to their value of {motiv_driver}."
-
-                    elif "conflict" in query or "fight" in query:
-                        response += f"**Conflict Style:** A {comm_style} may view conflict as {('an obstacle' if comm_style == 'Director' else 'a threat')}. "
-                        response += f"De-escalate by validating their {motiv_driver} needs."
-
                     else:
-                        response = f"I can help you manage {p2}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\nRemember: They are a **{comm_style}** driven by **{motiv_driver}**."
+                        response = f"I can help you manage {p2}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\n*Note: Add a Gemini API Key in the sidebar for smarter, custom answers.*"
                     
                     return response
 
@@ -1042,8 +1077,8 @@ elif st.session_state.current_view == "Conflict Mediator":
 
                     with st.chat_message("assistant"):
                         with st.spinner("Consulting the Compass Database..."):
-                            time.sleep(0.5) # Simulate thinking
-                            bot_reply = get_smart_response(prompt, s2, m2)
+                            # bot_reply = get_smart_response(prompt, s2, m2, gemini_key) # Fixed variable scope
+                            bot_reply = get_smart_response(prompt, s2, m2, gemini_key)
                             st.markdown(bot_reply)
                     
                     st.session_state.messages.append({"role": "assistant", "content": bot_reply})
