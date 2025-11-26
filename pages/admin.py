@@ -124,6 +124,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 def check_password():
+    # Looks for password in secrets.toml, defaults to "elmcrest2025" if not found
     PASSWORD = st.secrets.get("ADMIN_PASSWORD", "elmcrest2025") 
     if st.session_state.password_input == PASSWORD:
         st.session_state.authenticated = True
@@ -132,6 +133,7 @@ def check_password():
         st.error("Incorrect password")
 
 if not st.session_state.authenticated:
+    # Back Button for Login Screen
     st.markdown("""
         <div style="position: absolute; top: 20px; left: 20px;">
             <a href="/" target="_self" class="back-link">← Back</a>
@@ -151,69 +153,69 @@ if not st.session_state.authenticated:
 COMM_TRAITS = ["Director", "Encourager", "Facilitator", "Tracker"]
 MOTIV_TRAITS = ["Achievement", "Growth", "Purpose", "Connection"]
 
-# --- 5. DATA DICTIONARIES (DEFINED AT TOP LEVEL) ---
+# --- 5. CONTENT DICTIONARIES (ALL DEFINED AT TOP LEVEL) ---
 
-# (D) CONFLICT MATRIX (EXPANDED DEEP DIVE & SCRIPTS)
+# (D) CONFLICT MATRIX - EXPANDED
 SUPERVISOR_CLASH_MATRIX = {
     "Director": {
         "Encourager": {
             "tension": "Bulldozer vs. Doormat", 
             "psychology": """
-            This conflict stems from a fundamental mismatch in **Currency**. You (the Director) deal in **Utility**—is this useful, fast, and effective? They (the Encourager) deal in **Affirmation**—do people feel seen, safe, and valued?
+            **The Core Tension:** This conflict stems from a fundamental mismatch in **Currency**. You (the Director) deal in **Utility**—is this useful, fast, and effective? They (the Encourager) deal in **Affirmation**—do people feel seen, safe, and valued?
             
-            When you skip the 'human connection' to get straight to the work, the Encourager experiences this as a safety threat. To them, efficiency without empathy isn't just rude; it's dangerous to the team culture. You likely interpret their subsequent withdrawal as incompetence or lack of focus, but it is actually a stress response to your intensity. They retreat to protect themselves from what feels like an attack.
+            **Why it happens:** When you skip the 'human connection' to get straight to the work, the Encourager experiences this as a safety threat. To them, efficiency without empathy isn't just rude; it's dangerous to the team culture. You likely interpret their subsequent withdrawal as incompetence or lack of focus, but it is actually a stress response to your intensity. They retreat to protect themselves from what feels like an attack.
             """,
             "watch_fors": [
-                "**Silent Withdrawal:** The Encourager stops contributing in meetings. They nod and smile but offer no real input. This isn't agreement; it's self-protection from your intensity.",
-                "**Interrupting:** You start finishing their sentences because they take too long to get to the point, signaling that their process is a waste of your time.",
-                "**Venting:** They complain to peers that you are 'mean', 'cold', or 'don't care', eroding your authority behind your back because they don't feel safe bringing it to you.",
-                "**Exhaustion:** You feel drained by their constant need for what you perceive as 'hand-holding' or validation, viewing it as a tax on your productivity."
+                "**Silent Withdrawal:** The Encourager stops contributing in meetings. This isn't agreement; it is a safety mechanism. They have decided it is unsafe to speak.",
+                "**Interrupting:** You start finishing their sentences because they take too long to get to the point. This signals to them that their process is invalid.",
+                "**Venting:** They complain to peers that you are 'mean', 'cold', or 'don't care'. They seek validation elsewhere because they can't get it from you.",
+                "**Exhaustion:** You feel drained by their constant need for what you perceive as 'hand-holding'. You view their need for connection as a tax on your productivity."
             ],
             "intervention_steps": [
-                "**1. Pre-Frame (Mindset):** Before you speak, remind yourself: 'Efficiency without Empathy is Inefficiency.' If you break the relationship, the work stops. You must invest 5 minutes in rapport to save 5 hours of friction later. You are not 'coddling'; you are 'lubricating the gears' of the team.",
-                "**2. The Translate (Action):** In the meeting, translate their feelings into data. When they say they are 'stressed' or 'worried', do not dismiss it as fluff. Reframe it: 'When you say the team is stressed, you are giving me data about operational risk. Thank you for flagging that.' This validates them in your language.",
-                "**3. The Deal (Closing):** Explicitly agree to a protocol: You will listen for 5 minutes without solving or interrupting, if they agree to move to concrete action steps immediately after. This gives them the hearing they need and you the action you need."
+                "**Phase 1: The Pre-Frame (Mindset)**\n*The Goal:* To shift your internal narrative from 'they are slow' to 'they are safe'.\n*The Action:* Before you speak, remind yourself: 'Efficiency without Empathy is Inefficiency.' If you break the relationship, the work stops.",
+                "**Phase 2: The Translation (Action)**\n*The Goal:* To validate their feelings without losing your focus on facts.\n*The Action:* In the meeting, translate their feelings into data. When they say they are 'stressed', reframe it: 'When you say the team is stressed, you are giving me data about operational risk. Thank you.'",
+                "**Phase 3: The Deal (Closing)**\n*The Goal:* To set boundaries that honor both styles.\n*The Action:* Explicitly agree to a protocol: You will listen for 5 minutes without solving, if they agree to move to concrete action steps immediately after."
             ],
             "scripts": {
-                "Opening": "I want to hear how you're seeing this. I'm going to listen without fixing for the next few minutes.",
-                "Validation": "I hear that you're worried about the team's morale. That is a valid risk to flag.",
-                "The Pivot": "Now that I understand the emotional impact, can we look at the timeline for the project?",
-                "Crisis": "I know this feels rushed, and I'm sorry for that. We have to move fast for safety, but I'll circle back to check on you after.",
-                "Feedback": "My brevity is not anger; it is urgency. I value you, I am just stressed about the goal."
+                "Opening": "I want to pause. I feel like I'm pushing for a result and you're worried about the team. Tell me what I'm missing about the people side.",
+                "Validation": "I hear that you're worried about the team's morale. I want you to know I see that as a valid risk factor, not just 'feelings'.",
+                "The Pivot": "Now that I understand the emotional impact, can we look at the timeline? How do we achieve the goal while honoring that risk?",
+                "Crisis": "I know this feels rushed, and I'm sorry for that. We have to move fast for safety right now, but I promise we will circle back to check on the team after.",
+                "Feedback": "I want to be direct with you because I respect you. My brevity is not anger; it is urgency. I value you."
             }
         },
         "Facilitator": {
             "tension": "Gas vs. Brake",
             "psychology": """
-            This conflict is about **Risk Perception**. You fear **Stagnation** (doing nothing); they fear **Error** (doing the wrong thing or leaving someone behind). You operate on 'Ready, Fire, Aim'; they operate on 'Ready, Aim, Aim...'.
+            **The Core Tension:** This conflict is about **Risk Perception**. You fear **Stagnation** (doing nothing); they fear **Error** (doing the wrong thing or leaving someone behind). You operate on 'Ready, Fire, Aim'; they operate on 'Ready, Aim, Aim...'.
             
-            You feel slowed down and obstructed by their need for consensus. They feel steamrolled and unsafe by your speed. You push for a decision to relieve your anxiety about inaction; they pause the decision to relieve their anxiety about exclusion. The more you push, the more they dig in their heels to 'slow the car down.'
+            **Why it happens:** You feel slowed down and obstructed by their need for consensus. They feel steamrolled and unsafe by your speed. You push for a decision to relieve your anxiety about inaction; they pause the decision to relieve their anxiety about exclusion. The more you push, the more they dig in their heels to 'slow the car down' because they believe you are driving off a cliff.
             """,
             "watch_fors": [
-                "**Email Commands:** You issue commands via email to avoid a meeting because you know it will drag on, which alienates the team.",
-                "**The 'We Need to Talk' Loop:** They keep saying 'We need to talk about this' but never actually make a decision, trapping the team in perpetual processing.",
-                "**Eye Rolling:** You visibly check out or roll your eyes when they ask for 'thoughts' from the group, signaling that their process is invalid.",
-                "**Passive Resistance:** Decisions are made by you but passively resisted or ignored by the team because the Facilitator didn't buy in and quietly signaled that it wasn't a 'real' decision."
+                "**Email Commands:** You issue commands via email to avoid a meeting because you know it will drag on. This alienates the team and makes the Facilitator feel bypassed.",
+                "**The Loop:** They keep saying 'We need to talk about this' but never actually make a decision. They are stuck in the process loop.",
+                "**Eye Rolling:** You visibly check out or roll your eyes when they ask for 'thoughts' from the group. This signals that you don't value their method.",
+                "**Passive Resistance:** Decisions are made by you but passively resisted or ignored by the team because the Facilitator didn't buy in."
             ],
             "intervention_steps": [
-                "**1. Define the Clock:** They need time; you need a deadline. Negotiate it upfront. 'We will discuss this for exactly 30 minutes. At 30 minutes, I will make the call.' This contains your anxiety about time and theirs about process.",
-                "**2. Define the Veto:** Give them a 'Red Flag' right. Tell them: 'If you see a genuine safety risk, you can stop me. Otherwise, I am going to keep driving the bus.' This empowers them to protect the team without stalling every minor decision.",
-                "**3. The Debrief:** After the action, review: 'Did we move too fast? Or did we wait too long?' This builds trust for next time and proves you are willing to learn from the speed."
+                "**Phase 1: Define the Clock (Structure)**\n*The Goal:* To contain your anxiety about time and theirs about process.\n*The Action:* Negotiate it upfront. 'We will discuss this for exactly 30 minutes. At 30 minutes, I will make the call.'",
+                "**Phase 2: Define the Veto (Empowerment)**\n*The Goal:* To make them feel safe without giving them a filibuster.\n*The Action:* Give them a 'Red Flag' right. Tell them: 'If you see a genuine safety risk, you can stop me. Otherwise, I am going to keep driving the bus.'",
+                "**Phase 3: The Debrief (Trust)**\n*The Goal:* To prove that speed works.\n*The Action:* After the action, review: 'Did we move too fast? Or did we wait too long?' This builds trust for next time."
             ],
             "scripts": {
-                "Opening": "I know you want to get this right, and I want to get this done. Let's find a way to do both.",
-                "The Clock": "We have 15 minutes to debate. If we don't have consensus by then, I will make the executive decision.",
-                "The Pivot": "I've heard everyone's input. Thank you. Here is the decision we are going with.",
-                "Crisis": "We don't have time for consensus right now. I need you to trust me and execute this plan.",
-                "Feedback": "Force = Compliance, not Buy-in. If I push now, will they actually do the work?"
+                "Opening": "I know you want to get this right (accuracy), and I want to get this done (speed). Let's find a way to do both.",
+                "The Clock": "We have 15 minutes to debate. If we don't have consensus by then, I will make the executive decision to move us forward.",
+                "The Pivot": "I've heard everyone's input. Thank you for gathering that. Here is the decision we are going with.",
+                "Crisis": "We don't have time for consensus right now. I need you to trust me and execute this plan immediately. We can debrief later.",
+                "Feedback": "When you delay the decision to get everyone on board, we miss the window of opportunity. Sometimes a good decision now is better than a perfect decision later."
             }
         },
         "Tracker": {
             "tension": "Vision vs. Obstacle",
             "psychology": """
-            This is a clash of **Authority Sources**. You trust **Intuition** and results; they trust **The Handbook** and process. You say 'Make it happen'; they say 'But Regulation 14.B says...'.
+            **The Core Tension:** This is a clash of **Authority Sources**. You trust **Intuition** and results; they trust **The Handbook** and process. You say 'Make it happen'; they say 'But Regulation 14.B says...'.
             
-            You feel they are the 'Department of No', putting roadblocks in your way. They feel you are a liability lawsuit waiting to happen. You are focused on the destination; they are staring at the speedometer. You see rules as guidelines; they see them as physics—laws that cannot be broken.
+            **Why it happens:** You feel they are the 'Department of No', putting roadblocks in your way. They feel you are a liability lawsuit waiting to happen. You are focused on the destination (the goal); they are staring at the speedometer (the rules). You see rules as guidelines; they see them as physics—laws that cannot be broken.
             """,
             "watch_fors": [
                 "**Policy Wars:** They quote policy numbers in arguments instead of discussing the actual issue or solution.",
@@ -222,24 +224,24 @@ SUPERVISOR_CLASH_MATRIX = {
                 "**Workarounds:** You bypass them to get things done, creating compliance risks they have to clean up later, fueling their resentment."
             ],
             "intervention_steps": [
-                "**1. Clarify Roles:** You own the 'What' (Destination). They own the 'How' (Safe Route). You set the goal; they map the safest way to get there. Do not let them set the goal; do not try to map the route yourself.",
-                "**2. The 'Yes, If' Rule:** Coach them to never say 'No'. Instead say: 'Yes, we can do that, *if* we sign this waiver/change this budget.' This forces them to be problem solvers, not blockers.",
-                "**3. Risk Acceptance:** You must explicitly state: 'I accept the risk of deviating from the standard here.' This relieves their anxiety because the 'blame' is off their shoulders."
+                "**Phase 1: Clarify Roles (Boundaries)**\n*The Goal:* To stop fighting over who is driving.\n*The Action:* You own the 'What' (Destination). They own the 'How' (Safe Route). You set the goal; they map the safest way to get there.",
+                "**Phase 2: The 'Yes, If' Rule (Language)**\n*The Goal:* To shift them from blockers to problem solvers.\n*The Action:* Coach them to never say 'No'. Instead say: 'Yes, we can do that, *if* we sign this waiver/change this budget.'",
+                "**Phase 3: Risk Acceptance (Liability)**\n*The Goal:* To remove the weight of the decision from their shoulders.\n*The Action:* You must explicitly state: 'I accept the risk of deviating from the standard here.' This relieves their anxiety."
             ],
             "scripts": {
                 "Opening": "I need your help figuring out *how* to do this legally, not *if* we should do it.",
                 "The Ask": "I want to get to [Goal]. What is the safest, compliant way to get there fast?",
-                "The Pivot": "I hear the risk. I am choosing to accept that risk. Please document that I made this call.",
-                "Crisis": "The procedure doesn't cover this situation. We are using common sense for the next hour.",
-                "Feedback": "They are protecting you from liability. Their 'no' is actually care."
+                "The Pivot": "I hear the risk you are raising. I am choosing to accept that risk. Please document that I made this call.",
+                "Crisis": "The procedure doesn't cover this situation. We are using common sense for the next hour. I will sign off on it.",
+                "Feedback": "They are protecting you from liability. Their 'no' is actually care. Assume positive intent."
             }
         },
         "Director": {
             "tension": "King vs. King",
             "psychology": """
-            This is a pure **Dominance** struggle. Both of you define safety as **Control**. When the other person takes control, you feel unsafe or disrespected. The conversation becomes a debate about who is right rather than what is best.
+            **The Core Tension:** This is a pure **Dominance** struggle. Both of you define safety as **Control**. When the other person takes control, you feel unsafe or disrespected. The conversation becomes a debate about who is right rather than what is best.
             
-            You are both fighting for the steering wheel. Neither of you is listening; you are just reloading your next argument. You likely agree on the goal but are fighting over who gets the credit for the solution.
+            **Why it happens:** You are both fighting for the steering wheel. Neither of you is listening; you are just reloading your next argument. You likely agree on the goal but are fighting over who gets the credit for the solution.
             """,
             "watch_fors": [
                 "**Interruptions:** Constant interrupting and talking over each other to assert dominance.",
@@ -248,20 +250,20 @@ SUPERVISOR_CLASH_MATRIX = {
                 "**Awkward Team:** The team looks awkward while 'Mom and Dad fight' and stops contributing."
             ],
             "intervention_steps": [
-                "**1. Separate Lanes:** You cannot drive the same car. Give them distinct domains where they have total authority. 'You run the AM shift; I run the PM shift.' Respect the lane.",
-                "**2. The Truce:** Acknowledge the power struggle explicitly. 'We are both fighting for the wheel. Let's stop.' Name the dynamic to break it.",
-                "**3. Disagree and Commit.** Once a decision is made by the final authority, the debate ends. No meeting-after-the-meeting. You must model followership to get leadership."
+                "**Phase 1: Separate Lanes (Territory)**\n*The Goal:* To give you both a space to lead without collision.\n*The Action:* You cannot drive the same car. Give them distinct domains where they have total authority. 'You run the AM shift; I run the PM shift.'",
+                "**Phase 2: The Truce (Awareness)**\n*The Goal:* To stop the power struggle.\n*The Action:* Acknowledge it explicitly. 'We are both fighting for the wheel. Let's stop.' Name the dynamic to break it.",
+                "**Phase 3: Disagree and Commit (Execution)**\n*The Goal:* To move forward despite disagreement.\n*The Action:* Once a decision is made by the final authority, the debate ends. No meeting-after-the-meeting. You must model followership to get leadership."
             ],
             "scripts": {
-                "Opening": "We are battling for control right now. Let's pause and look at the problem.",
-                "The Lane": "You have full authority over this piece. I will not interfere.",
-                "The Pivot": "I see it differently, but I will back your play.",
+                "Opening": "We are battling for control right now. Let's pause and look at the problem, not each other.",
+                "The Lane": "You have full authority over this piece. I will not interfere. I need you to give me the same courtesy on my piece.",
+                "The Pivot": "I see it differently, but I will back your play 100% because you are the lead on this.",
                 "Crisis": "One voice needs to lead right now. Is it you or me?",
-                "Feedback": "We are fighting to be right instead of effective."
+                "Feedback": "We are fighting to be right instead of effective. Let's drop the ego and fix the issue."
             }
         }
     },
-    # Fallbacks for other combinations would be similarly detailed in a full deployment
+    # Fallbacks for other combinations to prevent errors
 }
 
 # Helper to ensure robust lookup
@@ -277,39 +279,39 @@ for s in COMM_TRAITS:
                 "scripts": {"Joint": "Let's align on the goal first."}
             }
 
-# (A) TEAM CULTURE GUIDE (EXPANDED)
+# (A) TEAM CULTURE GUIDE
 TEAM_CULTURE_GUIDE = {
     "Director": {
         "title": "The 'Action' Culture",
-        "impact_analysis": "**What it feels like:** This unit operates like a high-stakes trading floor. The energy is intense, fast, and results-oriented. Decisions are made quickly, often by the loudest voice. Competence is the primary currency of trust.\n\n**The Good:** You will rarely miss a deadline. Crises are handled with military precision. Productivity is high.\n\n**The Bad:** You risk 'Burnout by Urgency.' Quiet staff members will be steamrolled and stop contributing. You may solve the wrong problems very quickly because no one paused to ask 'Why?'.",
+        "impact_analysis": "**What it feels like:** This unit operates like a high-stakes trading floor. The energy is intense, fast, and results-oriented. Decisions are made quickly, often by the loudest voice. Competence is the primary currency of trust.\n\n**The Good:** You will rarely miss a deadline. Crises are handled with military precision. Productivity is high.\n**The Bad:** You risk 'Burnout by Urgency.' Quiet staff members will be steamrolled and stop contributing. You may solve the wrong problems very quickly because no one paused to ask 'Why?'.",
         "management_strategy": "**Your Role: The 'Governor'.** Your team has a heavy gas pedal; you must be the brake and the steering wheel.\n* **Slow them down:** Do not reward speed for speed's sake. Praise thoroughness.\n* **Protect the minority:** Actively solicit the opinion of the quietest person in the room.\n* **Enforce breaks:** This culture treats exhaustion as a badge of honor. You must mandate rest.",
         "meeting_protocol": "1. **The Devil's Advocate Rule:** Assign one person per meeting to specifically challenge the speed of the decision. Ask: 'What happens if we wait 24 hours?'\n2. **Forced Silence:** Implement a '2-minute silence' after a proposal is made to allow internal processors time to think before the Directors dominate the verbal space.\n3. **The 'Who' Check:** End every meeting by asking, 'Who might feel hurt or left out by this decision?'",
         "team_building": "Strategic games, escape rooms, competitions (with caution)."
     },
     "Encourager": {
         "title": "The 'Family' Culture",
-        "impact_analysis": "**What it feels like:** This unit feels like a family gathering. There is laughter, food, and deep personal connection. People feel safe, seen, and cared for. Staff retention is often high because people don't want to leave their friends.\n\n**The Good:** High psychological safety and trust. Staff support each other through personal crises. Resilience in hard times.\n\n**The Bad:** The 'Nice Guy Trap.' Bad behavior is tolerated because no one wants to be 'mean.' Accountability is viewed as aggression. Decisions are made based on what makes people happy, not what is effective.",
+        "impact_analysis": "**What it feels like:** This unit feels like a family gathering. There is laughter, food, and deep personal connection. People feel safe, seen, and cared for. Staff retention is often high because people don't want to leave their friends.\n\n**The Good:** High psychological safety and trust. Staff support each other through personal crises. Resilience in hard times.\n**The Bad:** The 'Nice Guy Trap.' Bad behavior is tolerated because no one wants to be 'mean.' Accountability is viewed as aggression. Decisions are made based on what makes people happy, not what is effective.",
         "management_strategy": "**Your Role: The 'Bad Guy'.** They have enough warmth; they need you to provide the spine.\n* **Normalize Conflict:** Teach them that disagreement is not disrespect.\n* **Separate Friends from Work:** Remind them that 'liking' someone doesn't mean letting them slide on safety protocols.\n* **Focus on the 'Who':** Frame accountability as 'protecting the team' rather than 'punishing the individual.'",
         "meeting_protocol": "1. **The 'Blockers' Agenda:** Start meetings with 'What is broken?' instead of 'How are we doing?'. Force negative feedback into the open.\n2. **Data-Driven Reviews:** Use dashboards to review performance. It depersonalizes the feedback. 'The chart says we are late' is easier for an Encourager to hear than 'You are late.'\n3. **Time-Box Venting:** Allow exactly 10 minutes for feelings/venting at the start, then physically set a timer to pivot to tasks.",
         "team_building": "Potlucks, appreciation circles, storytelling. Focus on connection and shared history."
     },
     "Facilitator": {
         "title": "The 'Consensus' Culture",
-        "impact_analysis": "**What it feels like:** This unit feels like a democratic senate. Every voice is heard, every angle is considered, and fairness is the ultimate goal. There is a deep sense of stability and equity.\n\n**The Good:** High buy-in. Few errors because decisions are vetted thoroughly. An equitable environment where no one is left behind.\n\n**The Bad:** Analysis Paralysis. This team struggles to move during a crisis. They will form a committee to decide where to order lunch. They risk 'death by meeting,' where the process of deciding becomes more important than the decision itself.",
+        "impact_analysis": "**What it feels like:** This unit feels like a democratic senate. Every voice is heard, every angle is considered, and fairness is the ultimate goal. There is a deep sense of stability and equity.\n\n**The Good:** High buy-in. Few errors because decisions are vetted thoroughly. An equitable environment where no one is left behind.\n**The Bad:** Analysis Paralysis. This team struggles to move during a crisis. They will form a committee to decide where to order lunch. They risk 'death by meeting,' where the process of deciding becomes more important than the decision itself.",
         "management_strategy": "**Your Role: The 'Closer'.** They have enough inputs; they need you to force the output.\n* **Set the Deadline:** Do not ask 'When should we decide?'. Tell them 'We decide on Tuesday.'\n* **Define 'Consensus':** Teach them that consensus means 'I can live with it,' not 'I love it.'\n* **Authorize Imperfection:** Give them permission to make mistakes. They are terrified of being wrong.",
         "meeting_protocol": "1. **The 'Disagree & Commit' Rule:** Establish a norm that once a decision is made, debate ends. No meeting-after-the-meeting.\n2. **Hard Deadlines:** Set the decision date BEFORE the discussion starts.\n3. **Opt-Out Rights:** Allow people to skip meetings if they trust the group to decide. Reduce the committee bloat.",
         "team_building": "Collaborative problem solving (e.g., Desert Survival). Activities where the group must agree to win."
     },
     "Tracker": {
         "title": "The 'Safety' Culture",
-        "impact_analysis": "**What it feels like:** This unit feels like a well-oiled machine or a laboratory. Everything has a place, a time, and a label. Documentation is impeccable. Risks are anticipated and managed before they happen.\n\n**The Good:** Safety and reliability. You never have to worry about an audit. Shifts run like clockwork.\n\n**The Bad:** Rigidity. This team struggles when the 'Plan' fails. They may quote the policy manual while a kid is in crisis, prioritizing the rule over the relationship. Innovation is low because 'we've always done it this way.'",
+        "impact_analysis": "**What it feels like:** This unit feels like a well-oiled machine or a laboratory. Everything has a place, a time, and a label. Documentation is impeccable. Risks are anticipated and managed before they happen.\n\n**The Good:** Safety and reliability. You never have to worry about an audit. Shifts run like clockwork.\n**The Bad:** Rigidity. This team struggles when the 'Plan' fails. They may quote the policy manual while a kid is in crisis, prioritizing the rule over the relationship. Innovation is low because 'we've always done it this way.'",
         "management_strategy": "**Your Role: The 'Visionary'.** They are looking at their feet (the steps); you must make them look at the horizon (the goal).\n* **Challenge the Rule:** Regularly ask 'Does this rule still serve us?'\n* **Humanize the Data:** Remind them that every number on the spreadsheet represents a human being.\n* **Encourage Flex:** Reward them for adapting to a crisis, not just for following the script.",
         "meeting_protocol": "1. **The 'Intent' Explain:** Trackers must explain the *intent* behind a rule (e.g., 'Safety') not just the rule itself.\n2. **Pilot Programs:** Frame innovation as a 'Controlled Experiment.' Trackers hate chaos, but they love data collection. Let them 'test' a new idea to gather data.\n3. **The Human Impact:** End every meeting by asking: 'How will this decision make the youth/staff *feel*?'",
         "team_building": "Logic puzzles, building projects (Lego), process improvement workshops. Avoid 'vague' creative tasks."
     },
     "Balanced": {
         "title": "The Balanced Culture",
-        "impact_analysis": "**What it feels like:** This unit has a healthy mix of all styles. There are no glaring blind spots, but friction is common because people are speaking different 'languages' (Action vs. Process, People vs. Task).\n\n**The Good:** High resilience and adaptability. You have someone for every type of crisis.\n\n**The Bad:** Communication breakdown. Directors annoy Facilitators; Trackers annoy Encouragers. Conflict is frequent.",
+        "impact_analysis": "**What it feels like:** This unit has a healthy mix of all styles. There are no glaring blind spots, but friction is common because people are speaking different 'languages' (Action vs. Process, People vs. Task).\n\n**The Good:** High resilience and adaptability. You have someone for every type of crisis.\n**The Bad:** Communication breakdown. Directors annoy Facilitators; Trackers annoy Encouragers. Conflict is frequent.",
         "management_strategy": "**Your Role: The Translator.** You must constantly translate intent.\n* **Translate Intent:** 'The Director isn't being mean; they are being efficient.' 'The Tracker isn't being difficult; they are being safe.'\n* **Rotate Leadership:** Let the Director lead the crisis; let the Encourager lead the debrief; let the Tracker lead the audit.",
         "meeting_protocol": "1. **Round Robin:** Use structured turn-taking so the loudest voice doesn't always win.\n2. **Role-Based Input:** Ask specific people for specific input: 'Bob (Tracker), are we safe? Jane (Encourager), are we cohesive?'",
         "team_building": "Personality assessments (like this one) and workshops on communication styles."
@@ -327,7 +329,7 @@ MISSING_VOICE_GUIDE = {
         "fix": "**Supervisor Strategy: Be the Heart.**\n* **The 5-Minute Rule:** Spend the first 5 minutes of every meeting on non-work connection. No exceptions.\n* **Manual Appreciation:** You must schedule reminders to send thank-you notes or verbal praise, as it won't happen naturally.\n* **Wellness Checks:** Ask 'How are you doing?' and wait for the real answer."
     },
     "Facilitator": {
-        "risk": "**Tunnel Vision & Bulldozing.** Without Facilitator energy, the loudest voices will dominate. You will have 'Blind Spots' because no one is stepping back to ask 'What about X?'. Dissent will be crushed or ignored. Decisions will be fast but often wrong or poorly implemented.",
+        "risk": "**Tunnel Vision & Bulldozing.** Without Facilitator energy, the loudest voices will dominate. You will have 'Blind spots' because no one is stepping back to ask 'What about X?'. Dissent will be crushed or ignored. Decisions will be fast but often wrong or poorly implemented.",
         "fix": "**Supervisor Strategy: Be the Brake.**\n* **Round Robin:** Force a mechanism where everyone speaks once before anyone speaks twice.\n* **The 'Pre-Mortem':** Before finalizing a plan, ask: 'If this fails, why did it fail?' forcing them to slow down and look for gaps.\n* **Check for Buy-In:** Explicitly ask the quietest people for their opinion."
     },
     "Tracker": {
@@ -511,7 +513,7 @@ FULL_MOTIV_PROFILES = {
     }
 }
 
-# --- 5c. GENERATOR FUNCTION ---
+# 5c. INTEGRATED PROFILES (Expanded & 10 Coaching Questions Logic)
 def generate_profile_content(comm, motiv):
     
     # This dictionary holds the specific text for the 16 combinations
@@ -923,17 +925,13 @@ elif st.session_state.current_view == "Conflict Mediator":
             s1, s2 = d1['p_comm'], d2['p_comm']
             st.divider()
             st.subheader(f"{s1} (Sup) vs. {s2} (Staff)")
-            
-            # Check matrix
             if s1 in SUPERVISOR_CLASH_MATRIX and s2 in SUPERVISOR_CLASH_MATRIX[s1]:
                 clash = SUPERVISOR_CLASH_MATRIX[s1][s2]
-                
                 with st.expander("🔍 **Psychological Deep Dive**", expanded=True):
                     st.markdown(f"**The Dynamic:** {clash['tension']}")
                     st.markdown(f"**Psychology:** {clash['psychology']}")
                     st.markdown("**🚩 Watch For:**")
                     for w in clash['watch_fors']: st.markdown(f"- {w}")
-                
                 c_a, c_b = st.columns(2)
                 with c_a:
                     st.markdown("##### 🛠️ 3-Phase Protocol")
