@@ -37,6 +37,11 @@ if not st.session_state.authenticated:
         <style>
         .stApp { background: radial-gradient(circle at center, #f1f5f9 0%, #cbd5e1 100%); }
         [data-testid="stHeader"] { background: transparent; }
+        
+        /* HIDE SIDEBAR NAVIGATION HERE TOO */
+        [data-testid="stSidebarNav"] {display: none;}
+        section[data-testid="stSidebar"] {display: none;}
+
         .login-card {
             background: white; padding: 40px; border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center;
@@ -47,12 +52,20 @@ if not st.session_state.authenticated:
         .login-title { color: #015bad; font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
         .login-subtitle { color: #64748b; margin-bottom: 20px; }
         </style>
+        
+        <!-- Back Button for Login Screen -->
+        <div style="position: absolute; top: 20px; left: 20px;">
+            <a href="/" target="_self" style="text-decoration: none; color: #64748b; font-weight: 600;">← Back</a>
+        </div>
+
         <div class='login-card'>
             <div class='login-title'>Supervisor Access</div>
             <div class='login-subtitle'>Please enter your credentials to access the leadership dashboard.</div>
         </div>
     """, unsafe_allow_html=True)
     st.text_input("Password", type="password", key="password_input", on_change=check_password)
+    if st.button("← Back to Compass"):
+        st.switch_page("app.py")
     st.stop()
 
 # ==========================================
@@ -103,6 +116,10 @@ st.markdown(f"""
             }}
         }}
 
+        /* HIDE SIDEBAR NAVIGATION */
+        [data-testid="stSidebarNav"] {{display: none;}}
+        section[data-testid="stSidebar"] {{display: none;}}
+
         html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; color: var(--text-main) !important; }}
         .stApp {{ background: radial-gradient(circle at top left, var(--bg-start) 0%, var(--bg-end) 100%); }}
         h1, h2, h3, h4 {{ color: var(--primary) !important; font-weight: 700 !important; letter-spacing: -0.02em; }}
@@ -144,6 +161,165 @@ COMM_TRAITS = {
     "Encourager": {"focus": "Morale & Harmony", "blindspot": "Hard Truths & Conflict", "needs": "Validation & Connection"},
     "Facilitator": {"focus": "Fairness & Process", "blindspot": "Decisiveness & Speed", "needs": "Time & Perspective"},
     "Tracker": {"focus": "Details & Safety", "blindspot": "Flexibility & Big Picture", "needs": "Structure & Logic"}
+}
+
+# --- EXTENDED CONTENT FOR PDF REPORT ---
+
+FULL_COMM_PROFILES = {
+    "Director": {
+        "description": "This staff member communicates primarily as a Director. They lead with clarity, structure, and urgency. They influence the emotional tone of the unit by providing a strong 'spine' during chaos. They are decisive and often view problems as things to be solved quickly rather than processed emotionally.",
+        "supervising_tips": "Match their directness. Do not 'sandwich' feedback; give it to them straight. Reinforce their strength in crisis while helping them build patience for process. Frame relationship-building not as 'fluff' but as a strategy for efficiency."
+    },
+    "Encourager": {
+        "description": "This staff member communicates primarily as an Encourager. They lead with empathy, warmth, and emotional presence. They act as the 'glue' of the team, ensuring people feel seen and safe. They are often the first to notice when morale is low.",
+        "supervising_tips": "Start every interaction with connection before content. Validate their intent ('I know you care deeply') before correcting impact. Help them separate their personal worth from the team's happiness."
+    },
+    "Facilitator": {
+        "description": "This staff member communicates primarily as a Facilitator. They lead by listening, building consensus, and ensuring fairness. They are the 'calm bridge' who de-escalates tension and ensures all voices are heard before a decision is made.",
+        "supervising_tips": "Give them time to process. Do not demand immediate decisions on complex issues. Reinforce that their slowness is a strength (deliberation), but help them define a 'hard stop' for decision making."
+    },
+    "Tracker": {
+        "description": "This staff member communicates primarily as a Tracker. They lead with details, accuracy, and safety. They find comfort in rules and consistency. They protect the agency and youth by noticing the small risks that others miss.",
+        "supervising_tips": "Provide clear, written expectations. Do not be vague. Honor their need for 'the plan.' When plans change, explain the 'why' clearly so they don't feel the change is arbitrary or unsafe."
+    }
+}
+
+FULL_MOTIV_PROFILES = {
+    "Achievement": {
+        "description": "Their primary motivator is Achievement. They thrive when they can see progress, check boxes, and win. They hate stagnation and ambiguity.",
+        "strategies": "Set clear, measurable goals. Use visual trackers. Celebrate 'wins' explicitly. Give them projects where they can own the result.",
+        "celebrate": "Concrete outcomes, finished projects, metrics improved, reliability."
+    },
+    "Growth": {
+        "description": "Their primary motivator is Growth. They thrive when they are learning, stretching, and mastering new skills. They hate feeling stuck or bored.",
+        "strategies": "Feed their curiosity. Assign them 'stretch' projects. frame feedback as 'coaching' for their future. Connect tasks to their career path.",
+        "celebrate": "New skills learned, adaptability, taking on new challenges, personal development."
+    },
+    "Purpose": {
+        "description": "Their primary motivator is Purpose. They thrive when they feel their work aligns with deep values and makes a real difference for kids. They hate bureaucracy that feels meaningless.",
+        "strategies": "Connect every rule to a 'Why'. Validate their passion for justice. Share stories of their impact on youth.",
+        "celebrate": "Advocacy for youth, integrity, ethical decision making, mission moments."
+    },
+    "Connection": {
+        "description": "Their primary motivator is Connection (Relationships). They thrive when they feel part of a tight-knit team. They hate isolation and unresolved conflict.",
+        "strategies": "Prioritize face time. Check in on them as a person. Build team rituals. Ensure they don't work in a silo.",
+        "celebrate": "Team cohesion, supporting peers, morale building, conflict resolution."
+    }
+}
+
+FULL_INTEGRATED_PROFILES = {
+    "Director-Growth": {
+        "summary": "Leads with decisive action and is hungry to improve. They want the unit to run well and want to keep leveling up their own skills.",
+        "support": "Ask for a small number of focused projects rather than trying to fix everything at once. Co-design development goals.",
+        "thriving": "Quick to turn learning into practice. Coaches peers effectively. Refines decisions based on new data.",
+        "struggling": "Moves faster than the team can handle. Becomes impatient with 'slow' learners. Defaults to control in crisis.",
+        "interventions": "Slow down. Focus on one change at a time. Ask: 'Who is left behind by this speed?'"
+    },
+    "Director-Purpose": {
+        "summary": "Driven to make clear, firm decisions that align with deep values. Cares about order, but also about justice and integrity.",
+        "support": "Share your top core values so they understand your decisions. Translate clinical values into concrete rules.",
+        "thriving": "Advocates strongly for youth safety. Holds boundaries even when unpopular. seen as a moral anchor.",
+        "struggling": "Becomes rigid or righteous when values are threatened. excessive frustration with 'the system'.",
+        "interventions": "Validate the value (e.g. safety) before asking for flexibility. Help them pick battles."
+    },
+    "Director-Connection": {
+        "summary": "Wants the team to feel supported but communicates with directness. Balances being the 'Boss' and the 'Friend'.",
+        "support": "Script phrases that are both firm and relational. Schedule short relational touchpoints during tough weeks.",
+        "thriving": "Anchors the team in crisis while checking on their feelings. Firm but not distant.",
+        "struggling": "Holds back hard conversations to avoid being 'mean'. Swings between 'all business' and 'all buddy'.",
+        "interventions": "Role-play the 'Hard Conversation' so they feel safe being direct. Remind them that clarity is kindness."
+    },
+    "Director-Achievement": {
+        "summary": "Results-focused and decisive. Wants to see tangible improvements in safety and outcomes. Takes charge to get there.",
+        "support": "Partner to define realistic pacing. Set process goals (we did the steps) not just outcome goals (the kid behaved).",
+        "thriving": "Sets clear goals. Helps staff understand success. Moves metrics in the right direction.",
+        "struggling": "Treats trauma behavior as a problem to 'solve' quickly. Micromanages peers. Judges self harshly.",
+        "interventions": "Contextualize metrics. Celebrate the 'small wins' so they don't burn out chasing perfection."
+    },
+    "Encourager-Growth": {
+        "summary": "Loves helping people grow. Brings energy and hope. Believes staff and youth can change and wants to support that process.",
+        "support": "Help them choose a small number of people to invest in so they don't spread thin. Pair encouragement with specific targets.",
+        "thriving": "Natural mentor. Youth feel believed in. Invests in peer development.",
+        "struggling": "Overcommits emotional energy. Avoids sharp feedback to spare feelings. Discouraged when others don't grow.",
+        "interventions": "Teach them to give 'Radical Candor'. Remind them they can't grow *for* other people."
+    },
+    "Encourager-Purpose": {
+        "summary": "Fueled by connection and meaning. Wants youth/staff to feel valued and respected. Keeps the 'Why' alive.",
+        "support": "Regular debriefs to process emotional load. Use values-based language for accountability.",
+        "thriving": "Catches when people feel unseen. Translates clinical concepts into human terms. Safe harbor for staff.",
+        "struggling": "Carries heavy emotional weight. Struggles to enforce consequences on 'sad' cases. Heartbroken by outcomes.",
+        "interventions": "Focus on 'Boundaries as Care'. Help them release what they cannot control."
+    },
+    "Encourager-Connection": {
+        "summary": "A community builder. Thrives on 'we are in this together'. Makes staff feel less alone in the hard work.",
+        "support": "Practice scripts that connect and correct simultaneously. Plan for hard conversations in advance.",
+        "thriving": "Makes staff feel safe. De-escalates through relationship. Repairs team conflict.",
+        "struggling": "Avoids addressing harm to keep the peace. Takes tension personally. Prioritizes harmony over safety.",
+        "interventions": "Challenge them: 'Is avoiding this conflict actually helping the team, or hurting safety?'"
+    },
+    "Encourager-Achievement": {
+        "summary": "Wants people to feel good and do well. Motivated when encouragement translates into visible progress.",
+        "support": "Define realistic progress for complex youth. Build in micro-celebrations.",
+        "thriving": "Celebrates wins constantly. Makes goals feel inspiring. Energizes the team to try new things.",
+        "struggling": "Pushes too hard on 'potential'. Feels personally failed when goals aren't met. Focuses only on big wins.",
+        "interventions": "Redefine success: 'Success is sticking to the plan, not fixing the kid'."
+    },
+    "Facilitator-Growth": {
+        "summary": "Creates calm space for growth. Patient, reflective, and interested in long-term development.",
+        "support": "Practice naming care and expectations in the same sentence. Break growth steps into small actions.",
+        "thriving": "Excellent reflective supervisor. Safe for youth to open up to. Paces change sustainably.",
+        "struggling": "Avoids sharp expectations. Underestimates need for structure. Overthinks instead of acting.",
+        "interventions": "Push for the 'Decisive Moment'. Help them value their authority as a tool for growth."
+    },
+    "Facilitator-Purpose": {
+        "summary": "Steady presence with a deep sense of right. Cares about emotional safety and ethical practice.",
+        "support": "Use supervision to talk about moral tension. Encourage them to voice concerns early.",
+        "thriving": "Maintains respectful climate. Holds space for hard feelings. strong moral anchor.",
+        "struggling": "Quietly carries moral distress. Stays neutral too long. Stuck when leadership disagrees with values.",
+        "interventions": "Encourage them to be the 'Voice of Conscience' loudly, not just quietly."
+    },
+    "Facilitator-Connection": {
+        "summary": "The calm, relational glue. Makes it easier for people to stay in the work and not shut down.",
+        "support": "Script accountability conversations. Set boundaries on how much emotional processing they do for others.",
+        "thriving": "Helps peers feel understood. De-escalates steady. Fosters help-seeking culture.",
+        "struggling": "Absorbs emotional labor. Struggles to set limits. Listens when they should be deciding.",
+        "interventions": "Validate their role as 'Stabilizer' but require them to also be 'Director' when safety is at risk."
+    },
+    "Facilitator-Achievement": {
+        "summary": "Steady and gentle, but wants to get things done. Wants progress without crushing people.",
+        "support": "Practice: 'I care about you, and this expectation is important.' Use clear follow-ups.",
+        "thriving": "Paces goals well. Helps staff understand improvement is a journey. Calm approach to metrics.",
+        "struggling": "Apologizes for having expectations. Quietly frustrated when others fail. Under-communicates urgency.",
+        "interventions": "Teach them that clear expectations reduce anxiety. Ambiguity is not kindness."
+    },
+    "Tracker-Growth": {
+        "summary": "Loves accurate info and improvement. Wants systems and documentation to keep getting better.",
+        "support": "Pick a few key processes to improve. Pair process changes with relational steps.",
+        "thriving": "Notices patterns in incidents. Keeps documentation tight. Helps peers improve process.",
+        "struggling": "Frustrated by details others miss. Over-focuses on systems over people. Hesitates in crisis.",
+        "interventions": "Help them zoom out. 'Perfection is the enemy of good'. Focus on 'Good Enough' for now."
+    },
+    "Tracker-Purpose": {
+        "summary": "Wants things done right because it matters for kids. Standards come from responsibility.",
+        "support": "Process the heavy sense of responsibility. Share the 'Why' behind standards with staff.",
+        "thriving": "Protects youth via safety checks. Notices small risks. Translates values into concrete practice.",
+        "struggling": "Intolerant of carelessness. Distressed by shortcuts. Leans on rules when anxious.",
+        "interventions": "Remind them: 'You are responsible for the process, not the outcome.' Release the weight."
+    },
+    "Tracker-Connection": {
+        "summary": "Cares about getting it right and caring for people. Wants a competent, cohesive team.",
+        "support": "Add relational check-ins before details. Share tasks instead of hoarding them.",
+        "thriving": "Gives grounded, specific support. Consistency feels safe to youth. Safe person for technical questions.",
+        "struggling": "Assumes people know they care (they don't). Becomes the 'Do-Everything' person. Burnout risk.",
+        "interventions": "Force delegation. 'If you do it for them, you rob them of the learning'."
+    },
+    "Tracker-Achievement": {
+        "summary": "Wants strong results via good systems. Motivated by making things run better and seeing the numbers.",
+        "support": "Pair data shares with appreciation. Contextualize metrics so they aren't personal verdicts.",
+        "thriving": "Strong at tracking metrics. clear sense of 'good'. Insists on consistent routines.",
+        "struggling": "Impatient with struggle. Focuses on reporting over empathy. Ties self-worth to numbers.",
+        "interventions": "Humanize the data. 'The chart is just a tool, not the goal.' Focus on effort."
+    }
 }
 
 # (A) TEAM CULTURE GUIDE
@@ -376,20 +552,6 @@ CAREER_PATHWAYS = {
     }
 }
 
-# (F) PDF PROFILES (Full)
-COMM_PROFILES = {
-    "Director": {"s1_profile":{"text":"Leads with clarity...","bullets":["Efficiency"]},"s2_supervising":{"text":"Be direct...","bullets":["Autonomy"]},"s8_struggling":{"text":"Becomes dominating...","bullets":["Steamrolling"]},"s11_coaching":["Risk of speed?","Who haven't we heard?"],"s12_advancement":{"text":"Shift to Influence","bullets":["Patience"]}},
-    "Encourager": {"s1_profile":{"text":"Leads with warmth...","bullets":["Harmony"]},"s2_supervising":{"text":"Connect first...","bullets":["Validation"]},"s8_struggling":{"text":"Avoids conflict...","bullets":["Venting"]},"s11_coaching":["Hard truths?","Boundaries?"],"s12_advancement":{"text":"Master structure","bullets":["Operations"]}},
-    "Facilitator": {"s1_profile":{"text":"Leads by listening...","bullets":["Consensus"]},"s2_supervising":{"text":"Give time...","bullets":["Advance notice"]},"s8_struggling":{"text":"Analysis paralysis...","bullets":["Indecision"]},"s11_coaching":["Cost of waiting?","Decision?"],"s12_advancement":{"text":"Executive presence","bullets":["Decisiveness"]}},
-    "Tracker": {"s1_profile":{"text":"Leads with details...","bullets":["Accuracy"]},"s2_supervising":{"text":"Provide clarity...","bullets":["Specifics"]},"s8_struggling":{"text":"Rigid...","bullets":["Micromanagement"]},"s11_coaching":["Safety impact?","Big picture?"],"s12_advancement":{"text":"Strategy","bullets":["Delegation"]}}
-}
-MOTIVATION_PROFILES = {
-    "Growth": {"s3_profile":{"text":"Driven by progress...","bullets":["Challenge"]},"s4_motivating":{"text":"Feed curiosity...","bullets":["Problems to solve"]},"s6_support":{"text":"Sponsor training...","bullets":["Mentorship"]},"s7_thriving":{"text":"Innovators...","bullets":["Proactive"]},"s10_celebrate":{"text":"Skill growth...","bullets":["Adaptability"]}},
-    "Purpose": {"s3_profile":{"text":"Driven by meaning...","bullets":["Mission"]},"s4_motivating":{"text":"Connect to why...","bullets":["Ethics"]},"s6_support":{"text":"Validate passion...","bullets":["Space for concerns"]},"s7_thriving":{"text":"Advocates...","bullets":["Integrity"]},"s10_celebrate":{"text":"Impact...","bullets":["Stories"]}},
-    "Connection": {"s3_profile":{"text":"Driven by belonging...","bullets":["Team"]},"s4_motivating":{"text":"Prioritize cohesion...","bullets":["Bonding"]},"s6_support":{"text":"No isolation...","bullets":["Check-ins"]},"s7_thriving":{"text":"Morale boosters...","bullets":["Rapport"]},"s10_celebrate":{"text":"Culture...","bullets":["Support"]}},
-    "Achievement": {"s3_profile":{"text":"Driven by goals...","bullets":["Winning"]},"s4_motivating":{"text":"Clear metrics...","bullets":["Checklists"]},"s6_support":{"text":"Remove blockers...","bullets":["Decisive"]},"s7_thriving":{"text":"Engines...","bullets":["Volume"]},"s10_celebrate":{"text":"Reliability...","bullets":["Output"]}}
-}
-
 # --- 5. HELPER FUNCTIONS ---
 def clean_text(text):
     if not text: return ""
@@ -412,8 +574,17 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf.set_font("Arial", '', 12); pdf.set_text_color(*black); pdf.cell(0, 8, clean_text(f"For: {name} ({role})"), ln=True, align='C')
     pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C'); pdf.ln(8)
     
-    c = COMM_PROFILES.get(p_comm, COMM_PROFILES["Director"])
-    m = MOTIVATION_PROFILES.get(p_mot, MOTIVATION_PROFILES["Achievement"])
+    # Data Lookup
+    comm_data = FULL_COMM_PROFILES.get(p_comm, FULL_COMM_PROFILES['Director'])
+    motiv_data = FULL_MOTIV_PROFILES.get(p_mot, FULL_MOTIV_PROFILES['Achievement'])
+    combo_key = f"{p_comm}-{p_mot}"
+    combo_data = FULL_INTEGRATED_PROFILES.get(combo_key, {
+        "summary": "Leads with their communication style to meet their motivational needs.",
+        "support": "Balance their need for results with support.",
+        "thriving": "High performance and engagement.",
+        "struggling": "Stress behavior and withdrawal.",
+        "interventions": "Address the root cause of stress."
+    })
 
     def add_section(title, body, bullets=None):
         pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
@@ -421,51 +592,86 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
         pdf.multi_cell(0, 5, clean_text(body))
         if bullets:
+            pdf.ln(2)
             for b in bullets: pdf.cell(5, 5, "-", 0, 0); pdf.multi_cell(0, 5, clean_text(b))
         pdf.ln(4)
 
-    add_section(f"1. Communication: {p_comm}", c['s1_profile']['text'], c['s1_profile']['bullets'])
-    add_section("2. Supervising Their Communication", c['s2_supervising']['text'], c['s2_supervising']['bullets'])
-    add_section(f"3. Motivation: {p_mot}", m['s3_profile']['text'], m['s3_profile']['bullets'])
-    add_section("4. Motivating Them", m['s4_motivating']['text'], m['s4_motivating']['bullets'])
-    integrated = f"Leads with {p_comm} traits to achieve {p_mot} goals. When aligned, they are unstoppable. Conflict between speed ({p_comm}) and needs ({p_mot}) causes stress."
-    add_section("5. Integrated Leadership Profile", integrated)
-    add_section("6. Best Support", m['s6_support']['text'], m['s6_support']['bullets'])
-    add_section("7. Thriving Signs", "Look for:", m['s7_thriving']['bullets'])
-    add_section("8. Struggling Signs", "Look for:", c['s8_struggling']['bullets'])
-    intervention_text = f"When struggling, validate {p_mot} first. Watch for {c['s8_struggling']['bullets'][0].lower()}."
-    add_section("9. Interventions", intervention_text, ["Validate Motivation", "Address Stress", "Re-align Expectations"])
-    add_section("10. Celebrate", m['s10_celebrate']['text'], m['s10_celebrate']['bullets'])
-    add_section("11. Coaching Questions", "Ask these:", c['s11_coaching'])
-    add_section("12. Advancement", c['s12_advancement']['text'], c['s12_advancement']['bullets'])
+    # 1. Communication Profile
+    add_section(f"1. Communication Profile: {p_comm}", comm_data['description'])
+    
+    # 2. Supervising Their Communication
+    add_section("2. Supervising Their Communication", comm_data['supervising_tips'])
+    
+    # 3. Motivation Profile
+    add_section(f"3. Motivation Profile: {p_mot}", motiv_data['description'])
+    
+    # 4. Motivating This Staff Member
+    add_section("4. Motivating This Staff Member", motiv_data['strategies'])
+    
+    # 5. Integrated Leadership Profile
+    add_section("5. Integrated Leadership Profile", combo_data['summary'])
+    
+    # 6. How You Can Best Support Them
+    add_section("6. How You Can Best Support Them", combo_data['support'])
+    
+    # 7. Thriving Signs
+    add_section("7. What They Look Like When Thriving", combo_data['thriving'])
+    
+    # 8. Struggling Signs
+    add_section("8. What They Look Like When Struggling", combo_data['struggling'])
+    
+    # 9. Interventions
+    add_section("9. Supervisory Interventions", combo_data['interventions'])
+    
+    # 10. Celebrate
+    add_section("10. What You Should Celebrate", motiv_data['celebrate'])
+
     return pdf.output(dest='S').encode('latin-1')
 
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
-    c = COMM_PROFILES.get(p_comm, COMM_PROFILES["Director"])
-    m = MOTIVATION_PROFILES.get(p_mot, MOTIVATION_PROFILES["Achievement"])
+    # Data Lookup
+    comm_data = FULL_COMM_PROFILES.get(p_comm, FULL_COMM_PROFILES['Director'])
+    motiv_data = FULL_MOTIV_PROFILES.get(p_mot, FULL_MOTIV_PROFILES['Achievement'])
+    combo_key = f"{p_comm}-{p_mot}"
+    combo_data = FULL_INTEGRATED_PROFILES.get(combo_key, {
+        "summary": "Leads with their communication style to meet their motivational needs.",
+        "support": "Balance their need for results with support.",
+        "thriving": "High performance and engagement.",
+        "struggling": "Stress behavior and withdrawal.",
+        "interventions": "Address the root cause of stress."
+    })
+
     st.markdown("---"); st.markdown(f"### 📘 Supervisory Guide: {name}"); st.divider()
-    st.subheader(f"1. Communication Profile: {p_comm}"); st.write(c['s1_profile']['text'])
-    for b in c['s1_profile']['bullets']: st.markdown(f"- {b}")
-    st.subheader("2. Supervising Their Communication"); st.write(c['s2_supervising']['text'])
-    for b in c['s2_supervising']['bullets']: st.markdown(f"- {b}")
-    st.subheader(f"3. Motivation Profile: {p_mot}"); st.write(m['s3_profile']['text'])
-    for b in m['s3_profile']['bullets']: st.markdown(f"- {b}")
-    st.subheader("4. Motivating This Staff Member"); st.write(m['s4_motivating']['text'])
-    for b in m['s4_motivating']['bullets']: st.markdown(f"- {b}")
-    st.subheader("5. Integrated Leadership Profile"); st.write(f"Leads with {p_comm} traits to achieve {p_mot} goals.")
-    st.subheader("6. How You Can Best Support Them"); st.write(m['s6_support']['text'])
-    for b in m['s6_support']['bullets']: st.markdown(f"- {b}")
-    st.subheader("7. What They Look Like When Thriving"); st.write(m['s7_thriving']['text'])
-    for b in m['s7_thriving']['bullets']: st.markdown(f"- {b}")
-    st.subheader("8. What They Look Like When Struggling"); st.write(c['s8_struggling']['text'])
-    for b in c['s8_struggling']['bullets']: st.markdown(f"- {b}")
-    st.subheader("9. Supervisory Interventions"); st.write("Validate Motivation. Address Stress. Re-align Expectations.")
-    st.subheader("10. What You Should Celebrate"); st.write(m['s10_celebrate']['text'])
-    for b in m['s10_celebrate']['bullets']: st.markdown(f"- {b}")
-    st.subheader("11. Coaching Questions"); 
-    for q in c['s11_coaching']: st.markdown(f"- {q}")
-    st.subheader("12. Helping Them Prepare for Advancement"); st.write(c['s12_advancement']['text'])
-    for b in c['s12_advancement']['bullets']: st.markdown(f"- {b}")
+    
+    st.subheader(f"1. Communication Profile: {p_comm}")
+    st.write(comm_data['description'])
+    
+    st.subheader("2. Supervising Their Communication")
+    st.write(comm_data['supervising_tips'])
+    
+    st.subheader(f"3. Motivation Profile: {p_mot}")
+    st.write(motiv_data['description'])
+    
+    st.subheader("4. Motivating This Staff Member")
+    st.write(motiv_data['strategies'])
+    
+    st.subheader("5. Integrated Leadership Profile")
+    st.write(combo_data['summary'])
+    
+    st.subheader("6. How You Can Best Support Them")
+    st.write(combo_data['support'])
+    
+    st.subheader("7. What They Look Like When Thriving")
+    st.write(combo_data['thriving'])
+    
+    st.subheader("8. What They Look Like When Struggling")
+    st.write(combo_data['struggling'])
+    
+    st.subheader("9. Supervisory Interventions")
+    st.write(combo_data['interventions'])
+    
+    st.subheader("10. What You Should Celebrate")
+    st.write(motiv_data['celebrate'])
 
 # --- 6. MAIN APP LOGIC ---
 staff_list = fetch_staff_data()
@@ -677,3 +883,4 @@ elif st.session_state.current_view == "Org Pulse":
         with c_b: 
             if 'role' in df.columns: st.plotly_chart(px.histogram(df, x="role", color="p_comm", title="Leadership Pipeline", color_discrete_map={'Director':BRAND_COLORS['blue'], 'Encourager':BRAND_COLORS['green'], 'Facilitator':BRAND_COLORS['teal'], 'Tracker':BRAND_COLORS['gray']}), use_container_width=True)
     else: st.warning("No data available.")
+        
