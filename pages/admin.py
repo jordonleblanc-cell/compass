@@ -303,7 +303,7 @@ FULL_MOTIV_PROFILES = {
     }
 }
 
-# --- MISSING DICTIONARIES (ADDED TO FIX CRASHES) ---
+# --- EXTENDED DICTIONARIES ---
 
 TEAM_CULTURE_GUIDE = {
     "Director": {
@@ -353,27 +353,92 @@ MISSING_VOICE_GUIDE = {
 SUPERVISOR_CLASH_MATRIX = {
     "Director": {
         "Encourager": {
-            "tension": "Bulldozer vs. Doormat",
-            "psychology": "You view their need for harmony as 'weakness'; they view your directness as 'aggression'.",
-            "watch_fors": ["You interrupting them.", "Them shutting down and agreeing just to make you stop."],
-            "intervention_steps": ["1. Lower your volume.", "2. Ask: 'How does this impact the team's feelings?'", "3. Let them speak first."],
-            "scripts": {"To Encourager": "I need you to push back on me.", "Joint": "We need to balance speed with safety."}
+            "tension": "Efficiency vs. Empathy (Safety as Control vs. Safety as Connection)",
+            "psychology": "This is the classic 'Oil and Water' dynamic. You (Director) find safety in speed, competence, and checking boxes. You view 'feelings' as variables that slow down the mission. \n\nThe Encourager finds safety in connection and harmony. When you push for speed or deliver blunt feedback, they don't just hear 'work instructions'—they feel an existential threat to the group's safety. They retreat because they feel steamrolled; you push harder because you think they are incompetent.",
+            "watch_fors": [
+                "**The 'Shut Down':** If they go silent, they aren't agreeing with you. They are protecting themselves from your intensity.",
+                "**The 'Smile & Nod':** They may agree to a deadline they know they can't meet just to end the uncomfortable interaction.",
+                "**Venting:** They will likely process their hurt feelings with peers, creating a 'shadow culture' you aren't part of."
+            ],
+            "intervention_steps": [
+                "**1. Disarm the Threat (Why: They are in fight/flight):** Lower your volume and physical pace. Sit down. Do not start with the task; start with the person. 'How are you feeling about the shift today?'",
+                "**2. Translate the Intent (Why: They think you are angry):** Explicitly state that your intensity is about the *problem*, not them. 'I am frustrated with the schedule, not with you. I value you.'",
+                "**3. The 'Sandwich' Reframe (Why: They need safety to hear truth):** You hate feedback sandwiches, but they need them. Affirm the relationship, give the correction, affirm the future. It is not 'fluff'; it is the toll you pay to get on the bridge."
+            ],
+            "scripts": {
+                "Opening": "I want to talk about [Task], but first I want to check in. I've been moving fast today—how is the team feeling?",
+                "Validation": "I know my communication style can feel intense or abrupt. I validate that you prioritize the team's morale, and I don't want to damage that.",
+                "The Pivot": "However, we do need to solve [Problem]. My concern is that if we don't fix this, the team will suffer in the long run.",
+                "Crisis": "I need to be very direct right now because of the safety risk. This isn't personal, but I need you to do X immediately.",
+                "Feedback": "I value how much the team loves you. To grow, I need you to be able to hear hard news without feeling like I'm attacking your character."
+            }
         },
         "Facilitator": {
-            "tension": "Speed vs. Process",
-            "psychology": "You want it done now; they want it done fairly. You think they are stalling.",
-            "watch_fors": ["You rolling your eyes at 'process'.", "Them using 'we need to discuss' as a delay tactic."],
-            "intervention_steps": ["1. Give them a deadline for the decision.", "2. Agree on who needs to be consulted."],
-            "scripts": {"To Facilitator": "We need a decision by 5 PM.", "Joint": "Process is good, but progress is better."}
+            "tension": "Speed vs. Process (Urgency vs. Fairness)",
+            "psychology": "You (Director) value 'Done'. They (Facilitator) value 'Fair'. You see their desire for meetings and consensus as 'Analysis Paralysis' and a waste of time. They see your desire for quick decisions as reckless and exclusive.\n\nThey are terrified of leaving someone behind. You are terrified of missing the opportunity. You are fighting for results; they are fighting for legitimacy.",
+            "watch_fors": [
+                "**The 'We Need to Talk':** They will try to schedule meetings to delay decisions they feel were made too fast.",
+                "**Passive Resistance:** They won't argue, but they won't implement the plan because they feel 'the team wasn't consulted'.",
+                "**Moral High Ground:** They may subtly frame your speed as 'uncaring' or 'undemocratic'."
+            ],
+            "intervention_steps": [
+                "**1. Define the Sandbox (Why: They need parameters):** Give them a clear deadline. 'We need to decide this by 3:00 PM.'",
+                "**2. Assign the 'Who' (Why: They fear exclusion):** Ask them specifically: 'Who are the critical 3 people we need to ask?' Limit it to 3.",
+                "**3. The 'Good Enough' Agreement (Why: They want perfection):** Remind them that a good decision today is better than a perfect decision next week. Ask: 'Is this safe enough to try?'"
+            ],
+            "scripts": {
+                "Opening": "I know this decision feels rushed. I want to respect the process, but we have a tight timeline.",
+                "Validation": "I value that you want everyone to be heard. You are the moral compass of the team.",
+                "The Pivot": "The risk we face is that if we don't decide by noon, we lose the option entirely. We have to move.",
+                "Crisis": "In this specific moment, I have to make the call. We can debrief the process later, but right now, follow my lead.",
+                "Feedback": "Your desire for consensus is a strength, but sometimes it becomes a bottleneck. I need you to be willing to make the '51% decision'."
+            }
         }
     },
     "Encourager": {
         "Director": {
-            "tension": "Sensitive vs. Blunt",
-            "psychology": "You feel hurt by their tone; they feel annoyed by your 'fluff'.",
-            "watch_fors": ["Taking feedback personally.", "Avoiding them."],
-            "intervention_steps": ["1. Don't sandwich feedback.", "2. Focus on the work, not the tone."],
-            "scripts": {"To Director": "I need a moment to process.", "Joint": "Directness is fine, disrespect is not."}
+            "tension": "Warmth vs. Competence (Being Liked vs. Being Effective)",
+            "psychology": "You (Encourager) value harmony and feeling connected. You interpret their (Director) lack of small talk and directness as dislike or anger. You feel unsafe around them.\n\nThey interpret your focus on feelings as incompetence or lack of focus. When you try to 'nice' them into compliance, they lose respect for you. They don't want a friend; they want a leader who can remove obstacles.",
+            "watch_fors": [
+                "**Apologizing:** You apologizing for giving them work to do.",
+                "**Taking it Personally:** You going home feeling hurt because they didn't say 'good morning' enthusiastically.",
+                "**Avoidance:** You emailing them instead of talking to them because you fear the conflict."
+            ],
+            "intervention_steps": [
+                "**1. Cut the Fluff (Why: They value time):** Do not ask about their weekend for 10 minutes. Start with the headline. 'I need your help with X.'",
+                "**2. Stand Your Ground (Why: They respect strength):** If they push back, do not fold. State your reasoning calmly. 'I hear you, but the policy is X, and that's what we are doing.'",
+                "**3. Ask for Input (Why: They want to solve problems):** Frame the relationship issue as a problem. 'I feel like we are missing each other. How can I communicate better with you?'"
+            ],
+            "scripts": {
+                "Opening": "I'm going to get straight to the point because I know you value your time.",
+                "Validation": "I know you are focused on getting this done, and I appreciate your efficiency.",
+                "The Pivot": "However, the way you spoke to the team caused a shutdown. We can't be efficient if no one wants to work for you.",
+                "Crisis": "Stop. I need you to listen to me right now. This is a safety issue.",
+                "Feedback": "You are excellent at tasks, but your delivery is costing you relationship capital. You are right on the facts, but wrong on the approach."
+            }
+        }
+    },
+    "Facilitator": {
+        "Tracker": {
+            "tension": "Consensus vs. Compliance (People vs. Policy)",
+            "psychology": "You (Facilitator) want the team to agree on a solution that feels fair. They (Tracker) want the team to follow the written rule because that is safe.\n\nYou feel they are being rigid and uncaring 'robots'. They feel you are being reckless and treating safety rules as 'suggestions'. You prioritize the human element; they prioritize the systemic element.",
+            "watch_fors": [
+                "**The Policy War:** They quote the handbook; you quote the 'vibe' or the 'context'.",
+                "**Ignoring:** You ignoring their emails about compliance because it feels like nagging.",
+                "**Anxiety:** They getting visibly anxious when you say 'let's just see how it goes'."
+            ],
+            "intervention_steps": [
+                "**1. Validate the Rule (Why: They need to know you aren't reckless):** Start by acknowledging the policy. 'I know the rule is X.'",
+                "**2. Contextualize the Exception (Why: They need a reason):** Explain *why* this specific human situation requires a bend. 'Because of [Client's] history, we need to adapt.'",
+                "**3. Define the New Boundary (Why: They fear chaos):** Create a new, temporary rule for this situation so they feel there is still a plan."
+            ],
+            "scripts": {
+                "Opening": "I know this plan deviates from our standard SOP, and I want to explain why.",
+                "Validation": "I appreciate you keeping us compliant. You protect the agency's license.",
+                "The Pivot": "In this specific case, following the rule to the letter will cause a behavioral escalation. We need to flex here to maintain safety.",
+                "Crisis": "I am taking responsibility for this exception. Please document that I made this call.",
+                "Feedback": "I need you to see the gray areas. The rulebook is a map, but the territory is real people."
+            }
         }
     }
 }
@@ -878,18 +943,23 @@ elif st.session_state.current_view == "Conflict Mediator":
             if s1 in SUPERVISOR_CLASH_MATRIX and s2 in SUPERVISOR_CLASH_MATRIX[s1]:
                 clash = SUPERVISOR_CLASH_MATRIX[s1][s2]
                 with st.expander("🔍 **Psychological Deep Dive**", expanded=True):
-                    st.markdown(f"**The Dynamic:** {clash['tension']}")
-                    st.markdown(f"**Psychology:** {clash['psychology']}")
+                    st.markdown(f"**The Core Tension:** {clash['tension']}")
+                    st.markdown(f"{clash['psychology']}")
                     st.markdown("**🚩 Watch For:**")
                     for w in clash['watch_fors']: st.markdown(f"- {w}")
+                
                 c_a, c_b = st.columns(2)
                 with c_a:
-                    st.markdown("##### 🛠️ 3-Phase Protocol")
+                    st.markdown("##### 🛠️ 3-Phase Coaching Protocol")
                     for i in clash['intervention_steps']: st.info(i)
                 with c_b:
-                    st.markdown("##### 🗣️ Scripts")
-                    st.success(f"**To Them:** \"{clash['scripts'].get('To '+s2, '...')}\"")
-                    st.info(f"**Joint:** \"{clash['scripts'].get('Joint', '...')}\"")
+                    st.markdown("##### 🗣️ Conflict Scripts (Click to Expand)")
+                    script_tabs = st.tabs(list(clash['scripts'].keys()))
+                    for i, (cat, text) in enumerate(clash['scripts'].items()):
+                        with script_tabs[i]:
+                            st.success(f"\"{text}\"")
+            else:
+                st.info("No specific conflict protocol exists for this combination yet. They likely work well together!")
             st.button("Reset", key="reset_t3", on_click=reset_t3)
 
 # 4. CAREER PATHFINDER
