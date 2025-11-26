@@ -3,7 +3,6 @@ import random
 import requests
 import time
 from fpdf import FPDF
-import io
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -253,7 +252,7 @@ INTEGRATED_PROFILES = {
     "Director-Purpose": {"title": "Director + Purpose – The Ethical Guardian", "summary": "You make firm decisions through a values lens.", "strengths": ["Advocacy", "Clarity", "Integrity"], "watchouts": ["Rigidity", "Righteous anger"]},
     "Director-Connection": {"title": "Director + Connection – The Relational Driver", "summary": "You lead with energy and care about how the team is doing together.", "strengths": ["Mobilizing", "Protective", "Direct"], "watchouts": ["Overpowering", "Taking conflict personally"]},
     "Director-Achievement": {"title": "Director + Achievement – The Results Leader", "summary": "You want clear goals and you’re willing to lead the way to reach them.", "strengths": ["Execution", "Focus", "Speed"], "watchouts": ["Steamrolling", "Ignoring feelings"]},
-    # (Add other combos if needed, fallback handles them dynamically)
+    # Note: If other combinations are needed, add them here. The app handles missing combos gracefully.
 }
 
 # --- 4. FUNCTIONS ---
@@ -288,6 +287,7 @@ def submit_to_google_sheets(data, action="save"):
 
 def send_email_via_smtp(to_email, subject, body):
     try:
+        # Requires secrets.toml setup
         sender_email = st.secrets["EMAIL_USER"]
         sender_password = st.secrets["EMAIL_PASSWORD"]
         
