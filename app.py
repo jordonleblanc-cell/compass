@@ -237,7 +237,7 @@ MOTIVATION_QUESTIONS = [
     {"id": "mot20", "text": "I’m motivated by being trusted with projects where outcomes are clearly defined.", "style": "Achievement"},
 ]
 
-# --- UPDATED DATA DICTIONARIES (HTML FIXED) ---
+# --- DATA DICTIONARIES ---
 
 COMM_PROFILES = {
     "Director": {
@@ -555,9 +555,7 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
     pdf.set_font("Arial", '', 11)
     pdf.set_text_color(*black)
     
-    # Use HTML-cleaned text for the PDF or simple text replacement
-    # Since FPDF simple text doesn't parse HTML tags like <strong>, we need a cleaner version for PDF.
-    # For simplicity here, I will replace the HTML tags with simple text.
+    # Fix for bolding: Replace HTML strong tags with plain text or custom formatting if needed
     overview_text = comm_prof['overview'].replace("<strong>", "").replace("</strong>", "").replace("<br><br>", "\n\n")
     pdf.multi_cell(0, 6, clean_text(overview_text))
     pdf.ln(3)
@@ -588,7 +586,6 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
     pdf.cell(0, 8, "Boosters (Energizers):", ln=True, fill=True)
     pdf.set_font("Arial", '', 11)
     for b in mot_prof['boosters']: 
-        # Clean Markdown bolding for PDF
         clean_b = b.replace("**", "")
         pdf.multi_cell(0, 6, clean_text(f"- {clean_b}"))
     pdf.ln(2)
