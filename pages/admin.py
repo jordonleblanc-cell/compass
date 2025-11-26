@@ -150,7 +150,10 @@ if not st.session_state.authenticated:
 # SUPERVISOR TOOL LOGIC STARTS HERE
 # ==========================================
 
-# --- 5. EXTENDED CONTENT DICTIONARIES (FULL TEXT) ---
+# --- 5. EXTENDED CONTENT DICTIONARIES ---
+
+COMM_TRAITS = ["Director", "Encourager", "Facilitator", "Tracker"]
+MOTIV_TRAITS = ["Achievement", "Growth", "Purpose", "Connection"]
 
 FULL_COMM_PROFILES = {
     "Director": {
@@ -194,139 +197,137 @@ FULL_MOTIV_PROFILES = {
     }
 }
 
+# FULL PROFILES FOR ALL 16 COMBINATIONS
 FULL_INTEGRATED_PROFILES = {
+    "Director-Achievement": {
+        "summary": "Results-focused and decisive. Wants to see tangible improvements in safety and outcomes. Takes charge to get there. They are excellent at operationalizing goals.",
+        "support": "Partner to define realistic pacing. Set process goals (we did the steps) not just outcome goals (the kid behaved).",
+        "thriving": "- Sets clear goals\n- Helps staff understand success\n- Moves metrics in the right direction\n- High follow-through",
+        "struggling": "- Treats trauma behavior as a problem to 'solve' quickly\n- Micromanages peers\n- Judges self harshly when metrics dip",
+        "interventions": "Contextualize metrics. Celebrate the 'small wins' so they don't burn out chasing perfection.",
+        "coaching": ["How are you defining success today?", "What is one win you can celebrate right now?"]
+    },
     "Director-Growth": {
         "summary": "Leads with decisive action and is hungry to improve. They want the unit to run well and want to keep leveling up their own skills. They are the 'General' who is always studying battle strategy.",
         "support": "Ask for a small number of focused projects rather than trying to fix everything at once. Co-design development goals.",
-        "thriving": "Quick to turn learning into practice. Coaches peers effectively. Refines decisions based on new data.",
-        "struggling": "Moves faster than the team can handle. Becomes impatient with 'slow' learners. Defaults to control in crisis.",
+        "thriving": "- Quick to turn learning into practice\n- Coaches peers effectively\n- Refines decisions based on new data",
+        "struggling": "- Moves faster than the team can handle\n- Becomes impatient with 'slow' learners\n- Defaults to control in crisis",
         "interventions": "Slow down. Focus on one change at a time. Ask: 'Who is left behind by this speed?'",
         "coaching": ["What is one way you can slow down for others?", "How are you measuring your own growth beyond just speed?"]
     },
     "Director-Purpose": {
         "summary": "Driven to make clear, firm decisions that align with deep values. Cares about order, but also about justice and integrity. They use their strength to fight for what is right.",
         "support": "Share your top core values so they understand your decisions. Translate clinical values into concrete rules.",
-        "thriving": "Advocates strongly for youth safety. Holds boundaries even when unpopular. Seen as a moral anchor.",
-        "struggling": "Becomes rigid or righteous when values are threatened. Excessive frustration with 'the system'.",
+        "thriving": "- Advocates strongly for youth safety\n- Holds boundaries even when unpopular\n- Seen as a moral anchor",
+        "struggling": "- Becomes rigid or righteous when values are threatened\n- Excessive frustration with 'the system'\n- Moral outrage",
         "interventions": "Validate the value (e.g. safety) before asking for flexibility. Help them pick battles.",
         "coaching": ["Where do you feel the system is failing your values?", "How can you advocate without burning bridges?"]
     },
     "Director-Connection": {
         "summary": "Wants the team to feel supported but communicates with directness. Balances being the 'Boss' and the 'Friend'. They are a 'Protective Captain' who leads firmly to keep the tribe safe.",
         "support": "Script phrases that are both firm and relational. Schedule short relational touchpoints during tough weeks.",
-        "thriving": "Anchors the team in crisis while checking on their feelings. Firm but not distant.",
-        "struggling": "Holds back hard conversations to avoid being 'mean'. Swings between 'all business' and 'all buddy'.",
+        "thriving": "- Anchors the team in crisis while checking on feelings\n- Firm but not distant\n- Protective of the team",
+        "struggling": "- Holds back hard conversations to avoid being 'mean'\n- Swings between 'all business' and 'all buddy'\n- Personalizes conflict",
         "interventions": "Role-play the 'Hard Conversation' so they feel safe being direct. Remind them that clarity is kindness.",
         "coaching": ["Are you avoiding this conversation to be kind, or to be safe?", "How can you be direct and caring at the same time?"]
     },
-    "Director-Achievement": {
-        "summary": "Results-focused and decisive. Wants to see tangible improvements in safety and outcomes. Takes charge to get there. They are excellent at operationalizing goals.",
-        "support": "Partner to define realistic pacing. Set process goals (we did the steps) not just outcome goals (the kid behaved).",
-        "thriving": "Sets clear goals. Helps staff understand success. Moves metrics in the right direction.",
-        "struggling": "Treats trauma behavior as a problem to 'solve' quickly. Micromanages peers. Judges self harshly.",
-        "interventions": "Contextualize metrics. Celebrate the 'small wins' so they don't burn out chasing perfection.",
-        "coaching": ["How are you defining success today?", "What is one win you can celebrate right now?"]
+    "Encourager-Achievement": {
+        "summary": "Wants people to feel good and do well. Motivated when encouragement translates into visible progress. They want the team to be happy AND winning.",
+        "support": "Define realistic progress for complex youth. Build in micro-celebrations.",
+        "thriving": "- Celebrates wins constantly\n- Makes goals feel inspiring\n- Energizes the team to try new things",
+        "struggling": "- Pushes too hard on 'potential'\n- Feels personally failed when goals aren't met\n- Focuses only on big wins",
+        "interventions": "Redefine success: 'Success is sticking to the plan, not fixing the kid'.",
+        "coaching": ["How can you celebrate effort, not just the result?", "Are you taking their failure personally?"]
     },
     "Encourager-Growth": {
         "summary": "Loves helping people grow. Brings energy and hope. Believes staff and youth can change and wants to support that process. They are a natural mentor.",
         "support": "Help them choose a small number of people to invest in so they don't spread thin. Pair encouragement with specific targets.",
-        "thriving": "Natural mentor. Youth feel believed in. Invests in peer development.",
-        "struggling": "Overcommits emotional energy. Avoids sharp feedback to spare feelings. Discouraged when others don't grow.",
+        "thriving": "- Natural mentor\n- Youth feel believed in\n- Invests in peer development",
+        "struggling": "- Overcommits emotional energy\n- Avoids sharp feedback to spare feelings\n- Discouraged when others don't grow",
         "interventions": "Teach them to give 'Radical Candor'. Remind them they can't grow *for* other people.",
         "coaching": ["Who are you working harder than right now?", "How can you give feedback that helps them grow?"]
     },
     "Encourager-Purpose": {
         "summary": "Fueled by connection and meaning. Wants youth/staff to feel valued and respected. Keeps the 'Why' alive. They are the 'Heart of the Mission'.",
         "support": "Regular debriefs to process emotional load. Use values-based language for accountability.",
-        "thriving": "Catches when people feel unseen. Translates clinical concepts into human terms. Safe harbor for staff.",
-        "struggling": "Carries heavy emotional weight. Struggles to enforce consequences on 'sad' cases. Heartbroken by outcomes.",
+        "thriving": "- Catches when people feel unseen\n- Translates clinical concepts into human terms\n- Safe harbor for staff",
+        "struggling": "- Carries heavy emotional weight\n- Struggles to enforce consequences on 'sad' cases\n- Heartbroken by outcomes",
         "interventions": "Focus on 'Boundaries as Care'. Help them release what they cannot control.",
         "coaching": ["What emotional weight are you carrying that isn't yours?", "How does holding this boundary actually help the youth?"]
     },
     "Encourager-Connection": {
         "summary": "A community builder. Thrives on 'we are in this together'. Makes staff feel less alone in the hard work. They prioritize harmony above all else.",
         "support": "Practice scripts that connect and correct simultaneously. Plan for hard conversations in advance.",
-        "thriving": "Makes staff feel safe. De-escalates through relationship. Repairs team conflict.",
-        "struggling": "Avoids addressing harm to keep the peace. Takes tension personally. Prioritizes harmony over safety.",
+        "thriving": "- Makes staff feel safe\n- De-escalates through relationship\n- Repairs team conflict",
+        "struggling": "- Avoids addressing harm to keep the peace\n- Takes tension personally\n- Prioritizes harmony over safety",
         "interventions": "Challenge them: 'Is avoiding this conflict actually helping the team, or hurting safety?'",
         "coaching": ["Are you prioritizing peace or safety?", "How can you lean into conflict to build stronger connection?"]
     },
-    "Encourager-Achievement": {
-        "summary": "Wants people to feel good and do well. Motivated when encouragement translates into visible progress. They want the team to be happy AND winning.",
-        "support": "Define realistic progress for complex youth. Build in micro-celebrations.",
-        "thriving": "Celebrates wins constantly. Makes goals feel inspiring. Energizes the team to try new things.",
-        "struggling": "Pushes too hard on 'potential'. Feels personally failed when goals aren't met. Focuses only on big wins.",
-        "interventions": "Redefine success: 'Success is sticking to the plan, not fixing the kid'.",
-        "coaching": ["How can you celebrate effort, not just the result?", "Are you taking their failure personally?"]
+    "Facilitator-Achievement": {
+        "summary": "Steady and gentle, but wants to get things done. Wants progress without crushing people. They move slowly but steadily.",
+        "support": "Practice: 'I care about you, and this expectation is important.' Use clear follow-ups.",
+        "thriving": "- Paces goals well\n- Helps staff understand improvement is a journey\n- Calm approach to metrics",
+        "struggling": "- Apologizes for having expectations\n- Quietly frustrated when others fail\n- Under-communicates urgency",
+        "interventions": "Teach them that clear expectations reduce anxiety. Ambiguity is not kindness.",
+        "coaching": ["How can you be clearer about what you need?", "Are you apologizing for having standards?"]
     },
     "Facilitator-Growth": {
         "summary": "Creates calm space for growth. Patient, reflective, and interested in long-term development. They create safe spaces for staff to make mistakes and learn.",
         "support": "Practice naming care and expectations in the same sentence. Break growth steps into small actions.",
-        "thriving": "Excellent reflective supervisor. Safe for youth to open up to. Paces change sustainably.",
-        "struggling": "Avoids sharp expectations. Underestimates need for structure. Overthinks instead of acting.",
+        "thriving": "- Excellent reflective supervisor\n- Safe for youth to open up to\n- Paces change sustainably",
+        "struggling": "- Avoids sharp expectations\n- Underestimates need for structure\n- Overthinks instead of acting",
         "interventions": "Push for the 'Decisive Moment'. Help them value their authority as a tool for growth.",
         "coaching": ["Where are you hesitating to lead?", "How can you be kind and firm at the same time?"]
     },
     "Facilitator-Purpose": {
         "summary": "Steady presence with a deep sense of right. Cares about emotional safety and ethical practice. They are the 'Moral Compass'.",
         "support": "Use supervision to talk about moral tension. Encourage them to voice concerns early.",
-        "thriving": "Maintains respectful climate. Holds space for hard feelings. Strong moral anchor.",
-        "struggling": "Quietly carries moral distress. Stays neutral too long. Stuck when leadership disagrees with values.",
+        "thriving": "- Maintains respectful climate\n- Holds space for hard feelings\n- Strong moral anchor",
+        "struggling": "- Quietly carries moral distress\n- Stays neutral too long\n- Stuck when leadership disagrees with values",
         "interventions": "Encourage them to be the 'Voice of Conscience' loudly, not just quietly.",
         "coaching": ["What moral tension are you holding right now?", "How can you speak up for your values effectively?"]
     },
     "Facilitator-Connection": {
         "summary": "The calm, relational glue. Makes it easier for people to stay in the work and not shut down. They are the 'Peacemaker'.",
         "support": "Script accountability conversations. Set boundaries on how much emotional processing they do for others.",
-        "thriving": "Helps peers feel understood. De-escalates steady. Fosters help-seeking culture.",
-        "struggling": "Absorbs emotional labor. Struggles to set limits. Listens when they should be deciding.",
+        "thriving": "- Helps peers feel understood\n- De-escalates steady\n- Fosters help-seeking culture",
+        "struggling": "- Absorbs emotional labor\n- Struggles to set limits\n- Listens when they should be deciding",
         "interventions": "Validate their role as 'Stabilizer' but require them to also be 'Director' when safety is at risk.",
         "coaching": ["What boundaries do you need to set to protect your energy?", "Are you listening too much and leading too little?"]
     },
-    "Facilitator-Achievement": {
-        "summary": "Steady and gentle, but wants to get things done. Wants progress without crushing people. They move slowly but steadily.",
-        "support": "Practice: 'I care about you, and this expectation is important.' Use clear follow-ups.",
-        "thriving": "Paces goals well. Helps staff understand improvement is a journey. Calm approach to metrics.",
-        "struggling": "Apologizes for having expectations. Quietly frustrated when others fail. Under-communicates urgency.",
-        "interventions": "Teach them that clear expectations reduce anxiety. Ambiguity is not kindness.",
-        "coaching": ["How can you be clearer about what you need?", "Are you apologizing for having standards?"]
+    "Tracker-Achievement": {
+        "summary": "Wants strong results via good systems. Motivated by making things run better and seeing the numbers. They are the 'Architect'.",
+        "support": "Pair data shares with appreciation. Contextualize metrics so they aren't personal verdicts.",
+        "thriving": "- Strong at tracking metrics\n- Clear sense of 'good'\n- Insists on consistent routines",
+        "struggling": "- Impatient with struggle\n- Focuses on reporting over empathy\n- Ties self-worth to numbers",
+        "interventions": "Humanize the data. 'The chart is just a tool, not the goal.' Focus on effort.",
+        "coaching": ["How can you measure effort, not just outcome?", "Are you valuing the data more than the person?"]
     },
     "Tracker-Growth": {
         "summary": "Loves accurate info and improvement. Wants systems and documentation to keep getting better. They are the 'Technical Expert'.",
         "support": "Pick a few key processes to improve. Pair process changes with relational steps.",
-        "thriving": "Notices patterns in incidents. Keeps documentation tight. Helps peers improve process.",
-        "struggling": "Frustrated by details others miss. Over-focuses on systems over people. Hesitates in crisis.",
+        "thriving": "- Notices patterns in incidents\n- Keeps documentation tight\n- Helps peers improve process",
+        "struggling": "- Frustrated by details others miss\n- Over-focuses on systems over people\n- Hesitates in crisis",
         "interventions": "Help them zoom out. 'Perfection is the enemy of good'. Focus on 'Good Enough' for now.",
         "coaching": ["Are you focusing on the system or the person?", "What is 'good enough' for today?"]
     },
     "Tracker-Purpose": {
         "summary": "Wants things done right because it matters for kids. Standards come from responsibility. They are the 'Guardian'.",
         "support": "Process the heavy sense of responsibility. Share the 'Why' behind standards with staff.",
-        "thriving": "Protects youth via safety checks. Notices small risks. Translates values into concrete practice.",
-        "struggling": "Intolerant of carelessness. Distressed by shortcuts. Leans on rules when anxious.",
+        "thriving": "- Protects youth via safety checks\n- Notices small risks\n- Translates values into concrete practice",
+        "struggling": "- Intolerant of carelessness\n- Distressed by shortcuts\n- Leans on rules when anxious",
         "interventions": "Remind them: 'You are responsible for the process, not the outcome.' Release the weight.",
         "coaching": ["How can you protect the mission without being rigid?", "Are you using rules to manage your anxiety?"]
     },
     "Tracker-Connection": {
         "summary": "Cares about getting it right and caring for people. Wants a competent, cohesive team. They are the 'Reliable Rock'.",
         "support": "Add relational check-ins before details. Share tasks instead of hoarding them.",
-        "thriving": "Gives grounded, specific support. Consistency feels safe to youth. Safe person for technical questions.",
-        "struggling": "Assumes people know they care (they don't). Becomes the 'Do-Everything' person. Burnout risk.",
+        "thriving": "- Gives grounded, specific support\n- Consistency feels safe to youth\n- Safe person for technical questions",
+        "struggling": "- Assumes people know they care (they don't)\n- Becomes the 'Do-Everything' person\n- Burnout risk",
         "interventions": "Force delegation. 'If you do it for them, you rob them of the learning'.",
         "coaching": ["How can you show care in a way they understand?", "Are you doing too much for others?"]
-    },
-    "Tracker-Achievement": {
-        "summary": "Wants strong results via good systems. Motivated by making things run better and seeing the numbers. They are the 'Architect'.",
-        "support": "Pair data shares with appreciation. Contextualize metrics so they aren't personal verdicts.",
-        "thriving": "Strong at tracking metrics. clear sense of 'good'. Insists on consistent routines.",
-        "struggling": "Impatient with struggle. Focuses on reporting over empathy. Ties self-worth to numbers.",
-        "interventions": "Humanize the data. 'The chart is just a tool, not the goal.' Focus on effort.",
-        "coaching": ["How can you measure effort, not just outcome?", "Are you valuing the data more than the person?"]
     }
 }
-
-COMM_TRAITS = ["Director", "Encourager", "Facilitator", "Tracker"]
-MOTIV_TRAITS = ["Achievement", "Growth", "Purpose", "Connection"]
 
 # (A) TEAM CULTURE GUIDE
 TEAM_CULTURE_GUIDE = {
@@ -558,7 +559,44 @@ CAREER_PATHWAYS = {
     }
 }
 
-# --- 5. HELPER FUNCTIONS ---
+# --- 6. HELPER FUNCTIONS ---
+
+# 6a. PROFILE CONTENT GENERATOR (Fixes the missing function error)
+def generate_profile_content(comm, motiv):
+    """
+    Generates the 10-section deep dive content for any Comm/Motiv combination.
+    Using data extracted from the full profile definitions.
+    """
+    # Data lookup with fallbacks
+    comm_data = FULL_COMM_PROFILES.get(comm, FULL_COMM_PROFILES['Director'])
+    motiv_data = FULL_MOTIV_PROFILES.get(motiv, FULL_MOTIV_PROFILES['Achievement'])
+    
+    # Integrated Profile Lookup
+    combo_key = f"{comm}-{motiv}"
+    combo_data = FULL_INTEGRATED_PROFILES.get(combo_key, {
+        "summary": "Leads with their communication style to meet their motivational needs.",
+        "support": "Balance their need for results with support.",
+        "thriving": "High performance and engagement.",
+        "struggling": "Stress behavior and withdrawal.",
+        "interventions": "Address the root cause of stress.",
+        "coaching": ["How can you balance your style with the team's needs?"]
+    })
+
+    # Construct the return object
+    return {
+        "s1": comm_data['description'],
+        "s2": comm_data['supervising_tips'],
+        "s3": motiv_data['description'],
+        "s4": motiv_data['strategies'],
+        "s5": combo_data['summary'],
+        "s6": combo_data['support'],
+        "s7": combo_data['thriving'],
+        "s8": combo_data['struggling'],
+        "s9": combo_data['interventions'],
+        "s10": motiv_data['celebrate'],
+        "coaching": combo_data.get('coaching', [])
+    }
+
 def clean_text(text):
     if not text: return ""
     return str(text).replace('\u2018', "'").replace('\u2019', "'").encode('latin-1', 'replace').decode('latin-1')
@@ -589,7 +627,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
         pdf.cell(0, 8, title, ln=True, fill=True); pdf.ln(2)
         pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
-        # Basic Markdown cleanup for PDF
+        # Clean markdown for PDF
         clean_body = body.replace("**", "").replace("* ", "- ")
         pdf.multi_cell(0, 5, clean_text(clean_body))
         pdf.ln(4)
@@ -612,6 +650,15 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         for q in data['coaching']:
             pdf.multi_cell(0, 5, clean_text(f"- {q}"))
         pdf.ln(4)
+
+    # Add Advancement Section (Generic for now based on comm style)
+    adv_text = "Help them master the operational side. Challenge them to see clarity and accountability as kindness."
+    if p_comm == "Director": adv_text = "Shift from doing to enabling. Challenge them to sit on their hands and let the team fail safely to learn."
+    elif p_comm == "Encourager": adv_text = "Master structure and operations. Challenge them to see that holding a boundary is a form of kindness."
+    elif p_comm == "Facilitator": adv_text = "Develop executive presence. Challenge them to make the 51% decision when consensus isn't possible."
+    elif p_comm == "Tracker": adv_text = "Develop intuition and flexibility. Challenge them to prioritize relationships over rigid compliance."
+    
+    add_section("12. Helping Them Prepare for Advancement", adv_text)
 
     return pdf.output(dest='S').encode('latin-1')
 
@@ -656,8 +703,16 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         st.subheader("11. Coaching Questions")
         for q in data['coaching']:
             st.write(f"- {q}")
+            
+    st.subheader("12. Helping Them Prepare for Advancement")
+    adv_text = "Help them master the operational side. Challenge them to see clarity and accountability as kindness."
+    if p_comm == "Director": adv_text = "Shift from doing to enabling. Challenge them to sit on their hands and let the team fail safely to learn."
+    elif p_comm == "Encourager": adv_text = "Master structure and operations. Challenge them to see that holding a boundary is a form of kindness."
+    elif p_comm == "Facilitator": adv_text = "Develop executive presence. Challenge them to make the 51% decision when consensus isn't possible."
+    elif p_comm == "Tracker": adv_text = "Develop intuition and flexibility. Challenge them to prioritize relationships over rigid compliance."
+    st.write(adv_text)
 
-# --- 6. MAIN APP LOGIC ---
+# --- 7. MAIN APP LOGIC ---
 staff_list = fetch_staff_data()
 df = pd.DataFrame(staff_list)
 
