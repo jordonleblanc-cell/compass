@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 from fpdf import FPDF
 import plotly.express as px
+import time
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
@@ -800,7 +801,7 @@ df = pd.DataFrame(staff_list)
 # Reset Helpers
 def reset_t1(): st.session_state.t1_staff_select = None
 def reset_t2(): st.session_state.t2_team_select = []
-def reset_t3(): st.session_state.p1 = None; st.session_state.p2 = None
+def reset_t3(): st.session_state.p1 = None; st.session_state.p2 = None; st.session_state.messages = []
 def reset_t4(): st.session_state.career = None; st.session_state.career_target = None
 
 # --- HERO SECTION ---
@@ -935,9 +936,12 @@ elif st.session_state.current_view == "Conflict Mediator":
         c1, c2 = st.columns(2)
         p1 = c1.selectbox("Select Yourself (Supervisor)", df['name'].unique(), index=None, key="p1")
         p2 = c2.selectbox("Select Staff Member", df['name'].unique(), index=None, key="p2")
+        
         if p1 and p2 and p1 != p2:
             d1 = df[df['name']==p1].iloc[0]; d2 = df[df['name']==p2].iloc[0]
             s1, s2 = d1['p_comm'], d2['p_comm']
+            m1, m2 = d1['p_mot'], d2['p_mot']
+            
             st.divider()
             st.subheader(f"{s1} (Sup) vs. {s2} (Staff)")
             if s1 in SUPERVISOR_CLASH_MATRIX and s2 in SUPERVISOR_CLASH_MATRIX[s1]:
@@ -960,6 +964,69 @@ elif st.session_state.current_view == "Conflict Mediator":
                             st.success(f"\"{text}\"")
             else:
                 st.info("No specific conflict protocol exists for this combination yet. They likely work well together!")
+            
+            # --- AI SUPERVISOR BOT ---
+            st.markdown("---")
+            st.subheader("🤖 AI Supervisor Assistant")
+            st.caption(f"Ask questions about managing {p2} based on their profile ({s2} x {m2})")
+            
+            # Initialize history specifically for this view if not present
+            if "messages" not in st.session_state:
+                st.session_state.messages = []
+
+            # Display messages
+            for message in st.session_state.messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+
+            # Logic Engine for No-API Chat
+            def get_smart_response(query, comm_style, motiv_driver):
+                query = query.lower()
+                response = ""
+                
+                # Context 1: Communication
+                comm_data = FULL_COMM_PROFILES.get(comm_style, {})
+                
+                # Context 2: Motivation
+                mot_data = FULL_MOTIV_PROFILES.get(motiv_driver, {})
+                
+                if "feedback" in query or "critical" in query or "correct" in query:
+                    response += f"**On giving feedback to a {comm_style}:** {comm_data.get('supervising', 'Be clear.')}\n\n"
+                    response += f"**Motivation Tip:** Frame the feedback in a way that doesn't block their drive for {motiv_driver}. "
+                    if motiv_driver == "Connection": response += "Reassure them that the relationship is safe."
+                    elif motiv_driver == "Achievement": response += "Focus on how fixing this helps them win."
+                
+                elif "motivate" in query or "burnout" in query or "tired" in query:
+                    response += f"**To motivate a {motiv_driver} driver:** {mot_data.get('strategies', 'Ask them what they need.')}\n\n"
+                    response += f"**Watch out for:** A {comm_style} under stress may become rigid or withdrawn."
+                
+                elif "meeting" in query or "talk" in query:
+                    response += f"**Meeting Strategy:** As a {comm_style}, they appreciate {comm_data.get('desc_bullets', ['clarity'])[0]}. "
+                    response += f"Ensure the meeting connects to their value of {motiv_driver}."
+
+                elif "conflict" in query or "fight" in query:
+                    response += f"**Conflict Style:** A {comm_style} may view conflict as {('an obstacle' if comm_style == 'Director' else 'a threat')}. "
+                    response += f"De-escalate by validating their {motiv_driver} needs."
+
+                else:
+                    response = f"I can help you manage {p2}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\nRemember: They are a **{comm_style}** driven by **{motiv_driver}**."
+                
+                return response
+
+            # Input
+            if prompt := st.chat_input(f"Ask about {p2}..."):
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                with st.chat_message("user"):
+                    st.markdown(prompt)
+
+                with st.chat_message("assistant"):
+                    with st.spinner("Consulting the Compass Database..."):
+                        time.sleep(0.5) # Simulate thinking
+                        bot_reply = get_smart_response(prompt, s2, m2)
+                        st.markdown(bot_reply)
+                
+                st.session_state.messages.append({"role": "assistant", "content": bot_reply})
+            
             st.button("Reset", key="reset_t3", on_click=reset_t3)
 
 # 4. CAREER PATHFINDER
