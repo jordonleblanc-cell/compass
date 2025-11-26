@@ -8,7 +8,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 # --- 1. CONFIGURATION ---
-st.set_page_config(page_title="Elmcrest Compass", page_icon="🧭", layout="centered")
+st.set_page_config(page_title="Elmcrest Compass", page_icon="🧭", layout="centered", initial_sidebar_state="collapsed")
 
 # --- 2. CSS STYLING (Modern Glassmorphism) ---
 st.markdown("""
@@ -28,6 +28,10 @@ st.markdown("""
             --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
             --input-bg: #f8fafc;
         }
+
+        /* HIDE STREAMLIT SIDEBAR NAVIGATION */
+        [data-testid="stSidebarNav"] {display: none;}
+        section[data-testid="stSidebar"] {display: none;}
 
         @media (prefers-color-scheme: dark) {
             :root {
@@ -233,17 +237,13 @@ MOTIVATION_QUESTIONS = [
     {"id": "mot20", "text": "I’m motivated by being trusted with projects where outcomes are clearly defined.", "style": "Achievement"},
 ]
 
-# --- UPDATED DATA DICTIONARIES (ENHANCED CONTENT) ---
+# --- UPDATED DATA DICTIONARIES (HTML FIXED) ---
 
 COMM_PROFILES = {
     "Director": {
         "name": "Director Communicator",
         "tagline": "The Decisive Driver",
-        "overview": """
-        **Core Style:** You blend decisive, crisis-ready leadership with a bias for action. You are likely to set direction quickly and then rally people to move with you. You prioritize efficiency and competence, often serving as the "adult in the room" who keeps things calm while making necessary calls.
-        
-        **Your Superpower:** In high-pressure moments, you step in and organize. Staff see you as fair and decisive—they know you will act, so they aren't stuck in limbo.
-        """,
+        "overview": "<strong>Core Style:</strong> You blend decisive, crisis-ready leadership with a bias for action. You are likely to set direction quickly and then rally people to move with you. You prioritize efficiency and competence, often serving as the 'adult in the room' who keeps things calm while making necessary calls.<br><br><strong>Your Superpower:</strong> In high-pressure moments, you step in and organize. Staff see you as fair and decisive—they know you will act, so they aren't stuck in limbo.",
         "conflictImpact": "Under stress, you may move faster than staff can realistically integrate, making them feel like they are always 'behind'. You might default to control before curiosity.",
         "traumaStrategy": "Your consistency and clear boundaries can be regulating for youth who need predictability, though some may find your intensity intimidating.",
         "roleTips": {
@@ -270,11 +270,7 @@ COMM_PROFILES = {
     "Encourager": {
         "name": "Encourager Communicator",
         "tagline": "The Relational Energizer",
-        "overview": """
-        **Core Style:** You lead with enthusiasm, vision, and warmth. You act as the emotional glue of the team, paying attention to how people feel and ensuring they feel seen and supported. You help change feel both human and organized.
-        
-        **Your Superpower:** You keep the 'why' of the work alive when others are exhausted. You are often the one who notices and names growth in youth or staff.
-        """,
+        "overview": "<strong>Core Style:</strong> You lead with enthusiasm, vision, and warmth. You act as the emotional glue of the team, paying attention to how people feel and ensuring they feel seen and supported. You help change feel both human and organized.<br><br><strong>Your Superpower:</strong> You keep the 'why' of the work alive when others are exhausted. You are often the one who notices and names growth in youth or staff.",
         "conflictImpact": "You may avoid giving sharp feedback because you don't want to discourage someone. You might also overcommit your emotional energy when many people need you.",
         "traumaStrategy": "Your ability to foster belonging helps youth feel that adults are approachable, kind, and on their side.",
         "roleTips": {
@@ -301,11 +297,7 @@ COMM_PROFILES = {
     "Facilitator": {
         "name": "Facilitator Communicator",
         "tagline": "The Calm Bridge",
-        "overview": """
-        **Core Style:** You prefer to listen first and build consensus. You blend a calm, listening posture with a genuine desire to keep relationships steady. You create calmer, more predictable environments.
-        
-        **Your Superpower:** You de-escalate tension by staying steady and non-threatening. People feel safe bringing mistakes or worries to you without fear of shame.
-        """,
+        "overview": "<strong>Core Style:</strong> You prefer to listen first and build consensus. You blend a calm, listening posture with a genuine desire to keep relationships steady. You create calmer, more predictable environments.<br><br><strong>Your Superpower:</strong> You de-escalate tension by staying steady and non-threatening. People feel safe bringing mistakes or worries to you without fear of shame.",
         "conflictImpact": "You might stay neutral too long when a strong stance is needed. You may quietly carry moral distress or frustration without voicing it.",
         "traumaStrategy": "Your steady presence helps youth feel safe enough to open up, especially when they aren't ready for intensity.",
         "roleTips": {
@@ -332,11 +324,7 @@ COMM_PROFILES = {
     "Tracker": {
         "name": "Tracker Communicator",
         "tagline": "The Structured Guardian",
-        "overview": """
-        **Core Style:** You lead with structure, detail, and a strong respect for procedure. You want plans to be sound and aligned before you move. You believe the path to success is through good systems and accurate work.
-        
-        **Your Superpower:** You protect youth and staff by ensuring documentation and procedures support ethical, safe care. You notice small patterns that could become big risks.
-        """,
+        "overview": "<strong>Core Style:</strong> You lead with structure, detail, and a strong respect for procedure. You want plans to be sound and aligned before you move. You believe the path to success is through good systems and accurate work.<br><br><strong>Your Superpower:</strong> You protect youth and staff by ensuring documentation and procedures support ethical, safe care. You notice small patterns that could become big risks.",
         "conflictImpact": "You may feel intolerant of what looks like carelessness in others. You can focus so much on accurate reporting that you under-communicate empathy.",
         "traumaStrategy": "Your consistency creates a predictable environment that feels safe for youth with trauma histories.",
         "roleTips": {
@@ -566,7 +554,12 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
     pdf.cell(0, 10, clean_text(f"Communication: {comm_prof['name']}"), ln=True)
     pdf.set_font("Arial", '', 11)
     pdf.set_text_color(*black)
-    pdf.multi_cell(0, 6, clean_text(comm_prof['overview']))
+    
+    # Use HTML-cleaned text for the PDF or simple text replacement
+    # Since FPDF simple text doesn't parse HTML tags like <strong>, we need a cleaner version for PDF.
+    # For simplicity here, I will replace the HTML tags with simple text.
+    overview_text = comm_prof['overview'].replace("<strong>", "").replace("</strong>", "").replace("<br><br>", "\n\n")
+    pdf.multi_cell(0, 6, clean_text(overview_text))
     pdf.ln(3)
     
     # Role Tips
@@ -594,13 +587,18 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
     pdf.set_font("Arial", 'B', 11)
     pdf.cell(0, 8, "Boosters (Energizers):", ln=True, fill=True)
     pdf.set_font("Arial", '', 11)
-    for b in mot_prof['boosters']: pdf.multi_cell(0, 6, clean_text(f"- {b}"))
+    for b in mot_prof['boosters']: 
+        # Clean Markdown bolding for PDF
+        clean_b = b.replace("**", "")
+        pdf.multi_cell(0, 6, clean_text(f"- {clean_b}"))
     pdf.ln(2)
     
     pdf.set_font("Arial", 'B', 11)
     pdf.cell(0, 8, "Drainers (De-energizers):", ln=True, fill=True)
     pdf.set_font("Arial", '', 11)
-    for k in mot_prof['killers']: pdf.multi_cell(0, 6, clean_text(f"- {k}"))
+    for k in mot_prof['killers']: 
+        clean_k = k.replace("**", "")
+        pdf.multi_cell(0, 6, clean_text(f"- {clean_k}"))
     pdf.ln(5)
     
     # Integrated
@@ -679,6 +677,13 @@ if st.session_state.step == 'intro':
                 st.session_state.user_info = {"name": name, "email": email, "role": role}
                 st.session_state.step = 'comm'
                 st.rerun()
+    
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    # Discrete Admin Access Button
+    col_spacer, col_admin = st.columns([0.8, 0.2])
+    with col_admin:
+        if st.button("🔒 Supervisor Portal"):
+            st.switch_page("pages/admin.py")
 
 # --- COMM ---
 elif st.session_state.step == 'comm':
