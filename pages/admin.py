@@ -3,7 +3,6 @@ import requests
 import pandas as pd
 from fpdf import FPDF
 import plotly.express as px
-import random
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
@@ -25,7 +24,7 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 def check_password():
-    # Defaults to 'elmcrest2025' if secret not set
+    # Looks for password in secrets.toml, defaults to "elmcrest2025" if not found
     PASSWORD = st.secrets.get("ADMIN_PASSWORD", "elmcrest2025") 
     if st.session_state.password_input == PASSWORD:
         st.session_state.authenticated = True
@@ -85,7 +84,7 @@ st.markdown(f"""
             --text-sub: #475569;
             --bg-start: #f8fafc;
             --bg-end: #e2e8f0;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.9);
             --border-color: #e2e8f0;
             --shadow: 0 4px 20px rgba(0,0,0,0.05);
             --input-bg: #ffffff;
@@ -97,7 +96,7 @@ st.markdown(f"""
                 --text-sub: #cbd5e1;
                 --bg-start: #0f172a;
                 --bg-end: #020617;
-                --card-bg: #1e293b;
+                --card-bg: rgba(30, 41, 59, 0.9);
                 --border-color: #334155;
                 --shadow: 0 4px 20px rgba(0,0,0,0.4);
                 --input-bg: #0f172a;
@@ -108,12 +107,13 @@ st.markdown(f"""
         .stApp {{ background: radial-gradient(circle at top left, var(--bg-start) 0%, var(--bg-end) 100%); }}
         h1, h2, h3, h4 {{ color: var(--primary) !important; font-weight: 700 !important; letter-spacing: -0.02em; }}
         
-        .custom-card {{ background-color: var(--card-bg); padding: 24px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border-color); margin-bottom: 20px; color: var(--text-main); }}
+        .custom-card {{ background-color: var(--card-bg); padding: 24px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border-color); margin-bottom: 20px; color: var(--text-main); backdrop-filter: blur(10px); }}
         
-        .hero-box {{ background: linear-gradient(135deg, #015bad 0%, #0f172a 100%); padding: 30px; border-radius: 16px; color: white !important; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(1, 91, 173, 0.2); }}
-        .hero-title {{ color: white !important; font-size: 2rem; font-weight: 800; margin-bottom:10px; }}
+        .hero-box {{ background: linear-gradient(135deg, #015bad 0%, #0f172a 100%); padding: 40px; border-radius: 16px; color: white !important; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(1, 91, 173, 0.2); }}
+        .hero-title {{ color: white !important; font-size: 2.2rem; font-weight: 800; margin-bottom:10px; }}
         .hero-subtitle {{ color: #e2e8f0 !important; font-size: 1.1rem; opacity: 0.9; max-width: 800px; line-height: 1.6; }}
 
+        /* Navigation Buttons */
         div[data-testid="column"] .stButton button {{
             background-color: var(--card-bg); color: var(--text-main) !important; border: 1px solid var(--border-color);
             box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: 140px; display: flex; flex-direction: column;
@@ -123,11 +123,12 @@ st.markdown(f"""
             transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); border-color: var(--primary); color: var(--primary) !important;
         }}
         
+        /* Action Buttons */
         .stButton button:not([style*="height: 140px"]) {{
             background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white !important; border: none; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 10px rgba(1, 91, 173, 0.2);
         }}
 
-        .stTextInput input, .stSelectbox div[data-baseweb="select"] > div {{ background-color: var(--card-bg) !important; color: var(--text-main) !important; border-color: var(--border-color) !important; }}
+        .stTextInput input, .stSelectbox div[data-baseweb="select"] > div {{ background-color: var(--input-bg) !important; color: var(--text-main) !important; border-color: var(--border-color) !important; border-radius: 8px; }}
         div[data-baseweb="popover"] {{ background-color: var(--card-bg) !important; }}
         div[data-baseweb="menu"] {{ background-color: var(--card-bg) !important; color: var(--text-main) !important; }}
         div[data-testid="stDataFrame"] {{ border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }}
@@ -151,7 +152,8 @@ TEAM_CULTURE_GUIDE = {
         "title": "The 'Action' Culture",
         "impact_analysis": "**What it feels like:** This unit operates like a high-stakes trading floor. The energy is intense, fast, and results-oriented. Decisions are made quickly, often by the loudest voice. Competence is the primary currency of trust.\n\n**The Good:** You will rarely miss a deadline. Crises are handled with military precision. Productivity is high.\n**The Bad:** You risk 'Burnout by Urgency.' Quiet staff members will be steamrolled and stop contributing. You may solve the wrong problems very quickly because no one paused to ask 'Why?'.",
         "management_strategy": "**Your Role: The 'Governor'.** Your team has a heavy gas pedal; you must be the brake and the steering wheel.\n* **Slow them down:** Do not reward speed for speed's sake. Praise thoroughness.\n* **Protect the minority:** Actively solicit the opinion of the quietest person in the room.\n* **Enforce breaks:** This culture treats exhaustion as a badge of honor. You must mandate rest.",
-        "meeting_protocol": "1. **The Devil's Advocate Rule:** Assign one person per meeting to specifically challenge the speed of the decision. Ask: 'What happens if we wait 24 hours?'\n2. **Forced Silence:** Implement a '2-minute silence' after a proposal is made to allow internal processors time to think before the Directors dominate the verbal space.\n3. **The 'Who' Check:** End every meeting by asking, 'Who might feel hurt or left out by this decision?'"
+        "meeting_protocol": "1. **The Devil's Advocate Rule:** Assign one person per meeting to specifically challenge the speed of the decision. Ask: 'What happens if we wait 24 hours?'\n2. **Forced Silence:** Implement a '2-minute silence' after a proposal is made to allow internal processors time to think before the Directors dominate the verbal space.\n3. **The 'Who' Check:** End every meeting by asking, 'Who might feel hurt or left out by this decision?'",
+        "team_building": "Strategic games, escape rooms, competitions (with caution)."
     },
     "Encourager": {
         "title": "The 'Family' Culture",
@@ -216,7 +218,7 @@ MOTIVATION_GAP_GUIDE = {
     }
 }
 
-# (D) CONFLICT MATRIX (Preserved)
+# (D) CONFLICT MATRIX
 SUPERVISOR_CLASH_MATRIX = {
     "Director": {
         "Encourager": {
@@ -230,7 +232,6 @@ SUPERVISOR_CLASH_MATRIX = {
                 "Joint": "We speak different languages. Director speaks Task; Encourager speaks Team. Both are valid."
             }
         },
-        # ... (Other Director combos would be here)
         "Facilitator": {
             "tension": "Gas vs. Brake",
             "psychology": "This conflict is about **Risk Perception**. You fear **Stagnation** (doing nothing); they fear **Error** (doing the wrong thing). You operate on 'Ready, Fire, Aim'; they operate on 'Ready, Aim, Aim...'. You feel slowed down and obstructed; they feel steamrolled and unsafe.",
