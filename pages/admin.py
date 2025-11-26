@@ -151,7 +151,7 @@ if not st.session_state.authenticated:
 COMM_TRAITS = ["Director", "Encourager", "Facilitator", "Tracker"]
 MOTIV_TRAITS = ["Achievement", "Growth", "Purpose", "Connection"]
 
-# --- 5. EXTENDED CONTENT DICTIONARIES ---
+# --- 5. DATA DICTIONARIES (DEFINED AT TOP LEVEL) ---
 
 # (A) TEAM CULTURE GUIDE
 TEAM_CULTURE_GUIDE = {
@@ -194,41 +194,45 @@ TEAM_CULTURE_GUIDE = {
 
 # (B) MISSING VOICE GUIDE
 MISSING_VOICE_GUIDE = {
-    "Director": {"risk": "**Risk of Stagnation.** Without Director energy, this team may talk in circles, create perfect plans that never launch, or prioritize comfort over results. You risk becoming a 'social club' that doesn't achieve outcomes.", "fix": "**Supervisor Strategy:** You must be the driver. Set hard deadlines. Interrupt circular conversations. Be the 'bad guy' who demands output. End every meeting with 'Who is doing What by When?'"},
-    "Encourager": {"risk": "**Risk of Burnout & Coldness.** Without Encourager energy, this team becomes transactional. Staff feel like cogs in a machine. You will likely see high turnover because no one feels 'seen' or 'cared for' personally.", "fix": "**Supervisor Strategy:** You must prioritize the 'Human Element'. Start meetings with personal check-ins. Schedule fun (yes, mandatory fun). Manually recognize effort, not just results. Send handwritten notes."},
-    "Facilitator": {"risk": "**Risk of Tunnel Vision.** Without Facilitator energy, the loudest voices will dominate. You will have 'Blind spots' because no one is stepping back to ask 'What about X?'. Dissent will be crushed or ignored.", "fix": "**Supervisor Strategy:** You must slow down the room. Use 'Round Robin' turn-taking so quiet people speak. Ask 'Who disagrees?' before moving on. Actively solicit the minority opinion."},
-    "Tracker": {"risk": "**Risk of Chaos & Liability.** Without Tracker energy, details will slip. Documentation will fail. Safety risks will be missed until they become accidents. The program will feel chaotic and reactive.", "fix": "**Supervisor Strategy:** You must be the auditor. Bring the checklist. Don't assume it's done; check it. Create visual trackers on the wall. Ask 'What is the backup plan?' repeatedly."}
+    "Director": {
+        "risk": "**The 'Nice' Stagnation.** Without Director energy, this team may talk in circles, create perfect plans that never launch, or prioritize comfort over results. You risk becoming a 'social club' that doesn't achieve outcomes. Problems are admired, not solved.",
+        "fix": "**Supervisor Strategy: Be the Driver.**\n* **Set Hard Deadlines:** Do not ask 'when will this be done?'. Say 'This is due Friday.'\n* **Interrupt Loops:** When conversation circles, interrupt with: 'What is the specific next action?'\n* **Assign Owners:** Never end a meeting without names attached to tasks. You must provide the urgency they lack."
+    },
+    "Encourager": {
+        "risk": "**The Cold Machine.** Without Encourager energy, this team becomes transactional and efficient but soulless. Staff feel like cogs in a machine. You will likely see high turnover because no one feels 'seen' or 'cared for' personally. Burnout happens silently.",
+        "fix": "**Supervisor Strategy: Be the Heart.**\n* **The 5-Minute Rule:** Spend the first 5 minutes of every meeting on non-work connection. No exceptions.\n* **Manual Appreciation:** You must schedule reminders to send thank-you notes or verbal praise, as it won't happen naturally.\n* **Wellness Checks:** Ask 'How are you doing?' and wait for the real answer."
+    },
+    "Facilitator": {
+        "risk": "**Tunnel Vision & Bulldozing.** Without Facilitator energy, the loudest voices will dominate. You will have 'Blind spots' because no one is stepping back to ask 'What about X?'. Dissent will be crushed or ignored. Decisions will be fast but often wrong or poorly implemented.",
+        "fix": "**Supervisor Strategy: Be the Brake.**\n* **Round Robin:** Force a mechanism where everyone speaks once before anyone speaks twice.\n* **The 'Pre-Mortem':** Before finalizing a plan, ask: 'If this fails, why did it fail?' forcing them to slow down and look for gaps.\n* **Check for Buy-In:** Explicitly ask the quietest people for their opinion."
+    },
+    "Tracker": {
+        "risk": "**Chaos & Liability.** Without Tracker energy, details will slip. Documentation will fail. Safety risks will be missed until they become accidents. The program will feel chaotic and reactive. Great ideas will launch but fail due to poor logistics.",
+        "fix": "**Supervisor Strategy: Be the Auditor.**\n* **Bring the Checklist:** You must be the one who asks 'Is the paperwork done?' and 'Who is locking the door?'.\n* **Visual Tracking:** Put goals and compliance metrics on the wall. Make the data visible.\n* **The 'How' Question:** When they have a big idea, you ask: 'Walk me through the specific steps to make that happen.'"
+    }
 }
 
-# (C) MOTIVATION GAP GUIDE
+# (C) MOTIVATION GAP GUIDE (EXPANDED)
 MOTIVATION_GAP_GUIDE = {
     "Growth": {
-        "title": "The Restless Team",
-        "description": "This team is driven by progress, competence, and future potential. They view the job as a stepping stone. If they aren't learning, they are leaving.",
-        "risk": "Boredom & Stagnation. If the work becomes repetitive without new challenges, they will disengage or find a new job that offers 'growth'.",
-        "symptoms": "High turnover among top performers. Complaints about 'doing the same thing every day'. Disengagement during routine tasks.",
-        "strategy": "**Feed the Beast.**\n* **Rotate Roles:** Don't let them do the same task for 6 months. Rotate 'Shift Lead', 'Safety Captain', etc.\n* **The 'Pilot' Frame:** Frame boring changes as 'Experiments' they get to lead and evaluate.\n* **Career Pathing:** Talk about their next job explicitly. 'Doing this well helps you get to [Goal].'"
+        "title": "The Stagnation Trap",
+        "description": "This team is content with the status quo. They do the job well enough, but they aren't looking to improve. They resist new training or changes to protocol because 'it works fine now.' High performers will get bored and leave.",
+        "strategy": "**Supervisor Strategy: Force Evolution.**\n* **The 'Pilot' Approach:** Frame every change as a '30-day experiment' rather than a permanent shift to lower resistance.\n* **External Stimulus:** Bring in outside speakers or send them to visit other high-performing units to spark curiosity.\n* **Career Pathing:** Even if they don't ask, map out a growth plan for them."
     },
     "Purpose": {
-        "title": "The Crusader Team",
-        "description": "This team is driven by the mission, justice, and 'The Why'. They will endure hard conditions if they believe it matters. They rebel against anything that feels bureaucratic or heartless.",
-        "risk": "Cynicism & Burnout. If they feel the agency cares more about liability/paperwork than the kids, they will become toxic/cynical defenders of the youth against management.",
-        "symptoms": "Moral outrage at policy changes. Refusal to do paperwork ('It takes time away from kids'). Us vs. Them mentality with Admin.",
-        "strategy": "**Connect the Dots.**\n* **Mission Moments:** Start every meeting with a client success story.\n* **Explain the Why:** Never give a raw order. Always link compliance to client advocacy. 'This form gets the kid funding.'\n* **Validate Passion:** When they push back, say 'I love that you care so much', then redirect."
+        "title": "The Mercenary Trap",
+        "description": "This team treats the work as 'just a job.' They clock in and clock out. They follow the rules but lack heart. They may be cynical about the organization's mission or leadership. Quality of care drops because no one goes the extra mile.",
+        "strategy": "**Supervisor Strategy: Re-Connect the Dots.**\n* **Mission Moments:** Start every meeting with a specific story of a youth who was helped. Make the impact visible.\n* **The 'Why' Behind the 'What':** Never give a task without explaining how it helps the client. 'We clean the van so the kids feel dignified,' not 'because I said so.'\n* **Validate Frustration:** Acknowledge system failures so they know you aren't blind, then pivot to 'how do we help anyway?'"
     },
     "Connection": {
-        "title": "The Relational Team",
-        "description": "This team is driven by belonging, mutual support, and 'feeling' good. They work for each other. If the team is tight, they can handle anything.",
-        "risk": "Cliques & Drama. If the relational glue fails (conflict) or if they feel isolated by management, productivity halts. They prioritize harmony over accountability.",
-        "symptoms": "High interpersonal drama or gossip. Productivity drops when a specific friend is absent. Resistance to new staff who 'don't fit in'.",
-        "strategy": "**Shepherd the Flock.**\n* **Relationship First:** Do not start a meeting with tasks. Start with a check-in.\n* **Repair Conflict:** You cannot ignore interpersonal friction; it stops the work. Mediate immediately.\n* **Visual Belonging:** Swag, team photos, inside jokes—these matter to them."
+        "title": "The Silo Trap",
+        "description": "This team works independently but not cooperatively. There is low trust. People hoard information or throw each other under the bus. Turnover is high because there is no social glue holding them there when the work gets hard.",
+        "strategy": "**Supervisor Strategy: Manufacture Belonging.**\n* **Shared Suffering/Success:** Create goals that can ONLY be hit if they work together (e.g., a unit-wide incentive).\n* **Forced Collision:** Assign tasks to pairs of people who don't normally interact.\n* **Rituals:** Create non-work traditions (Friday donuts, birthday cards) that signal 'we are a tribe'."
     },
     "Achievement": {
-        "title": "The Winning Team",
-        "description": "This team is driven by clarity, goals, and winning. They want to know the score. They hate ambiguity and moving goalposts.",
-        "risk": "Frustration & Checking Out. If success isn't defined, they feel like they are losing. They hate inefficiency and 'endless talking' without action.",
-        "symptoms": "Checking out during long discussions. Asking 'Is this on the test/evaluation?'. Frustration with peers who are 'slow' or 'emotional'.",
-        "strategy": "**Keep Score.**\n* **Gamify:** Use leaderboards, checklists, or visual trackers for shift tasks.\n* **Definition of Done:** Be hyper-specific about expectations. 'Clean the room' is bad; 'Floor swept, beds made' is good.\n* **Cut the Fluff:** Keep meetings short and action-oriented."
+        "title": "The Apathy Trap",
+        "description": "This team doesn't know if they are winning or losing, so they stop trying. They feel like effort doesn't matter because outcomes are vague. They drift through shifts without urgency or focus.",
+        "strategy": "**Supervisor Strategy: Keep Score.**\n* **Visual Scoreboards:** Put a chart on the wall tracking *something* (attendance, cleanliness, incidents). Humans naturally want to improve a number they can see.\n* **Micro-Wins:** Define what a 'good shift' looks like concretely. Give high-fives at the end of the day for hitting it.\n* **Gamification:** Turn mundane tasks into a friendly competition."
     }
 }
 
@@ -345,7 +349,7 @@ FULL_MOTIV_PROFILES = {
             "**Advocacy:** They fight for the underdog.",
             "**Meaning:** They need to see the human impact of their work."
         ],
-        "strategies": "Connect every rule to a 'Why.' Validate their passion for justice and advocacy. Share specific stories of their impact on youth. When assigning tasks, explain how this helps the youth or the mission. Allow them space to voice ethical concerns without judgment.",
+        "strategies": "Connect every rule to a 'Why.' Validate their passion for justice and advocacy. Share specific stories of their impact on youth. When assigning tasks, explain how this helps the youth or the mission.",
         "strategies_bullets": [
             "**The Why:** Always explain the mission behind the mandate.",
             "**Storytelling:** Share stories of life-change, not just data.",
@@ -550,7 +554,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     add_section("2. Supervising Their Communication", data['s2'], data['s2_b'])
     add_section(f"3. Motivation Profile: {p_mot}", data['s3'], data['s3_b'])
     add_section("4. Motivating This Staff Member", data['s4'], data['s4_b'])
-    add_section("5. Integrated Leadership Profile", data['s5']) # Integrated usually text only
+    add_section("5. Integrated Leadership Profile", data['s5']) 
     add_section("6. How You Can Best Support Them", data['s6'], data['s6_b'])
     add_section("7. What They Look Like When Thriving", data['s7'], data['s7_b'])
     add_section("8. What They Look Like When Struggling", data['s8'], data['s8_b'])
@@ -566,20 +570,20 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf.ln(4)
 
     # 12. Advancement
-    adv_text = "Help them master the operational side. Challenge them to see clarity and accountability as kindness."
+    adv_text = "Help them master the operational side. Challenge them to see clarity and accountability as kindness.\n\nTo advance, they must move beyond their natural strengths and develop their blind spots. This requires intentional coaching and 'safe failure' opportunities."
     adv_bullets = ["Master operations", "See accountability as kindness"]
     
     if p_comm == "Director": 
-        adv_text = "Shift from doing to enabling. Challenge them to sit on their hands and let the team fail safely to learn. They need to move from being the hero to being the guide."
+        adv_text = "Shift from doing to enabling. Challenge them to sit on their hands and let the team fail safely to learn. They need to move from being the hero to being the guide.\n\nTheir natural instinct is to take over when things get slow or messy. Advancement requires them to tolerate the messiness of other people's learning curves."
         adv_bullets = ["Delegate effectively", "Allow safe failure", "Focus on strategy vs tactics"]
     elif p_comm == "Encourager": 
-        adv_text = "Master structure and operations. Challenge them to see that holding a boundary is a form of kindness. They need to learn that being 'nice' isn't always being 'kind'."
+        adv_text = "Master structure and operations. Challenge them to see that holding a boundary is a form of kindness. They need to learn that being 'nice' isn't always being 'kind'.\n\nThey naturally lean into relationships. Advancement requires them to lean into the structural and operational pillars of leadership without losing their heart."
         adv_bullets = ["Master structure", "Hold boundaries", "Separate niceness from kindness"]
     elif p_comm == "Facilitator": 
-        adv_text = "Develop executive presence. Challenge them to make the 51% decision when consensus isn't possible. They need to get comfortable with not everyone agreeing."
+        adv_text = "Develop executive presence. Challenge them to make the 51% decision when consensus isn't possible. They need to get comfortable with not everyone agreeing.\n\nThey naturally seek harmony and input. Advancement requires them to become comfortable with the loneliness of making the final call when the team is divided."
         adv_bullets = ["Executive presence", "Decisive action", "Limit consensus-seeking"]
     elif p_comm == "Tracker": 
-        adv_text = "Develop intuition and flexibility. Challenge them to prioritize relationships over rigid compliance. They need to learn to read the room, not just the rulebook."
+        adv_text = "Develop intuition and flexibility. Challenge them to prioritize relationships over rigid compliance. They need to learn to read the room, not just the rulebook.\n\nThey naturally lean into safety and rules. Advancement requires them to understand the 'spirit of the law' and to build relational capital that allows them to lead people, not just processes."
         adv_bullets = ["Develop intuition", "Prioritize relationships", "Flexibility"]
     
     add_section("12. Helping Them Prepare for Advancement", adv_text, adv_bullets)
