@@ -966,6 +966,7 @@ elif st.session_state.current_view == "Conflict Mediator":
                 st.info("No specific conflict protocol exists for this combination yet. They likely work well together!")
             
             # --- AI SUPERVISOR BOT ---
+            st.markdown("---")
             with st.container(border=True):
                 st.subheader("🤖 AI Supervisor Assistant")
                 st.caption(f"Ask questions about managing **{p2}** based on their profile ({s2} x {m2}).")
@@ -991,7 +992,26 @@ elif st.session_state.current_view == "Conflict Mediator":
                     # Context 2: Motivation
                     mot_data = FULL_MOTIV_PROFILES.get(motiv_driver, {})
                     
-                    if "feedback" in query or "critical" in query or "correct" in query:
+                    # General Profile Query
+                    if "who is" in query or "tell me about" in query or "profile" in query or "style" in query:
+                         response += f"**Profile Overview:** {p2} is a **{comm_style}** driven by **{motiv_driver}**.\n\n"
+                         response += f"**Communication Style:** {comm_data.get('description', '')}\n\n"
+                         response += f"**Core Driver:** {mot_data.get('description', '')}"
+
+                    elif "strengths" in query or "good at" in query:
+                        response += f"**Strengths:** As a {comm_style}, they excel at: \n"
+                        for b in comm_data.get('desc_bullets', []):
+                            response += f"- {b}\n"
+                        response += f"\nDriven by {motiv_driver}, they are motivated by: \n"
+                        for b in mot_data.get('desc_bullets', []):
+                            response += f"- {b}\n"
+
+                    elif "weakness" in query or "struggle" in query or "bad at" in query:
+                         response += f"**Potential Blindspots:** \n"
+                         response += f"- A {comm_style} might struggle with: {comm_data.get('supervising_bullets', [''])[2]}\n" # Heuristic
+                         response += f"- When their need for {motiv_driver} isn't met, they might disengage."
+
+                    elif "feedback" in query or "critical" in query or "correct" in query:
                         response += f"**On giving feedback to a {comm_style}:** {comm_data.get('supervising', 'Be clear.')}\n\n"
                         response += f"**Motivation Tip:** Frame the feedback in a way that doesn't block their drive for {motiv_driver}. "
                         if motiv_driver == "Connection": response += "Reassure them that the relationship is safe."
