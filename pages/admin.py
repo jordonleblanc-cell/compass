@@ -936,22 +936,23 @@ elif st.session_state.current_view == "Conflict Mediator":
     if not df.empty:
         # Sidebar for API Key
         with st.sidebar:
-            # Allow users to input key, defaulting to secrets if available
-            default_key = st.secrets.get("GEMINI_API_KEY", "")
-            # Capture the input directly into a variable
+            # Try to get key from secrets (support both names)
+            secret_key = st.secrets.get("GOOGLE_API_KEY") or st.secrets.get("GEMINI_API_KEY", "")
+            
+            # Input field (defaults to secret if found)
             user_api_key = st.text_input(
-                "🔑 Gemini API Key (Optional)", 
-                value=st.session_state.get("gemini_key_input", default_key),
-                type="password", 
+                "🔑 Gemini API Key", 
+                value=st.session_state.get("gemini_key_input", secret_key),
+                type="password",
                 help="Get a key at aistudio.google.com"
             )
             
-            # Store in session state manually to be safe for persistence
+            # Persist input to session state
             if user_api_key:
                 st.session_state.gemini_key_input = user_api_key
-                st.success("Status: Ready")
+                st.success("✅ API Key Active")
             else:
-                st.info("Status: No Key")
+                st.error("❌ No API Key Found")
 
         c1, c2 = st.columns(2)
         p1 = c1.selectbox("Select Yourself (Supervisor)", df['name'].unique(), index=None, key="p1")
@@ -990,7 +991,7 @@ elif st.session_state.current_view == "Conflict Mediator":
             with st.container(border=True):
                 st.subheader("🤖 AI Supervisor Assistant")
                 
-                # Determine active key from the variable captured above
+                # Determine active key from variable
                 active_key = user_api_key
                 
                 if active_key:
