@@ -934,12 +934,20 @@ elif st.session_state.current_view == "Team DNA":
 elif st.session_state.current_view == "Conflict Mediator":
     st.subheader("⚖️ Conflict Mediator")
     if not df.empty:
-        # Sidebar for API Key
+        # Sidebar for API Key (Fixed for persistence)
         with st.sidebar:
-            gemini_key = st.text_input("🔑 Gemini API Key (Optional)", type="password", help="Get a key at aistudio.google.com to enable the smart chatbot.")
-            if not gemini_key:
-                # Try to get from secrets if not input
-                gemini_key = st.secrets.get("GEMINI_API_KEY", "")
+            if "gemini_key" not in st.session_state:
+                st.session_state.gemini_key = st.secrets.get("GEMINI_API_KEY", "")
+            
+            st.text_input(
+                "🔑 Gemini API Key (Optional)", 
+                type="password", 
+                key="gemini_key", 
+                help="Get a key at aistudio.google.com to enable the smart chatbot."
+            )
+            
+            if st.session_state.gemini_key:
+                st.caption("✅ Key Active")
 
         c1, c2 = st.columns(2)
         p1 = c1.selectbox("Select Yourself (Supervisor)", df['name'].unique(), index=None, key="p1")
@@ -977,7 +985,11 @@ elif st.session_state.current_view == "Conflict Mediator":
             st.markdown("---")
             with st.container(border=True):
                 st.subheader("🤖 AI Supervisor Assistant")
-                if gemini_key:
+                
+                # Check if key is actually present in session state
+                active_key = st.session_state.get("gemini_key", "")
+                
+                if active_key:
                     st.caption(f"Powered by Gemini 2.5 Flash | Ask specific questions about managing **{p2}** ({s2} x {m2}).")
                 else:
                     st.caption("Basic Mode | Add an API Key in the sidebar to unlock full AI capabilities.")
@@ -1065,7 +1077,7 @@ elif st.session_state.current_view == "Conflict Mediator":
                         response += f"**To motivate a {motiv_driver} driver:** {mot_data.get('strategies', 'Ask them what they need.')}\n\n"
                     
                     else:
-                        response = f"I can help you manage {p2}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\n*Note: Add a Gemini API Key in the sidebar for smarter, custom answers.*"
+                        response = f"I can help you manage {p2}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\n*Note: No API Key detected. Please check the sidebar.*"
                     
                     return response
 
@@ -1077,8 +1089,8 @@ elif st.session_state.current_view == "Conflict Mediator":
 
                     with st.chat_message("assistant"):
                         with st.spinner("Consulting the Compass Database..."):
-                            # bot_reply = get_smart_response(prompt, s2, m2, gemini_key) # Fixed variable scope
-                            bot_reply = get_smart_response(prompt, s2, m2, gemini_key)
+                            # Pass the persistent key from session state
+                            bot_reply = get_smart_response(prompt, s2, m2, active_key)
                             st.markdown(bot_reply)
                     
                     st.session_state.messages.append({"role": "assistant", "content": bot_reply})
