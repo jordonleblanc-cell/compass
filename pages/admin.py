@@ -423,7 +423,7 @@ SUPERVISOR_CLASH_MATRIX = {
     "Facilitator": {
         "Tracker": {
             "tension": "Consensus vs. Compliance (People vs. Policy)",
-            "psychology": "You (Facilitator) want the team to agree on a solution that feels fair. They (Tracker) want the team to follow the written rule because that is safe.\n\nYou feel they are being rigid and uncaring 'robots'. They feel you are being rigid and treating safety rules as 'suggestions'. You prioritize the human element; they prioritize the systemic element.",
+            "psychology": "You (Facilitator) want the team to agree on a solution that feels fair. They (Tracker) want the team to follow the written rule because that is safe.\n\nYou feel they are being rigid and uncaring 'robots'. They feel you are being reckless and treating safety rules as 'suggestions'. You prioritize the human element; they prioritize the systemic element.",
             "watch_fors": [
                 "**The Policy War:** They quote the handbook; you quote the 'vibe' or the 'context'.",
                 "**Ignoring:** You ignoring their emails about compliance because it feels like nagging.",
@@ -978,7 +978,7 @@ elif st.session_state.current_view == "Conflict Mediator":
             with st.container(border=True):
                 st.subheader("🤖 AI Supervisor Assistant")
                 if gemini_key:
-                    st.caption(f"Powered by Gemini 1.5 Flash | Ask specific questions about managing **{p2}** ({s2} x {m2}).")
+                    st.caption(f"Powered by Gemini 2.5 Flash | Ask specific questions about managing **{p2}** ({s2} x {m2}).")
                 else:
                     st.caption("Basic Mode | Add an API Key in the sidebar to unlock full AI capabilities.")
                 
@@ -1020,8 +1020,8 @@ elif st.session_state.current_view == "Conflict Mediator":
                             Be concise, practical, and empathetic.
                             """
                             
-                            # API Call to Gemini 1.5 Flash (Standard Endpoint)
-                            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
+                            # API Call to Gemini 2.5 Flash (Standard Endpoint)
+                            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
                             payload = {
                                 "contents": [{
                                     "parts": [{"text": system_prompt + "\n\nUser Question: " + query}]
