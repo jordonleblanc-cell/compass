@@ -423,7 +423,7 @@ SUPERVISOR_CLASH_MATRIX = {
     "Facilitator": {
         "Tracker": {
             "tension": "Consensus vs. Compliance (People vs. Policy)",
-            "psychology": "You (Facilitator) want the team to agree on a solution that feels fair. They (Tracker) want the team to follow the written rule because that is safe.\n\nYou feel they are being rigid and uncaring 'robots'. They feel you are being reckless and treating safety rules as 'suggestions'. You prioritize the human element; they prioritize the systemic element.",
+            "psychology": "You (Facilitator) want the team to agree on a solution that feels fair. They (Tracker) want the team to follow the written rule because that is safe.\n\nYou feel they are being rigid and uncaring 'robots'. They feel you are being rigid and treating safety rules as 'suggestions'. You prioritize the human element; they prioritize the systemic element.",
             "watch_fors": [
                 "**The Policy War:** They quote the handbook; you quote the 'vibe' or the 'context'.",
                 "**Ignoring:** You ignoring their emails about compliance because it feels like nagging.",
@@ -934,20 +934,24 @@ elif st.session_state.current_view == "Team DNA":
 elif st.session_state.current_view == "Conflict Mediator":
     st.subheader("⚖️ Conflict Mediator")
     if not df.empty:
-        # Sidebar for API Key (Fixed for persistence)
+        # Sidebar for API Key
         with st.sidebar:
-            if "gemini_key" not in st.session_state:
-                st.session_state.gemini_key = st.secrets.get("GEMINI_API_KEY", "")
-            
-            st.text_input(
+            # Allow users to input key, defaulting to secrets if available
+            default_key = st.secrets.get("GEMINI_API_KEY", "")
+            # Capture the input directly into a variable
+            user_api_key = st.text_input(
                 "🔑 Gemini API Key (Optional)", 
+                value=st.session_state.get("gemini_key_input", default_key),
                 type="password", 
-                key="gemini_key", 
-                help="Get a key at aistudio.google.com to enable the smart chatbot."
+                help="Get a key at aistudio.google.com"
             )
             
-            if st.session_state.gemini_key:
-                st.caption("✅ Key Active")
+            # Store in session state manually to be safe for persistence
+            if user_api_key:
+                st.session_state.gemini_key_input = user_api_key
+                st.success("Status: Ready")
+            else:
+                st.info("Status: No Key")
 
         c1, c2 = st.columns(2)
         p1 = c1.selectbox("Select Yourself (Supervisor)", df['name'].unique(), index=None, key="p1")
@@ -986,8 +990,8 @@ elif st.session_state.current_view == "Conflict Mediator":
             with st.container(border=True):
                 st.subheader("🤖 AI Supervisor Assistant")
                 
-                # Check if key is actually present in session state
-                active_key = st.session_state.get("gemini_key", "")
+                # Determine active key from the variable captured above
+                active_key = user_api_key
                 
                 if active_key:
                     st.caption(f"Powered by Gemini 2.5 Flash | Ask specific questions about managing **{p2}** ({s2} x {m2}).")
@@ -1077,7 +1081,9 @@ elif st.session_state.current_view == "Conflict Mediator":
                         response += f"**To motivate a {motiv_driver} driver:** {mot_data.get('strategies', 'Ask them what they need.')}\n\n"
                     
                     else:
-                        response = f"I can help you manage {p2}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\n*Note: No API Key detected. Please check the sidebar.*"
+                        # Helpful debugging info in the fallback message
+                        debug_key_info = f"Key detected: {key[:4]}..." if key else "No API Key detected"
+                        response = f"I can help you manage {p2}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\n*Note: {debug_key_info}. Please check the sidebar.*"
                     
                     return response
 
@@ -1089,7 +1095,7 @@ elif st.session_state.current_view == "Conflict Mediator":
 
                     with st.chat_message("assistant"):
                         with st.spinner("Consulting the Compass Database..."):
-                            # Pass the persistent key from session state
+                            # Pass the persistent key from variable
                             bot_reply = get_smart_response(prompt, s2, m2, active_key)
                             st.markdown(bot_reply)
                     
