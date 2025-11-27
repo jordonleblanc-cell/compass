@@ -310,46 +310,65 @@ FULL_MOTIV_PROFILES = {
 TEAM_CULTURE_GUIDE = {
     "Director": {
         "title": "The Command Center",
-        "impact_analysis": "This team moves fast and breaks things. They are highly efficient but likely suffering from low psychological safety. Quiet voices are being steamrolled.",
-        "management_strategy": "**Slow Down.** Force them to pause and debate. Protect the dissenters. Assign a 'Devil's Advocate' in every meeting.",
-        "meeting_protocol": "No interruptions allowed. 2-minute silence after a proposal to think before speaking.",
-        "team_building": "Empathy maps or vulnerability exercises (which they will hate, but need)."
+        "impact_analysis": "This team moves fast and breaks things. They are highly efficient but likely suffering from low psychological safety. Quiet voices are being steamrolled. The vibe is 'High Performance, Low Patience.'\n\n**The Good:** Crises are handled instantly. Decisions are made fast.\n**The Bad:** Psychological safety is likely low. 'Feelings' are viewed as inefficiencies. Quiet dissenters (Facilitators/Trackers) are likely being steamrolled or silencing themselves to avoid conflict. You are at risk of 'Burn and Turn'—burning out staff and turning over positions.",
+        "management_strategy": "**Your Role: The Brake Pedal.**\n\nDirectors view deliberation as weakness. You must reframe it as 'risk management.'\n\n1. **Force the Pause:** Mandate a 10-minute 'Devil's Advocate' session for major decisions. Make them sit in the discomfort of silence.\n2. **Protect Dissent:** Explicitly call on the quietest person in the room first. Protect them from interruption.\n3. **Humanize the Data:** Constantly remind them that 'efficiency' with traumatized youth often looks like 'impatience.'",
+        "meeting_protocol": "**The 'No Interruption' Rule:** Directors interrupt to 'speed things up.' Enforce a strict 'one voice at a time' rule to protect slower processors.",
+        "team_building": "Vulnerability Exercises (e.g., 'Highs and Lows'). They will hate it, but they need it to humanize each other."
     },
     "Encourager": {
         "title": "The Social Hub",
-        "impact_analysis": "This team has high morale but low accountability. They avoid hard conversations and tolerate underperformance to keep the peace.",
-        "management_strategy": "**Tighten Up.** Focus on results and deadlines. Normalize 'healthy conflict' as a tool for growth, not a threat to safety.",
-        "meeting_protocol": "Start with 'Where are we failing?' to break the toxic positivity.",
-        "team_building": "Debate club or competitive goal-setting."
+        "impact_analysis": "This team has high morale but low accountability. They avoid hard conversations and tolerate underperformance to keep the peace. The vibe is 'We Are Family' (which creates toxicity when you have to fire a 'family member').\n\n**The Good:** People feel loved and supported. Retention is high among the core group.\n**The Bad:** Standards slip. Mediocrity is tolerated. High performers burn out carrying the low performers who are 'too nice to fire.'",
+        "management_strategy": "**Your Role: The Standard Bearer.**\n\n1. **Redefine Kindness:** Coach them that clear boundaries are kind, and allowing failure is cruel. Frame accountability as 'protecting the team' from toxicity.\n2. **Data-Driven Feedback:** Remove the emotion from performance reviews. Use checklists and audit scores so they can't 'nice' their way out of it.\n3. **The 'Who' vs. The 'What':** They focus on the 'Who' (person). You must constantly pivot back to the 'What' (the mission/youth safety).",
+        "meeting_protocol": "**Start with the Failure:** Begin meetings by reviewing an incident or error (blamelessly) to normalize talking about hard things.",
+        "team_building": "Debate Club or Competitive Goal-Setting. Force them to compete and disagree safely."
     },
     "Facilitator": {
         "title": "The United Nations",
-        "impact_analysis": "This team is fair and inclusive but suffers from analysis paralysis. Decisions take forever because they wait for consensus.",
-        "management_strategy": "**Speed Up.** Set hard deadlines for decisions. Teach 'Disagreement and Commitment'.",
-        "meeting_protocol": "The '51% Rule': If we are 51% sure, we move. No revisiting decisions.",
-        "team_building": "Escape rooms (forcing time-bound decisions)."
+        "impact_analysis": "This team is fair and inclusive but suffers from analysis paralysis. Decisions take forever because they wait for consensus. The vibe is 'Let's Talk About It.'\n\n**The Good:** Everyone feels heard. Decisions have high buy-in once made.\n**The Bad:** Urgent problems fester. Opportunities are missed. In a crisis, the team may freeze, waiting for a vote when they need a command.",
+        "management_strategy": "**Your Role: The Clock.**\n\n1. **The 51% Rule:** Establish a rule that once you have 51% certainty (or 51% consensus), you move. Perfection is the enemy of done.\n2. **Disagree and Commit:** Teach the culture that it is okay to disagree with a decision but still support its execution 100%.\n3. **Assign 'Decision Owners':** Stop making decisions by committee. Assign one person to decide, and the committee only *advises*.",
+        "meeting_protocol": "**The '51% Rule':** If we are 51% sure, we move. No revisiting decisions after the meeting ends.",
+        "team_building": "Escape Rooms. They force the team to make rapid decisions against a clock to survive."
     },
     "Tracker": {
         "title": "The Audit Team",
-        "impact_analysis": "This team is safe and compliant but rigid. They fear change and will quote policy to stop innovation. They lack flexibility.",
-        "management_strategy": "**Loosen Up.** Focus on the 'spirit of the law', not just the letter. Reward creative problem solving.",
-        "meeting_protocol": "Ban the phrase 'We've always done it this way'.",
-        "team_building": "Improv games (forcing adaptability)."
+        "impact_analysis": "This team is safe and compliant but rigid. They fear change and will quote policy to stop innovation. The vibe is 'By The Book.'\n\n**The Good:** Audits are perfect. Safety risks are low. Documentation is flawless.\n**The Bad:** Innovation is dead. Staff escalate youth behaviors because they prioritize enforcing a minor rule over maintaining the relationship. The culture is fear-based.",
+        "management_strategy": "**Your Role: The permission Giver.**\n\n1. **'Safe to Fail' Zones:** Explicitly designate areas where staff are allowed to experiment and fail without consequence.\n2. **The 'Why' Test:** Challenge every rule. If a staff member cannot explain *why* a rule exists (beyond 'it's in the book'), they aren't leading; they are robot-ing.\n3. **Reward Adaptation:** Publicly praise staff who *bent* a rule to save a situation (safely). Show that judgment is valued over blind compliance.",
+        "meeting_protocol": "**Ban the phrase:** 'We've always done it this way.' Require a rationale for every old habit.",
+        "team_building": "Improv Games. Forcing them to react to the unexpected without a script."
     },
     "Balanced": {
         "title": "The Balanced Team",
-        "impact_analysis": "No single style dominates.",
-        "management_strategy": "Act as a translator between styles.",
-        "meeting_protocol": "Round robin input.",
-        "team_building": "Role swapping."
+        "impact_analysis": "No single style dominates. This reduces blindspots but may increase friction as different 'languages' are spoken.",
+        "management_strategy": "**Your Role: The Translator.**\n\nYou must constantly translate intent. 'The Director isn't being mean; they are being efficient.' 'The Tracker isn't being difficult; they are being safe.' Rotate leadership based on the task: let the Director lead the crisis, the Encourager lead the debrief, the Tracker lead the audit.",
+        "meeting_protocol": "Round Robin input to ensure the quiet ones speak and the loud ones listen.",
+        "team_building": "Role Swapping. Have the Director do the paperwork and the Tracker run the floor."
     }
 }
 
 MISSING_VOICE_GUIDE = {
-    "Director": {"risk": "No one is driving the bus. Decisions linger and urgency is low.", "fix": "You must be the bad guy. Set shorter deadlines and demand 'bottom lines'."},
-    "Encourager": {"risk": "The team is cold and transactional. Burnout is high because no one feels cared for.", "fix": "Start every meeting with a personal check-in. Celebrate birthdays and wins aggressively."},
-    "Facilitator": {"risk": "Steamrolling. The loudest voices win, and quiet dissenters check out.", "fix": "Use round-robin speaking. Don't let anyone speak twice until everyone speaks once."},
-    "Tracker": {"risk": "Chaos. Details are dropped, and safety issues are missed.", "fix": "Create checklists. Assign a 'Safety Captain' to review plans for risks."}
+    "Director": {"risk": "**The Drift.** Without a Director, the team lacks a 'spine' of urgency. Decisions linger in 'discussion mode' forever. There is no one to cut through the noise and say 'This is what we are doing.' Problems are admired, not solved.", "fix": "**Be the Bad Guy.** You must artificially inject urgency. Set artificially tight deadlines (e.g., 'Decide by 3 PM'). Use 'Command Language' rather than 'Suggestion Language' during crises."},
+    "Encourager": {"risk": "**The Cold Front.** The team is cold and transactional. Burnout is high because no one feels cared for. Staff feel like 'cogs in a machine.' Retention will plummet because people join for the mission but stay for the people.", "fix": "**Artificial Warmth.** You must operationalize care. Start every meeting with a personal check-in. Celebrate birthdays and wins aggressively. Schedule 'no agenda' time just to connect."},
+    "Facilitator": {"risk": "**Steamrolling.** The loudest voices win, and quiet dissenters check out. Decisions are made fast but often wrong because key perspectives were ignored. There is 'compliance' but not 'buy-in.'", "fix": "**Forced Input.** Use round-robin speaking. Don't let anyone speak twice until everyone speaks once. Explicitly ask: 'Who haven't we heard from?'"},
+    "Tracker": {"risk": "**Chaos.** Details are dropped, and safety issues are missed. The team has great ideas but poor execution. Audits will fail, and safety risks will slip through the cracks.", "fix": "**The Checklist.** You must become the external hard drive. Create checklists for everything. Assign a 'Safety Captain' to review every plan for risks before execution."}
+}
+
+MOTIVATION_GAP_GUIDE = {
+    "Achievement": {
+        "warning": "This team runs on **Winning**. If they cannot see the scoreboard, they will disengage.",
+        "coaching": "**Strategy: Gamify the Grind.**\n\n1. **Visual Scoreboards:** Do not just say 'do better.' Put a chart on the wall tracking 'Days Without a Restraint' or 'Paperwork Accuracy %.' They need to see the line go up.\n2. **Micro-Wins:** Youth care is a long game. Break it down. Celebrate 'One smooth transition' or 'One clean file' as a victory.\n3. **Feedback Style:** Be objective. 'You hit 90% accuracy' lands better than 'You did a good job.'\n4. **The Trap:** Watch out for them cutting corners to hit the metric. Audit the *quality*, not just the *quantity*."
+    },
+    "Connection": {
+        "warning": "This team runs on **Belonging**. If the culture feels cold or isolated, they will quit.",
+        "coaching": "**Strategy: The Tribe.**\n\n1. **Face Time:** E-mail is the enemy. Walk the floor. Sit in the office and chat. They need to feel your presence to feel safe.\n2. **Rituals:** Establish team rituals (e.g., Friday food, morning huddles). These aren't 'nice to haves'; they are the glue holding the team together.\n3. **Protect the Vibe:** Toxic peers will destroy this team faster than bad management. You must excise toxicity immediately.\n4. **The Trap:** They may form cliques. Ensure the 'connection' includes everyone, not just the favorites."
+    },
+    "Growth": {
+        "warning": "This team runs on **Competence**. If they feel stagnant or bored, they will leave.",
+        "coaching": "**Strategy: The Ladder.**\n\n1. **Micro-Promotions:** You can't promote everyone to supervisor, so create 'titles' (e.g., 'Safety Captain', 'Trainer', 'Logistics Lead'). Give them ownership of a domain.\n2. **The 'Why' Behind the Task:** Don't just assign work; explain how this task builds a skill they will need for their next job.\n3. **Mentorship:** Connect them with leaders they admire. They crave access to expertise.\n4. **The Trap:** They may get bored with routine duties. Frame the boring stuff as 'professional discipline' required for advancement."
+    },
+    "Purpose": {
+        "warning": "This team runs on **Mission**. If the work feels meaningless or bureaucratic, they will rebel.",
+        "coaching": "**Strategy: The Storyteller.**\n\n1. **Connect Dots:** Constantly draw the line between the boring task (paperwork) and the mission (getting the kid funded/safe). Never assume they see the connection.\n2. **Mission Moments:** Start meetings by sharing a specific story of a youth's success. Remind them why they are tired.\n3. **Validation:** When they vent about the system, validate their moral outrage. 'You are right, it is unfair. That's why we have to fight harder.'\n4. **The Trap:** They can become martyrs, burning themselves out for the cause. You must mandate self-care as a 'mission requirement.'"
+    }
 }
 
 SUPERVISOR_CLASH_MATRIX = {
@@ -919,14 +938,13 @@ elif st.session_state.current_view == "Team DNA":
                     dom_mot = mot_counts.idxmax()
                     st.markdown("---")
                     st.subheader(f"⚠️ Motivation Gap: {dom_mot} Driven")
-                    if dom_mot == "Connection":
-                        st.warning("This team is driven by **Relationships**. If you manage them with cold metrics and checklists, they will disengage. You must lead with warmth.")
-                    elif dom_mot == "Achievement":
-                        st.warning("This team is driven by **Winning**. If goals are vague or accomplishments aren't recognized, they will leave. You must lead with clear scoreboards.")
-                    elif dom_mot == "Growth":
-                        st.warning("This team is driven by **Learning**. If they feel stagnant, they will quit. You must provide new challenges and training.")
-                    elif dom_mot == "Purpose":
-                        st.warning("This team is driven by **Mission**. If you focus only on policy compliance, they will rebel. You must connect every task to the 'Why'.")
+                    
+                    # Fetch data from new dictionary
+                    mot_guide = MOTIVATION_GAP_GUIDE.get(dom_mot, {})
+                    if mot_guide:
+                        st.warning(mot_guide['warning'])
+                        with st.expander("💡 Coaching Strategy for this Driver", expanded=True):
+                            st.markdown(mot_guide['coaching'])
             
             st.button("Clear", on_click=reset_t2)
 
