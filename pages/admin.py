@@ -372,7 +372,29 @@ MOTIVATION_GAP_GUIDE = {
 }
 
 SUPERVISOR_CLASH_MATRIX = {
+    # --- SAME STYLE CONFLICTS (NEW) ---
     "Director": {
+        "Director": {
+            "tension": "Power Struggle (Control vs. Control)",
+            "psychology": "When two Directors clash, it's a battle for dominance. Both value speed, autonomy, and being 'right.' The conflict usually isn't personal; it's structural. You both want to drive the car, and neither wants to be the passenger. This leads to stepping on toes, power plays, and a chaotic environment where the team doesn't know who to follow.",
+            "watch_fors": [
+                "**The Public Showdown:** Arguing in front of the team to establish who is 'Alpha'.",
+                "**Malicious Compliance:** 'Fine, I'll do it your way, but I'll watch it fail.'",
+                "**Siloing:** Dividing the team into 'My Crew' vs. 'Your Crew'."
+            ],
+            "intervention_steps": [
+                "**1. Define Swim Lanes (Why: You need autonomy):** Explicitly divide the turf. 'You own the schedule; I own the audit.' Do not cross lines without permission.",
+                "**2. The 'Disagree and Commit' Pact (Why: Speed matters):** Agree that once a decision is made, you back each other 100% in public, even if you argued in private.",
+                "**3. Scheduled Friction (Why: You need a vent):** Set a weekly 'Fight Club' meeting where you are allowed to debate strategy fiercely behind closed doors, so you don't do it on the floor."
+            ],
+            "scripts": {
+                "Opening": "We are both strong leaders, which is great, but right now we are canceling each other out.",
+                "Validation": "I respect your drive and your ability to get things done. I know you want the best for this program.",
+                "The Pivot": "However, when we battle for control in front of the team, we create confusion. We need to stop competing and start coordinating.",
+                "Crisis": "We don't have time for a power struggle. You take the East Wing, I'll take the West Wing. Go.",
+                "Feedback": "I need you to trust me to handle my lane. When you double-check my work, it feels like you don't trust my competence."
+            }
+        },
         "Encourager": {
             "tension": "Efficiency vs. Empathy (Safety as Control vs. Safety as Connection)",
             "psychology": "This is the classic 'Oil and Water' dynamic. You (Director) find safety in speed, competence, and checking boxes. You view 'feelings' as variables that slow down the mission. \n\nThe Encourager finds safety in connection and harmony. When you push for speed or deliver blunt feedback, they don't just hear 'work instructions'—they feel an existential threat to the group's safety. They retreat because they feel steamrolled; you push harder because you think they are incompetent.",
@@ -414,9 +436,51 @@ SUPERVISOR_CLASH_MATRIX = {
                 "Crisis": "In this specific moment, I have to make the call. We can debrief the process later, but right now, follow my lead.",
                 "Feedback": "Your desire for consensus is a strength, but sometimes it becomes a bottleneck. I need you to be willing to make the '51% decision'."
             }
+        },
+        "Tracker": {
+            "tension": "Innovation vs. Compliance (Change vs. Safety)",
+            "psychology": "You (Director) want to break the status quo to get better results. They (Tracker) want to protect the status quo to ensure safety. You see them as 'The Department of No.' They see you as a reckless cowboy who is going to get the agency sued.\n\nYou interpret their questions as resistance. They interpret your new ideas as chaos.",
+            "watch_fors": [
+                "**The Rulebook Defense:** They will quote policy to stop your new idea.",
+                "**The 'Yes, But':** Every time you propose a solution, they find 10 reasons why it might fail.",
+                "**Anxiety:** Your speed makes them visibly nervous."
+            ],
+            "intervention_steps": [
+                "**1. The Pre-Mortem (Why: They need to voice risks):** Before launching a plan, ask them: 'What are the 3 biggest risks here?' Let them list them. Then solve them together.",
+                "**2. Honor the Detail (Why: That is their value):** Do not dismiss the details. 'You are right, I missed that regulation. Thank you for catching it.'",
+                "**3. Trial Runs (Why: They fear permanent mistakes):** Frame changes as 'experiments.' 'Let's try this for 3 days and see if it works.' It feels less permanent/risky."
+            ],
+            "scripts": {
+                "Opening": "I have a new idea, and I need your eyes on it to make sure it's safe.",
+                "Validation": "I appreciate your attention to detail. You keep us compliant and safe.",
+                "The Pivot": "We need to find a way to make this work because the current system is failing our kids. How can we do this safely?",
+                "Crisis": "I am taking full responsibility for this decision. If it goes wrong, it's on me. I need you to execute the plan.",
+                "Feedback": "I need you to help me find the 'Yes.' Don't just tell me why we can't do it; tell me how we *could* do it."
+            }
         }
     },
     "Encourager": {
+        "Encourager": {
+            "tension": "Artificial Harmony (Nice vs. Nice)",
+            "psychology": "When two Encouragers work together, the vibe is amazing, but the accountability is zero. You both value harmony so much that you avoid hard conversations. Issues fester underground. You become 'Toxic Protectors,' shielding the team from reality until a crisis hits. You struggle to make decisions that might upset anyone.",
+            "watch_fors": [
+                "**The Vent Session:** Spending 30 minutes complaining about a problem but taking no action to fix it.",
+                "**The 'Reply All' Apology:** Apologizing to the team for enforcing basic rules.",
+                "**Ghosting:** Avoiding a staff member rather than correcting them."
+            ],
+            "intervention_steps": [
+                "**1. The 'Safety' Contract (Why: You fear conflict):** Explicitly agree that giving feedback is safe. 'I promise I won't be mad if you tell me I'm wrong.'",
+                "**2. Assign the 'Bad Guy' Role (Why: It creates distance):** Rotate who has to deliver the bad news so one person doesn't carry the emotional load.",
+                "**3. Focus on the Victim (Why: You need a moral cause):** When you need to hold a staff member accountable, remind each other of the *youth* who is suffering because of that staff member's laziness."
+            ],
+            "scripts": {
+                "Opening": "I hate having to have this conversation, but we need to talk about [Issue].",
+                "Validation": "I know we both want the team to be happy. We care about these people.",
+                "The Pivot": "But by not addressing this, we are actually hurting the team. True kindness is holding them to a standard.",
+                "Crisis": "We can't hug our way out of this one. We have to be firm.",
+                "Feedback": "I feel like we are dancing around the issue. Let's just say it directly."
+            }
+        },
         "Director": {
             "tension": "Warmth vs. Competence (Being Liked vs. Being Effective)",
             "psychology": "You (Encourager) value harmony and feeling connected. You interpret their (Director) lack of small talk and directness as dislike or anger. You feel unsafe around them.\n\nThey interpret your focus on feelings as incompetence or lack of focus. When you try to 'nice' them into compliance, they lose respect for you. They don't want a friend; they want a leader who can remove obstacles.",
@@ -440,9 +504,30 @@ SUPERVISOR_CLASH_MATRIX = {
         }
     },
     "Facilitator": {
+        "Facilitator": {
+            "tension": "Process Paralysis (Talk vs. Talk)",
+            "psychology": "The infinite loop. You both want to make sure everyone is heard. You both want to explore every option. The result? Meetings that never end and decisions that never happen. You enable each other's worst habit: procrastination in the name of 'process.'",
+            "watch_fors": [
+                "**The 'Let's Circle Back':** delaying a decision to another meeting.",
+                "**The Meeting About the Meeting:** Planning to plan.",
+                "**Consensus Addiction:** Refusing to move until 100% of people agree (which never happens)."
+            ],
+            "intervention_steps": [
+                "**1. The 'Shot Clock' (Why: You need external pressure):** Set a timer. 'We have 10 minutes to decide. If we don't agree, we flip a coin.'",
+                "**2. Limit the Input (Why: More isn't always better):** Agree to only consult 2 people, not the whole team.",
+                "**3. The 'Good Enough' Pact (Why: Perfection is the enemy):** Remind each other that a B+ decision today is better than an A+ decision next month."
+            ],
+            "scripts": {
+                "Opening": "We are over-thinking this. We need to land the plane.",
+                "Validation": "I value that we are being thorough. It's important to be fair.",
+                "The Pivot": "But we are stuck in analysis paralysis. We need to pick a direction and go.",
+                "Crisis": "Process is over. I am making the call now.",
+                "Feedback": "We need to stop asking for permission and start giving direction."
+            }
+        },
         "Tracker": {
             "tension": "Consensus vs. Compliance (People vs. Policy)",
-            "psychology": "You (Facilitator) want the team to agree on a solution that feels fair. They (Tracker) want the team to follow the written rule because that is safe.\n\nYou feel they are being rigid and uncaring 'robots'. They feel you are being reckless and treating safety rules as 'suggestions'. You prioritize the human element; they prioritize the systemic element.",
+            "psychology": "You (Facilitator) want the team to agree on a solution that feels fair. They (Tracker) want the team to follow the written rule because that is safe.\n\nYou feel they are being rigid and uncaring 'robots'. They feel you are being rigid and treating safety rules as 'suggestions'. You prioritize the human element; they prioritize the systemic element.",
             "watch_fors": [
                 "**The Policy War:** They quote the handbook; you quote the 'vibe' or the 'context'.",
                 "**Ignoring:** You ignoring their emails about compliance because it feels like nagging.",
@@ -459,6 +544,29 @@ SUPERVISOR_CLASH_MATRIX = {
                 "The Pivot": "In this specific case, following the rule to the letter will cause a behavioral escalation. We need to flex here to maintain safety.",
                 "Crisis": "I am taking responsibility for this exception. Please document that I made this call.",
                 "Feedback": "I need you to see the gray areas. The rulebook is a map, but the territory is real people."
+            }
+        }
+    },
+    "Tracker": {
+        "Tracker": {
+            "tension": "The Micro-War (Detail vs. Detail)",
+            "psychology": "When two Trackers clash, it is usually over *interpretation* of a rule. It becomes a court case. You both dig into the details to prove you are 'technically correct.' The team gets lost in the minutiae. You risk creating a culture where 'doing it right' is more important than 'doing it well.'",
+            "watch_fors": [
+                "**The Email War:** Sending long, evidence-filled emails to each other instead of talking.",
+                "**Malicious Audit:** Looking for errors in each other's work to prove a point.",
+                "**Stalemate:** Refusing to move until the 'policy' is clarified by upper management."
+            ],
+            "intervention_steps": [
+                "**1. Zoom Out (Why: You are lost in the weeds):** Stop talking about the rule. Talk about the goal. 'What are we actually trying to achieve here?'",
+                "**2. Pick a Lane (Why: You need ownership):** Divide the compliance tasks. 'You own Fire Safety; I own File Compliance.'",
+                "**3. The 'Human Override' (Why: Systems aren't people):** Remind each other that the system serves the kid, not the other way around."
+            ],
+            "scripts": {
+                "Opening": "We are getting lost in the weeds. Let's step back.",
+                "Validation": "I know we both want to do this exactly right. I respect your attention to detail.",
+                "The Pivot": "However, arguing over this specific procedure is slowing down the team. Is this critical to safety, or just a preference?",
+                "Crisis": "The procedure doesn't matter right now. Safety matters. We do X.",
+                "Feedback": "We need to stop using the rulebook as a weapon against each other."
             }
         }
     }
