@@ -222,8 +222,11 @@ if not st.session_state.authenticated:
     """, unsafe_allow_html=True)
     
     # User Selection for RBAC
-    if not df_all.empty and 'name' in df_all.columns:
-        user_names = ["Administrator"] + sorted(df_all['name'].unique().tolist())
+    if not df_all.empty and 'name' in df_all.columns and 'role' in df_all.columns:
+        # Filter dropdown to only show leadership roles
+        leadership_roles = ["Program Supervisor", "Shift Supervisor", "Manager", "Admin"]
+        eligible_staff = df_all[df_all['role'].isin(leadership_roles)]['name'].unique().tolist()
+        user_names = ["Administrator"] + sorted(eligible_staff)
         st.selectbox("Who are you?", user_names, key="user_select")
     else:
         st.selectbox("Who are you?", ["Administrator"], key="user_select")
@@ -662,7 +665,7 @@ SUPERVISOR_CLASH_MATRIX = {
         },
         "Tracker": {
             "tension": "Consensus vs. Compliance (People vs. Policy)",
-            "psychology": "You (Facilitator) want the team to agree on a solution that feels fair. They (Tracker) want the team to follow the written rule because that is safe.\n\nYou feel they are being rigid and uncaring 'robots'. They feel you are being reckless and treating safety rules as 'suggestions'. You prioritize the human element; they prioritize the systemic element.",
+            "psychology": "You (Facilitator) want the team to agree on a solution that feels fair. They (Tracker) want the team to follow the written rule because that is safe.\n\nYou feel they are being rigid and uncaring 'robots'. They feel you are being rigid and treating safety rules as 'suggestions'. You prioritize the human element; they prioritize the systemic element.",
             "watch_fors": [
                 "**The Policy War:** They quote the handbook; you quote the 'vibe' or the 'context'.",
                 "**Ignoring:** You ignoring their emails about compliance because it feels like nagging.",
@@ -1058,6 +1061,11 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     show_section("12. Helping Them Prepare for Advancement", adv_text, adv_bullets)
 
 # --- 6. MAIN APP LOGIC ---
+staff_list = fetch_staff_data()
+df = pd.DataFrame(staff_list)
+if not df_all.empty:
+    df_all.columns = df_all.columns.str.lower().str.strip() # Converts 'Cottage' to 'cottage'
+
 # Reset Helpers
 def reset_t1(): st.session_state.t1_staff_select = None
 def reset_t2(): st.session_state.t2_team_select = []
@@ -1181,13 +1189,14 @@ elif st.session_state.current_view == "Team DNA":
                     dom_mot = mot_counts.idxmax()
                     st.markdown("---")
                     st.subheader(f"⚠️ Motivation Gap: {dom_mot} Driven")
-                    
-                    # Fetch data from new dictionary
-                    mot_guide = MOTIVATION_GAP_GUIDE.get(dom_mot, {})
-                    if mot_guide:
-                        st.warning(mot_guide['warning'])
-                        with st.expander("💡 Coaching Strategy for this Driver", expanded=True):
-                            st.markdown(mot_guide['coaching'])
+                    if dom_mot == "Connection":
+                        st.warning("This team is driven by **Relationships**. If you manage them with cold metrics and checklists, they will disengage. You must lead with warmth.")
+                    elif dom_mot == "Achievement":
+                        st.warning("This team is driven by **Winning**. If goals are vague or accomplishments aren't recognized, they will leave. You must lead with clear scoreboards.")
+                    elif dom_mot == "Growth":
+                        st.warning("This team is driven by **Learning**. If they feel stagnant, they will quit. You must provide new challenges and training.")
+                    elif dom_mot == "Purpose":
+                        st.warning("This team is driven by **Mission**. If you focus only on policy compliance, they will rebel. You must connect every task to the 'Why'.")
             
             st.button("Clear", on_click=reset_t2)
 
@@ -1405,167 +1414,12 @@ elif st.session_state.current_view == "Career Pathfinder":
 elif st.session_state.current_view == "Org Pulse":
     st.subheader("📈 Organization Pulse")
     if not df.empty:
-        # --- DATA PREP ---
-        total_staff = len(df)
-        comm_counts = df['p_comm'].value_counts(normalize=True) * 100
-        mot_counts = df['p_mot'].value_counts(normalize=True) * 100
-        
-        # Top Metrics
         c1, c2, c3 = st.columns(3)
-        if not comm_counts.empty:
-            dom_comm = comm_counts.idxmax()
-            dom_mot = mot_counts.idxmax()
-            c1.metric("Dominant Style", f"{dom_comm} ({int(comm_counts.max())}%)")
-            c2.metric("Top Driver", f"{dom_mot} ({int(mot_counts.max())}%)") 
-            c3.metric("Total Staff Analyzed", total_staff)
-            
-            st.divider()
-            
-            # --- VISUALS ---
-            c_a, c_b = st.columns(2)
-            with c_a: 
-                st.markdown("##### 🗣️ Communication Mix")
-                st.plotly_chart(px.pie(df, names='p_comm', color='p_comm', color_discrete_map={'Director':BRAND_COLORS['blue'], 'Encourager':BRAND_COLORS['green'], 'Facilitator':BRAND_COLORS['teal'], 'Tracker':BRAND_COLORS['gray']}), use_container_width=True)
-            with c_b: 
-                st.markdown("##### 🔋 Motivation Drivers")
-                st.plotly_chart(px.bar(df['p_mot'].value_counts(), orientation='h', color_discrete_sequence=[BRAND_COLORS['blue']]), use_container_width=True)
-
-            st.divider()
-            st.header("🔍 Deep Organizational Analysis")
-            
-            tab1, tab2, tab3 = st.tabs(["🛡️ Culture Risk Assessment", "🔥 Motivation Strategy", "🌱 Leadership Pipeline Health"])
-            
-            # --- TAB 1: CULTURE RISK ---
-            with tab1:
-                st.markdown(f"### The {dom_comm}-Dominant Culture")
-                
-                if dom_comm == "Director":
-                    st.error("🚨 **Risk Area: The Efficiency Trap**")
-                    st.write("Your organization is heavily weighted towards action, speed, and results. While this means you get things done, you are at high risk for **'Burn and Turn.'**")
-                    st.markdown("""
-                    **The Blindspot:**
-                    * **Low Empathy:** Staff likely feel that 'management doesn't care about us, only the numbers.'
-                    * **Steamrolling:** Quiet voices (Facilitators/Trackers) are likely being ignored in meetings because they don't speak fast enough.
-                    * **Crisis Addiction:** The culture likely rewards firefighting more than fire prevention.
-                    
-                    **🛡️ Coaching Strategy for Leadership:**
-                    1.  **Mandate 'Cooling Off' Periods:** Do not allow major decisions to be made in the same meeting they are proposed. Force a 24-hour pause to let slower processors think.
-                    2.  **Artificial Empathy:** You must operationalize care. Start every meeting with 5 minutes of personal check-ins. It will feel like a waste of time to you; it is oxygen to your staff.
-                    3.  **Protect the Dissenters:** Explicitly ask the quietest person in the room for their opinion. They see the risks you are missing.
-                    """)
-                
-                elif dom_comm == "Encourager":
-                    st.warning("⚠️ **Risk Area: The 'Nice' Trap**")
-                    st.write("Your organization prioritizes harmony, relationships, and good vibes. While morale is likely good, you are at high risk for **'Toxic Tolerance.'**")
-                    st.markdown("""
-                    **The Blindspot:**
-                    * **Lack of Accountability:** Poor performance is tolerated because no one wants to be 'mean.'
-                    * **The 'Cool Parent' Syndrome:** Leaders want to be liked more than they want to be respected.
-                    * **Hidden Conflict:** Because open conflict is avoided, issues go underground (gossip, passive-aggression).
-                    
-                    **🛡️ Coaching Strategy for Leadership:**
-                    1.  **Redefine Kindness:** Coach your leaders that holding people accountable is *kind* because it helps them succeed. Allowing failure is cruel.
-                    2.  **Standardize Feedback:** Create a rigid structure for performance reviews so leaders can't opt-out of hard conversations.
-                    3.  **Focus on the 'Who':** When making hard decisions, frame it as protecting the *team* (the collective 'who') from the toxicity of the individual.
-                    """)
-                
-                elif dom_comm == "Facilitator":
-                    st.info("🐢 **Risk Area: The Consensus Trap**")
-                    st.write("Your organization values fairness, listening, and inclusion. While people feel heard, you are at risk for **'Analysis Paralysis.'**")
-                    st.markdown("""
-                    **The Blindspot:**
-                    * **Slow Decisions:** You likely have meetings about meetings. Urgent problems fester while you wait for everyone to agree.
-                    * **The 'Lowest Common Denominator':** Solutions are often watered down to ensure no one is offended.
-                    * **Crisis Failure:** In an emergency, the team may freeze, waiting for a vote when they need a command.
-                    
-                    **🛡️ Coaching Strategy for Leadership:**
-                    1.  **The 51% Rule:** Establish a rule that once you have 51% certainty (or 51% consensus), you move. Perfection is the enemy of done.
-                    2.  **Disagree and Commit:** Teach the culture that it is okay to disagree with a decision but still support its execution 100%.
-                    3.  **Assign 'Decision Owners':** Stop making decisions by committee. Assign one person to decide, and the committee only *advises*.
-                    """)
-                
-                elif dom_comm == "Tracker":
-                    st.warning("🛑 **Risk Area: The Bureaucracy Trap**")
-                    st.write("Your organization values safety, precision, and rules. While you are compliant, you are at risk for **'Stagnation.'**")
-                    st.markdown("""
-                    **The Blindspot:**
-                    * **Innovation Death:** New ideas are killed by 'policy' before they can be tested.
-                    * **Rigidity:** Staff may escalate youth behaviors because they prioritize enforcing a minor rule over maintaining the relationship.
-                    * **Fear Based:** The culture is likely driven by a fear of getting in trouble rather than a desire to do good.
-                    
-                    **🛡️ Coaching Strategy for Leadership:**
-                    1.  **'Safe to Fail' Zones:** Explicitly designate areas where staff are allowed to experiment and fail without consequence.
-                    2.  **The 'Why' Test:** Challenge every rule. If a staff member cannot explain *why* a rule exists (beyond 'it's in the book'), they aren't leading; they are robot-ing.
-                    3.  **Reward Adaptation:** Publicly praise staff who *bent* a rule to save a situation (safely). Show that judgment is valued over blind compliance.
-                    """)
-
-            # --- TAB 2: MOTIVATION STRATEGY ---
-            with tab2:
-                st.markdown(f"### The Drive: {dom_mot}")
-                
-                if dom_mot == "Achievement":
-                    st.success("🏆 **Strategy: The Scoreboard**")
-                    st.write("Your team runs on winning. They need to know they are succeeding based on objective data.")
-                    st.markdown("""
-                    * **The Danger:** If goals are vague or 'feelings-based,' they will disengage.
-                    * **The Fix:** Visualize success. Put charts on the wall. Track days without incidents. Give out awards for 'Most Shifts Covered' or 'Best Audit Score'.
-                    * **Language:** Use words like *Goal, Target, Win, Speed, Elite.*
-                    """)
-                elif dom_mot == "Connection":
-                    st.info("🤝 **Strategy: The Tribe**")
-                    st.write("Your team runs on belonging. They will work harder for each other than for the 'company.'")
-                    st.markdown("""
-                    * **The Danger:** If they feel isolated or if management feels 'cold,' they will quit. Toxic peers destroy this culture fast.
-                    * **The Fix:** Invest in food, team outings, and face time. Start meetings with personal connection.
-                    * **Language:** Use words like *Family, Team, Support, Together, Safe.*
-                    """)
-                elif dom_mot == "Purpose":
-                    st.warning("🔥 **Strategy: The Mission**")
-                    st.write("Your team runs on meaning. They are here to change lives, not just collect a paycheck.")
-                    st.markdown("""
-                    * **The Danger:** If they feel the work is just 'paperwork' or 'warehousing kids,' they will burn out or rebel.
-                    * **The Fix:** Connect EVERY task to the youth. 'We do this paperwork so [Youth Name] can get funding for his placement.' Share success stories constantly.
-                    * **Language:** Use words like *Impact, Mission, Change, Justice, Future.*
-                    """)
-                elif dom_mot == "Growth":
-                    st.success("🌱 **Strategy: The Ladder**")
-                    st.write("Your team runs on competence. They want to get better, smarter, and more skilled.")
-                    st.markdown("""
-                    * **The Danger:** If they feel stagnant or bored, they will leave for a new challenge.
-                    * **The Fix:** create 'Micro-Promotions.' Give them special titles (e.g., 'Safety Captain'). Send them to trainings. Map out their career path visually.
-                    * **Language:** Use words like *Skill, Level Up, Career, Master, Learn.*
-                    """)
-
-            # --- TAB 3: PIPELINE HEALTH ---
-            with tab3:
-                st.markdown("### Leadership Pipeline Analysis")
-                if 'role' in df.columns:
-                    # Compare Leadership Composition to General Staff
-                    leaders = df[df['role'].isin(['Program Supervisor', 'Shift Supervisor', 'Manager'])]
-                    if not leaders.empty:
-                        l_counts = leaders['p_comm'].value_counts(normalize=True) * 100
-                        
-                        st.write("**Leadership Diversity Check:**")
-                        c1, c2 = st.columns(2)
-                        with c1:
-                            st.caption("Leadership Team Mix")
-                            st.dataframe(l_counts)
-                        with c2:
-                            st.caption("General Staff Mix")
-                            st.dataframe(comm_counts)
-                        
-                        # Clone Warning
-                        dom_lead = l_counts.idxmax()
-                        if l_counts.max() > 60:
-                            st.error(f"🚫 **Warning: Cloning Bias Detected**")
-                            st.write(f"Your leadership team is over 60% **{dom_lead}**. You are likely promoting people who 'look like you' (communication-wise).")
-                            st.write("This creates a massive blind spot. If all leaders are Directors, who is listening to the staff? If all leaders are Encouragers, who is making the hard calls?")
-                            st.info("**Recommendation:** actively recruit for the *opposite* style for your next leadership opening.")
-                    else:
-                        st.info("No leadership roles identified in the data set to analyze.")
-                else:
-                    st.warning("Role data missing. Cannot analyze pipeline.")
-        else:
-             st.warning("No valid data found for your selection.")
-
+        top_comm = df['p_comm'].mode()[0]; top_mot = df['p_mot'].mode()[0]
+        c1.metric("Dominant Style", top_comm); c2.metric("Top Driver", top_mot); c3.metric("Total Staff", len(df))
+        st.divider()
+        c_a, c_b = st.columns(2)
+        with c_a: st.plotly_chart(px.pie(df, names='p_comm', title="Communication Styles", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
+        with c_b: 
+            if 'role' in df.columns: st.plotly_chart(px.histogram(df, x="role", color="p_comm", title="Leadership Pipeline", color_discrete_map={'Director':BRAND_COLORS['blue'], 'Encourager':BRAND_COLORS['green'], 'Facilitator':BRAND_COLORS['teal'], 'Tracker':BRAND_COLORS['gray']}), use_container_width=True)
     else: st.warning("No data available.")
