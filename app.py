@@ -654,6 +654,12 @@ def scroll_to_top():
         var doc = window.parent.document.documentElement;
         doc.scrollTop = 0;
         body.scrollTop = 0;
+        
+        var main = window.parent.document.querySelector(".main");
+        if (main) main.scrollTop = 0;
+        
+        var stApp = window.parent.document.querySelector(".stApp");
+        if (stApp) stApp.scrollTop = 0;
     </script>
     """
     components.html(js, height=0)
@@ -670,6 +676,9 @@ if 'step' not in st.session_state:
 
 # --- INTRO ---
 if st.session_state.step == 'intro':
+    # Force scroll to top on load (optional, but good practice)
+    scroll_to_top()
+    
     show_brand_header("Communication & Motivation Snapshot")
     st.markdown("#### 👋 Welcome")
     st.info("This assessment helps you understand your natural patterns at work. Your insights will shape a personalized profile built to support your growth.")
@@ -691,11 +700,7 @@ if st.session_state.step == 'intro':
             else:
                 st.session_state.user_info = {"name": name, "email": email, "role": role, "cottage": cottage}
                 st.session_state.step = 'comm'
-                scroll_to_top()
                 st.rerun()
-
-    # JS to force scroll to top if we just landed here (optional)
-    scroll_to_top()
     
     st.markdown("<br><br>", unsafe_allow_html=True)
     # Discrete Admin Access Button
@@ -747,7 +752,6 @@ elif st.session_state.step == 'comm':
             else:
                 st.session_state.answers_comm = answers
                 st.session_state.step = 'motiv'
-                scroll_to_top()
                 st.rerun()
 
 # --- MOTIV ---
@@ -793,7 +797,6 @@ elif st.session_state.step == 'motiv':
             else:
                 st.session_state.answers_motiv = answers
                 st.session_state.step = 'processing'
-                scroll_to_top()
                 st.rerun()
 
 # --- PROCESSING ---
