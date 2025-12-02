@@ -691,8 +691,10 @@ if st.session_state.step == 'intro':
             else:
                 st.session_state.user_info = {"name": name, "email": email, "role": role, "cottage": cottage}
                 st.session_state.step = 'comm'
-                scroll_to_top()
                 st.rerun()
+
+    # JS to force scroll to top if we just landed here (optional)
+    scroll_to_top()
     
     st.markdown("<br><br>", unsafe_allow_html=True)
     # Discrete Admin Access Button
@@ -703,6 +705,7 @@ if st.session_state.step == 'intro':
 
 # --- COMM ---
 elif st.session_state.step == 'comm':
+    scroll_to_top()
     show_brand_header("Part 1: Communication")
     st.progress(33)
     st.markdown("**Instructions:** Choose how strongly each statement fits you most days.")
@@ -743,11 +746,11 @@ elif st.session_state.step == 'comm':
             else:
                 st.session_state.answers_comm = answers
                 st.session_state.step = 'motiv'
-                scroll_to_top()
                 st.rerun()
 
 # --- MOTIV ---
 elif st.session_state.step == 'motiv':
+    scroll_to_top()
     show_brand_header("Part 2: Motivation")
     st.progress(66)
     st.markdown("**Instructions:** Focus on what keeps you engaged or drains you.")
@@ -788,11 +791,11 @@ elif st.session_state.step == 'motiv':
             else:
                 st.session_state.answers_motiv = answers
                 st.session_state.step = 'processing'
-                scroll_to_top()
                 st.rerun()
 
 # --- PROCESSING ---
 elif st.session_state.step == 'processing':
+    scroll_to_top()
     c_scores = {k:0 for k in COMM_PROFILES}
     m_scores = {k:0 for k in MOTIVATION_PROFILES}
     for q in COMM_QUESTIONS: c_scores[q['style']] += st.session_state.answers_comm[q['id']]
@@ -824,6 +827,7 @@ elif st.session_state.step == 'processing':
 
 # --- RESULTS ---
 elif st.session_state.step == 'results':
+    scroll_to_top()
     st.progress(100)
     res = st.session_state.results
     user = st.session_state.user_info
