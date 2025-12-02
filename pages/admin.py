@@ -121,14 +121,55 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. SECURITY: PASSWORD CHECK ---
+# --- 4. DATA FETCHING ---
+@st.cache_data(ttl=60)
+def fetch_staff_data():
+    try:
+        response = requests.get(GOOGLE_SCRIPT_URL)
+        if response.status_code == 200: return response.json()
+        return []
+    except: return []
+
+all_staff_list = fetch_staff_data()
+# Convert to DF and Normalize Columns immediately
+df_all = pd.DataFrame(all_staff_list)
+if not df_all.empty:
+    df_all.columns = df_all.columns.str.lower().str.strip() # Converts 'Cottage' to 'cottage'
+
+# --- 5. SECURITY & LOGIN ---
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
+if "current_user_role" not in st.session_state:
+    st.session_state.current_user_role = None
+if "current_user_cottage" not in st.session_state:
+    st.session_state.current_user_cottage = None
+if "current_user_name" not in st.session_state:
+    st.session_state.current_user_name = None
 
 def check_password():
-    PASSWORD = st.secrets.get("ADMIN_PASSWORD", "elmcrest2025") 
+    PASSWORD = st.secrets.get("ADMIN_PASSWORD", "elmcrest2025")
     if st.session_state.password_input == PASSWORD:
         st.session_state.authenticated = True
+        # Set User Context based on selection
+        if not df_all.empty and st.session_state.user_select:
+            # Handle Admin
+            if st.session_state.user_select == "Administrator":
+                st.session_state.current_user_name = "Administrator"
+                st.session_state.current_user_role = "Admin"
+                st.session_state.current_user_cottage = "All"
+            else:
+                # Standard User
+                user_row = df_all[df_all['name'] == st.session_state.user_select].iloc[0]
+                st.session_state.current_user_name = user_row['name']
+                # Case-insensitive column access thanks to normalization above
+                st.session_state.current_user_role = user_row.get('role', 'YDP') 
+                st.session_state.current_user_cottage = user_row.get('cottage', 'All') 
+        else:
+            # Fallback if data is empty
+            st.session_state.current_user_name = "Administrator"
+            st.session_state.current_user_role = "Admin"
+            st.session_state.current_user_cottage = "All"
+            
         del st.session_state.password_input
     else:
         st.error("Incorrect password")
@@ -140,11 +181,67 @@ if not st.session_state.authenticated:
         </div>
         <div class='login-card'>
             <div class='login-title'>Supervisor Access</div>
-            <div class='login-subtitle'>Please enter your credentials to access the leadership dashboard.</div>
+            <div class='login-subtitle'>Select your name and enter the access code.</div>
         </div>
     """, unsafe_allow_html=True)
-    st.text_input("Password", type="password", key="password_input", on_change=check_password)
+    
+    # User Selection for RBAC
+    if not df_all.empty and 'name' in df_all.columns:
+        user_names = ["Administrator"] + sorted(df_all['name'].unique().tolist())
+        st.selectbox("Who are you?", user_names, key="user_select")
+    else:
+        st.selectbox("Who are you?", ["Administrator"], key="user_select")
+        
+    st.text_input("Access Code", type="password", key="password_input", on_change=check_password)
     st.stop()
+
+# --- 6. DATA FILTERING ENGINE (RBAC) ---
+# This logic filters the dataframe based on who is logged in
+def get_filtered_dataframe():
+    user_role = st.session_state.current_user_role
+    user_cottage = st.session_state.current_user_cottage
+    
+    # If Admin, return everything
+    if user_role == "Admin" or st.session_state.current_user_name == "Administrator":
+        return df_all
+    
+    # Filter logic
+    filtered_df = df_all.copy()
+    
+    # 1. Filter by Cottage (unless Admin or missing column)
+    if 'cottage' in df_all.columns:
+        # Program/Shift Supervisors can usually see their own cottage data
+        # If user_cottage is 'All', they see all (rare)
+        if user_cottage != "All":
+             filtered_df = filtered_df[filtered_df['cottage'] == user_cottage]
+    
+    # 2. Filter by Hierarchy
+    if 'role' in df_all.columns:
+        if user_role == "Program Supervisor":
+            # PS can see Shift Supervisors and YDPs in their cottage
+            filtered_df = filtered_df[filtered_df['role'].isin(['Shift Supervisor', 'YDP'])]
+            
+        elif user_role == "Shift Supervisor":
+            # SS can only see YDPs in their cottage
+            filtered_df = filtered_df[filtered_df['role'] == 'YDP']
+            
+        elif user_role == "YDP":
+            # YDPs shouldn't really be in here, but if they are, they see nothing
+            filtered_df = pd.DataFrame(columns=df_all.columns) 
+
+    return filtered_df
+
+# Get the data visible to THIS user
+df = get_filtered_dataframe()
+
+# --- SIDEBAR INFO ---
+with st.sidebar:
+    st.caption(f"Logged in as: **{st.session_state.current_user_name}**")
+    st.caption(f"Role: **{st.session_state.current_user_role}**")
+    st.caption(f"Scope: **{st.session_state.current_user_cottage}**")
+    if st.button("Logout"):
+        st.session_state.authenticated = False
+        st.rerun()
 
 # ==========================================
 # SUPERVISOR TOOL LOGIC STARTS HERE
@@ -925,6 +1022,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 # --- 6. MAIN APP LOGIC ---
 staff_list = fetch_staff_data()
 df = pd.DataFrame(staff_list)
+if not df_all.empty:
+    df_all.columns = df_all.columns.str.lower().str.strip() # Converts 'Cottage' to 'cottage'
 
 # Reset Helpers
 def reset_t1(): st.session_state.t1_staff_select = None
