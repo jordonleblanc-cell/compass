@@ -6,6 +6,7 @@ from fpdf import FPDF
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import streamlit.components.v1 as components  # Required for scrolling
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(page_title="Elmcrest Compass", page_icon="🧭", layout="centered", initial_sidebar_state="collapsed")
@@ -645,6 +646,18 @@ def draw_score_bar(label, value, max_value=25):
 
 # --- 6. APP LOGIC ---
 
+# Function to scroll to top
+def scroll_to_top():
+    js = """
+    <script>
+        var body = window.parent.document.body;
+        var doc = window.parent.document.documentElement;
+        doc.scrollTop = 0;
+        body.scrollTop = 0;
+    </script>
+    """
+    components.html(js, height=0)
+
 if 'step' not in st.session_state:
     st.session_state.step = 'intro'
     comm_q, motiv_q = COMM_QUESTIONS.copy(), MOTIVATION_QUESTIONS.copy()
@@ -678,6 +691,7 @@ if st.session_state.step == 'intro':
             else:
                 st.session_state.user_info = {"name": name, "email": email, "role": role, "cottage": cottage}
                 st.session_state.step = 'comm'
+                scroll_to_top()
                 st.rerun()
     
     st.markdown("<br><br>", unsafe_allow_html=True)
@@ -729,6 +743,7 @@ elif st.session_state.step == 'comm':
             else:
                 st.session_state.answers_comm = answers
                 st.session_state.step = 'motiv'
+                scroll_to_top()
                 st.rerun()
 
 # --- MOTIV ---
@@ -773,6 +788,7 @@ elif st.session_state.step == 'motiv':
             else:
                 st.session_state.answers_motiv = answers
                 st.session_state.step = 'processing'
+                scroll_to_top()
                 st.rerun()
 
 # --- PROCESSING ---
