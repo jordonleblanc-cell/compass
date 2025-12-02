@@ -121,14 +121,55 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. SECURITY: PASSWORD CHECK ---
+# --- 4. DATA FETCHING ---
+@st.cache_data(ttl=60)
+def fetch_staff_data():
+    try:
+        response = requests.get(GOOGLE_SCRIPT_URL)
+        if response.status_code == 200: return response.json()
+        return []
+    except: return []
+
+all_staff_list = fetch_staff_data()
+# Convert to DF and Normalize Columns immediately
+df_all = pd.DataFrame(all_staff_list)
+if not df_all.empty:
+    df_all.columns = df_all.columns.str.lower().str.strip() # Converts 'Cottage' to 'cottage'
+
+# --- 5. SECURITY & LOGIN ---
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
+if "current_user_role" not in st.session_state:
+    st.session_state.current_user_role = None
+if "current_user_cottage" not in st.session_state:
+    st.session_state.current_user_cottage = None
+if "current_user_name" not in st.session_state:
+    st.session_state.current_user_name = None
 
 def check_password():
-    PASSWORD = st.secrets.get("ADMIN_PASSWORD", "elmcrest2025") 
+    PASSWORD = st.secrets.get("ADMIN_PASSWORD", "elmcrest2025")
     if st.session_state.password_input == PASSWORD:
         st.session_state.authenticated = True
+        # Set User Context based on selection
+        if not df_all.empty and st.session_state.user_select:
+            # Handle Admin
+            if st.session_state.user_select == "Administrator":
+                st.session_state.current_user_name = "Administrator"
+                st.session_state.current_user_role = "Admin"
+                st.session_state.current_user_cottage = "All"
+            else:
+                # Standard User
+                user_row = df_all[df_all['name'] == st.session_state.user_select].iloc[0]
+                st.session_state.current_user_name = user_row['name']
+                # Case-insensitive column access thanks to normalization above
+                st.session_state.current_user_role = user_row.get('role', 'YDP') 
+                st.session_state.current_user_cottage = user_row.get('cottage', 'All') 
+        else:
+            # Fallback if data is empty
+            st.session_state.current_user_name = "Administrator"
+            st.session_state.current_user_role = "Admin"
+            st.session_state.current_user_cottage = "All"
+            
         del st.session_state.password_input
     else:
         st.error("Incorrect password")
@@ -140,11 +181,67 @@ if not st.session_state.authenticated:
         </div>
         <div class='login-card'>
             <div class='login-title'>Supervisor Access</div>
-            <div class='login-subtitle'>Please enter your credentials to access the leadership dashboard.</div>
+            <div class='login-subtitle'>Select your name and enter the access code.</div>
         </div>
     """, unsafe_allow_html=True)
-    st.text_input("Password", type="password", key="password_input", on_change=check_password)
+    
+    # User Selection for RBAC
+    if not df_all.empty and 'name' in df_all.columns:
+        user_names = ["Administrator"] + sorted(df_all['name'].unique().tolist())
+        st.selectbox("Who are you?", user_names, key="user_select")
+    else:
+        st.selectbox("Who are you?", ["Administrator"], key="user_select")
+        
+    st.text_input("Access Code", type="password", key="password_input", on_change=check_password)
     st.stop()
+
+# --- 6. DATA FILTERING ENGINE (RBAC) ---
+# This logic filters the dataframe based on who is logged in
+def get_filtered_dataframe():
+    user_role = st.session_state.current_user_role
+    user_cottage = st.session_state.current_user_cottage
+    
+    # If Admin, return everything
+    if user_role == "Admin" or st.session_state.current_user_name == "Administrator":
+        return df_all
+    
+    # Filter logic
+    filtered_df = df_all.copy()
+    
+    # 1. Filter by Cottage (unless Admin or missing column)
+    if 'cottage' in df_all.columns:
+        # Program/Shift Supervisors can usually see their own cottage data
+        # If user_cottage is 'All', they see all (rare)
+        if user_cottage != "All":
+             filtered_df = filtered_df[filtered_df['cottage'] == user_cottage]
+    
+    # 2. Filter by Hierarchy
+    if 'role' in df_all.columns:
+        if user_role == "Program Supervisor":
+            # PS can see Shift Supervisors and YDPs in their cottage
+            filtered_df = filtered_df[filtered_df['role'].isin(['Shift Supervisor', 'YDP'])]
+            
+        elif user_role == "Shift Supervisor":
+            # SS can only see YDPs in their cottage
+            filtered_df = filtered_df[filtered_df['role'] == 'YDP']
+            
+        elif user_role == "YDP":
+            # YDPs shouldn't really be in here, but if they are, they see nothing
+            filtered_df = pd.DataFrame(columns=df_all.columns) 
+
+    return filtered_df
+
+# Get the data visible to THIS user
+df = get_filtered_dataframe()
+
+# --- SIDEBAR INFO ---
+with st.sidebar:
+    st.caption(f"Logged in as: **{st.session_state.current_user_name}**")
+    st.caption(f"Role: **{st.session_state.current_user_role}**")
+    st.caption(f"Scope: **{st.session_state.current_user_cottage}**")
+    if st.button("Logout"):
+        st.session_state.authenticated = False
+        st.rerun()
 
 # ==========================================
 # SUPERVISOR TOOL LOGIC STARTS HERE
@@ -310,50 +407,91 @@ FULL_MOTIV_PROFILES = {
 TEAM_CULTURE_GUIDE = {
     "Director": {
         "title": "The Command Center",
-        "impact_analysis": "This team moves fast and breaks things. They are highly efficient but likely suffering from low psychological safety. Quiet voices are being steamrolled.",
-        "management_strategy": "**Slow Down.** Force them to pause and debate. Protect the dissenters. Assign a 'Devil's Advocate' in every meeting.",
-        "meeting_protocol": "No interruptions allowed. 2-minute silence after a proposal to think before speaking.",
-        "team_building": "Empathy maps or vulnerability exercises (which they will hate, but need)."
+        "impact_analysis": "This team moves fast and breaks things. They are highly efficient but likely suffering from low psychological safety. Quiet voices are being steamrolled. The vibe is 'High Performance, Low Patience.'\n\n**The Good:** Crises are handled instantly. Decisions are made fast.\n**The Bad:** Psychological safety is likely low. 'Feelings' are viewed as inefficiencies. Quiet dissenters (Facilitators/Trackers) are likely being steamrolled or silencing themselves to avoid conflict. You are at risk of 'Burn and Turn'—burning out staff and turning over positions.",
+        "management_strategy": "**Your Role: The Brake Pedal.**\n\nDirectors view deliberation as weakness. You must reframe it as 'risk management.'\n\n1. **Force the Pause:** Mandate a 10-minute 'Devil's Advocate' session for major decisions. Make them sit in the discomfort of silence.\n2. **Protect Dissent:** Explicitly call on the quietest person in the room first. Protect them from interruption.\n3. **Humanize the Data:** Constantly remind them that 'efficiency' with traumatized youth often looks like 'impatience.'",
+        "meeting_protocol": "**The 'No Interruption' Rule:** Directors interrupt to 'speed things up.' Enforce a strict 'one voice at a time' rule to protect slower processors.",
+        "team_building": "Vulnerability Exercises (e.g., 'Highs and Lows'). They will hate it, but they need it to humanize each other."
     },
     "Encourager": {
         "title": "The Social Hub",
-        "impact_analysis": "This team has high morale but low accountability. They avoid hard conversations and tolerate underperformance to keep the peace.",
-        "management_strategy": "**Tighten Up.** Focus on results and deadlines. Normalize 'healthy conflict' as a tool for growth, not a threat to safety.",
-        "meeting_protocol": "Start with 'Where are we failing?' to break the toxic positivity.",
-        "team_building": "Debate club or competitive goal-setting."
+        "impact_analysis": "This team has high morale but low accountability. They avoid hard conversations and tolerate underperformance to keep the peace. The vibe is 'We Are Family' (which creates toxicity when you have to fire a 'family member').\n\n**The Good:** People feel loved and supported. Retention is high among the core group.\n**The Bad:** Standards slip. Mediocrity is tolerated. High performers burn out carrying the low performers who are 'too nice to fire.'",
+        "management_strategy": "**Your Role: The Standard Bearer.**\n\n1. **Redefine Kindness:** Coach them that clear boundaries are kind, and allowing failure is cruel. Frame accountability as 'protecting the team' from toxicity.\n2. **Data-Driven Feedback:** Remove the emotion from performance reviews. Use checklists and audit scores so they can't 'nice' their way out of it.\n3. **The 'Who' vs. The 'What':** They focus on the 'Who' (person). You must constantly pivot back to the 'What' (the mission/youth safety).",
+        "meeting_protocol": "**Start with the Failure:** Begin meetings by reviewing an incident or error (blamelessly) to normalize talking about hard things.",
+        "team_building": "Debate Club or Competitive Goal-Setting. Force them to compete and disagree safely."
     },
     "Facilitator": {
         "title": "The United Nations",
-        "impact_analysis": "This team is fair and inclusive but suffers from analysis paralysis. Decisions take forever because they wait for consensus.",
-        "management_strategy": "**Speed Up.** Set hard deadlines for decisions. Teach 'Disagreement and Commitment'.",
-        "meeting_protocol": "The '51% Rule': If we are 51% sure, we move. No revisiting decisions.",
-        "team_building": "Escape rooms (forcing time-bound decisions)."
+        "impact_analysis": "This team is fair and inclusive but suffers from analysis paralysis. Decisions take forever because they wait for consensus. The vibe is 'Let's Talk About It.'\n\n**The Good:** Everyone feels heard. Decisions have high buy-in once made.\n**The Bad:** Urgent problems fester. Opportunities are missed. In a crisis, the team may freeze, waiting for a vote when they need a command.",
+        "management_strategy": "**Your Role: The Clock.**\n\n1. **The 51% Rule:** Establish a rule that once you have 51% certainty (or 51% consensus), you move. Perfection is the enemy of done.\n2. **Disagree and Commit:** Teach the culture that it is okay to disagree with a decision but still support its execution 100%.\n3. **Assign 'Decision Owners':** Stop making decisions by committee. Assign one person to decide, and the committee only *advises*.",
+        "meeting_protocol": "**The '51% Rule':** If we are 51% sure, we move. No revisiting decisions after the meeting ends.",
+        "team_building": "Escape Rooms. They force the team to make rapid decisions against a clock to survive."
     },
     "Tracker": {
         "title": "The Audit Team",
-        "impact_analysis": "This team is safe and compliant but rigid. They fear change and will quote policy to stop innovation. They lack flexibility.",
-        "management_strategy": "**Loosen Up.** Focus on the 'spirit of the law', not just the letter. Reward creative problem solving.",
-        "meeting_protocol": "Ban the phrase 'We've always done it this way'.",
-        "team_building": "Improv games (forcing adaptability)."
+        "impact_analysis": "This team is safe and compliant but rigid. They fear change and will quote policy to stop innovation. The vibe is 'By The Book.'\n\n**The Good:** Audits are perfect. Safety risks are low. Documentation is flawless.\n**The Bad:** Innovation is dead. Staff escalate youth behaviors because they prioritize enforcing a minor rule over maintaining the relationship. The culture is fear-based.",
+        "management_strategy": "**Your Role: The permission Giver.**\n\n1. **'Safe to Fail' Zones:** Explicitly designate areas where staff are allowed to experiment and fail without consequence.\n2. **The 'Why' Test:** Challenge every rule. If a staff member cannot explain *why* a rule exists (beyond 'it's in the book'), they aren't leading; they are robot-ing.\n3. **Reward Adaptation:** Publicly praise staff who *bent* a rule to save a situation (safely). Show that judgment is valued over blind compliance.",
+        "meeting_protocol": "**Ban the phrase:** 'We've always done it this way.' Require a rationale for every old habit.",
+        "team_building": "Improv Games. Forcing them to react to the unexpected without a script."
     },
     "Balanced": {
         "title": "The Balanced Team",
-        "impact_analysis": "No single style dominates.",
-        "management_strategy": "Act as a translator between styles.",
-        "meeting_protocol": "Round robin input.",
-        "team_building": "Role swapping."
+        "impact_analysis": "No single style dominates. This reduces blindspots but may increase friction as different 'languages' are spoken.",
+        "management_strategy": "**Your Role: The Translator.**\n\nYou must constantly translate intent. 'The Director isn't being mean; they are being efficient.' 'The Tracker isn't being difficult; they are being safe.' Rotate leadership based on the task: let the Director lead the crisis, the Encourager lead the debrief, the Tracker lead the audit.",
+        "meeting_protocol": "Round Robin input to ensure the quiet ones speak and the loud ones listen.",
+        "team_building": "Role Swapping. Have the Director do the paperwork and the Tracker run the floor."
     }
 }
 
 MISSING_VOICE_GUIDE = {
-    "Director": {"risk": "No one is driving the bus. Decisions linger and urgency is low.", "fix": "You must be the bad guy. Set shorter deadlines and demand 'bottom lines'."},
-    "Encourager": {"risk": "The team is cold and transactional. Burnout is high because no one feels cared for.", "fix": "Start every meeting with a personal check-in. Celebrate birthdays and wins aggressively."},
-    "Facilitator": {"risk": "Steamrolling. The loudest voices win, and quiet dissenters check out.", "fix": "Use round-robin speaking. Don't let anyone speak twice until everyone speaks once."},
-    "Tracker": {"risk": "Chaos. Details are dropped, and safety issues are missed.", "fix": "Create checklists. Assign a 'Safety Captain' to review plans for risks."}
+    "Director": {"risk": "**The Drift.** Without a Director, the team lacks a 'spine' of urgency. Decisions linger in 'discussion mode' forever. There is no one to cut through the noise and say 'This is what we are doing.' Problems are admired, not solved.", "fix": "**Be the Bad Guy.** You must artificially inject urgency. Set artificially tight deadlines (e.g., 'Decide by 3 PM'). Use 'Command Language' rather than 'Suggestion Language' during crises."},
+    "Encourager": {"risk": "**The Cold Front.** The team is cold and transactional. Burnout is high because no one feels cared for. Staff feel like 'cogs in a machine.' Retention will plummet because people join for the mission but stay for the people.", "fix": "**Artificial Warmth.** You must operationalize care. Start every meeting with a personal check-in. Celebrate birthdays and wins aggressively. Schedule 'no agenda' time just to connect."},
+    "Facilitator": {"risk": "**Steamrolling.** The loudest voices win, and quiet dissenters check out. Decisions are made fast but often wrong because key perspectives were ignored. There is 'compliance' but not 'buy-in.'", "fix": "**Forced Input.** Use round-robin speaking. Don't let anyone speak twice until everyone speaks once. Explicitly ask: 'Who haven't we heard from?'"},
+    "Tracker": {"risk": "**Chaos.** Details are dropped, and safety issues are missed. The team has great ideas but poor execution. Audits will fail, and safety risks will slip through the cracks.", "fix": "**The Checklist.** You must become the external hard drive. Create checklists for everything. Assign a 'Safety Captain' to review every plan for risks before execution."}
+}
+
+MOTIVATION_GAP_GUIDE = {
+    "Achievement": {
+        "warning": "This team runs on **Winning**. If they cannot see the scoreboard, they will disengage.",
+        "coaching": "**Strategy: Gamify the Grind.**\n\n1. **Visual Scoreboards:** Do not just say 'do better.' Put a chart on the wall tracking 'Days Without a Restraint' or 'Paperwork Accuracy %.' They need to see the line go up.\n2. **Micro-Wins:** Youth care is a long game. Break it down. Celebrate 'One smooth transition' or 'One clean file' as a victory.\n3. **Feedback Style:** Be objective. 'You hit 90% accuracy' lands better than 'You did a good job.'\n4. **The Trap:** Watch out for them cutting corners to hit the metric. Audit the *quality*, not just the *quantity*."
+    },
+    "Connection": {
+        "warning": "This team runs on **Belonging**. If the culture feels cold or isolated, they will quit.",
+        "coaching": "**Strategy: The Tribe.**\n\n1. **Face Time:** E-mail is the enemy. Walk the floor. Sit in the office and chat. They need to feel your presence to feel safe.\n2. **Rituals:** Establish team rituals (e.g., Friday food, morning huddles). These aren't 'nice to haves'; they are the glue holding the team together.\n3. **Protect the Vibe:** Toxic peers will destroy this team faster than bad management. You must excise toxicity immediately.\n4. **The Trap:** They may form cliques. Ensure the 'connection' includes everyone, not just the favorites."
+    },
+    "Growth": {
+        "warning": "This team runs on **Competence**. If they feel stagnant or bored, they will leave.",
+        "coaching": "**Strategy: The Ladder.**\n\n1. **Micro-Promotions:** You can't promote everyone to supervisor, so create 'titles' (e.g., 'Safety Captain', 'Trainer', 'Logistics Lead'). Give them ownership of a domain.\n2. **The 'Why' Behind the Task:** Don't just assign work; explain how this task builds a skill they will need for their next job.\n3. **Mentorship:** Connect them with leaders they admire. They crave access to expertise.\n4. **The Trap:** They may get bored with routine duties. Frame the boring stuff as 'professional discipline' required for advancement."
+    },
+    "Purpose": {
+        "warning": "This team runs on **Mission**. If the work feels meaningless or bureaucratic, they will rebel.",
+        "coaching": "**Strategy: The Storyteller.**\n\n1. **Connect Dots:** Constantly draw the line between the boring task (paperwork) and the mission (getting the kid funded/safe). Never assume they see the connection.\n2. **Mission Moments:** Start meetings by sharing a specific story of a youth's success. Remind them why they are tired.\n3. **Validation:** When they vent about the system, validate their moral outrage. 'You are right, it is unfair. That's why we have to fight harder.'\n4. **The Trap:** They can become martyrs, burning themselves out for the cause. You must mandate self-care as a 'mission requirement.'"
+    }
 }
 
 SUPERVISOR_CLASH_MATRIX = {
+    # --- SAME STYLE CONFLICTS (NEW) ---
     "Director": {
+        "Director": {
+            "tension": "Power Struggle (Control vs. Control)",
+            "psychology": "When two Directors clash, it's a battle for dominance. Both value speed, autonomy, and being 'right.' The conflict usually isn't personal; it's structural. You both want to drive the car, and neither wants to be the passenger. This leads to stepping on toes, power plays, and a chaotic environment where the team doesn't know who to follow.",
+            "watch_fors": [
+                "**The Public Showdown:** Arguing in front of the team to establish who is 'Alpha'.",
+                "**Malicious Compliance:** 'Fine, I'll do it your way, but I'll watch it fail.'",
+                "**Siloing:** Dividing the team into 'My Crew' vs. 'Your Crew'."
+            ],
+            "intervention_steps": [
+                "**1. Define Swim Lanes (Why: You need autonomy):** Explicitly divide the turf. 'You own the schedule; I own the audit.' Do not cross lines without permission.",
+                "**2. The 'Disagree and Commit' Pact (Why: Speed matters):** Agree that once a decision is made, you back each other 100% in public, even if you argued in private.",
+                "**3. Scheduled Friction (Why: You need a vent):** Set a weekly 'Fight Club' meeting where you are allowed to debate strategy fiercely behind closed doors, so you don't do it on the floor."
+            ],
+            "scripts": {
+                "Opening": "We are both strong leaders, which is great, but right now we are canceling each other out.",
+                "Validation": "I respect your drive and your ability to get things done. I know you want the best for this program.",
+                "The Pivot": "However, when we battle for control in front of the team, we create confusion. We need to stop competing and start coordinating.",
+                "Crisis": "We don't have time for a power struggle. You take the East Wing, I'll take the West Wing. Go.",
+                "Feedback": "I need you to trust me to handle my lane. When you double-check my work, it feels like you don't trust my competence."
+            }
+        },
         "Encourager": {
             "tension": "Efficiency vs. Empathy (Safety as Control vs. Safety as Connection)",
             "psychology": "This is the classic 'Oil and Water' dynamic. You (Director) find safety in speed, competence, and checking boxes. You view 'feelings' as variables that slow down the mission. \n\nThe Encourager finds safety in connection and harmony. When you push for speed or deliver blunt feedback, they don't just hear 'work instructions'—they feel an existential threat to the group's safety. They retreat because they feel steamrolled; you push harder because you think they are incompetent.",
@@ -395,9 +533,51 @@ SUPERVISOR_CLASH_MATRIX = {
                 "Crisis": "In this specific moment, I have to make the call. We can debrief the process later, but right now, follow my lead.",
                 "Feedback": "Your desire for consensus is a strength, but sometimes it becomes a bottleneck. I need you to be willing to make the '51% decision'."
             }
+        },
+        "Tracker": {
+            "tension": "Innovation vs. Compliance (Change vs. Safety)",
+            "psychology": "You (Director) want to break the status quo to get better results. They (Tracker) want to protect the status quo to ensure safety. You see them as 'The Department of No.' They see you as a reckless cowboy who is going to get the agency sued.\n\nYou interpret their questions as resistance. They interpret your new ideas as chaos.",
+            "watch_fors": [
+                "**The Rulebook Defense:** They will quote policy to stop your new idea.",
+                "**The 'Yes, But':** Every time you propose a solution, they find 10 reasons why it might fail.",
+                "**Anxiety:** Your speed makes them visibly nervous."
+            ],
+            "intervention_steps": [
+                "**1. The Pre-Mortem (Why: They need to voice risks):** Before launching a plan, ask them: 'What are the 3 biggest risks here?' Let them list them. Then solve them together.",
+                "**2. Honor the Detail (Why: That is their value):** Do not dismiss the details. 'You are right, I missed that regulation. Thank you for catching it.'",
+                "**3. Trial Runs (Why: They fear permanent mistakes):** Frame changes as 'experiments.' 'Let's try this for 3 days and see if it works.' It feels less permanent/risky."
+            ],
+            "scripts": {
+                "Opening": "I have a new idea, and I need your eyes on it to make sure it's safe.",
+                "Validation": "I appreciate your attention to detail. You keep us compliant and safe.",
+                "The Pivot": "We need to find a way to make this work because the current system is failing our kids. How can we do this safely?",
+                "Crisis": "I am taking full responsibility for this decision. If it goes wrong, it's on me. I need you to execute the plan.",
+                "Feedback": "I need you to help me find the 'Yes.' Don't just tell me why we can't do it; tell me how we *could* do it."
+            }
         }
     },
     "Encourager": {
+        "Encourager": {
+            "tension": "Artificial Harmony (Nice vs. Nice)",
+            "psychology": "When two Encouragers work together, the vibe is amazing, but the accountability is zero. You both value harmony so much that you avoid hard conversations. Issues fester underground. You become 'Toxic Protectors,' shielding the team from reality until a crisis hits. You struggle to make decisions that might upset anyone.",
+            "watch_fors": [
+                "**The Vent Session:** Spending 30 minutes complaining about a problem but taking no action to fix it.",
+                "**The 'Reply All' Apology:** Apologizing to the team for enforcing basic rules.",
+                "**Ghosting:** Avoiding a staff member rather than correcting them."
+            ],
+            "intervention_steps": [
+                "**1. The 'Safety' Contract (Why: You fear conflict):** Explicitly agree that giving feedback is safe. 'I promise I won't be mad if you tell me I'm wrong.'",
+                "**2. Assign the 'Bad Guy' Role (Why: It creates distance):** Rotate who has to deliver the bad news so one person doesn't carry the emotional load.",
+                "**3. Focus on the Victim (Why: You need a moral cause):** When you need to hold a staff member accountable, remind each other of the *youth* who is suffering because of that staff member's laziness."
+            ],
+            "scripts": {
+                "Opening": "I hate having to have this conversation, but we need to talk about [Issue].",
+                "Validation": "I know we both want the team to be happy. We care about these people.",
+                "The Pivot": "But by not addressing this, we are actually hurting the team. True kindness is holding them to a standard.",
+                "Crisis": "We can't hug our way out of this one. We have to be firm.",
+                "Feedback": "I feel like we are dancing around the issue. Let's just say it directly."
+            }
+        },
         "Director": {
             "tension": "Warmth vs. Competence (Being Liked vs. Being Effective)",
             "psychology": "You (Encourager) value harmony and feeling connected. You interpret their (Director) lack of small talk and directness as dislike or anger. You feel unsafe around them.\n\nThey interpret your focus on feelings as incompetence or lack of focus. When you try to 'nice' them into compliance, they lose respect for you. They don't want a friend; they want a leader who can remove obstacles.",
@@ -421,9 +601,30 @@ SUPERVISOR_CLASH_MATRIX = {
         }
     },
     "Facilitator": {
+        "Facilitator": {
+            "tension": "Process Paralysis (Talk vs. Talk)",
+            "psychology": "The infinite loop. You both want to make sure everyone is heard. You both want to explore every option. The result? Meetings that never end and decisions that never happen. You enable each other's worst habit: procrastination in the name of 'process.'",
+            "watch_fors": [
+                "**The 'Let's Circle Back':** delaying a decision to another meeting.",
+                "**The Meeting About the Meeting:** Planning to plan.",
+                "**Consensus Addiction:** Refusing to move until 100% of people agree (which never happens)."
+            ],
+            "intervention_steps": [
+                "**1. The 'Shot Clock' (Why: You need external pressure):** Set a timer. 'We have 10 minutes to decide. If we don't agree, we flip a coin.'",
+                "**2. Limit the Input (Why: More isn't always better):** Agree to only consult 2 people, not the whole team.",
+                "**3. The 'Good Enough' Pact (Why: Perfection is the enemy):** Remind each other that a B+ decision today is better than an A+ decision next month."
+            ],
+            "scripts": {
+                "Opening": "We are over-thinking this. We need to land the plane.",
+                "Validation": "I value that we are being thorough. It's important to be fair.",
+                "The Pivot": "But we are stuck in analysis paralysis. We need to pick a direction and go.",
+                "Crisis": "Process is over. I am making the call now.",
+                "Feedback": "We need to stop asking for permission and start giving direction."
+            }
+        },
         "Tracker": {
             "tension": "Consensus vs. Compliance (People vs. Policy)",
-            "psychology": "You (Facilitator) want the team to agree on a solution that feels fair. They (Tracker) want the team to follow the written rule because that is safe.\n\nYou feel they are being rigid and uncaring 'robots'. They feel you are being reckless and treating safety rules as 'suggestions'. You prioritize the human element; they prioritize the systemic element.",
+            "psychology": "You (Facilitator) want the team to agree on a solution that feels fair. They (Tracker) want the team to follow the written rule because that is safe.\n\nYou feel they are being rigid and uncaring 'robots'. They feel you are being rigid and treating safety rules as 'suggestions'. You prioritize the human element; they prioritize the systemic element.",
             "watch_fors": [
                 "**The Policy War:** They quote the handbook; you quote the 'vibe' or the 'context'.",
                 "**Ignoring:** You ignoring their emails about compliance because it feels like nagging.",
@@ -440,6 +641,29 @@ SUPERVISOR_CLASH_MATRIX = {
                 "The Pivot": "In this specific case, following the rule to the letter will cause a behavioral escalation. We need to flex here to maintain safety.",
                 "Crisis": "I am taking responsibility for this exception. Please document that I made this call.",
                 "Feedback": "I need you to see the gray areas. The rulebook is a map, but the territory is real people."
+            }
+        }
+    },
+    "Tracker": {
+        "Tracker": {
+            "tension": "The Micro-War (Detail vs. Detail)",
+            "psychology": "When two Trackers clash, it is usually over *interpretation* of a rule. It becomes a court case. You both dig into the details to prove you are 'technically correct.' The team gets lost in the minutiae. You risk creating a culture where 'doing it right' is more important than 'doing it well.'",
+            "watch_fors": [
+                "**The Email War:** Sending long, evidence-filled emails to each other instead of talking.",
+                "**Malicious Audit:** Looking for errors in each other's work to prove a point.",
+                "**Stalemate:** Refusing to move until the 'policy' is clarified by upper management."
+            ],
+            "intervention_steps": [
+                "**1. Zoom Out (Why: You are lost in the weeds):** Stop talking about the rule. Talk about the goal. 'What are we actually trying to achieve here?'",
+                "**2. Pick a Lane (Why: You need ownership):** Divide the compliance tasks. 'You own Fire Safety; I own File Compliance.'",
+                "**3. The 'Human Override' (Why: Systems aren't people):** Remind each other that the system serves the kid, not the other way around."
+            ],
+            "scripts": {
+                "Opening": "We are getting lost in the weeds. Let's step back.",
+                "Validation": "I know we both want to do this exactly right. I respect your attention to detail.",
+                "The Pivot": "However, arguing over this specific procedure is slowing down the team. Is this critical to safety, or just a preference?",
+                "Crisis": "The procedure doesn't matter right now. Safety matters. We do X.",
+                "Feedback": "We need to stop using the rulebook as a weapon against each other."
             }
         }
     }
@@ -798,6 +1022,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 # --- 6. MAIN APP LOGIC ---
 staff_list = fetch_staff_data()
 df = pd.DataFrame(staff_list)
+if not df_all.empty:
+    df_all.columns = df_all.columns.str.lower().str.strip() # Converts 'Cottage' to 'cottage'
 
 # Reset Helpers
 def reset_t1(): st.session_state.t1_staff_select = None
@@ -919,14 +1145,13 @@ elif st.session_state.current_view == "Team DNA":
                     dom_mot = mot_counts.idxmax()
                     st.markdown("---")
                     st.subheader(f"⚠️ Motivation Gap: {dom_mot} Driven")
-                    if dom_mot == "Connection":
-                        st.warning("This team is driven by **Relationships**. If you manage them with cold metrics and checklists, they will disengage. You must lead with warmth.")
-                    elif dom_mot == "Achievement":
-                        st.warning("This team is driven by **Winning**. If goals are vague or accomplishments aren't recognized, they will leave. You must lead with clear scoreboards.")
-                    elif dom_mot == "Growth":
-                        st.warning("This team is driven by **Learning**. If they feel stagnant, they will quit. You must provide new challenges and training.")
-                    elif dom_mot == "Purpose":
-                        st.warning("This team is driven by **Mission**. If you focus only on policy compliance, they will rebel. You must connect every task to the 'Why'.")
+                    
+                    # Fetch data from new dictionary
+                    mot_guide = MOTIVATION_GAP_GUIDE.get(dom_mot, {})
+                    if mot_guide:
+                        st.warning(mot_guide['warning'])
+                        with st.expander("💡 Coaching Strategy for this Driver", expanded=True):
+                            st.markdown(mot_guide['coaching'])
             
             st.button("Clear", on_click=reset_t2)
 
@@ -1144,12 +1369,164 @@ elif st.session_state.current_view == "Career Pathfinder":
 elif st.session_state.current_view == "Org Pulse":
     st.subheader("📈 Organization Pulse")
     if not df.empty:
+        # --- DATA PREP ---
+        total_staff = len(df)
+        comm_counts = df['p_comm'].value_counts(normalize=True) * 100
+        mot_counts = df['p_mot'].value_counts(normalize=True) * 100
+        
+        # Top Metrics
         c1, c2, c3 = st.columns(3)
-        top_comm = df['p_comm'].mode()[0]; top_mot = df['p_mot'].mode()[0]
-        c1.metric("Dominant Style", top_comm); c2.metric("Top Driver", top_mot); c3.metric("Total Staff", len(df))
+        dom_comm = comm_counts.idxmax()
+        dom_mot = mot_counts.idxmax()
+        c1.metric("Dominant Style", f"{dom_comm} ({int(comm_counts.max())}%)")
+        c2.metric("Top Driver", f"{dom_mot} ({int(mot_counts.max())}%)") 
+        c3.metric("Total Staff Analyzed", total_staff)
+        
         st.divider()
+        
+        # --- VISUALS ---
         c_a, c_b = st.columns(2)
-        with c_a: st.plotly_chart(px.pie(df, names='p_comm', title="Communication Styles", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
+        with c_a: 
+            st.markdown("##### 🗣️ Communication Mix")
+            st.plotly_chart(px.pie(df, names='p_comm', color='p_comm', color_discrete_map={'Director':BRAND_COLORS['blue'], 'Encourager':BRAND_COLORS['green'], 'Facilitator':BRAND_COLORS['teal'], 'Tracker':BRAND_COLORS['gray']}), use_container_width=True)
         with c_b: 
-            if 'role' in df.columns: st.plotly_chart(px.histogram(df, x="role", color="p_comm", title="Leadership Pipeline", color_discrete_map={'Director':BRAND_COLORS['blue'], 'Encourager':BRAND_COLORS['green'], 'Facilitator':BRAND_COLORS['teal'], 'Tracker':BRAND_COLORS['gray']}), use_container_width=True)
+            st.markdown("##### 🔋 Motivation Drivers")
+            st.plotly_chart(px.bar(df['p_mot'].value_counts(), orientation='h', color_discrete_sequence=[BRAND_COLORS['blue']]), use_container_width=True)
+
+        st.divider()
+        st.header("🔍 Deep Organizational Analysis")
+        
+        tab1, tab2, tab3 = st.tabs(["🛡️ Culture Risk Assessment", "🔥 Motivation Strategy", "🌱 Leadership Pipeline Health"])
+        
+        # --- TAB 1: CULTURE RISK ---
+        with tab1:
+            st.markdown(f"### The {dom_comm}-Dominant Culture")
+            
+            if dom_comm == "Director":
+                st.error("🚨 **Risk Area: The Efficiency Trap**")
+                st.write("Your organization is heavily weighted towards action, speed, and results. While this means you get things done, you are at high risk for **'Burn and Turn.'**")
+                st.markdown("""
+                **The Blindspot:**
+                * **Low Empathy:** Staff likely feel that 'management doesn't care about us, only the numbers.'
+                * **Steamrolling:** Quiet voices (Facilitators/Trackers) are likely being ignored in meetings because they don't speak fast enough.
+                * **Crisis Addiction:** The culture likely rewards firefighting more than fire prevention.
+                
+                **🛡️ Coaching Strategy for Leadership:**
+                1.  **Mandate 'Cooling Off' Periods:** Do not allow major decisions to be made in the same meeting they are proposed. Force a 24-hour pause to let slower processors think.
+                2.  **Artificial Empathy:** You must operationalize care. Start every meeting with 5 minutes of personal check-ins. It will feel like a waste of time to you; it is oxygen to your staff.
+                3.  **Protect the Dissenters:** Explicitly ask the quietest person in the room for their opinion. They see the risks you are missing.
+                """)
+            
+            elif dom_comm == "Encourager":
+                st.warning("⚠️ **Risk Area: The 'Nice' Trap**")
+                st.write("Your organization prioritizes harmony, relationships, and good vibes. While morale is likely good, you are at high risk for **'Toxic Tolerance.'**")
+                st.markdown("""
+                **The Blindspot:**
+                * **Lack of Accountability:** Poor performance is tolerated because no one wants to be 'mean.'
+                * **The 'Cool Parent' Syndrome:** Leaders want to be liked more than they want to be respected.
+                * **Hidden Conflict:** Because open conflict is avoided, issues go underground (gossip, passive-aggression).
+                
+                **🛡️ Coaching Strategy for Leadership:**
+                1.  **Redefine Kindness:** Coach your leaders that holding people accountable is *kind* because it helps them succeed. Allowing failure is cruel.
+                2.  **Standardize Feedback:** Create a rigid structure for performance reviews so leaders can't opt-out of hard conversations.
+                3.  **Focus on the 'Who':** When making hard decisions, frame it as protecting the *team* (the collective 'who') from the toxicity of the individual.
+                """)
+            
+            elif dom_comm == "Facilitator":
+                st.info("🐢 **Risk Area: The Consensus Trap**")
+                st.write("Your organization values fairness, listening, and inclusion. While people feel heard, you are at risk for **'Analysis Paralysis.'**")
+                st.markdown("""
+                **The Blindspot:**
+                * **Slow Decisions:** You likely have meetings about meetings. Urgent problems fester while you wait for everyone to agree.
+                * **The 'Lowest Common Denominator':** Solutions are often watered down to ensure no one is offended.
+                * **Crisis Failure:** In an emergency, the team may freeze, waiting for a vote when they need a command.
+                
+                **🛡️ Coaching Strategy for Leadership:**
+                1.  **The 51% Rule:** Establish a rule that once you have 51% certainty (or 51% consensus), you move. Perfection is the enemy of done.
+                2.  **Disagree and Commit:** Teach the culture that it is okay to disagree with a decision but still support its execution 100%.
+                3.  **Assign 'Decision Owners':** Stop making decisions by committee. Assign one person to decide, and the committee only *advises*.
+                """)
+            
+            elif dom_comm == "Tracker":
+                st.warning("🛑 **Risk Area: The Bureaucracy Trap**")
+                st.write("Your organization values safety, precision, and rules. While you are compliant, you are at risk for **'Stagnation.'**")
+                st.markdown("""
+                **The Blindspot:**
+                * **Innovation Death:** New ideas are killed by 'policy' before they can be tested.
+                * **Rigidity:** Staff may escalate youth behaviors because they prioritize enforcing a minor rule over maintaining the relationship.
+                * **Fear Based:** The culture is likely driven by a fear of getting in trouble rather than a desire to do good.
+                
+                **🛡️ Coaching Strategy for Leadership:**
+                1.  **'Safe to Fail' Zones:** Explicitly designate areas where staff are allowed to experiment and fail without consequence.
+                2.  **The 'Why' Test:** Challenge every rule. If a staff member cannot explain *why* a rule exists (beyond 'it's in the book'), they aren't leading; they are robot-ing.
+                3.  **Reward Adaptation:** Publicly praise staff who *bent* a rule to save a situation (safely). Show that judgment is valued over blind compliance.
+                """)
+
+        # --- TAB 2: MOTIVATION STRATEGY ---
+        with tab2:
+            st.markdown(f"### The Drive: {dom_mot}")
+            
+            if dom_mot == "Achievement":
+                st.success("🏆 **Strategy: The Scoreboard**")
+                st.write("Your team runs on winning. They need to know they are succeeding based on objective data.")
+                st.markdown("""
+                * **The Danger:** If goals are vague or 'feelings-based,' they will disengage.
+                * **The Fix:** Visualize success. Put charts on the wall. Track days without incidents. Give out awards for 'Most Shifts Covered' or 'Best Audit Score'.
+                * **Language:** Use words like *Goal, Target, Win, Speed, Elite.*
+                """)
+            elif dom_mot == "Connection":
+                st.info("🤝 **Strategy: The Tribe**")
+                st.write("Your team runs on belonging. They will work harder for each other than for the 'company.'")
+                st.markdown("""
+                * **The Danger:** If they feel isolated or if management feels 'cold,' they will quit. Toxic peers destroy this culture fast.
+                * **The Fix:** Invest in food, team outings, and face time. Start meetings with personal connection.
+                * **Language:** Use words like *Family, Team, Support, Together, Safe.*
+                """)
+            elif dom_mot == "Purpose":
+                st.warning("🔥 **Strategy: The Mission**")
+                st.write("Your team runs on meaning. They are here to change lives, not just collect a paycheck.")
+                st.markdown("""
+                * **The Danger:** If they feel the work is just 'paperwork' or 'warehousing kids,' they will burn out or rebel.
+                * **The Fix:** Connect EVERY task to the youth. 'We do this paperwork so [Youth Name] can get funding for his placement.' Share success stories constantly.
+                * **Language:** Use words like *Impact, Mission, Change, Justice, Future.*
+                """)
+            elif dom_mot == "Growth":
+                st.success("🌱 **Strategy: The Ladder**")
+                st.write("Your team runs on competence. They want to get better, smarter, and more skilled.")
+                st.markdown("""
+                * **The Danger:** If they feel stagnant or bored, they will leave for a new challenge.
+                * **The Fix:** create 'Micro-Promotions.' Give them special titles (e.g., 'Safety Captain'). Send them to trainings. Map out their career path visually.
+                * **Language:** Use words like *Skill, Level Up, Career, Master, Learn.*
+                """)
+
+        # --- TAB 3: PIPELINE HEALTH ---
+        with tab3:
+            st.markdown("### Leadership Pipeline Analysis")
+            if 'role' in df.columns:
+                # Compare Leadership Composition to General Staff
+                leaders = df[df['role'].isin(['Program Supervisor', 'Shift Supervisor', 'Manager'])]
+                if not leaders.empty:
+                    l_counts = leaders['p_comm'].value_counts(normalize=True) * 100
+                    
+                    st.write("**Leadership Diversity Check:**")
+                    c1, c2 = st.columns(2)
+                    with c1:
+                        st.caption("Leadership Team Mix")
+                        st.dataframe(l_counts)
+                    with c2:
+                        st.caption("General Staff Mix")
+                        st.dataframe(comm_counts)
+                    
+                    # Clone Warning
+                    dom_lead = l_counts.idxmax()
+                    if l_counts.max() > 60:
+                        st.error(f"🚫 **Warning: Cloning Bias Detected**")
+                        st.write(f"Your leadership team is over 60% **{dom_lead}**. You are likely promoting people who 'look like you' (communication-wise).")
+                        st.write("This creates a massive blind spot. If all leaders are Directors, who is listening to the staff? If all leaders are Encouragers, who is making the hard calls?")
+                        st.info("**Recommendation:** actively recruit for the *opposite* style for your next leadership opening.")
+                else:
+                    st.info("No leadership roles identified in the data set to analyze.")
+            else:
+                st.warning("Role data missing. Cannot analyze pipeline.")
+
     else: st.warning("No data available.")
