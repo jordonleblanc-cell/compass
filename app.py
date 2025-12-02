@@ -691,6 +691,7 @@ if st.session_state.step == 'intro':
             else:
                 st.session_state.user_info = {"name": name, "email": email, "role": role, "cottage": cottage}
                 st.session_state.step = 'comm'
+                scroll_to_top()
                 st.rerun()
 
     # JS to force scroll to top if we just landed here (optional)
@@ -746,6 +747,7 @@ elif st.session_state.step == 'comm':
             else:
                 st.session_state.answers_comm = answers
                 st.session_state.step = 'motiv'
+                scroll_to_top()
                 st.rerun()
 
 # --- MOTIV ---
@@ -791,6 +793,7 @@ elif st.session_state.step == 'motiv':
             else:
                 st.session_state.answers_motiv = answers
                 st.session_state.step = 'processing'
+                scroll_to_top()
                 st.rerun()
 
 # --- PROCESSING ---
@@ -810,11 +813,15 @@ elif st.session_state.step == 'processing':
         "commScores": c_scores, "motivScores": m_scores
     }
     
+    # Logic to clean cottage name (remove "Cottage " prefix)
+    raw_cottage = st.session_state.user_info['cottage']
+    clean_cottage = raw_cottage.replace("Cottage ", "")
+    
     payload = {
         "name": st.session_state.user_info['name'],
         "email": st.session_state.user_info['email'],
         "role": st.session_state.user_info['role'],
-        "cottage": st.session_state.user_info['cottage'],
+        "cottage": clean_cottage, # Use cleaned version
         "scores": st.session_state.results
     }
     
