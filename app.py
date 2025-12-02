@@ -231,7 +231,7 @@ MOTIVATION_QUESTIONS = [
     {"id": "mot14", "text": "I’m often thinking about the emotional climate of the unit and how people are relating.", "style": "Connection"},
     {"id": "mot15", "text": "I’m more likely to go above and beyond when I feel a sense of belonging.", "style": "Connection"},
     {"id": "mot16", "text": "I like having clear goals and being able to see, in concrete ways, when we’ve met them.", "style": "Achievement"},
-    {"id": "mot17", "text": "I feel satisfied when I can see that my effort led to specific improvements.", "style": "Achievement"},
+    {"id": "mot17", "text": "I feel satisfied when I can see that that my effort led to specific improvements.", "style": "Achievement"},
     {"id": "mot18", "text": "It’s frustrating when expectations keep shifting and I’m not sure what success looks like.", "style": "Achievement"},
     {"id": "mot19", "text": "I appreciate data, tracking tools, or simple dashboards that help show progress.", "style": "Achievement"},
     {"id": "mot20", "text": "I’m motivated by being trusted with projects where outcomes are clearly defined.", "style": "Achievement"},
@@ -666,12 +666,17 @@ if st.session_state.step == 'intro':
         c1, c2 = st.columns(2)
         name = c1.text_input("Full Name", placeholder="e.g. Jane Doe")
         email = c2.text_input("Email Address", placeholder="e.g. jane@elmcrest.org")
-        role = st.selectbox("Current Role", ["Program Supervisor", "Shift Supervisor", "YDP"], index=None, placeholder="Select your role...")
+        
+        c3, c4 = st.columns(2)
+        role = c3.selectbox("Current Role", ["Program Supervisor", "Shift Supervisor", "YDP"], index=None, placeholder="Select your role...")
+        cottage = c4.selectbox("Home Program", ["Cottage 2", "Cottage 3", "Cottage 8", "Cottage 9", "Cottage 11", "Overnight"], index=None, placeholder="Select your program...")
+
         st.markdown("<br>", unsafe_allow_html=True)
         if st.form_submit_button("Start Assessment →"):
-            if not name or not email or not role: st.error("Please complete all fields.")
+            if not name or not email or not role or not cottage: 
+                st.error("Please complete all fields.")
             else:
-                st.session_state.user_info = {"name": name, "email": email, "role": role}
+                st.session_state.user_info = {"name": name, "email": email, "role": role, "cottage": cottage}
                 st.session_state.step = 'comm'
                 st.rerun()
     
@@ -790,6 +795,7 @@ elif st.session_state.step == 'processing':
         "name": st.session_state.user_info['name'],
         "email": st.session_state.user_info['email'],
         "role": st.session_state.user_info['role'],
+        "cottage": st.session_state.user_info['cottage'],
         "scores": st.session_state.results
     }
     
