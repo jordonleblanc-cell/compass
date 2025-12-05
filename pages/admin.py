@@ -16,7 +16,7 @@ st.set_page_config(
 
 # --- NAVIGATION HELPER ---
 if "current_view" not in st.session_state:
-    st.session_state.current_view = "Guide Generator"
+    st.session_state.current_view = "Supervisor's Guide"
 
 def set_view(view_name):
     st.session_state.current_view = view_name
@@ -320,8 +320,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Intensity Overload",
         "s8_b": ["**The Steamroller Effect:** Announcing decisions without checking if the team is emotionally ready to follow, creating 'malicious compliance.'", "**Burnout by Intensity:** Assuming everyone has their stamina and pushing for result after result without rest.", "**Dismissing 'Soft' Data:** Ignoring a staff member's 'bad feeling' because there is no proof, missing early warning signs."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (The Pause Button):** Challenge them to force a delay between thought and action. Ask them to ask three questions before giving one order.", "**Phase 2 (Narrative Leadership):** Coach them to explain the 'Why' behind directives, connecting commands to the larger mission of healing.", "**Phase 3 (Multiplier Effect):** Encourage them to stop being the hero who fixes everything and train two deputies to think like them."],
-        "s10": "Celebrate their ability to prevent stagnation. When the team is stuck in a 'what if' loop, they cut the knot and create movement."
+        "s9_b": ["**Phase 1 (The Pause Button):** Objective: Reduce impulsive command. Action: Force a delay between thought and action. Ask three questions before giving one order.", "**Phase 2 (Narrative Leadership):** Objective: Increase buy-in. Action: Explain the 'Why' behind directives, connecting commands to the larger mission of healing.", "**Phase 3 (Multiplier Effect):** Objective: Scale impact. Action: Stop being the hero who fixes everything. Train two deputies to think like them."],
+        "s10": "Celebrate their ability to prevent stagnation. When the team is stuck in a 'what if' loop, they cut the knot and create movement.",
+        "s10_b": ["**Efficiency:** Celebrating how quickly they solved a complex scheduling issue.", "**Clarity:** Acknowledging that the team knows exactly what to do because of their direction.", "**Resilience:** Praising their ability to bounce back immediately after a crisis."]
     },
     "Director-Growth": {
         "title": "THE RESTLESS IMPROVER (Director x Growth)",
@@ -338,8 +339,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Impatience with Status Quo",
         "s8_b": ["**The Pace Mismatch:** Getting frustrated with staff who learn slowly or bureaucracy that slows down improvements.", "**'Fix-It' Fatigue:** Seeing everything as a problem to be solved, making staff feel they can never please them.", "**Leaving People Behind:** Focusing on the *idea* rather than the *adoption*, launching initiatives that no one follows."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (Validation):** Coach them to validate the *current* effort before suggesting a *future* improvement. Practice saying, 'This is working well.'", "**Phase 2 (Change Management):** Have them study how people process change to increase adoption of their ideas.", "**Phase 3 (Capacity Building):** Shift them from being the 'idea generator' to the facilitator of *others'* ideas."],
-        "s10": "Celebrate their diagnostic ability. They turn failures into lessons and stop the team from making the same mistake twice."
+        "s9_b": ["**Phase 1 (Validation):** Objective: Build trust before changing things. Action: Validate the *current* effort before suggesting a *future* improvement. Practice saying, 'This is working well.'", "**Phase 2 (Change Management):** Objective: Increase adoption. Action: Study how people process change to increase adoption of their ideas.", "**Phase 3 (Capacity Building):** Objective: Scale innovation. Action: Shift from being the 'idea generator' to the facilitator of *others'* ideas."],
+        "s10": "Celebrate their diagnostic ability. They turn failures into lessons and stop the team from making the same mistake twice.",
+        "s10_b": ["**Insight:** Praising how they identified the root cause of a recurring issue.", "**Development:** Celebrating a staff member they successfully coached up.", "**Courage:** Acknowledging their willingness to try a new approach when the old one failed."]
     },
     "Director-Purpose": {
         "title": "THE MISSION DEFENDER (Director x Purpose)",
@@ -356,8 +358,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Righteous Intensity",
         "s8_b": ["**Righteous Rigidity:** Seeing the world in black and white; viewing differences of opinion as moral failings.", "**The Martyr Complex:** Overworking to the point of collapse because they don't trust anyone else to care as much.", "**Judgmental Tone:** Applying high internal standards externally; appearing 'preachy' to staff."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (The Gray Zone):** Practice identifying validity in opposing viewpoints. Learn that two people can have different strategies and both care about kids.", "**Phase 2 (Sustainable Advocacy):** Coach them to pick their battles. Not every hill is worth dying on.", "**Phase 3 (Cultural Architecture):** Move from fighting individual fires to building systems that institutionalize values."],
-        "s10": "Celebrate their protection of the vulnerable. Youth know this supervisor is on their side, even when enforcing rules, which builds deep trust."
+        "s9_b": ["**Phase 1 (The Gray Zone):** Objective: Increase flexibility. Action: Practice identifying validity in opposing viewpoints. Learn that two people can have different strategies and both care about kids.", "**Phase 2 (Sustainable Advocacy):** Objective: Prevent burnout. Action: Coach them to pick their battles. Not every hill is worth dying on.", "**Phase 3 (Cultural Architecture):** Objective: Long-term impact. Action: Move from fighting individual fires to building systems that institutionalize values."],
+        "s10": "Celebrate their protection of the vulnerable. Youth know this supervisor is on their side, even when enforcing rules, which builds deep trust.",
+        "s10_b": ["**Integrity:** Celebrating a moment they stood up for what was right, even if it was hard.", "**Advocacy:** Acknowledging how they gave a voice to a youth who wasn't being heard.", "**Consistency:** Praising their unwavering commitment to the mission."]
     },
     "Director-Connection": {
         "title": "THE PROTECTIVE CAPTAIN (Director x Connection)",
@@ -374,8 +377,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Protective Overreach",
         "s8_b": ["**Us vs. Them Mentality:** Becoming hostile toward other shifts or admin, viewing them as outsiders who don't understand.", "**Over-Functioning:** Doing everyone's job to protect them from stress, preventing staff growth.", "**Taking Conflict Personally:** Conflating professional disagreement with personal betrayal."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (Delegation of Care):** Coach them to stop being the only fixer. Assign 'care tasks' to others.", "**Phase 2 (Organizational Citizenship):** Expand their circle of loyalty to view the whole agency as 'your team.'", "**Phase 3 (Mentorship):** Transition them from Captain to Admiral—teaching others to build loyalty."],
-        "s10": "Celebrate their high retention. Staff stay because they know this supervisor has their back."
+        "s9_b": ["**Phase 1 (Delegation of Care):** Objective: Prevent burnout. Action: Stop being the only one who fixes things. Assign 'care tasks' to others to build their muscles.", "**Phase 2 (Organizational Citizenship):** Objective: Reduce silos. Action: Expand their circle of loyalty to view the whole agency as 'your team.'", "**Phase 3 (Mentorship):** Objective: Legacy. Action: Transition from being the Captain to being the Admiral—teaching others to build the loyalty you generate."],
+        "s10": "Celebrate their high retention. Staff stay because they know this supervisor has their back.",
+        "s10_b": ["**Loyalty:** Celebrating how they stood up for their team.", "**Stabilization:** Acknowledging how their presence calmed a chaotic situation.", "**Culture:** Praising the strong sense of identity they have built on their unit."]
     },
     "Encourager-Achievement": {
         "title": "THE COACH (Encourager x Achievement)",
@@ -392,8 +396,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Optimism Traps",
         "s8_b": ["**The 'Nice' Trap:** Avoiding negative feedback to preserve vibes, letting underperformance slide.", "**Hiding Failure:** Downplaying serious incidents or spinning bad data to maintain a winning image.", "**Exhaustion:** Crashing hard at home due to the physical drain of maintaining high energy."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (Hard Conversations):** Commit to giving one piece of constructive feedback per week.", "**Phase 2 (Data Reality):** Coach them to love 'bad' data as a tool for fixing problems, not something to hide.", "**Phase 3 (Culture Carrier):** Systematize celebration rituals so they happen even when the supervisor isn't there."],
-        "s10": "Celebrate their ability to prevent burnout in others. Their optimism is a buffer against the despair that can set in after bad incidents."
+        "s9_b": ["**Phase 1 (Hard Conversations):** Objective: Build accountability. Action: Commit to giving one piece of constructive/negative feedback per week. Get comfortable with the awkwardness.", "**Phase 2 (Data Reality):** Objective: Objective management. Action: Coach them to love 'bad' data as a tool for fixing problems, not something to hide.", "**Phase 3 (Culture Carrier):** Objective: Sustainability. Action: Systematize celebration rituals so they happen even when the supervisor isn't there."],
+        "s10": "Celebrate their ability to prevent burnout in others. Their optimism is a buffer against the despair that can set in after bad incidents.",
+        "s10_b": ["**Motivation:** Celebrating how they turned a bad shift around with their energy.", "**Wins:** Acknowledging a specific goal they led the team to achieve.", "**Resilience:** Praising their ability to find the silver lining in a tough situation."]
     },
     "Encourager-Growth": {
         "title": "THE MENTOR (Encourager x Growth)",
@@ -410,8 +415,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Over-Investment",
         "s8_b": ["**Tolerating Mediocrity:** Confusing potential with performance; waiting too long for improvement.", "**Over-Investment:** Working harder on someone's growth than they are.", "**Softening the Blow:** Hinting at problems rather than naming them, leaving staff confused."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (Assessment):** Learn to objectively assess skill vs. will.", "**Phase 2 (The Exit Ramp):** Learn how to help people transition *out* of roles that aren't a fit.", "**Phase 3 (Train the Trainer):** Build a curriculum from their intuitive teaching style."],
-        "s10": "Celebrate their ability to turn failures into lessons. They stop the team from making the same mistake twice."
+        "s9_b": ["**Phase 1 (Assessment):** Objective: Realistic expectations. Action: Learn to objectively assess skill vs. will. You can teach skill; you cannot force will.", "**Phase 2 (The Exit Ramp):** Objective: Difficult conversations. Action: Learn how to help people transition *out* of roles that aren't a fit. This is also a form of mentorship.", "**Phase 3 (Train the Trainer):** Objective: Scale impact. Action: Build a curriculum. Take your intuitive teaching style and write it down so others can use it."],
+        "s10": "Celebrate their ability to turn failures into lessons. They stop the team from making the same mistake twice.",
+        "s10_b": ["**Development:** Celebrating a specific staff member who improved under their guidance.", "**Insight:** Acknowledging a hidden talent they spotted in someone.", "**Patience:** Praising their willingness to stick with a difficult youth or staff member."]
     },
     "Encourager-Purpose": {
         "title": "THE HEART OF THE MISSION (Encourager x Purpose)",
@@ -428,8 +434,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Empathy Overload",
         "s8_b": ["**Compassion Fatigue:** Absorbing everyone's trauma; crashing into depression/numbness.", "**Boundary Drift:** Sharing too much personal info or making exceptions because 'rules feel like barriers.'", "**Difficulty with Punitive Measures:** Struggling to enforce consequences because of empathy for trauma history."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (Emotional Armor):** Learn the difference between empathy (feeling *with*) and compassion (feeling *for*).", "**Phase 2 (Structural Care):** Learn how rules and boundaries are tools of love.", "**Phase 3 (The Storyteller):** Use their voice to advocate for systemic change."],
-        "s10": "Celebrate their ability to prevent abuse and neglect by keeping the environment humane."
+        "s9_b": ["**Phase 1 (Emotional Armor):** Objective: Self-preservation. Action: Learn the difference between empathy (feeling *with* them) and compassion (feeling *for* them). Keep one foot on the bank while you help them in the river.", "**Phase 2 (Structural Care):** Objective: Healthy boundaries. Action: Learn how rules and boundaries are actually tools of love for traumatized kids.", "**Phase 3 (The Storyteller):** Objective: Systemic influence. Action: Use your voice to advocate for systemic change. Write the impact stories that get funding or change policy."],
+        "s10": "Celebrate their ability to prevent abuse and neglect by keeping the environment humane.",
+        "s10_b": ["**Empathy:** Celebrating how they made a youth or staff member feel seen.", "**Advocacy:** Acknowledging their courage in speaking up for the team's needs.", "**Culture:** Praising the warmth and humanity they bring to the unit."]
     },
     "Encourager-Connection": {
         "title": "THE TEAM BUILDER (Encourager x Connection)",
@@ -446,8 +453,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Conflict Avoidance",
         "s8_b": ["**Ruinous Empathy:** Valuing harmony over truth; failing to fire toxic employees.", "**Clique Formation:** Accidentally creating an 'in-group' of favorites.", "**Difficulty with Unpopularity:** Struggling to make necessary unpopular decisions."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (Boundaries):** Practice saying 'No' without over-explaining.", "**Phase 2 (Professional Distance):** Differentiate between being 'Friendly' and 'Friends.'", "**Phase 3 (Culture Architect):** Institutionalize belonging so it doesn't depend on them being in the room."],
-        "s10": "Celebrate their low turnover. People stay for the team even when the work is hard."
+        "s9_b": ["**Phase 1 (Boundaries):** Objective: Self-care. Action: Learn to say 'No' without over-explaining or apologizing.", "**Phase 2 (Professional Distance):** Objective: Objectivity. Action: Differentiate between being 'Friendly' and being 'Friends.' You can't be best friends with your direct reports.", "**Phase 3 (Culture Architect):** Objective: Systems building. Action: Move from planning potlucks to planning culture. How do we institutionalize belonging so it doesn't depend on you being in the room?"],
+        "s10": "Celebrate their low turnover. People stay for the team even when the work is hard.",
+        "s10_b": ["**Cohesion:** Celebrating how well the team is working together under their leadership.", "**Support:** Acknowledging the personal care they show for their staff.", "**Atmosphere:** Praising the positive, welcoming vibe on their unit."]
     },
     "Facilitator-Achievement": {
         "title": "THE STEADY MOVER (Facilitator x Achievement)",
@@ -464,8 +472,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Slow & Steady Risks",
         "s8_b": ["**Analysis Paralysis:** Waiting for 100% consensus/data confidence while the unit burns.", "**Frustration with 'Director' Types:** Viewing fast movers as reckless.", "**Under-Selling Success:** Modesty preventing them from claiming credit."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (Speed Drills):** Practice making low-stakes decisions instantly.", "**Phase 2 (Directive Voice):** Practice saying 'I have decided' instead of 'What do we think?'", "**Phase 3 (Strategic Alignment):** Bridge groups to solve agency-wide silos."],
-        "s10": "Celebrate their high adoption rates. When they launch a project, it works because people aren't sabotaging it."
+        "s9_b": ["**Phase 1 (Speed Drills):** Objective: Crisis confidence. Action: Practice making low-stakes decisions instantly. Train your gut.", "**Phase 2 (Directive Voice):** Objective: Authority. Action: Practice saying 'I have decided' instead of 'What do we think?' in appropriate moments.", "**Phase 3 (Strategic Alignment):** Objective: Organizational impact. Action: Use your ability to bridge groups to solve agency-wide silos (e.g., bridging Unit Staff and Clinical Staff)."],
+        "s10": "Celebrate their high adoption rates. When they launch a project, it works because people aren't sabotaging it.",
+        "s10_b": ["**Buy-In:** Celebrating how they got the whole team on board with a new initiative.", "**Consistency:** Acknowledging their steady hand during a chaotic week.", "**Follow-Through:** Praising their ability to finish what they start."]
     },
     "Facilitator-Growth": {
         "title": "THE PATIENT GARDENER (Facilitator x Growth)",
@@ -482,8 +491,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Over-Process",
         "s8_b": ["**Lack of Urgency:** Tolerating safety violations as 'part of the learning curve.'", "**The 'Drift':** Standards slipping over time due to lack of reinforcement.", "**Over-Processing:** Spending hours debriefing minor incidents."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (The Pruning Shears):** Learn that cutting back bad behaviors is an act of growth.", "**Phase 2 (Operational Cadence):** Add rhythm (weekly checks) to structure the growth.", "**Phase 3 (Scalable Wisdom):** Create learning modules to scale their wisdom."],
-        "s10": "Celebrate their resilience. They help the team ride out storms without losing hope."
+        "s9_b": ["**Phase 1 (The Pruning Shears):** Objective: Standards. Action: Learn that cutting back dead branches (bad behaviors/tasks) is an act of growth. Get comfortable with the 'cut.'", "**Phase 2 (Operational Cadence):** Objective: Consistency. Action: Add rhythm to your growth. Weekly checks, monthly goals. Structure helps the garden grow straight.", "**Phase 3 (Scalable Wisdom):** Objective: Legacy. Action: Create learning modules. How do you take your wisdom and put it in a video or a guide?"],
+        "s10": "Celebrate their resilience. They help the team ride out storms without losing hope.",
+        "s10_b": ["**Safety:** Celebrating the safe environment they have created for staff to learn.", "**Growth:** Acknowledging the visible improvement in their direct reports.", "**Perspective:** Praising their ability to stay calm and focused on the long term."]
     },
     "Facilitator-Purpose": {
         "title": "THE MORAL COMPASS (Facilitator x Purpose)",
@@ -500,8 +510,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Decision Drag",
         "s8_b": ["**Decision Fatigue:** Getting stuck trying to weigh every ethical variable.", "**Perceived as 'Slow':** Losing credibility in emergencies due to need for discussion.", "**Process over Outcome:** Holding a perfect meeting where no decision is made."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (Bias for Action):** Practice making decisions with 80% of voices heard.", "**Phase 2 (Conflict Confidence):** Move from mediating to directing when necessary.", "**Phase 3 (Systemic Ethics):** Design systems that are fair by default."],
-        "s10": "Celebrate their integrity. They save the agency from ethical lapses and PR nightmares."
+        "s9_b": ["**Phase 1 (Bias for Action):** Objective: Speed. Action: Practice making decisions with only 80% of the voices heard. Realize the world didn't end.", "**Phase 2 (Conflict Confidence):** Objective: Authority. Action: Move from mediating to directing. Sometimes fairness requires a judge, not a mediator.", "**Phase 3 (Systemic Ethics):** Objective: Prevention. Action: Help design the systems (hiring, intake) so they are fair by default."],
+        "s10": "Celebrate their integrity. They save the agency from ethical lapses and PR nightmares.",
+        "s10_b": ["**Fairness:** Celebrating how they ensured a difficult process was handled justly.", "**Inclusion:** Acknowledging how they brought overlooked voices into the conversation.", "**Trust:** Praising the deep respect they have earned from the team."]
     },
     "Facilitator-Connection": {
         "title": "THE PEACEMAKER (Facilitator x Connection)",
@@ -518,8 +529,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Absorption",
         "s8_b": ["**Conflict Avoidance:** Letting passive-aggressive behavior slide to avoid a fight.", "**The Emotional Sponge:** Going home exhausted from carrying everyone's feelings.", "**Passive Resistance:** Saying 'Yes' to be nice, then not doing the task."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (Assertiveness):** Practice stating their own needs ('I need X').", "**Phase 2 (The Bad Cop):** Role-play being the enforcer; realize they are still liked.", "**Phase 3 (Facilitating Conflict):** Move from stopping fights to refereeing productive arguments."],
-        "s10": "Celebrate their safety record. Fewer restraints and fights occur on their watch due to their de-escalation skills."
+        "s9_b": ["**Phase 1 (Assertiveness):** Objective: Self-advocacy. Action: Practice stating your own needs. 'I need [X].'", "**Phase 2 (The Bad Cop):** Objective: Boundary setting. Action: Role-play being the enforcer. Realize that people still like you even when you say no.", "**Phase 3 (Facilitating Conflict):** Objective: Mediation. Action: Move from *stopping* the fight to *refereeing* the fight. Help people argue productively."],
+        "s10": "Celebrate their safety record. Fewer restraints and fights occur on their watch due to their de-escalation skills.",
+        "s10_b": ["**Calm:** Celebrating their ability to de-escalate tension.", "**Bridge-Building:** Acknowledging how they resolved a conflict between staff.", "**Care:** Praising the genuine support they provide to the team."]
     },
     "Tracker-Achievement": {
         "title": "THE ARCHITECT (Tracker x Achievement)",
@@ -536,8 +548,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Rigid Efficiency",
         "s8_b": ["**Rigidity:** Panicking when the plan changes; prioritizing forms over people.", "**Valuing Process over People:** Treating staff like widgets.", "**Inability to Pivot:** Sunk cost fallacy in their own systems."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (Human Variables):** Accept that humans are messy variables.", "**Phase 2 (User Experience):** Design forms for the user, not just the data.", "**Phase 3 (Systems Thinking):** Fix agency workflows, not just unit ones."],
-        "s10": "Celebrate their efficiency. They solve the *real* problems, not just the symptoms."
+        "s9_b": ["**Phase 1 (Human Variables):** Objective: Flexibility. Action: Accept that humans are messy variables. You cannot spreadsheet feelings.", "**Phase 2 (User Experience):** Objective: Empathy. Action: Ask 'How does this form *feel* to the person filling it out?' Design for the user, not just the data.", "**Phase 3 (Systems Thinking):** Objective: Scale. Action: Move from fixing the unit to fixing the agency workflow."],
+        "s10": "Celebrate their efficiency. They solve the *real* problems, not just the symptoms.",
+        "s10_b": ["**Optimization:** Celebrating a process they improved.", "**Reliability:** Acknowledging their flawless execution of a complex task.", "**Data:** Praising how they used data to make a smart decision."]
     },
     "Tracker-Growth": {
         "title": "THE TECHNICAL EXPERT (Tracker x Growth)",
@@ -554,8 +567,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Micromanagement",
         "s8_b": ["**Micromanagement:** Believing there is only one 'Right Way' (theirs).", "**Frustration with 'Sloppy' Work:** Becoming critical of less detailed staff.", "**Missing the Human Element:** Evaluating technique while ignoring tone/affect."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (Delegation):** Let someone else do it 80% as well.", "**Phase 2 (Soft Skills):** Study empathy as a 'technical skill' to be mastered.", "**Phase 3 (Knowledge Management):** Build the resource library/wiki."],
-        "s10": "Celebrate their quality control. They keep the agency from falling behind industry standards."
+        "s9_b": ["**Phase 1 (Delegation):** Objective: Trust. Action: Let someone else do it, even if they do it 80% as well as you.", "**Phase 2 (Soft Skills):** Objective: Emotional Intelligence. Action: Study leadership and empathy as 'technical skills' to be mastered.", "**Phase 3 (Knowledge Management):** Objective: Legacy. Action: Build the wiki. Create the resource library so your brain exists outside your head."],
+        "s10": "Celebrate their quality control. They keep the agency from falling behind industry standards.",
+        "s10_b": ["**Expertise:** Celebrating their deep knowledge of a specific subject.", "**Teaching:** Acknowledging how well they trained others.", "**Quality:** Praising the high standard of their work."]
     },
     "Tracker-Purpose": {
         "title": "THE GUARDIAN (Tracker x Purpose)",
@@ -572,8 +586,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Bureaucratic Blinders",
         "s8_b": ["**Bureaucracy:** Stifling connection with paperwork due to risk aversion.", "**Rules as Absolute:** Struggling to make therapeutic exceptions.", "**Conflict with Flexible Thinkers:** Clashing with 'Encourager' types."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (The 'Why'):** Explain *why* the rule exists when enforcing it.", "**Phase 2 (Risk Tolerance):** Differentiate between 'Red Risks' (Safety) and 'Yellow Risks' (Procedural).", "**Phase 3 (Policy Architect):** Rewrite rules to be easier to follow."],
-        "s10": "Celebrate their protection. They prevent the tragedies that end agencies."
+        "s9_b": ["**Phase 1 (The 'Why'):** Objective: Communication. Action: Practice explaining *why* the rule exists every time you enforce it.", "**Phase 2 (Risk Tolerance):** Objective: Prioritization. Action: Differentiate between 'Red Risks' (Life safety) and 'Yellow Risks' (Procedural error). Don't treat a typo like a fire.", "**Phase 3 (Policy Architect):** Objective: System design. Action: Help rewrite the rules so they are easier to follow. Good policy makes compliance easy."],
+        "s10": "Celebrate their protection. They prevent the tragedies that end agencies.",
+        "s10_b": ["**Safety:** Celebrating how they caught a risk before it became an issue.", "**Diligence:** Acknowledging their tireless effort to keep things compliant.", "**Care:** Praising how they use structure to protect the team."]
     },
     "Tracker-Connection": {
         "title": "THE RELIABLE ROCK (Tracker x Connection)",
@@ -590,8 +605,9 @@ SUPERVISOR_GUIDE_DB = {
         "s8": "Silent Stress",
         "s8_b": ["**Inflexibility:** Getting grumpy when the routine breaks.", "**Appearing Cold:** Cleaning the kitchen while someone is crying.", "**Struggle with Expression:** Difficulty verbally praising/comforting."],
         "s9": "Strategic Roadmap",
-        "s9_b": ["**Phase 1 (Verbalizing Care):** Say 'I did this *because* I care.'", "**Phase 2 (Delegation):** Allow others to help; stop being sustainable alone.", "**Phase 3 (Operational Leadership):** Teach the team the value of order."],
-        "s10": "Celebrate their reliability. They create the stability that allows relationships to flourish."
+        "s9_b": ["**Phase 1 (Verbalizing Care):** Objective: Emotional expression. Action: Practice saying 'I did this *because* I care about you.' Connect the dot for them.", "**Phase 2 (Delegation):** Objective: Sustainability. Action: Allow others to help you. Doing everything yourself isn't sustainable.", "**Phase 3 (Operational Leadership):** Objective: Systems. Action: Teach the team the value of order. Create systems that run without you."],
+        "s10": "Celebrate their reliability. They create the stability that allows relationships to flourish.",
+        "s10_b": ["**Consistency:** Celebrating their unwavering reliability.", "**Service:** Acknowledging the behind-the-scenes work they do to support the team.", "**Order:** Praising the calm and organized environment they maintain."]
     }
 }
 
@@ -624,7 +640,7 @@ def generate_profile_content(comm, motiv):
         "s9": profile.get("s9", "Interventions"),
         "s9_b": profile.get("s9_b", []),
         "s10": profile.get("s10", ""),
-        "s10_b": [],
+        "s10_b": profile.get("s10_b", []),
         "coaching": questions
     }
 
@@ -675,7 +691,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     add_section(f"7. Thriving: {data['s7']}", "", data['s7_b'])
     add_section(f"8. Struggling: {data['s8']}", "", data['s8_b'])
     add_section(f"9. Supervisory Interventions: {data['s9']}", "", data['s9_b'])
-    add_section("10. What You Should Celebrate", data['s10'], data['s10_b'])
+    add_section(f"10. What You Should Celebrate", data['s10'], data['s10_b'])
 
     return pdf.output(dest='S').encode('latin-1')
 
@@ -732,7 +748,7 @@ st.markdown("""
 nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
 
 with nav_col1:
-    if st.button("📝 Guide Generator\n\nCreate 12-point coaching manuals.", use_container_width=True): set_view("Guide Generator")
+    if st.button("📝 Supervisor's Guide\n\nCreate 12-point coaching manuals.", use_container_width=True): set_view("Supervisor's Guide")
 with nav_col2:
     if st.button("🧬 Team DNA\n\nAnalyze unit culture & blindspots.", use_container_width=True): set_view("Team DNA")
 with nav_col3:
@@ -746,8 +762,8 @@ st.markdown("---")
 # --- VIEW CONTROLLER ---
 
 # 1. GUIDE GENERATOR
-if st.session_state.current_view == "Guide Generator":
-    st.subheader("📝 Guide Generator")
+if st.session_state.current_view == "Supervisor's Guide":
+    st.subheader("📝 Supervisor's Guide")
     sub1, sub2 = st.tabs(["Database", "Manual"])
     with sub1:
         if not df.empty:
