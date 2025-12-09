@@ -14,13 +14,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- NAVIGATION HELPER ---
-if "current_view" not in st.session_state:
-    st.session_state.current_view = "Guide Generator"
-
-def set_view(view_name):
-    st.session_state.current_view = view_name
-
 # --- 2. CONSTANTS ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
 
@@ -239,69 +232,61 @@ with st.sidebar:
         st.rerun()
 
 # ==========================================
-# EXPANDED CONTENT DICTIONARIES
+# EXPANDED CONTENT DICTIONARIES (3-4 Sentences per bullet)
 # ==========================================
 
 FULL_COMM_PROFILES = {
     "Director": {
         "description": "This staff member communicates primarily as a **Director**. They lead with clarity, structure, and urgency.\n\nThey often strip away emotional context to get straight to the facts, prioritizing the 'bottom line' over the backstory. While this efficiency is a major asset, they can sometimes appear blunt or dismissive of feelings, which may alienate more sensitive team members.",
         "desc_bullets": [
-            "**Clarity:** They prioritize headlines over paragraphs to ensure immediate understanding.",
-            "**Speed:** They process information rapidly and expect others to keep up.",
-            "**Conflict:** They view conflict as a tool for problem-solving, not a relationship breaker."
+            "**Clarity:** They prioritize headlines over paragraphs to ensure immediate understanding. Supervisors should not mistake their brevity for rudeness; they are simply trying to be efficient. When communicating with them, start with the conclusion first, then fill in details if asked.",
+            "**Speed:** They process information rapidly and expect others to keep up, preferring a quick 80% solution over a delayed 100% solution. They are likely to interrupt if they feel a conversation is dragging or becoming repetitive. Supervisors should be prepared to move quickly through agenda items.",
+            "**Conflict:** They view conflict as a tool for problem-solving rather than a relationship breaker. They do not take disagreement personally and respect those who push back with logic. They are comfortable addressing issues head-on and may perceive hesitation in others as weakness."
         ],
-        "supervising": "To supervise a Director effectively, match their directness. Do not 'sandwich' feedback with small talk; give it to them straight. They respect competence and time management above all else.\n\nFocus on outcomes rather than micromanaging the process. Give them a goal and the autonomy to achieve it, and trust them to come to you if they hit a roadblock.",
-        "supervising_bullets": [
-            "**Be Concise:** Get to the point immediately; they value their time and yours.",
-            "**Focus on Outcomes:** Tell them *what* needs to be achieved, but leave the *how* to them.",
-            "**Respect Autonomy:** Give them space to operate independently; tight oversight feels like distrust."
-        ],
-        "questions": ["Where are you moving too fast for the team?", "Who haven't you heard from on this issue?", "How does your tone land when you are stressed?"]
+        "supervising": [
+            "**Be Concise:** Get to the point immediately; avoid 'sandwiching' feedback with small talk. They value their time and yours, and they respect supervisors who treat time as a resource. If you have five minutes of content, do not stretch it to thirty.",
+            "**Focus on Outcomes:** Tell them *what* needs to be achieved, but leave the *how* to them. Focusing on the end result empowers them to find the most efficient path. Over-explaining the process will make them feel micromanaged and stifled.",
+            "**Respect Autonomy:** Give them space to operate independently; tight oversight feels like distrust to a Director. Check in at agreed-upon milestones rather than hovering constantly. Trust that they will come to you if they hit a roadblock they cannot remove themselves."
+        ]
     },
     "Encourager": {
         "description": "This staff member communicates primarily as an **Encourager**. They lead with empathy, warmth, and emotional presence.\n\nThey act as the 'glue' of the team, ensuring everyone feels seen and included. They process information verbally and socially, often thinking out loud to find clarity. They are naturally optimistic and focus on potential.",
         "desc_bullets": [
-            "**Verbal Processing:** They think out loud and need dialogue to process ideas.",
-            "**Optimism:** They focus on potential and bring hope to difficult situations.",
-            "**Relationship-First:** They influence people through connection and charisma."
+            "**Verbal Processing:** They think out loud and prefer talking through problems rather than reading about them. They are articulate and inspiring, often needing to hear their own voice to know what they think. They explore ideas through conversation.",
+            "**Optimism:** They naturally focus on the potential and the positive. They sell the vision effectively but may gloss over the gritty details. They see the glass as overflowing and bring a sense of possibility to the team.",
+            "**Relationship-First:** They influence people through liking and charisma. They prioritize the 'vibe' of the interaction and want you to like them before they want you to understand them. They build bridges before they try to cross them."
         ],
-        "supervising": "Start every interaction with connection before content. If you jump straight to business, they may feel you are cold or angry. Validate their positive intent before correcting the impact of their behavior.\n\nBe specific with feedback, as they can sometimes speak in generalities. Ensure you follow up verbally agreed-upon tasks with written documentation, as they may focus more on the feeling of the meeting than the details.",
-        "supervising_bullets": [
-            "**Allow Discussion:** Give space to connect before diving into business.",
-            "**Ask for Specifics:** Drill down to facts when they speak in broad strokes.",
-            "**Follow Up in Writing:** Document everything important to ensure alignment."
-        ],
-        "questions": ["Are you avoiding the hard truth to be nice?", "Is your silence creating confusion?", "What boundaries do you need to set to protect your energy?"]
+        "supervising": [
+            "**Allow Discussion:** Give them a few minutes to chat and connect; cutting them off too early kills their morale. They need the relational runway to take off. Small talk is an investment in their productivity.",
+            "**Ask for Specifics:** They speak in generalities ('It's going great!'). Ask 'What specifically is going great?' to get the data. You must drill down to find the reality beneath the enthusiasm. Force them to define their terms.",
+            "**Follow Up in Writing:** They may agree enthusiastically in the moment but forget the details. Always send a recap email to create a paper trail. Their memory is often tied to the emotion of the moment, not the facts."
+        ]
     },
     "Facilitator": {
         "description": "This staff member communicates primarily as a **Facilitator**. They lead by listening, building consensus, and ensuring fairness across the board.\n\nThey are the 'calm bridge' who de-escalates tension and ensures all voices are heard before a decision is made. They value the process of decision-making as much as the outcome itself, ensuring that no one is left behind.",
         "desc_bullets": [
-            "**Listening:** They gather all perspectives before forming a judgment.",
-            "**Consensus:** They prefer group agreement and dislike polarization.",
-            "**Process:** They value fairness and want a just process for everyone."
+            "**Listening:** They gather all perspectives before speaking, ensuring that the quietest voices in the room are heard. They are excellent at synthesizing disparate points of view into a cohesive summary. They rarely interrupt and often wait until the end to speak.",
+            "**Consensus:** They prefer group agreement and are uncomfortable with unilateral decision-making. They will work tirelessly to find a solution that everyone can live with. They view a split vote as a failure of process.",
+            "**Process:** They value *how* a decision is made as much as the decision itself. They believe that a fair process yields the best results. They are wary of rushing to judgment without following the proper steps."
         ],
-        "supervising": "Give them time to process. Do not demand immediate decisions on complex issues if possible. They need to weigh the options and consider the impact on the team.\n\nSet clear deadlines to prevent 'analysis paralysis.' Encourage them to speak first in meetings to ensure their valuable insights aren't drowned out by louder voices.",
-        "supervising_bullets": [
-            "**Advance Notice:** Give them time to think before demanding a response.",
-            "**Deadlines:** Set clear 'decision dates' to prevent endless deliberation.",
-            "**Solicit Opinion:** Ask them explicitly for their view, as they may not fight for airtime."
-        ],
-        "questions": ["Where do you need to make a 51% decision?", "Are you waiting for consensus that isn't coming?", "How does your silence impact the team?"]
+        "supervising": [
+            "**Advance Notice:** Give them time to think before demanding a answer. They process internally and need time to weigh the ethical implications of a decision. Putting them on the spot often yields a tentative or incomplete answer.",
+            "**Deadlines:** Set clear 'decision dates' to prevent them from deliberating forever. Without a deadline, they may search for the 'perfect' solution indefinitely. You must provide the container for their processing.",
+            "**Solicit Opinion:** Ask them explicitly what they think, as they often will not volunteer it if the room is loud. Create space for them to speak without fighting for airtime. Their insights are often profound but require an invitation."
+        ]
     },
     "Tracker": {
         "description": "This staff member communicates primarily as a **Tracker**. They lead with details, accuracy, and safety.\n\nThey find comfort in rules and consistency, protecting the agency and youth by noticing the small risks that others miss. They value precision and are risk-averse, preferring to verify facts before speaking or acting.",
         "desc_bullets": [
-            "**Detail-Oriented:** They value accuracy and speak in specifics.",
-            "**Risk-Averse:** They are cautious and verify facts before acting.",
-            "**Process-Driven:** They trust the handbook and follow protocol."
+            "**Detail-Oriented:** They communicate in spreadsheets, data, and precise details. They value accuracy above all else and will correct you if you are wrong. They want to be right, not just understood.",
+            "**Risk-Averse:** They are cautious in their speech, avoiding definitive statements until they are 100% sure. They will often say 'let me check on that' rather than guessing. They view guessing as lying or irresponsibility.",
+            "**Process-Driven:** They talk about *how* we do things, not just what we do. They are the guardians of the handbook and the policy. They believe the rules exist to save us from chaos."
         ],
-        "supervising": "Provide clear, written expectations. Do not be vague. Honor their need for 'the plan' and specific metrics. When plans change, explain the 'why' clearly so they don't feel the change is arbitrary or unsafe.\n\nUse logic and data to persuade them, not emotional appeals. They respect competence and consistency above charisma.",
-        "supervising_bullets": [
-            "**Be Specific:** Use metrics and data when giving feedback.",
-            "**Provide Data:** Use logic over emotion to persuade them.",
-            "**Written Instructions:** Document everything important in writing."
-        ],
-        "questions": ["Are you focusing on the system or the person?", "What is 'good enough' for today?", "How can you support the person, not just the process?"]
+        "supervising": [
+            "**Be Specific:** Do not use vague language like 'do it better.' Give them the metric: 'Increase accuracy by 10%.' They cannot hit a target they cannot see. Use numbers, not feelings.",
+            "**Provide Data:** If you want to persuade them, bring the numbers and the facts. Emotional appeals will bounce off them. They respect logic, evidence, and precedent.",
+            "**Written Instructions:** Follow up every verbal conversation with an email. They trust the written word more than the spoken word. It provides a paper trail they crave for security."
+        ]
     }
 }
 
@@ -309,86 +294,74 @@ FULL_MOTIV_PROFILES = {
     "Achievement": {
         "description": "Their primary motivator is **Achievement**. They thrive when they can see progress, check boxes, and win.\n\nThey hate stagnation and ambiguity. They want to know they are doing a good job based on objective evidence, not just feelings. They are driven by the scoreboard and the satisfaction of completion.",
         "desc_bullets": [
-            "**Scoreboard:** They need to know if they are winning or losing.",
-            "**Completion:** They get energy from finishing tasks and closing loops.",
-            "**Efficiency:** They hate wasted time and redundancy."
+            "**Scoreboard:** They need to know if they are winning or losing at any given moment. Ambiguity is their enemy; they need quantifiable metrics to judge their own performance. Without a clear definition of success, they may become anxious.",
+            "**Completion:** They derive energy from finishing tasks and closing loops. An endless list of open-ended projects drains them; they need the dopamine hit of marking a task 'done.' Ensure they have a mix of short-term wins alongside long-term goals.",
+            "**Efficiency:** They hate wasted time and redundancy more than almost anything else. If a meeting has no clear purpose, they will resent attending. They are motivated by streamlining processes and removing bottlenecks."
         ],
-        "strategies": "Set clear, measurable goals. Use visual trackers or dashboards. Celebrate 'wins' explicitly and publicly. Give them projects where they can own the result from start to finish.\n\nEnsure they have a way to track their own progress. They will work incredibly hard if they can see the finish line.",
-        "strategies_bullets": [
-            "**Visual Goals:** Use charts or checklists they can physically mark off.",
-            "**Public Wins:** Acknowledge their success in front of peers.",
-            "**Autonomy:** Give them the goal and let them design the strategy."
+        "motivating": [
+            "**Visual Goals:** Use charts, dashboards, or checklists they can physically mark off. Seeing their progress visually reinforces their sense of forward momentum. Set up a system where they can self-monitor their data without needing to ask you.",
+            "**Public Wins:** Acknowledge their success in front of peers, highlighting competence and results. They value respect for their capability more than praise for their personality. Be specific about what they achieved, using data whenever possible.",
+            "**Autonomy:** Give them the goal and let them design the strategy. This appeals to their desire for control and efficiency. When they succeed using their own methods, their buy-in to the organization deepens significantly."
         ],
-        "celebrate": "Celebrate concrete outcomes, finished projects, improved metrics, and their reliability in getting things done. They want to be recognized for their competence and output.",
-        "celebrate_bullets": [
-            "**Outcomes:** 'You hit 100% on documentation.'",
-            "**Reliability:** 'I know I can count on you to finish this.'",
-            "**Speed:** 'You got this done faster than anyone else.'"
-        ],
-        "questions": ["How are you defining success today beyond just metrics?", "What is one win you can celebrate right now?", "Are you driving the team too hard?"]
+        "celebrate": [
+            "**Efficiency:** Celebrate specific instances where they solved a complex logistical puzzle quickly and correctly. Point out exactly how their reorganization saved the team time or effort to validate their instinct.",
+            "**Clarity:** Celebrate their ability to draw a hard line or make a tough call in ambiguous situations where others were wavering. When others were confused, point out that they provided a clear direction.",
+            "**Resilience:** Celebrate their ability to bounce back immediately and focus on solutions after a crisis or failure. While others might dwell on the failure, praise them for looking for the fix."
+        ]
     },
     "Growth": {
         "description": "Their primary motivator is **Growth**. They thrive when they are learning, stretching, and mastering new skills.\n\nThey hate feeling stuck or bored. They view their role as a stepping stone to greater competence and are constantly looking for the next challenge. They value feedback as a tool for improvement.",
         "desc_bullets": [
-            "**Curiosity:** They are driven to understand the 'why' and 'how'.",
-            "**Future-Focused:** They are thinking about their next career step.",
-            "**Feedback:** They crave constructive correction over empty praise."
+            "**Curiosity:** They are driven to understand the 'why' and 'how' behind every rule. They will not accept 'because we've always done it this way' as an answer. This curiosity is an asset for innovation but can feel like insubordination to insecure leaders.",
+            "**Future-Focused:** They view their current role primarily as a stepping stone to the next challenge. They need to see a clear trajectory for their career or they will look elsewhere. They are constantly scanning the horizon for what is next.",
+            "**Feedback:** They crave constructive correction over empty praise. Telling them 'good job' is less effective than telling them 'here is how you could do that 10% better.' They view criticism as free consulting for their personal brand."
         ],
-        "strategies": "Feed their curiosity. Assign them 'stretch' projects that require new skills. Frame feedback as 'coaching' for their future career. Connect mundane tasks to their long-term professional development.\n\n regularly discuss their career path and facilitate mentorship opportunities with leaders they admire.",
-        "strategies_bullets": [
-            "**Stretch Assignments:** Give them tasks slightly above their current skill level.",
-            "**Career Pathing:** Regularly discuss their professional future.",
-            "**Mentorship:** Connect them with leaders they admire."
+        "motivating": [
+            "**Stretch Assignments:** Assign tasks slightly above their current skill level. They are bored by mastery; they need to feel the tension of potential failure to stay engaged. Give them problems that no one else has solved yet.",
+            "**Career Pathing:** Discuss their professional future regularly, not just at annual reviews. Map out exactly how their current work contributes to their 5-year plan. Be honest about what skills they lack for the next level.",
+            "**Mentorship:** Connect them with leaders they admire inside or outside the organization. They learn through observation and proximity to power/intellect. Facilitate introductions to senior leadership as a reward for performance."
         ],
-        "celebrate": "Celebrate new skills learned, adaptability, taking on new challenges, and their personal development trajectory. Validate their intellect and insight.",
-        "celebrate_bullets": [
-            "**Insight:** Celebrate specific moments where they identified a root cause others missed.",
-            "**Development:** A staff member who visibly improved under their guidance.",
-            "**Courage:** Their willingness to try a new approach, even if it failed."
-        ],
-        "questions": ["What are you learning from this struggle?", "Are you expecting too much too soon from others?", "How are you feeding your own curiosity?"]
+        "celebrate": [
+            "**Insight:** Celebrate specific moments where they identified a root cause others missed. Acknowledge the depth of their analysis. Show them that their ability to see beneath the surface is valued.",
+            "**Development:** Celebrate a staff member who visibly improved under their guidance. Point out the specific coaching intervention they used that worked. Reinforce that their greatest legacy is the people they build up.",
+            "**Courage:** Celebrate their willingness to try a new approach, even if it failed. Reward the attempt at innovation to keep them taking risks. Make sure they know that safe failure is part of the growth process."
+        ]
     },
     "Purpose": {
         "description": "Their primary motivator is **Purpose**. They thrive when they feel their work aligns with deep values and makes a real difference for kids.\n\nThey hate bureaucracy that feels meaningless or performative. They will endure difficult conditions if they believe the 'Why' is noble, but they will rebel against policies that feel unjust.",
         "desc_bullets": [
-            "**Values-Driven:** Decisions must align with their moral compass.",
-            "**Advocacy:** They are wired to fight for the underdog.",
-            "**Meaning:** They need the 'why' connected to client well-being."
+            "**Values-Driven:** They filter every decision through the lens of 'Is this right?' They are less concerned with 'Is this profitable?' or 'Is this efficient?' If a directive violates their internal code, they will resist it, often openly and fiercely.",
+            "**Advocacy:** They are wired to fight for the underdog. They naturally align themselves with the most vulnerable person in the room (the client, the new staff member). They see themselves as the shield against a cold system.",
+            "**Meaning:** They need the 'why' connected to client well-being. They cannot work for a paycheck alone; they must believe their work matters. If they lose connection to the mission, they burn out instantly."
         ],
-        "strategies": "Connect every rule to a 'Why.' Validate their passion for justice and advocacy. Share specific stories of their impact on youth. When assigning tasks, explain how this helps the youth or the mission.\n\nAllow space for them to voice moral concerns without penalty. Even if you can't change the decision, listening builds trust.",
-        "strategies_bullets": [
-            "**The Why:** Always explain the mission behind the mandate.",
-            "**Storytelling:** Share stories of life-change and impact.",
-            "**Ethics:** Allow space for them to voice moral concerns."
+        "motivating": [
+            "**The Why:** Explain the mission behind every mandate. Never say 'because I said so' or 'because it's policy.' Connect the rule directly to how it keeps a child safe or helps a family heal. If they understand the noble purpose, they will endure any hardship.",
+            "**Storytelling:** Share narratives of redemption and impact. They are fueled by stories of success against the odds. Remind them of the specific lives they have touched. Use qualitative data to show them their impact.",
+            "**Ethics:** Allow space to voice moral concerns. Do not shut down their ethical questions; validate them. Even if you cannot change the decision, acknowledging their moral struggle builds trust. They need to know their leader has a soul."
         ],
-        "celebrate": "Celebrate their advocacy for youth, their integrity, ethical decision making, and specific 'mission moments' where they changed a life. Validate their heart.",
-        "celebrate_bullets": [
-            "**Integrity:** Celebrate moments where they made a hard ethical choice.",
-            "**Advocacy:** Celebrate when they gave a voice to the voiceless.",
-            "**Consistency:** Celebrate their unwavering commitment to care."
-        ],
-        "questions": ["Where do you feel the system is failing your values?", "How can you advocate without burning bridges?", "Is this a hill worth dying on?"]
+        "celebrate": [
+            "**Integrity:** Celebrate moments where they made a hard choice because it was the right thing to do. Acknowledge the courage it took to prioritize values over convenience. Reinforce that their character is their greatest asset.",
+            "**Advocacy:** Celebrate when they gave a voice to the voiceless. Recognize specific times they stood up for a client or a staff member who couldn't stand up for themselves. Validate that their protective instinct is seen and appreciated.",
+            "**Consistency:** Celebrate their unwavering commitment to care. Point out that they are the standard-bearer for the agency's mission. Thank them for keeping the team honest."
+        ]
     },
     "Connection": {
         "description": "Their primary motivator is **Connection**. They thrive when they feel part of a tight-knit team and have a sense of belonging.\n\nThey hate isolation and unresolved conflict. For them, the 'who' is more important than the 'what.' If the team is fractured, their performance will suffer.",
         "desc_bullets": [
-            "**Belonging:** They view the team as family.",
-            "**Harmony:** They are sensitive to tension and avoid conflict.",
-            "**Support:** They are motivated by helping their peers."
+            "**Belonging:** They view the team as a family. Their primary goal is to ensure everyone feels they belong. They are the first to welcome new hires and the last to leave a party. They define success by the tightness of the circle.",
+            "**Harmony:** They are sensitive to tension and will absorb it to protect others. A fight on the unit ruins their entire day. They want everyone to get along, but unlike the Peacemaker, they will fight to *impose* peace if necessary.",
+            "**Support:** They are motivated by helping peers. They will stay late to help a coworker even if their own work is done. They see service to the team as their primary job description. They are loyal to the people, not just the policy."
         ],
-        "strategies": "Prioritize face time. Check in on them as a person, not just an employee. Build team rituals (food, shout-outs). Ensure they don't work in a silo.\n\nWhen giving feedback, reassure them of their belonging in the team. They need to know the relationship is safe even when the work needs correction.",
-        "strategies_bullets": [
-            "**Face Time:** Prioritize in-person check-ins.",
-            "**Team Rituals:** Encourage meals and team bonding.",
-            "**Personal Care:** Ask about their life outside work."
+        "motivating": [
+            "**Face Time:** Prioritize in-person check-ins. They value the relationship with you more than the tasks you assign. A text message is okay, but a face-to-face conversation is gold. They need to see your eyes to trust you.",
+            "**Team Rituals:** Encourage meals, huddles, and traditions. Give them the space to create culture. They thrive when the team has a shared identity and shared experiences.",
+            "**Personal Care:** Ask about life outside work. They bring their whole self to work and expect you to care about it. Knowing their kids' names or their hobbies matters deeply to them."
         ],
-        "celebrate": "Celebrate team cohesion, their support of peers, morale building, and their role in conflict resolution. Validate their invisible labor of culture building.",
-        "celebrate_bullets": [
-            "**Loyalty:** Celebrate their standing up for the team.",
-            "**Stabilization:** Celebrate their presence calming a room.",
-            "**Culture:** Celebrate the strong identity they build."
-        ],
-        "questions": ["Are you avoiding this conversation to be kind, or to be safe?", "How is the team reacting to your directness?", "Who do you need to check in with today?"]
+        "celebrate": [
+            "**Loyalty:** Celebrate their standing up for the team. Acknowledge that their protective instinct makes people feel safe. Validate their role as the team's immune system.",
+            "**Stabilization:** Celebrate their physical presence calming a room. Point out specifically how their confidence lowered the temperature of a crisis. Reinforce that their strength is a therapeutic tool.",
+            "**Culture:** Celebrate the strong identity of the unit. Praise the low turnover or the high morale. Make sure they know you see the community they have built."
+        ]
     }
 }
 
@@ -401,7 +374,8 @@ INTEGRATED_PROFILES = {
         "struggling": ["**The Steamroller Effect:** They announce decisions without checking if the team is emotionally ready. This can alienate staff who feel unheard or bulldozed.", "**Burnout by Intensity:** They assume everyone has their stamina and push until the team breaks. They struggle to understand why others can't just 'power through.'", "**Dismissing 'Soft' Data:** They ignore 'bad feelings' or intuition because there is no proof. This leads to missing early warning signs of cultural toxicity."],
         "interventions": ["**Phase 1: The Pause Button (0-6 Months):** Force a delay between thought and action. Require them to ask three questions of their team before issuing a command.", "**Phase 2: Narrative Leadership (6-12 Months):** Coach them to script the 'Why' behind their directives. They need to learn that explaining logic is not a waste of time, but an investment.", "**Phase 3: Multiplier Effect (12-18 Months):** Identify two deputies and train the supervisor to sit on their hands while the deputies lead. This shifts their focus from 'doing' to 'developing'."],
         "questions": ["How are you defining success today beyond just metrics?", "What is one win you can celebrate right now?", "Are you driving the team too hard?", "What is the cost of speed right now?", "Where are you moving too fast for the team?", "Who haven't you heard from on this issue?", "How does your tone land when you are stressed?", "Are you celebrating the small wins?", "Who helped you win this week?", "What is 'good enough' for right now?"],
-        "advancement": ["**Delegate Effectively:** Give away tasks they are good at to prove they can build a team. They must learn that their value comes from their team's output, not just their own.", "**Allow Safe Failure:** Let the team struggle so they can learn, rather than rescuing them. Rescuing robs the team of the learning opportunity.", "**Focus on Strategy:** Move from the 'how' (tactics) to the 'why' (organizational strategy). Advancement requires thinking about the next year, not just the next shift."]
+        "advancement": ["**Delegate Effectively:** Give away tasks they are good at to prove they can build a team. They must learn that their value comes from their team's output, not just their own.", "**Allow Safe Failure:** Let the team struggle so they can learn, rather than rescuing them. Rescuing robs the team of the learning opportunity.", "**Focus on Strategy:** Move from the 'how' (tactics) to the 'why' (organizational strategy). Advancement requires thinking about the next year, not just the next shift."],
+        "celebrate": ["**Efficiency:** Celebrate specific instances where they solved a complex logistical puzzle quickly and correctly.", "**Clarity:** Celebrate their ability to draw a hard line or make a tough call in ambiguous situations.", "**Resilience:** Celebrate their ability to bounce back immediately and focus on solutions after a crisis or failure."]
     },
     "Director-Growth": {
         "title": "THE RESTLESS IMPROVER",
@@ -411,7 +385,8 @@ INTEGRATED_PROFILES = {
         "struggling": ["**The Pace Mismatch:** They get visibly frustrated with slow learners or bureaucracy. This impatience can leak out as arrogance or disdain.", "**'Fix-It' Fatigue:** They are constantly pointing out flaws and forgetting to validate what is working. The team may feel that nothing is ever good enough for them.", "**Leaving People Behind:** They focus on the *idea* of change rather than the *adoption* of change. They implement new systems without getting buy-in, leading to failure."],
         "interventions": ["**Phase 1: Validation (0-6 Months):** Mandate that they validate the current effort before suggesting improvements. They must catch people doing things right to build trust.", "**Phase 2: Change Management (6-12 Months):** Require a 'stakeholder analysis' for their next idea (who will resist and why?). This forces them to consider the human element of change.", "**Phase 3: Capacity Building (12-18 Months):** Shift them from being the idea generator to the facilitator of *others'* ideas. Challenge them to help a peer implement a change project."],
         "questions": ["Where are you moving too fast for the team?", "Who haven't you heard from on this issue?", "How does your tone land when you are stressed?", "What are you learning from this struggle?", "Are you expecting too much too soon from others?", "How are you feeding your own curiosity?", "What is one way you can slow down for others?", "How are you measuring your own growth beyond just speed?", "Are you leaving the team behind?", "Is this change necessary right now?"],
-        "advancement": ["**Delegate Effectively:** Stop being the 'fixer,' become the 'developer.' They must learn to guide others to the answer rather than providing it.", "**Allow Safe Failure:** Resist the urge to jump in and correct every mistake. They need to learn that struggle is a necessary part of the learning process.", "**Focus on Strategy:** Design tomorrow's solutions rather than solving today's problems. Shift their gaze from 'immediate fix' to 'systemic prevention.'"]
+        "advancement": ["**Delegate Effectively:** Stop being the 'fixer,' become the 'developer.' They must learn to guide others to the answer rather than providing it.", "**Allow Safe Failure:** Resist the urge to jump in and correct every mistake. They need to learn that struggle is a necessary part of the learning process.", "**Focus on Strategy:** Design tomorrow's solutions rather than solving today's problems. Shift their gaze from 'immediate fix' to 'systemic prevention.'"],
+        "celebrate": ["**Insight:** Celebrate specific moments where they identified a root cause others missed.", "**Development:** Celebrate a staff member who visibly improved under their guidance.", "**Courage:** Celebrate their willingness to try a new approach, even if it failed."]
     },
     "Director-Purpose": {
         "title": "THE MISSION DEFENDER",
@@ -421,7 +396,8 @@ INTEGRATED_PROFILES = {
         "struggling": ["**Righteous Rigidity:** They struggle to see the gray areas, viewing everything as black and white. This can make them inflexible and difficult to negotiate with.", "**The Martyr Complex:** They overwork because they don't trust others to care enough. They believe that if they stop, the clients will suffer.", "**Judgmental Tone:** They come across as 'preachy' or morally superior. They may unintentionally shame staff who are just trying to get through the day."],
         "interventions": ["**Phase 1: The Gray Zone (0-6 Months):** Practice identifying validity in opposing viewpoints. Require them to argue the 'other side' of an ethical debate to build cognitive flexibility.", "**Phase 2: Sustainable Advocacy (6-12 Months):** Coach them to use a 'Tier System' for battles (Tier 1: Fight, Tier 2: Debate, Tier 3: Let go).", "**Phase 3: Cultural Architecture (12-18 Months):** Move from fighting battles to building systems that prevent injustice. Challenge them to write the policy rather than just complaining."],
         "questions": ["Where do you feel the system is failing your values?", "How can you advocate without burning bridges?", "Is this a hill worth dying on?", "How does flexibility serve the mission here?", "What do you need right now?", "Where are you stuck?", "How can I help?", "What is the goal?", "Where are you moving too fast for the team?", "How does your tone land when you are stressed?"],
-        "advancement": ["**Delegate Effectively:** Build a team that protects children. They must learn that they can multiply their impact by teaching others to care.", "**Allow Safe Failure:** Trust that others also care. They need to learn that a mistake by a staff member doesn't mean that staff member is 'bad.'", "**Focus on Strategy:** Build systems that prevent injustice. They need to move from reacting to individual crises to preventing them through policy and culture."]
+        "advancement": ["**Delegate Effectively:** Build a team that protects children. They must learn that they can multiply their impact by teaching others to care.", "**Allow Safe Failure:** Trust that others also care. They need to learn that a mistake by a staff member doesn't mean that staff member is 'bad.'", "**Focus on Strategy:** Build systems that prevent injustice. They need to move from reacting to individual crises to preventing them through policy and culture."],
+        "celebrate": ["**Integrity:** Celebrate moments where they made a hard choice because it was the right thing to do.", "**Advocacy:** Celebrate when they gave a voice to the voiceless.", "**Consistency:** Celebrate their unwavering commitment to care."]
     },
     "Director-Connection": {
         "title": "THE PROTECTIVE CAPTAIN",
@@ -431,7 +407,8 @@ INTEGRATED_PROFILES = {
         "struggling": ["**Us vs. Them:** They become hostile toward outsiders (admin, other units). They circle the wagons and view any critique of their team as an attack.", "**Over-Functioning:** They do everyone's job to protect them. They burn themselves out trying to carry the load for 'weaker' team members.", "**Taking Conflict Personally:** They conflate professional disagreement with personal betrayal. If you correct them, they feel unloved."],
         "interventions": ["**Phase 1: Delegation of Care (0-6 Months):** Stop being the only fixer; assign care tasks to others. Require them to let someone else handle a crisis.", "**Phase 2: Organizational Citizenship (6-12 Months):** Expand the circle of loyalty to the whole agency. Challenge them to partner with another unit or department.", "**Phase 3: Mentorship (12-18 Months):** Transition from Captain to Admiral (teaching others to build loyalty). Task them with training a new supervisor on how to build culture."],
         "questions": ["Are you avoiding this conversation to be kind, or to be safe?", "How can you be direct and caring at the same time?", "Are you protecting them from growth?", "How is the team reacting to your directness?", "What do you need right now?", "Where are you stuck?", "How can I help?", "What is the goal?", "Where are you moving too fast for the team?", "Who do you need to check in with today?"],
-        "advancement": ["**Delegate Effectively:** Stop being 'camp parent.' They must prove they can manage managers, not just staff. This means letting go of the daily emotional caretaking.", "**Allow Safe Failure:** Learn the team is resilient. They need to see that the team won't break if they step back. This builds their confidence in the system.", "**Focus on Strategy:** Expand loyalty to the whole agency. They need to advocate for the organization, not just their unit. This is the shift to executive thinking."]
+        "advancement": ["**Delegate Effectively:** Stop being 'camp parent.' They must prove they can manage managers, not just staff. This means letting go of the daily emotional caretaking.", "**Allow Safe Failure:** Learn the team is resilient. They need to see that the team won't break if they step back. This builds their confidence in the system.", "**Focus on Strategy:** Expand loyalty to the whole agency. They need to advocate for the organization, not just their unit. This is the shift to executive thinking."],
+        "celebrate": ["**Loyalty:** Celebrate their standing up for the team.", "**Stabilization:** Celebrate their physical presence calming a room.", "**Culture:** Celebrate the strong identity of the unit."]
     },
     "Encourager-Achievement": {
         "title": "THE COACH",
@@ -441,17 +418,19 @@ INTEGRATED_PROFILES = {
         "struggling": ["**Overselling:** They promise things they can't deliver to get buy-in. This leads to disappointment and loss of trust later.", "**Disorganization:** They are moving so fast and talking so much they lose paperwork or forget details. They leave a wake of administrative chaos.", "**Impatience:** They get frustrated when the team doesn't share their burning desire to win immediately. They can't understand low energy."],
         "interventions": ["**Phase 1: Follow-Through (0-6 Months):** Focus on finishing. Require them to complete one project fully before starting the next exciting one.", "**Phase 2: Data Discipline (6-12 Months):** Move from 'feeling' to 'fact.' Require them to bring data to supervision, not just stories. 'Show me, don't just tell me.'", "**Phase 3: Grooming Talent (12-18 Months):** Challenge them to let others shine. The 'Coach' needs to get off the field and let the players score."],
         "questions": ["How do we keep this energy up when things get boring?", "What are the specific steps to get to that vision?", "Who is doing the work: you or the team?", "How will you track this?", "What is the one thing we must finish this week?", "Who needs the spotlight more than you right now?", "Are you listening or just waiting to speak?", "What happens if we miss this goal?", "How are you celebrating the team's grind, not just the win?", "Is your enthusiasm masking a problem?"],
-        "advancement": ["**Detail Management:** They must prove they can handle the boring stuff (admin, budgets). If they can't do the paperwork, they can't run the department.", "**Listening:** They need to learn to sit back and let others speak. They must prove they can intake information, not just output it.", "**Consistency:** Prove they can maintain performance when the excitement fades. They need to show they can grind."]
+        "advancement": ["**Detail Management:** They must prove they can handle the boring stuff (admin, budgets). If they can't do the paperwork, they can't run the department.", "**Listening:** They need to learn to sit back and let others speak. They must prove they can intake information, not just output it.", "**Consistency:** Prove they can maintain performance when the excitement fades. They need to show they can grind."],
+        "celebrate": ["**Energy:** Celebrate the way they lit up the room during a dark time.", "**Wins:** Celebrate specific targets hit.", "**Persuasion:** Celebrate how they convinced a resistant staff member to get on board."]
     },
     "Encourager-Growth": {
         "title": "THE MENTOR",
         "lead": "The synergy here is **Developmental Charisma**. They see the gold in people and talk it out of them. They make people feel smarter and more capable just by being around them. They lead by selling the team on their own potential.",
         "support": ["**Structure:** They have a million ideas; provide the structure to execute one. You are the trellis for their vine. Help them focus their creative energy.", "**Patience:** Remind them that growth is messy and non-linear. They can get discouraged when people slide back. Be the steady hand."],
         "thriving": ["**Talent Magnet:** People want to work for them because they feel grown and seen. They attract high-potential staff. They build a deep bench.", "**Culture of Learning:** Mistakes are celebrated as learning opportunities, reducing fear in the unit. They create a safe laboratory for growth.", "**Innovation:** They are constantly bringing in new ideas from books, podcasts, or other units. They keep the agency fresh."],
-        "struggling": ["**Shiny Object Syndrome:** They chase a new initiative every week, confusing the team. The staff gets whiplash from the constant pivots.", "**Avoidance of Hard Conversations:** They want to inspire, not correct. They struggle to give negative feedback that might 'hurt' the relationship.", "**All Talk:** They talk a great game about development but lack the follow-through to document it. Great visions, poor execution."],
+        "struggling": ["**Shiny Object Syndrome:** They chase a new initiative every week, confusing the team. The staff gets whiplash from the constant pivots.", "**Avoidance of Hard Conversations:** They want to inspire, not correct. They struggle to give negative feedback that might 'hurt' the relationship. They sugarcoat the poison.", "**All Talk:** They talk a great game about development but lack the follow-through to document it. Great visions, poor execution."],
         "interventions": ["**Phase 1: Closing the Loop (0-6 Months):** Force them to finish what they start. No new ideas until the last one is implemented. Make them live with their creations.", "**Phase 2: Difficult Feedback (6-12 Months):** Role-play giving 'hard' feedback. Teach them that clarity is kind. They must learn to break the news without breaking the bond.", "**Phase 3: Systems of Growth (12-18 Months):** Turn their informal mentoring into a formal training manual. Capture their genius in a document."],
         "questions": ["Who are you investing in, and who are you ignoring?", "How do we turn this idea into a habit?", "Are you avoiding the hard truth to be nice?", "What is the one skill the team needs right now?", "How are you measuring that improvement?", "Are you talking more than they are?", "What did you finish this week?", "Is this practical, or just interesting?", "How does this help the client today?", "What are you reading/learning?"],
-        "advancement": ["**Execution:** Prove they can implement, not just ideate. They need to show they can land the plane, not just fly it.", "**Toughness:** Prove they can make the hard personnel calls. They need to show they can fire someone if necessary.", "**Focus:** Prove they can stick to a boring plan for the long haul. They need to show they can survive the mundane."]
+        "advancement": ["**Execution:** Prove they can implement, not just ideate. They need to show they can land the plane, not just fly it.", "**Toughness:** Prove they can make the hard personnel calls. They need to show they can fire someone if necessary.", "**Focus:** Prove they can stick to a boring plan for the long haul. They need to show they can survive the mundane."],
+        "celebrate": ["**Development:** Celebrate specific staff members who have promoted or improved under them.", "**Ideas:** Acknowledge their creative solutions.", "**Vulnerability:** Celebrate when they admit they don't know something."]
     },
     "Encourager-Purpose": {
         "title": "THE HEART OF THE MISSION",
@@ -461,7 +440,8 @@ INTEGRATED_PROFILES = {
         "struggling": ["**Emotional Flooding:** They get so wrapped up in the 'story' they lose objectivity. They might cry in meetings or get irrationally angry at perceived slights.", "**Us vs. The System:** They can whip the team into a frenzy against 'cold' administration. They become the ringleader of the rebellion.", "**Burnout:** They give everything and have nothing left. They crash hard and often abruptly because they have no reserves."],
         "interventions": ["**Phase 1: Boundaries (0-6 Months):** Teach them to leave work at work. 'The badge stays at the door.' Create specific rituals for disconnecting.", "**Phase 2: Fact-Checking (6-12 Months):** When they tell a passionate story, ask 'Is that true, or is that how it felt?' Force them to separate emotion from data.", "**Phase 3: Channeling Passion (12-18 Months):** Give them a platform (e.g., orientation training) where their passion is an asset, not a distraction."],
         "questions": ["Is this feeling a fact?", "How can you care without carrying?", "Are you whipping the team up or calming them down?", "What is the most ethical choice, even if it feels bad?", "Who is supporting you?", "Is this your battle to fight?", "How does the policy actually help the child?", "Are you listening to the logic, or just the tone?", "What do you need to let go of today?", "How can we use your voice for good?"],
-        "advancement": ["**Objectivity:** Prove they can make dispassionate decisions. They need to show they can look at a spreadsheet without crying.", "**Policy:** Understand the legal/fiscal reasons behind rules. They need to learn the language of administration and risk management.", "**Resilience:** Bounce back without drama. They need to show they can take a hit and keep moving without needing constant reassurance."]
+        "advancement": ["**Objectivity:** Prove they can make dispassionate decisions. They need to show they can look at a spreadsheet without crying.", "**Policy:** Understand the legal/fiscal reasons behind rules. They need to learn the language of administration and risk management.", "**Resilience:** Bounce back without drama. They need to show they can take a hit and keep moving without needing constant reassurance."],
+        "celebrate": ["**Passion:** Celebrate their genuine love for the clients.", "**Advocacy:** Celebrate how they fought for a specific outcome.", "**Atmosphere:** Celebrate the warmth they bring to the unit."]
     },
     "Encourager-Connection": {
         "title": "THE TEAM BUILDER",
@@ -471,7 +451,8 @@ INTEGRATED_PROFILES = {
         "struggling": ["**The Country Club:** Too much socializing, not enough work. The unit becomes a hangout spot where standards slip. Productivity drops.", "**Gossip:** Their need to be 'in the know' and close to everyone can spiral into drama. They trade secrets for connection. They become the center of the rumor mill.", "**Favoritism:** They struggle to lead people they don't personally like. They create an 'in-crowd' and an 'out-crowd.' They alienate the outliers."],
         "interventions": ["**Phase 1: Professionalism (0-6 Months):** Define the line between 'friend' and 'colleague' explicitly. They often blur these lines.", "**Phase 2: Inclusive Leadership (6-12 Months):** Challenge them to connect with the staff member they like the least. Break up their clique.", "**Phase 3: Task Focus (12-18 Months):** Assign them a project that requires solitude or deep focus to build that muscle. Teach independence."],
         "questions": ["Are we having fun, or are we working?", "Who is on the outside of the circle?", "Are you avoiding the conflict to keep the peace?", "How can you deliver that news directly?", "Are you gossiping or venting?", "Can you be friendly without being their best friend?", "How does the work get done if we talk all day?", "What is the cost of not holding them accountable?", "Who needs to hear from you today?", "How are you protecting your own energy?"],
-        "advancement": ["**Separation:** Prove they can lead without needing to be liked. They need to be respected first, liked second. This is the hardest hurdle.", "**Confidentiality:** Prove they can keep secrets. They need to show they aren't a sieve for information.", "**Productivity:** Prove they can drive results, not just vibes. They need to show they can hit the numbers and hold others to them."]
+        "advancement": ["**Separation:** Prove they can lead without needing to be liked. They need to be respected first, liked second. This is the hardest hurdle.", "**Confidentiality:** Prove they can keep secrets. They need to show they aren't a sieve for information.", "**Productivity:** Prove they can drive results, not just vibes. They need to show they can hit the numbers and hold others to them."],
+        "celebrate": ["**Retention:** 'People stay because of the culture you built.'", "**Inclusion:** Celebrate pulling a new hire into the circle.", "**Fun:** Celebrate bringing levity to a hard week."]
     },
     "Facilitator-Achievement": {
         "title": "THE STEADY MOVER",
@@ -481,7 +462,8 @@ INTEGRATED_PROFILES = {
         "struggling": ["**Analysis Paralysis:** They freeze at the intersection of speed and agreement. They want to achieve the goal but want everyone to agree on how.", "**Frustration with Chaos:** They hate last-minute changes that disrupt the plan they worked hard to create. They can be rigid when the plan changes.", "**Silent Resentment:** They work hard and resent those who don't, but won't say it aloud to avoid conflict. They steam internally."],
         "interventions": ["**Phase 1: Speaking Up (0-6 Months):** Call on them first in meetings to break the habit of waiting. Force them to voice their messy thoughts.", "**Phase 2: Imperfect Action (6-12 Months):** Assign a task with an impossible deadline to force a 'good enough' decision. Make them move before they are ready.", "**Phase 3: Direct Delegation (12-18 Months):** Challenge them to assign tasks without asking for volunteers. They must learn to command, not just coordinate."],
         "questions": ["What is the 'good enough' decision right now?", "Are you waiting for everyone to agree?", "How can we move forward even if it's messy?", "Who is holding up the project?", "What have you achieved this week?", "Is the process helping or hurting the goal?", "How can you say 'no' to protect the timeline?", "Who needs to be cut out of the decision loop?", "Are you doing the work to avoid asking others?", "What is the next step?"],
-        "advancement": ["**Speed:** Make faster decisions with less data. They need to prove they can move at the speed of the crisis.", "**Conflict:** Call out underperformance directly. They need to show they can have the hard talk without crumbling.", "**Vision:** Look beyond the checklist to the strategy. They need to lift their eyes to the horizon and see what's coming."]
+        "advancement": ["**Speed:** Make faster decisions with less data. They need to prove they can move at the speed of the crisis.", "**Conflict:** Call out underperformance directly. They need to show they can have the hard talk without crumbling.", "**Vision:** Look beyond the checklist to the strategy. They need to lift their eyes to the horizon and see what's coming."],
+        "celebrate": ["**Completion:** Celebrate finishing the big project.", "**Fairness:** Celebrate ensuring the workload was shared.", "**Consistency:** Celebrate the lack of drama in their results."]
     },
     "Facilitator-Growth": {
         "title": "THE PATIENT GARDENER",
@@ -491,7 +473,8 @@ INTEGRATED_PROFILES = {
         "struggling": ["**Tolerance of Mediocrity:** They give people too many chances in the name of 'growth.' They enable bad behavior by refusing to set hard limits.", "**Slow to Launch:** They study the problem forever without fixing it. They get stuck in diagnosis and analysis paralysis.", "**Fear of Judgment:** They struggle to evaluate people because they know how hard growth is. They don't want to play judge or executioner."],
         "interventions": ["**Phase 1: Timelines (0-6 Months):** Put a date on development goals. 'They have 3 months to improve.' Create a kill switch for their patience.", "**Phase 2: Judgment (6-12 Months):** Practice evaluating performance objectively based on data. 'Is this good or bad?' Force them to use binary labels.", "**Phase 3: Pruning (12-18 Months):** They must terminate or discipline a staff member to learn that protection isn't always love. They must experience the necessity of the cut."],
         "questions": ["How long is too long to wait for improvement?", "Is this person actually growing, or are we just hoping?", "What is the cost to the team of keeping this person?", "Are you learning, or just stalling?", "What is the lesson here?", "How can you speed up this process?", "Who are you neglecting by focusing on the struggler?", "What does 'accountability' look like to you?", "Are you afraid to judge?", "What is the next step today?"],
-        "advancement": ["**Decisiveness:** Act on the data, not just the hope. They must show they can call the game based on facts. They need to be firm when necessary.", "**Speed:** Move faster than feels comfortable. They must match the market's pace and urgency. They need to accelerate their decision-making.", "**Standards:** Hold the line on quality without apology. They must show they have a floor for performance. They need to demand excellence."]
+        "advancement": ["**Decisiveness:** Act on the data, not just the hope. They must show they can call the game based on facts. They need to be firm when necessary.", "**Speed:** Move faster than feels comfortable. They must match the market's pace and urgency. They need to accelerate their decision-making.", "**Standards:** Hold the line on quality without apology. They must show they have a floor for performance. They need to demand excellence."],
+        "celebrate": ["**Patience:** Staying calm when everyone else gave up on a kid.", "**Insight:** Their deep understanding of a complex situation.", "**Growth:** The long-term success of their people."]
     },
     "Facilitator-Purpose": {
         "title": "THE MORAL COMPASS",
@@ -501,7 +484,8 @@ INTEGRATED_PROFILES = {
         "struggling": ["**Moral Paralysis:** They refuse to make a decision because no option is perfectly ethical. They freeze in the face of ambiguity.", "**Passive Resistance:** Instead of arguing openly, they simply don't do the things they disagree with. They silently rebel against policies they dislike.", "**Judgment:** They may silently judge others who are more pragmatic or business-minded. They can become self-righteous and isolated."],
         "interventions": ["**Phase 1: The '51% Decision' (0-6 Months):** Teach them that in leadership, you often have to move with only 51% certainty. Require them to make calls even when uncomfortable.", "**Phase 2: Voice Training (6-12 Months):** Challenge them to speak their dissent in the meeting, not after. They need to learn to be a 'vocal conscience.'", "**Phase 3: Operational Ethics (12-18 Months):** Task them with creating a system or policy that institutionalizes their values. Move them from complaining to building."],
         "questions": ["What moral tension are you holding right now?", "How can you speak up for your values effectively?", "Are you staying neutral when you should take a stand?", "How does your silence impact the team?", "What do you need right now?", "Where are you stuck?", "How can I help?", "What is the goal?", "Where do you need to make a 51% decision?", "Are you waiting for consensus that isn't coming?"],
-        "advancement": ["**Decisiveness:** They must prove they can make hard calls when it is necessary, even if it hurts feelings.", "**Public Speaking:** They need to get comfortable projecting their voice and values to a larger audience. They need to lead out loud.", "**Pragmatism:** They need to demonstrate they understand the business realities alongside the ethical ones. They need balance."]
+        "advancement": ["**Decisiveness:** They must prove they can make hard calls when it is necessary, even if it hurts feelings.", "**Public Speaking:** They need to get comfortable projecting their voice and values to a larger audience. They need to lead out loud.", "**Pragmatism:** They need to demonstrate they understand the business realities alongside the ethical ones. They need balance."],
+        "celebrate": ["**Integrity:** Celebrate moments where they made a hard choice because it was the right thing to do.", "**Mediation:** Praise them when they successfully help two conflicting parties find common ground.", "**Advocacy:** Recognize when they spoke up for a client or staff member who needed help."]
     },
     "Facilitator-Connection": {
         "title": "THE PEACEMAKER",
@@ -511,17 +495,19 @@ INTEGRATED_PROFILES = {
         "struggling": ["**The Doormat:** They let staff walk all over them to avoid a fight. They lose respect and authority. They become a pushover.", "**Exhaustion:** They carry everyone's emotional baggage and trauma. They develop compassion fatigue from over-caring.", "**Triangulation:** Instead of addressing an issue directly, they complain to others to vent. They create side conversations to avoid the main conflict."],
         "interventions": ["**Phase 1: Direct Address (0-6 Months):** Require them to have one direct, hard conversation per week. Inspect the result. Build calluses on their empathy.", "**Phase 2: Disappointing Others (6-12 Months):** Challenge them to make a decision they know will be unpopular. Support them through the backlash.", "**Phase 3: Self-Protection (12-18 Months):** Teach them to set boundaries on their time and empathy. They must learn to say 'no' to protect their own health."],
         "questions": ["What boundaries do you need to set to protect your energy?", "Are you listening too much and leading too little?", "Who is taking care of you?", "Is your silence creating confusion?", "What do you need right now?", "Where are you stuck?", "How can I help?", "What is the goal?", "Where do you need to make a 51% decision?", "Are you waiting for consensus that isn't coming?"],
-        "advancement": ["**Conflict:** Prove they can handle a fight without crumbling. They need to show toughness and the ability to hold a line.", "**Separation:** Prove they can lead friends and former peers. They need to show authority and professional distance.", "**Results:** Prove they value outcomes as much as feelings. They need to show performance metrics, not just morale scores."]
+        "advancement": ["**Conflict:** Prove they can handle a fight without crumbling. They need to show toughness and the ability to hold a line.", "**Separation:** Prove they can lead friends and former peers. They need to show authority and professional distance.", "**Results:** Prove they value outcomes as much as feelings. They need to show performance metrics, not just morale scores."],
+        "celebrate": ["**Harmony:** Celebrate the peace on the unit.", "**Support:** Celebrate the way they care for the team.", "**Inclusion:** Celebrate how they welcome outsiders."]
     },
     "Tracker-Achievement": {
         "title": "THE ARCHITECT",
         "lead": "The synergy here is **Systematic Perfection**. They build the systems that allow the team to succeed. They are the engineers of the unit. They ensure that nothing falls through the cracks and that every procedure is followed to the letter.",
         "support": ["**Clarity:** Be hyper-clear about expectations. Ambiguity is torture for them.", "**Time:** Give them the time to do it right. Respect their need for precision."],
         "thriving": ["**Flawless Execution:** Their paperwork is perfect. Their audits are 100% compliant. You never have to check their work twice.", "**System Builder:** They create new trackers or logs that save everyone time. They build infrastructure.", "**Reliability:** If they say it is done, it is done right. They are a safe pair of hands."],
-        "struggling": ["**Rigidity:** They refuse to bend rules even when it makes sense. They become the 'bureaucrat'.", "**Micromanagement:** They hover to ensure it is done 'perfectly'. They can't let go.", "**Critique:** They constantly point out errors. They become the 'compliance police'."],
+        "struggling": ["**Rigidity:** They refuse to bend rules even when it makes sense. They become the 'bureaucrat'.", "**Micromanagement:** They hover to ensure it is done 'perfectly'. They can't let go.", "**Critique:** They constantly point out errors. They become the 'compliance police,' alienating their peers."],
         "interventions": ["**Phase 1: Flexibility (0-6 Months):** Challenge them to identify one rule that can be bent for the greater good. Force them to operate in the gray.", "**Phase 2: People over Process (6-12 Months):** Require them to mentor a disorganized staff member without doing the work for them. They must learn to tolerate imperfection.", "**Phase 3: Big Picture (12-18 Months):** Ask them to explain *why* the system exists, not just *how* it works. Move them from the weeds to the sky."],
         "questions": ["How can you measure effort, not just outcome?", "Are you valuing the data more than the person?", "Where is flexibility needed right now?", "How can you support the person, not just the process?", "What do you need right now?", "Where are you stuck?", "How can I help?", "What is the goal?", "Are you focusing on the rule or the relationship?", "What is 'good enough' for right now?"],
-        "advancement": ["**Flexibility:** Prove they can handle chaos without breaking. They need to show adaptability when the plan fails.", "**Delegation:** Prove they can trust others to do the work, even imperfectly. They need to let go of the control to scale.", "**Warmth:** Prove they can connect with people, not just papers. They need to build relationships to influence the team."]
+        "advancement": ["**Flexibility:** Prove they can handle chaos without breaking. They need to show adaptability when the plan fails.", "**Delegation:** Prove they can trust others to do the work, even imperfectly. They need to let go of the control to scale.", "**Warmth:** Prove they can connect with people, not just papers. They need to build relationships to influence the team."],
+        "celebrate": ["**Accuracy:** Celebrate the zero-error report.", "**Systems:** Celebrate the new workflow they designed.", "**Reliability:** Celebrate that you never worry about their tasks."]
     },
     "Tracker-Growth": {
         "title": "THE TECHNICAL EXPERT",
@@ -531,7 +517,8 @@ INTEGRATED_PROFILES = {
         "struggling": ["**Arrogance:** They weaponize knowledge to dominate. They value IQ over EQ.", "**Over-Complication:** They design systems too complex for users. They create barriers.", "**Disengagement:** If they stop learning, they check out. They need stimulation."],
         "interventions": ["**Phase 1: Simplification (0-6 Months):** Challenge them to explain a complex idea to a layperson without using jargon. You are teaching communication.", "**Phase 2: Emotional Intelligence (6-12 Months):** Require them to mentor someone based on their *potential*, not their current knowledge. Focus on the relationship.", "**Phase 3: Strategic Vision (12-18 Months):** Ask them to solve a problem where there is no 'right' answer, only trade-offs. You are teaching executive judgment."],
         "questions": ["Are you focusing on the system or the person?", "What is 'good enough' for today?", "Are you correcting or coaching?", "How can you make it safe to make mistakes?", "What do you need right now?", "Where are you stuck?", "How can I help?", "What is the goal?", "Are you focusing on the rule or the relationship?", "What is 'good enough' for right now?"],
-        "advancement": ["**Communication:** Prove they can speak simply and clearly. They need to translate the technical to the practical for leadership.", "**Empathy:** Prove they can care about people who aren't experts. They need to show patience with learners and strugglers.", "**Strategy:** Prove they can think about the 'why,' not just the 'how.' They need to see the business case and the mission impact."]
+        "advancement": ["**Communication:** Prove they can speak simply and clearly. They need to translate the technical to the practical for leadership.", "**Empathy:** Prove they can care about people who aren't experts. They need to show patience with learners and strugglers.", "**Strategy:** Prove they can think about the 'why,' not just the 'how.' They need to see the business case and the mission impact."],
+        "celebrate": ["**Knowledge:** Celebrate when they knew the answer no one else did.", "**Innovation:** Celebrate the new tool they built.", "**Teaching:** Celebrate when they helped a peer understand."]
     },
     "Tracker-Purpose": {
         "title": "THE GUARDIAN",
@@ -539,19 +526,21 @@ INTEGRATED_PROFILES = {
         "support": ["**Explanation:** Explain the 'why' behind policy changes. Give them the rationale.", "**Validation:** Validate their fears. Honor their watchfulness as a skill."],
         "thriving": ["**Safety Net:** They catch errors that would cause liability. They save the agency's life.", "**Moral Consistency:** They ensure we do what we say. They keep us honest.", "**Reliability:** They are a vault for secrets and safety. They are dependable."],
         "struggling": ["**Bureaucracy:** They use rules to block action. They get stuck in red tape.", "**Fear-Mongering:** They predict disaster. They spread anxiety.", "**Judgment:** They view errors as moral failings. They judge harshly."],
-        "interventions": ["**Phase 1: Risk Assessment (0-6 Months):** Rate risks 1-10. Teach perspective.", "**Phase 2: The 'Why' of Flexibility (6-12 Months):** Show where breaking a rule saved a kid. Teach judgment.", "**Phase 3: Solution Focus (12-18 Months):** Don't bring problems without solutions. Teach leadership."],
+        "interventions": ["**Phase 1: Risk Assessment (0-6 Months):** When they flag a risk, ask them to rate it 1-10. Teach them that not all risks are fatal.", "**Phase 2: The 'Why' of Flexibility (6-12 Months):** Show where breaking a rule saved a kid. Teach judgment.", "**Phase 3: Solution Focus (12-18 Months):** Don't bring problems without solutions. Teach leadership."],
         "questions": ["How can you protect the mission without being rigid?", "Are you using rules to manage your anxiety?", "Is this rule serving the child right now?", "How can you explain the 'why' behind the rule?", "What do you need right now?", "Where are you stuck?", "How can I help?", "What is the goal?", "Are you focusing on the rule or the relationship?", "What is 'good enough' for right now?"],
-        "advancement": ["**Risk Tolerance:** Take a calculated risk. Learn that growth requires risk.", "**Flexibility:** Adapt to change without panic. Bend without breaking.", "**Vision:** See the forest, not just the trees. Rise above daily compliance."]
+        "advancement": ["**Risk Tolerance:** Prove they can take a calculated risk. They need to show courage to act when the outcome isn't guaranteed.", "**Flexibility:** Prove they can adapt to change without panic. They need to show agility in a shifting landscape.", "**Vision:** Prove they can see the forest, not just the trees. They need to see the big picture and the long-term goal."],
+        "celebrate": ["**Safety:** Celebrate the audit they passed.", "**Integrity:** Celebrate their adherence to standards.", "**Care:** Celebrate how their details served the client."]
     },
     "Tracker-Connection": {
         "title": "THE RELIABLE ROCK",
         "lead": "The synergy here is **Servant Consistency**. They show their love for the team by doing the work perfectly. They are the backbone of the unit. They don't want the spotlight; they just want to be useful and safe within the group.",
         "support": ["**Notice the Details:** Validate the invisible labor that keeps the office running.", "**Change Management:** Hold their hand through change. Be their anchor."],
         "thriving": ["**Steady Presence:** They are always there and prepared. They provide stability.", "**Helper:** They support the lead without ego. They make everyone look good.", "**Culture Keeper:** They maintain traditions and history. They nurture the bond."],
-        "struggling": ["**Overwhelmed:** They say 'yes' to everything and drown. They suffer in silence.", "**Passive Aggressive:** They withdraw if unappreciated. They resent lack of thanks.", "**Resistance to Change:** They love the rut because it is safe. They block innovation."],
+        "struggling": ["**Overwhelmed:** They say 'yes' to everything and drown. They suffer in silence.", "**Passive Aggressive:** If they feel unappreciated, they will slow down or withdraw. They punish you with silence and minimum effort.", "**Resistance to Change:** They love the rut because it is safe. They block innovation."],
         "interventions": ["**Phase 1: Saying No (0-6 Months):** Practice saying 'no'. Teach self-respect.", "**Phase 2: Vocalizing Needs (6-12 Months):** Ask for what they need. Teach assertiveness.", "**Phase 3: Leading Change (12-18 Months):** Help a new person adapt. Teach mentorship."],
         "questions": ["How can you show care in a way they understand?", "Are you doing too much for others?", "Do they know you care?", "Where do you need help carrying the load?", "What do you need right now?", "Where are you stuck?", "How can I help?", "What is the goal?", "Are you focusing on the rule or the relationship?", "What is 'good enough' for right now?"],
-        "advancement": ["**Voice:** Speak up in meetings. Learn to advocate verbally.", "**Boundaries:** Stop over-functioning. Protect your time.", "**Flexibility:** Handle a new way of doing things. Navigate change."]
+        "advancement": ["**Voice:** Prove they can speak up in a meeting. They need to be heard to lead.", "**Boundaries:** Prove they can stop over-functioning. They need to sustain themselves to lead others.", "**Flexibility:** Prove they can handle a new way of doing things. They need to adapt to grow."],
+        "celebrate": ["**Consistency:** Celebrate their perfect attendance or reliability.", "**Service:** Celebrate the task they did for the team.", "**Loyalty:** Celebrate their commitment to the group."]
     }
 }
 
@@ -569,13 +558,13 @@ def generate_profile_content(comm, motiv):
     # 3. Construct Data Packet
     return {
         "s1": comm_data.get("description", ""),
-        "s1_b": comm_data.get("bullets", []),
+        "s1_b": comm_data.get("desc_bullets", []),
         "s2": "To supervise this staff member effectively, you must match their communication style while guiding them toward the team's goals.",
-        "s2_b": comm_data.get("supervising", []),
+        "s2_b": comm_data.get("supervising_bullets", []),
         "s3": mot_data.get("description", ""),
-        "s3_b": mot_data.get("bullets", []),
+        "s3_b": mot_data.get("desc_bullets", []),
         "s4": "Use these strategies to keep them engaged and productive.",
-        "s4_b": mot_data.get("motivating", []),
+        "s4_b": mot_data.get("strategies_bullets", []),
         "s5": int_data.get("lead", ""),
         "s6": "Support them by honoring their unique combination of traits.",
         "s6_b": int_data.get("support", []),
@@ -583,7 +572,7 @@ def generate_profile_content(comm, motiv):
         "s8": int_data.get("struggling", []),
         "s9": int_data.get("interventions", []),
         "s10": int_data.get("title", ""), # Using title for section header context if needed
-        "s10_b": mot_data.get("celebrate", []),
+        "s10_b": int_data.get("celebrate", []),
         "coaching": int_data.get("questions", []),
         "advancement": int_data.get("advancement", [])
     }
