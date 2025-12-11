@@ -9,7 +9,7 @@ from email.mime.multipart import MIMEMultipart
 import streamlit.components.v1 as components  # Required for scrolling
 
 # --- 1. CONFIGURATION ---
-st.set_page_config(page_title="Elmcrest Compass", page_icon="🧭", layout="centered", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Elmcrest Leadership Compass", page_icon="🧭", layout="centered", initial_sidebar_state="collapsed")
 
 # --- 2. CSS STYLING (Modern Glassmorphism) ---
 st.markdown("""
@@ -890,7 +890,7 @@ def send_email_via_smtp(to_email, subject, body):
         return False
 
 def generate_text_report(user_info, results, comm_prof, mot_prof, int_prof, role_key, role_labels):
-    lines = [f"ELMCREST COMPASS PROFILE FOR {user_info['name'].upper()}", "="*40, ""]
+    lines = [f"Elmcrest Leadership Compass PROFILE FOR {user_info['name'].upper()}", "="*40, ""]
     
     # Comm
     lines.append(f"COMMUNICATION STYLE: {comm_prof['name']}")
@@ -943,7 +943,7 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
     # Header
     pdf.set_font("Arial", 'B', 20)
     pdf.set_text_color(*blue)
-    pdf.cell(0, 10, "Elmcrest Compass Profile", ln=True, align='C')
+    pdf.cell(0, 10, "Elmcrest Leadership Compass Profile", ln=True, align='C')
     
     pdf.set_font("Arial", '', 12)
     pdf.set_text_color(*black)
@@ -1047,7 +1047,7 @@ def show_brand_header(subtitle):
     with col2:
         st.markdown(f"""
         <div style="display: flex; flex-direction: column; justify-content: center; height: 60px;">
-            <div style="color: #015bad; font-weight: 800; font-size: 1.6rem; letter-spacing: -0.03em;">ELMCREST COMPASS</div>
+            <div style="color: #015bad; font-weight: 800; font-size: 1.6rem; letter-spacing: -0.03em;">Elmcrest Leadership Compass</div>
             <div style="color: #64748b; font-size: 0.95rem; font-weight: 500;">{subtitle}</div>
         </div>
         """, unsafe_allow_html=True)
@@ -1283,7 +1283,7 @@ elif st.session_state.step == 'results':
         if st.button("📧 Email Me Full Report"):
             full_text = generate_text_report(user, res, comm_prof, mot_prof, int_prof, role_key, role_labels)
             with st.spinner("Sending..."):
-                if send_email_via_smtp(user['email'], "Your Elmcrest Compass Profile", full_text):
+                if send_email_via_smtp(user['email'], "Your Elmcrest Leadership Compass Profile", full_text):
                     st.success("Sent!")
 
     st.markdown("---")
