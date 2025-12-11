@@ -899,201 +899,149 @@ MOTIVATION_GAP_GUIDE = {
 }
 
 SUPERVISOR_CLASH_MATRIX = {
-    # --- SAME STYLE CONFLICTS (NEW) ---
     "Director": {
         "Director": {
             "tension": "Power Struggle (Control vs. Control)",
-            "psychology": "When two Directors clash, it's a battle for dominance. Both value speed, autonomy, and being 'right.' The conflict usually isn't personal; it's structural. You both want to drive the car, and neither wants to be the passenger. This leads to stepping on toes, power plays, and a chaotic environment where the team doesn't know who to follow.",
-            "watch_fors": [
-                "**The Public Showdown:** Arguing in front of the team to establish who is 'Alpha'.",
-                "**Malicious Compliance:** 'Fine, I'll do it your way, but I'll watch it fail.'",
-                "**Siloing:** Dividing the team into 'My Crew' vs. 'Your Crew'."
-            ],
-            "intervention_steps": [
-                "**1. Define Swim Lanes (Why: You need autonomy):** Explicitly divide the turf. 'You own the schedule; I own the audit.' Do not cross lines without permission.",
-                "**2. The 'Disagree and Commit' Pact (Why: Speed matters):** Agree that once a decision is made, you back each other 100% in public, even if you argued in private.",
-                "**3. Scheduled Friction (Why: You need a vent):** Set a weekly 'Fight Club' meeting where you are allowed to debate strategy fiercely behind closed doors, so you don't do it on the floor."
-            ],
+            "psychology": "When two Directors clash, it's a battle for dominance. Both value speed, autonomy, and being 'right.' The conflict usually isn't personal; it's structural.",
+            "watch_fors": ["**The Public Showdown:** Arguing in front of the team to establish who is 'Alpha'.", "**Malicious Compliance:** 'Fine, I'll do it your way, but I'll watch it fail.'", "**Siloing:** Dividing the team into 'My Crew' vs. 'Your Crew'."],
+            "intervention_steps": ["**1. Define Swim Lanes:** Explicitly divide the turf.", "**2. The 'Disagree and Commit' Pact:** Agree to back each other in public.", "**3. Scheduled Friction:** Set a weekly meeting to debate strategy behind closed doors."],
             "scripts": {
-                "Opening": "We are both strong leaders, which is great, but right now we are canceling each other out.",
-                "Validation": "I respect your drive and your ability to get things done. I know you want the best for this program.",
-                "The Pivot": "However, when we battle for control in front of the team, we create confusion. We need to stop competing and start coordinating.",
-                "Crisis": "We don't have time for a power struggle. You take the East Wing, I'll take the West Wing. Go.",
-                "Feedback": "I need you to trust me to handle my lane. When you double-check my work, it feels like you don't trust my competence."
+                "Opening": "We are both strong leaders, but right now we are canceling each other out.",
+                "Validation": "I respect your drive. I know you want the best for this program.",
+                "The Pivot": "When we battle for control, we create confusion. We need to stop competing and start coordinating.",
+                "Crisis": "We don't have time for a power struggle. Go.",
+                "Feedback": "I need you to trust me to handle my lane."
             }
         },
         "Encourager": {
             "tension": "Efficiency vs. Empathy (Safety as Control vs. Safety as Connection)",
-            "psychology": "This is the classic 'Oil and Water' dynamic. You (Director) find safety in speed, competence, and checking boxes. You view 'feelings' as variables that slow down the mission. \n\nThe Encourager finds safety in connection and harmony. When you push for speed or deliver blunt feedback, they don't just hear 'work instructions'—they feel an existential threat to the group's safety. They retreat because they feel steamrolled; you push harder because you think they are incompetent.",
-            "watch_fors": [
-                "**The 'Shut Down':** If they go silent, they aren't agreeing with you. They are protecting themselves from your intensity.",
-                "**The 'Smile & Nod':** They may agree to a deadline they know they can't meet just to end the uncomfortable interaction.",
-                "**Venting:** They will likely process their hurt feelings with peers, creating a 'shadow culture' you aren't part of."
-            ],
-            "intervention_steps": [
-                "**1. Disarm the Threat (Why: They are in fight/flight):** Lower your volume and physical pace. Sit down. Do not start with the task; start with the person. 'How are you feeling about the shift today?'",
-                "**2. Translate the Intent (Why: They think you are angry):** Explicitly state that your intensity is about the *problem*, not them. 'I am frustrated with the schedule, not with you. I value you.'",
-                "**3. The 'Sandwich' Reframe (Why: They need safety to hear truth):** You hate feedback sandwiches, but they need them. Affirm the relationship, give the correction, affirm the future. It is not 'fluff'; it is the toll you pay to get on the bridge."
-            ],
+            "psychology": "You (Director) find safety in speed and checking boxes. They (Encourager) find safety in connection and harmony. You view 'feelings' as distractions; they view them as the work. They feel steamrolled by your brevity; you feel slowed down by their need to chat.",
+            "watch_fors": ["**The 'Shut Down':** They go silent to protect themselves from your intensity.", "**The 'Smile & Nod':** They agree to a deadline they can't meet just to end the interaction.", "**Venting:** They process their hurt feelings with peers."],
+            "intervention_steps": ["**1. Disarm the Threat:** Lower your volume. Start with the person, not the task.", "**2. Translate Intent:** State that your intensity is about the *problem*, not them.", "**3. The 'Sandwich' Reframe:** They need the relational affirmation to hear the feedback."],
             "scripts": {
-                "Opening": "I want to talk about [Task], but first I want to check in. I've been moving fast today—how is the team feeling?",
-                "Validation": "I know my communication style can feel intense or abrupt. I validate that you prioritize the team's morale, and I don't want to damage that.",
-                "The Pivot": "However, we do need to solve [Problem]. My concern is that if we don't fix this, the team will suffer in the long run.",
-                "Crisis": "I need to be very direct right now because of the safety risk. This isn't personal, but I need you to do X immediately.",
-                "Feedback": "I value how much the team loves you. To grow, I need you to be able to hear hard news without feeling like I'm attacking your character."
+                "Opening": "I want to talk about the task, but first—how are you doing?",
+                "Validation": "I know my style can feel intense. I value your connection with the team.",
+                "The Pivot": "However, we need to solve this problem efficiently.",
+                "Crisis": "I need to be very direct right now because of the safety risk. It isn't personal.",
+                "Feedback": "I value you. To grow, I need you to hear hard news without feeling attacked."
             }
         },
         "Facilitator": {
             "tension": "Speed vs. Process (Urgency vs. Fairness)",
-            "psychology": "You (Director) value 'Done'. They (Facilitator) value 'Fair'. You see their desire for meetings and consensus as 'Analysis Paralysis' and a waste of time. They see your desire for quick decisions as reckless and exclusive.\n\nThey are terrified of leaving someone behind. You are terrified of missing the opportunity. You are fighting for results; they are fighting for legitimacy.",
-            "watch_fors": [
-                "**The 'We Need to Talk':** They will try to schedule meetings to delay decisions they feel were made too fast.",
-                "**Passive Resistance:** They won't argue, but they won't implement the plan because they feel 'the team wasn't consulted'.",
-                "**Moral High Ground:** They may subtly frame your speed as 'uncaring' or 'undemocratic'."
-            ],
-            "intervention_steps": [
-                "**1. Define the Sandbox (Why: They need parameters):** Give them a clear deadline. 'We need to decide this by 3:00 PM.'",
-                "**2. Assign the 'Who' (Why: They fear exclusion):** Ask them specifically: 'Who are the critical 3 people we need to ask?' Limit it to 3.",
-                "**3. The 'Good Enough' Agreement (Why: They want perfection):** Remind them that a good decision today is better than a perfect decision next week. Ask: 'Is this safe enough to try?'"
-            ],
+            "psychology": "You (Director) value 'Done'. They (Facilitator) value 'Fair'. You see their desire for consensus as 'Analysis Paralysis'. They see your quick decisions as reckless. You fight for results; they fight for legitimacy.",
+            "watch_fors": ["**The 'We Need to Talk':** They schedule meetings to delay decisions.", "**Passive Resistance:** They won't argue, but they won't execute the plan.", "**Moral High Ground:** They frame your speed as 'uncaring'."],
+            "intervention_steps": ["**1. Define the Sandbox:** Give them a clear deadline (e.g., 'Decide by 3 PM').", "**2. Assign the 'Who':** Limit who they need to consult.", "**3. The 'Good Enough' Agreement:** Remind them a good decision today is better than a perfect one next week."],
             "scripts": {
-                "Opening": "I know this decision feels rushed. I want to respect the process, but we have a tight timeline.",
-                "Validation": "I value that you want everyone to be heard. You are the moral compass of the team.",
-                "The Pivot": "The risk we face is that if we don't decide by noon, we lose the option entirely. We have to move.",
-                "Crisis": "In this specific moment, I have to make the call. We can debrief the process later, but right now, follow my lead.",
-                "Feedback": "Your desire for consensus is a strength, but sometimes it becomes a bottleneck. I need you to be willing to make the '51% decision'."
+                "Opening": "I know this feels rushed. I want to respect the process, but we have a tight timeline.",
+                "Validation": "I value that you want everyone to be heard.",
+                "The Pivot": "The risk is that if we don't decide by noon, we lose the option.",
+                "Crisis": "In this moment, I have to make the call. Follow my lead.",
+                "Feedback": "Your desire for consensus is a strength, but sometimes it becomes a bottleneck."
             }
         },
         "Tracker": {
             "tension": "Innovation vs. Compliance (Change vs. Safety)",
-            "psychology": "You (Director) want to break the status quo to get better results. They (Tracker) want to protect the status quo to ensure safety. You see them as 'The Department of No.' They see you as a reckless cowboy who is going to get the agency sued.\n\nYou interpret their questions as resistance. They interpret your new ideas as chaos.",
-            "watch_fors": [
-                "**The Rulebook Defense:** They will quote policy to stop your new idea.",
-                "**The 'Yes, But':** Every time you propose a solution, they find 10 reasons why it might fail.",
-                "**Anxiety:** Your speed makes them visibly nervous."
-            ],
-            "intervention_steps": [
-                "**1. The Pre-Mortem (Why: They need to voice risks):** Before launching a plan, ask them: 'What are the 3 biggest risks here?' Let them list them. Then solve them together.",
-                "**2. Honor the Detail (Why: That is their value):** Do not dismiss the details. 'You are right, I missed that regulation. Thank you for catching it.'",
-                "**3. Trial Runs (Why: They fear permanent mistakes):** Frame changes as 'experiments.' 'Let's try this for 3 days and see if it works.' It feels less permanent/risky."
-            ],
+            "psychology": "You (Director) want to break the status quo to get results. They (Tracker) want to protect the status quo to ensure safety. You see them as the 'Department of No.' They see you as a liability.",
+            "watch_fors": ["**The Rulebook Defense:** Quoting policy to stop new ideas.", "**The 'Yes, But':** Finding 10 reasons why it will fail.", "**Anxiety:** Your speed makes them visibly nervous."],
+            "intervention_steps": ["**1. The Pre-Mortem:** Ask them to list the risks, then solve them together.", "**2. Honor the Detail:** Do not dismiss their accuracy.", "**3. Trial Runs:** Frame changes as temporary experiments."],
             "scripts": {
                 "Opening": "I have a new idea, and I need your eyes on it to make sure it's safe.",
-                "Validation": "I appreciate your attention to detail. You keep us compliant and safe.",
-                "The Pivot": "We need to find a way to make this work because the current system is failing our kids. How can we do this safely?",
-                "Crisis": "I am taking full responsibility for this decision. If it goes wrong, it's on me. I need you to execute the plan.",
-                "Feedback": "I need you to help me find the 'Yes.' Don't just tell me why we can't do it; tell me how we *could* do it."
+                "Validation": "I appreciate your attention to detail. You keep us compliant.",
+                "The Pivot": "We need to find a way to make this work. How can we do this safely?",
+                "Crisis": "I am taking full responsibility for this decision.",
+                "Feedback": "I need you to help me find the 'Yes.' Don't just tell me why we can't."
             }
         }
     },
     "Encourager": {
         "Encourager": {
             "tension": "Artificial Harmony (Nice vs. Nice)",
-            "psychology": "When two Encouragers work together, the vibe is amazing, but the accountability is zero. You both value harmony so much that you avoid hard conversations. Issues fester underground. You become 'Toxic Protectors,' shielding the team from reality until a crisis hits. You struggle to make decisions that might upset anyone.",
-            "watch_fors": [
-                "**The Vent Session:** Spending 30 minutes complaining about a problem but taking no action to fix it.",
-                "**The 'Reply All' Apology:** Apologizing to the team for enforcing basic rules.",
-                "**Ghosting:** Avoiding a staff member rather than correcting them."
-            ],
-            "intervention_steps": [
-                "**1. The 'Safety' Contract (Why: You fear conflict):** Explicitly agree that giving feedback is safe. 'I promise I won't be mad if you tell me I'm wrong.'",
-                "**2. Assign the 'Bad Guy' Role (Why: It creates distance):** Rotate who has to deliver the bad news so one person doesn't carry the emotional load.",
-                "**3. Focus on the Victim (Why: You need a moral cause):** When you need to hold a staff member accountable, remind each other of the *youth* who is suffering because of that staff member's laziness."
-            ],
+            "psychology": "The vibe is amazing, but accountability is low. You both value harmony so much that you avoid hard conversations. Issues fester underground. You become 'Toxic Protectors,' shielding the team from reality.",
+            "watch_fors": ["**The Vent Session:** Complaining without action.", "**The 'Reply All' Apology:** Apologizing for enforcing rules.", "**Ghosting:** Avoiding staff rather than correcting them."],
+            "intervention_steps": ["**1. The 'Safety' Contract:** Agree that giving feedback is safe.", "**2. Assign the 'Bad Guy':** Rotate who delivers bad news.", "**3. Focus on the Victim:** Remind each other of the youth suffering due to lack of structure."],
             "scripts": {
-                "Opening": "I hate having to have this conversation, but we need to talk about [Issue].",
-                "Validation": "I know we both want the team to be happy. We care about these people.",
-                "The Pivot": "But by not addressing this, we are actually hurting the team. True kindness is holding them to a standard.",
-                "Crisis": "We can't hug our way out of this one. We have to be firm.",
-                "Feedback": "I feel like we are dancing around the issue. Let's just say it directly."
+                "Opening": "I hate having this conversation, but we need to talk about it.",
+                "Validation": "I know we both want the team to be happy.",
+                "The Pivot": "But by not addressing this, we are hurting the team.",
+                "Crisis": "We can't hug our way out of this. We have to be firm.",
+                "Feedback": "I feel like we are dancing around the issue. Let's just say it."
             }
         },
         "Director": {
             "tension": "Warmth vs. Competence (Being Liked vs. Being Effective)",
-            "psychology": "You (Encourager) value harmony and feeling connected. You interpret their (Director) lack of small talk and directness as dislike or anger. You feel unsafe around them.\n\nThey interpret your focus on feelings as incompetence or lack of focus. When you try to 'nice' them into compliance, they lose respect for you. They don't want a friend; they want a leader who can remove obstacles.",
-            "watch_fors": [
-                "**Apologizing:** You apologizing for giving them work to do.",
-                "**Taking it Personally:** You going home feeling hurt because they didn't say 'good morning' enthusiastically.",
-                "**Avoidance:** You emailing them instead of talking to them because you fear the conflict."
-            ],
-            "intervention_steps": [
-                "**1. Cut the Fluff (Why: They value time):** Do not ask about their weekend for 10 minutes. Start with the headline. 'I need your help with X.'",
-                "**2. Stand Your Ground (Why: They respect strength):** If they push back, do not fold. State your reasoning calmly. 'I hear you, but the policy is X, and that's what we are doing.'",
-                "**3. Ask for Input (Why: They want to solve problems):** Frame the relationship issue as a problem. 'I feel like we are missing each other. How can I communicate better with you?'"
-            ],
+            "psychology": "You (Encourager) interpret their brevity as anger. They (Director) interpret your need for chat as incompetence or padding. You feel unsafe; they feel slowed down.",
+            "watch_fors": ["**Apologizing:** You apologizing for giving them work.", "**Taking it Personally:** Feeling hurt by their directness.", "**Avoidance:** Emailing instead of talking to avoid the friction."],
+            "intervention_steps": ["**1. Cut the Fluff:** Start with the headline.", "**2. Stand Your Ground:** If they push back, state your reasoning calmly.", "**3. Ask for Input:** Frame the relationship issue as a problem to be solved."],
             "scripts": {
-                "Opening": "I'm going to get straight to the point because I know you value your time.",
-                "Validation": "I know you are focused on getting this done, and I appreciate your efficiency.",
-                "The Pivot": "However, the way you spoke to the team caused a shutdown. We can't be efficient if no one wants to work for you.",
-                "Crisis": "Stop. I need you to listen to me right now. This is a safety issue.",
-                "Feedback": "You are excellent at tasks, but your delivery is costing you relationship capital. You are right on the facts, but wrong on the approach."
+                "Opening": "I'm going to get straight to the point.",
+                "Validation": "I know you are focused on getting this done.",
+                "The Pivot": "However, the way you spoke to the team caused a shutdown.",
+                "Crisis": "Stop. Listen to me. This is a safety issue.",
+                "Feedback": "You are right on the facts, but wrong on the approach."
             }
         }
     },
     "Facilitator": {
         "Facilitator": {
             "tension": "Process Paralysis (Talk vs. Talk)",
-            "psychology": "The infinite loop. You both want to make sure everyone is heard. You both want to explore every option. The result? Meetings that never end and decisions that never happen. You enable each other's worst habit: procrastination in the name of 'process.'",
+            "psychology": "The infinite loop. You both want to make sure everyone is heard. You both dislike polarization. The result is meetings that never end and decisions that never happen.",
+            "watch_fors": ["**The 'Let's Circle Back':** Delaying decisions.", "**The Meeting About the Meeting:** Planning to plan.", "**Consensus Addiction:** Refusing to move without 100% agreement."],
+            "intervention_steps": ["**1. The 'Shot Clock':** Set a timer for the decision.", "**2. Limit Input:** Agree to only consult 2 people, not everyone.", "**3. The 'Good Enough' Pact:** Agree that 80% certainty is enough."],
+            "scripts": {
+                "Opening": "We are over-thinking this.",
+                "Validation": "I value that we are being thorough.",
+                "The Pivot": "But we are stuck. We need to pick a direction.",
+                "Crisis": "Process is over. I am making the call.",
+                "Feedback": "We need to stop asking for permission and start giving direction."
+            }
+        },
+        "Encourager": {
+            "tension": "Fairness vs. Favor (Process vs. Vibe)",
+            "psychology": "You (Facilitator) try to create a fair system where everyone is treated equally. They (Encourager) try to create a happy family where everyone feels liked. You clash when you try to enforce a rule for equity, and they try to bend it to save a relationship. You view them as playing favorites; they view you as cold or bureaucratic.",
             "watch_fors": [
-                "**The 'Let's Circle Back':** delaying a decision to another meeting.",
-                "**The Meeting About the Meeting:** Planning to plan.",
-                "**Consensus Addiction:** Refusing to move until 100% of people agree (which never happens)."
+                "**The 'Nice' Trap:** You both avoid conflict, so performance issues are ignored until they explode.",
+                "**The Talk Loop:** You listen to gather perspective; they talk to process. Meetings run overtime with no action items.",
+                "**Vibe over Fact:** They sell you an optimistic story ('It's going great!'). You want to believe the team is aligned, so you don't dig for the data."
             ],
             "intervention_steps": [
-                "**1. The 'Shot Clock' (Why: You need external pressure):** Set a timer. 'We have 10 minutes to decide. If we don't agree, we flip a coin.'",
-                "**2. Limit the Input (Why: More isn't always better):** Agree to only consult 2 people, not the whole team.",
-                "**3. The 'Good Enough' Pact (Why: Perfection is the enemy):** Remind each other that a B+ decision today is better than an A+ decision next month."
+                "**1. Data over Feeling:** They speak in generalities. You must force them to bring specific numbers/facts to supervision.",
+                "**2. The 'Bad Guy' Agreement:** You both struggle to be the enforcer. Explicitly agree on who delivers the bad news so you don't both ghost the issue.",
+                "**3. Written Action Items:** They forget details after the emotion fades. You value process. End every meeting with a written list of tasks."
             ],
             "scripts": {
-                "Opening": "We are over-thinking this. We need to land the plane.",
-                "Validation": "I value that we are being thorough. It's important to be fair.",
-                "The Pivot": "But we are stuck in analysis paralysis. We need to pick a direction and go.",
-                "Crisis": "Process is over. I am making the call now.",
-                "Feedback": "We need to stop asking for permission and start giving direction."
+                "Opening": "I love the energy you bring, but we need to look at the numbers.",
+                "Validation": "I know you want to protect the team's morale.",
+                "The Pivot": "But by letting this slide, we are being unfair to the staff who follow the rules.",
+                "Crisis": "We can't worry about feelings right now. We follow the protocol.",
+                "Feedback": "You are great at the relationship, but I need you to be better at the paperwork/follow-through."
             }
         },
         "Tracker": {
             "tension": "Consensus vs. Compliance (People vs. Policy)",
-            "psychology": "You (Facilitator) want the team to agree on a solution that feels fair. They (Tracker) want the team to follow the written rule because that is safe.\n\nYou feel they are being rigid and uncaring 'robots'. They feel you are being rigid and treating safety rules as 'suggestions'. You prioritize the human element; they prioritize the systemic element.",
-            "watch_fors": [
-                "**The Policy War:** They quote the handbook; you quote the 'vibe' or the 'context'.",
-                "**Ignoring:** You ignoring their emails about compliance because it feels like nagging.",
-                "**Anxiety:** They getting visibly anxious when you say 'let's just see how it goes'."
-            ],
-            "intervention_steps": [
-                "**1. Validate the Rule (Why: They need to know you aren't reckless):** Start by acknowledging the policy. 'I know the rule is X.'",
-                "**2. Contextualize the Exception (Why: They need a reason):** Explain *why* this specific human situation requires a bend. 'Because of [Client's] history, we need to adapt.'",
-                "**3. Define the New Boundary (Why: They fear chaos):** Create a new, temporary rule for this situation so they feel there is still a plan."
-            ],
+            "psychology": "You (Facilitator) want the team to agree. They (Tracker) want the team to follow the rule. You feel they are being rigid 'robots'. They feel you are treating safety rules as 'suggestions' to make people happy.",
+            "watch_fors": ["**The Policy War:** They quote the handbook; you quote the 'context'.", "**Ignoring:** You ignoring their emails because they feel like nagging.", "**Anxiety:** They get anxious when you say 'let's just see how it goes'."],
+            "intervention_steps": ["**1. Validate the Rule:** Acknowledge the policy first.", "**2. Contextualize the Exception:** Explain *why* this specific situation requires a bend.", "**3. Define the New Boundary:** Create a temporary rule so they feel safe."],
             "scripts": {
-                "Opening": "I know this plan deviates from our standard SOP, and I want to explain why.",
-                "Validation": "I appreciate you keeping us compliant. You protect the agency's license.",
-                "The Pivot": "In this specific case, following the rule to the letter will cause a behavioral escalation. We need to flex here to maintain safety.",
-                "Crisis": "I am taking responsibility for this exception. Please document that I made this call.",
-                "Feedback": "I need you to see the gray areas. The rulebook is a map, but the territory is real people."
+                "Opening": "I know this plan deviates from SOP, and I want to explain why.",
+                "Validation": "I appreciate you keeping us compliant.",
+                "The Pivot": "In this specific case, following the rule will cause escalation.",
+                "Crisis": "I am taking responsibility for this exception.",
+                "Feedback": "I need you to see the gray areas."
             }
         }
     },
     "Tracker": {
         "Tracker": {
             "tension": "The Micro-War (Detail vs. Detail)",
-            "psychology": "When two Trackers clash, it is usually over *interpretation* of a rule. It becomes a court case. You both dig into the details to prove you are 'technically correct.' The team gets lost in the minutiae. You risk creating a culture where 'doing it right' is more important than 'doing it well.'",
-            "watch_fors": [
-                "**The Email War:** Sending long, evidence-filled emails to each other instead of talking.",
-                "**Malicious Audit:** Looking for errors in each other's work to prove a point.",
-                "**Stalemate:** Refusing to move until the 'policy' is clarified by upper management."
-            ],
-            "intervention_steps": [
-                "**1. Zoom Out (Why: You are lost in the weeds):** Stop talking about the rule. Talk about the goal. 'What are we actually trying to achieve here?'",
-                "**2. Pick a Lane (Why: You need ownership):** Divide the compliance tasks. 'You own Fire Safety; I own File Compliance.'",
-                "**3. The 'Human Override' (Why: Systems aren't people):** Remind each other that the system serves the kid, not the other way around."
-            ],
+            "psychology": "It becomes a court case over the interpretation of a rule. You both dig into details to prove you are 'technically correct.' The team gets lost in the minutiae.",
+            "watch_fors": ["**The Email War:** Sending evidence-filled emails instead of talking.", "**Malicious Audit:** Looking for errors in each other's work.", "**Stalemate:** Refusing to move until policy is clarified."],
+            "intervention_steps": ["**1. Zoom Out:** Stop talking about the rule. Talk about the goal.", "**2. Pick a Lane:** Divide compliance tasks.", "**3. The 'Human Override':** Remind each other systems serve people."],
             "scripts": {
-                "Opening": "We are getting lost in the weeds. Let's step back.",
-                "Validation": "I know we both want to do this exactly right. I respect your attention to detail.",
-                "The Pivot": "However, arguing over this specific procedure is slowing down the team. Is this critical to safety, or just a preference?",
-                "Crisis": "The procedure doesn't matter right now. Safety matters. We do X.",
-                "Feedback": "We need to stop using the rulebook as a weapon against each other."
+                "Opening": "We are getting lost in the weeds.",
+                "Validation": "I know we both want to do this exactly right.",
+                "The Pivot": "Is this critical to safety, or just a preference?",
+                "Crisis": "The procedure doesn't matter right now. Safety matters.",
+                "Feedback": "We need to stop using the rulebook as a weapon."
             }
         }
     }
