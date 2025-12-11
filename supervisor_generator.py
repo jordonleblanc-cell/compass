@@ -16,7 +16,7 @@ st.set_page_config(
 
 # --- NAVIGATION HELPER ---
 if "current_view" not in st.session_state:
-    st.session_state.current_view = "Guide Generator"
+    st.session_state.current_view = "Supervisor's Guide"
 
 def set_view(view_name):
     st.session_state.current_view = view_name
@@ -1283,7 +1283,7 @@ st.markdown("""
 nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
 
 with nav_col1:
-    if st.button("📝 Guide Generator\n\nCreate 12-point coaching manuals.", use_container_width=True): set_view("Guide Generator")
+    if st.button("📝 Supervisor's Guide\n\nCreate 12-point coaching manuals.", use_container_width=True): set_view("Supervisor's Guide")
 with nav_col2:
     if st.button("🧬 Team DNA\n\nAnalyze unit culture & blindspots.", use_container_width=True): set_view("Team DNA")
 with nav_col3:
@@ -1296,9 +1296,9 @@ st.markdown("---")
 
 # --- VIEW CONTROLLER ---
 
-# 1. GUIDE GENERATOR
-if st.session_state.current_view == "Guide Generator":
-    st.subheader("📝 Guide Generator")
+# 1. Supervisor's Guide
+if st.session_state.current_view == "Supervisor's Guide":
+    st.subheader("📝 Supervisor's Guide")
     sub1, sub2 = st.tabs(["Database", "Manual"])
     with sub1:
         if not df.empty:
