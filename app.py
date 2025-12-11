@@ -1043,7 +1043,7 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
 def show_brand_header(subtitle):
     col1, col2 = st.columns([0.15, 0.85])
     with col1:
-        st.markdown("<div style='width:60px;height:60px;background:linear-gradient(135deg,#015bad,#51c3c5);border-radius:14px;color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.4rem;box-shadow:0 4px 10px rgba(1,91,173,0.3);'>EC</div>", unsafe_allow_html=True)
+        st.markdown("<div style='width:60px;height:60px;background:linear-gradient(135deg,#015bad,#51c3c5);border-radius:14px;color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.4rem;box-shadow:0 4px 10px rgba(1,91,173,0.3);'>ELC</div>", unsafe_allow_html=True)
     with col2:
         st.markdown(f"""
         <div style="display: flex; flex-direction: column; justify-content: center; height: 60px;">
@@ -1334,7 +1334,7 @@ elif st.session_state.step == 'results':
     
     st.info(f"**Support Needed:** {mot_prof['roleSupport'][role_key]}")
 
-    # --- INTEGRATED SECTION ---
+        # --- INTEGRATED SECTION ---
     if int_prof:
         st.markdown("---")
         st.markdown(f"### 🔗 Integrated: {int_prof['title']}")
