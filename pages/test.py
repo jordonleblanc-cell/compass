@@ -16,36 +16,39 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. CSS STYLING (iOS 16/17 Design Language) ---
+# --- 2. CSS STYLING (Pixel / Material Inspired + Compact) ---
 st.markdown("""
     <style>
-        /* --- iOS SYSTEM VARIABLES --- */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap');
+
+        /* --- LIGHT MODE VARIABLES --- */
         :root {
-            /* Light Mode Defaults */
-            --ios-blue: #007AFF;
-            --ios-bg: #F2F2F7;
-            --ios-card: #FFFFFF;
-            --ios-text: #000000;
-            --ios-subtext: #8E8E93;
-            --ios-input: #E5E5EA;
-            --ios-border: #C6C6C8;
-            --ios-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            --radius-card: 20px;
-            --radius-input: 12px;
-            --radius-button: 14px;
+            --primary: #1a73e8;
+            --primary-hover: #1557b0;
+            --background: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #202124;
+            --text-sub: #5f6368;
+            --border-color: #dadce0;
+            --input-bg: #f1f3f4;
+            --shadow: 0 1px 3px rgba(0,0,0,0.12);
+            --score-track: #e8eaed;
         }
 
+        /* --- DARK MODE VARIABLES --- */
         @media (prefers-color-scheme: dark) {
             :root {
-                /* Dark Mode Overrides */
-                --ios-blue: #0A84FF;
-                --ios-bg: #000000;
-                --ios-card: #1C1C1E;
-                --ios-text: #FFFFFF;
-                --ios-subtext: #98989D;
-                --ios-input: #2C2C2E;
-                --ios-border: #38383A;
-                --ios-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                --primary: #8ab4f8;
+                --primary-hover: #aecbfa;
+                --background: #1C1C1E;    /* Changed from #000000 to Dark Gray */
+                --card-bg: #2C2C2E;       /* Slightly lighter gray for cards */
+                --text-main: #e8eaed;
+                --text-sub: #9aa0a6;
+                --border-color: #38383A;
+                --input-bg: #3A3A3C;      /* Lighter input background */
+                --shadow: 0 4px 8px rgba(0,0,0,0.3);
+                --score-track: #5f6368;
             }
         }
 
@@ -55,146 +58,129 @@ st.markdown("""
         header {visibility: hidden;}
         footer {visibility: hidden;}
 
-        /* GLOBAL FONT & BACKGROUND */
+        /* GLOBAL */
         html, body, [class*="css"] {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--ios-bg);
-            color: var(--ios-text);
+            font-family: 'Google Sans', 'Roboto', sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
         }
-        .stApp { background-color: var(--ios-bg); }
+        .stApp { background-color: var(--background); }
 
-        /* HEADERS (Large Title Style) */
-        h1, h2, h3 {
-            font-weight: 700 !important;
-            color: var(--ios-text) !important;
-            letter-spacing: -0.02em;
+        /* TYPOGRAPHY */
+        h1, h2, h3, h4 {
+            font-family: 'Google Sans', sans-serif;
+            color: var(--text-main) !important;
+            font-weight: 500 !important;
+            margin-bottom: 0.5rem !important; /* Tighter headings */
         }
-        h4, h5, h6 {
-            font-weight: 600 !important;
-            color: var(--ios-text) !important;
+        p, label, .stMarkdown {
+            color: var(--text-main) !important;
+            line-height: 1.5;
+            font-size: 0.95rem; /* Slightly smaller for compactness */
         }
 
-        /* CONTAINER (Mobile Width feel) */
+        /* COMPACT CONTAINER */
         .block-container {
-            padding-top: 3rem !important;
+            padding-top: 2rem !important; /* Reduced from 3rem */
+            padding-bottom: 2rem !important;
             max-width: 700px;
         }
 
-        /* iOS CARDS (Inset Grouped Style) */
+        /* CARDS */
         div[data-testid="stForm"], .info-card, div[data-testid="stExpander"] {
-            background-color: var(--ios-card);
-            border-radius: var(--radius-card);
-            padding: 24px;
-            box-shadow: var(--ios-shadow);
-            border: none;
-            margin-bottom: 20px;
-        }
-        
-        /* INPUT FIELDS (iOS Gray Background) */
-        .stTextInput input, .stSelectbox [data-baseweb="select"] {
-            background-color: var(--ios-input);
-            border: none;
-            border-radius: var(--radius-input);
-            color: var(--ios-text);
-            padding: 12px 16px;
-            font-size: 17px; /* iOS Standard Size */
-        }
-        .stTextInput input:focus, .stSelectbox [data-baseweb="select"]:focus-within {
-            background-color: var(--ios-input); /* No change on focus, just cursor */
-            outline: 2px solid var(--ios-blue);
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px; /* Slightly tighter corners */
+            padding: 20px; /* Reduced from 32px */
+            box-shadow: var(--shadow);
+            margin-bottom: 16px; /* Reduced margin */
         }
 
-        /* BUTTONS (Apple Blue Pills) */
+        /* BUTTONS */
         .stButton button {
-            background-color: var(--ios-blue);
-            color: #FFFFFF !important;
+            background-color: var(--primary);
+            color: var(--background) !important;
             border: none;
-            border-radius: var(--radius-button);
-            padding: 14px 20px;
-            font-size: 17px;
-            font-weight: 600;
+            border-radius: 20px;
+            padding: 0.5rem 1.5rem;
+            font-family: 'Google Sans', sans-serif;
+            font-weight: 500;
+            text-transform: none;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
             width: 100%;
-            transition: opacity 0.2s;
         }
         .stButton button:hover {
-            opacity: 0.8; /* iOS touch feedback style */
-            box-shadow: none;
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* INPUTS */
+        .stTextInput input, .stSelectbox [data-baseweb="select"] {
+            background-color: var(--input-bg);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 8px 12px; /* Tighter padding */
+            font-size: 0.95rem;
+            min-height: 40px;
         }
         
-        /* RADIO BUTTONS */
+        /* RADIO */
         .stRadio { background-color: transparent; }
         div[role="radiogroup"] > label > div:first-of-type {
-            background-color: var(--ios-card) !important;
-            border: 1px solid var(--ios-border) !important;
-            width: 22px; height: 22px;
+            background-color: var(--card-bg) !important;
+            border: 2px solid var(--text-sub) !important;
+            width: 18px; height: 18px;
         }
         div[role="radiogroup"] > label[data-checked="true"] > div:first-of-type {
-            background-color: var(--ios-blue) !important;
-            border-color: var(--ios-blue) !important;
+            background-color: var(--primary) !important;
+            border-color: var(--primary) !important;
         }
 
         /* PROGRESS BAR */
         .stProgress > div > div > div > div {
-            background-color: var(--ios-blue);
+            background-color: var(--primary);
             border-radius: 10px;
         }
 
-        /* TEXT UTILITIES */
+        /* UTILS */
         .question-text {
-            font-size: 17px;
+            font-size: 1rem;
             font-weight: 400;
-            line-height: 1.4;
-            color: var(--ios-text);
-            margin-bottom: 8px;
+            color: var(--text-main);
+            margin-bottom: 4px;
         }
         .scale-labels {
             display: flex;
             justify-content: space-between;
-            font-size: 13px;
-            color: var(--ios-subtext);
-            font-weight: 500;
+            font-size: 0.7rem;
+            color: var(--text-sub);
             text-transform: uppercase;
-            margin-bottom: 4px;
+            font-weight: 700;
+            margin-bottom: 2px;
         }
-
-        /* DIVIDER */
-        hr {
-            margin: 24px 0;
-            border: 0;
-            border-top: 1px solid var(--ios-border);
-        }
-
-        /* SCORE BARS */
         .score-container {
-            background-color: var(--ios-input);
+            background-color: var(--score-track);
             border-radius: 6px;
             height: 8px;
             width: 100%;
-            margin-top: 6px;
-            margin-bottom: 16px;
+            margin-top: 4px;
+            margin-bottom: 12px;
             overflow: hidden;
         }
         .score-fill {
             height: 100%;
             border-radius: 6px;
-            background-color: var(--ios-blue);
+            background-color: var(--primary);
         }
-        
-        /* ALERTS / NOTIFICATIONS */
-        div[data-baseweb="notification"] {
-            border-radius: var(--radius-card);
-            background-color: var(--ios-card);
-            box-shadow: var(--ios-shadow);
-            border-left: 6px solid var(--ios-blue);
+        hr {
+            border: 0;
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 16px 0; /* Tighter margins */
         }
-        
-        .stAlert {
-            background-color: var(--ios-card);
-            color: var(--ios-text);
-            border-radius: var(--radius-input);
-            border: 1px solid var(--ios-border);
-        }
-
+        .info-card { border-left: 5px solid var(--primary); }
     </style>
 """, unsafe_allow_html=True)
 
@@ -1061,8 +1047,8 @@ def show_brand_header(subtitle):
     with col2:
         st.markdown(f"""
         <div style="display: flex; flex-direction: column; justify-content: center; height: 60px;">
-            <div style="color: #015bad; font-weight: 800; font-size: 1.6rem; letter-spacing: -0.03em;">Elmcrest Leadership Compass</div>
-            <div style="color: #64748b; font-size: 0.95rem; font-weight: 500;">{subtitle}</div>
+            <div style="color: #007AFF; font-weight: 700; font-size: 1.5rem; letter-spacing: -0.02em;">Elmcrest Leadership Compass</div>
+            <div style="color: #8E8E93; font-size: 0.9rem; font-weight: 500;">{subtitle}</div>
         </div>
         """, unsafe_allow_html=True)
     st.markdown("<hr>", unsafe_allow_html=True)
@@ -1070,8 +1056,8 @@ def show_brand_header(subtitle):
 def draw_score_bar(label, value, max_value=25):
     pct = (value / max_value) * 100
     st.markdown(f"""
-    <div style="margin-bottom: 10px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.85rem; font-weight: 600; color: #475569;">
+    <div style="margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; font-weight: 500; color: #8E8E93;">
             <span>{label}</span>
             <span>{value}</span>
         </div>
@@ -1118,7 +1104,6 @@ if st.session_state.step == 'intro':
     
     show_brand_header("Communication & Motivation Snapshot")
     st.markdown("#### 👋 Welcome")
-    # Tighter welcome message (removed info box for spacing)
     st.markdown("This assessment helps you understand your natural patterns at work. Your insights will shape a personalized profile built to support your growth.")
     st.markdown("<br>", unsafe_allow_html=True)
     
@@ -1141,7 +1126,7 @@ if st.session_state.step == 'intro':
                 st.rerun()
     
     st.markdown("<br>", unsafe_allow_html=True)
-    # Discrete Admin Access Button (Tighter spacing)
+    # Discrete Admin Access Button
     col_spacer, col_admin = st.columns([0.7, 0.3])
     with col_admin:
         if st.button("🔒 Supervisor Portal"):
@@ -1307,7 +1292,7 @@ elif st.session_state.step == 'results':
     st.markdown(f"### 🗣️ {comm_prof['name']}")
     st.markdown(f"""
     <div class="info-card">
-        <div style="color:#015bad;font-weight:700;margin-bottom:5px;text-transform:uppercase;font-size:0.85rem;">{comm_prof['tagline']}</div>
+        <div style="color:#007AFF;font-weight:700;margin-bottom:5px;text-transform:uppercase;font-size:0.85rem;">{comm_prof['tagline']}</div>
         <div style="line-height:1.6;">{comm_prof['overview']}</div>
     </div>
     """, unsafe_allow_html=True)
@@ -1334,7 +1319,7 @@ elif st.session_state.step == 'results':
     st.markdown(f"### 🔋 {mot_prof['name']}")
     st.markdown(f"""
     <div class="info-card">
-        <div style="color:#015bad;font-weight:700;margin-bottom:5px;text-transform:uppercase;font-size:0.85rem;">{mot_prof['tagline']}</div>
+        <div style="color:#007AFF;font-weight:700;margin-bottom:5px;text-transform:uppercase;font-size:0.85rem;">{mot_prof['tagline']}</div>
         <div style="line-height:1.6;">{mot_prof['summary']}</div>
     </div>
     """, unsafe_allow_html=True)
