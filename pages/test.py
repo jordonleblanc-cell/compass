@@ -16,197 +16,185 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. CSS STYLING (Pixel / Material Inspired) ---
+# --- 2. CSS STYLING (iOS 16/17 Design Language) ---
 st.markdown("""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap');
-
-        /* --- LIGHT MODE VARIABLES (Default) --- */
+        /* --- iOS SYSTEM VARIABLES --- */
         :root {
-            --primary: #1a73e8;       /* Google Blue */
-            --primary-hover: #1557b0;
-            --background: #f0f2f5;    /* Light Grey Surface */
-            --card-bg: #ffffff;       /* Pure White */
-            --text-main: #202124;     /* High Emphasis */
-            --text-sub: #5f6368;      /* Medium Emphasis */
-            --border-color: #dadce0;  /* Divider Line */
-            --input-bg: #f1f3f4;      /* Input Field Grey */
-            --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-            --score-track: #e8eaed;
+            /* Light Mode Defaults */
+            --ios-blue: #007AFF;
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-subtext: #8E8E93;
+            --ios-input: #E5E5EA;
+            --ios-border: #C6C6C8;
+            --ios-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --radius-card: 20px;
+            --radius-input: 12px;
+            --radius-button: 14px;
         }
 
-        /* --- DARK MODE VARIABLES (System Preference) --- */
         @media (prefers-color-scheme: dark) {
             :root {
-                --primary: #8ab4f8;       /* Pastel Blue for Dark Mode */
-                --primary-hover: #aecbfa;
-                --background: #202124;    /* Google Dark Grey */
-                --card-bg: #303134;       /* Lighter Dark Grey */
-                --text-main: #e8eaed;     /* High Emphasis White */
-                --text-sub: #9aa0a6;      /* Medium Emphasis Grey */
-                --border-color: #5f6368;  /* Dark Divider */
-                --input-bg: #3c4043;      /* Input Field Dark */
-                --shadow: 0 4px 8px rgba(0,0,0,0.3); /* Deeper shadow for depth */
-                --score-track: #5f6368;
+                /* Dark Mode Overrides */
+                --ios-blue: #0A84FF;
+                --ios-bg: #000000;
+                --ios-card: #1C1C1E;
+                --ios-text: #FFFFFF;
+                --ios-subtext: #98989D;
+                --ios-input: #2C2C2E;
+                --ios-border: #38383A;
+                --ios-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             }
         }
 
-        /* HIDE STREAMLIT UI CHROME */
+        /* HIDE DEFAULT UI */
         [data-testid="stSidebarNav"] {display: none;}
         section[data-testid="stSidebar"] {display: none;}
         header {visibility: hidden;}
         footer {visibility: hidden;}
 
-        /* GLOBAL STYLES */
+        /* GLOBAL FONT & BACKGROUND */
         html, body, [class*="css"] {
-            font-family: 'Google Sans', 'Roboto', sans-serif;
-            background-color: var(--background);
-            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--ios-bg);
+            color: var(--ios-text);
         }
-        
-        .stApp {
-            background-color: var(--background);
+        .stApp { background-color: var(--ios-bg); }
+
+        /* HEADERS (Large Title Style) */
+        h1, h2, h3 {
+            font-weight: 700 !important;
+            color: var(--ios-text) !important;
+            letter-spacing: -0.02em;
+        }
+        h4, h5, h6 {
+            font-weight: 600 !important;
+            color: var(--ios-text) !important;
         }
 
-        /* TYPOGRAPHY */
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Google Sans', sans-serif;
-            color: var(--text-main) !important;
-            font-weight: 500 !important;
-            letter-spacing: -0.5px;
-        }
-        
-        p, label, .stMarkdown {
-            color: var(--text-main) !important;
-            line-height: 1.6;
-        }
-        
-        /* CONTAINER */
+        /* CONTAINER (Mobile Width feel) */
         .block-container {
-            padding-top: 3rem;
-            max-width: 720px;
+            padding-top: 3rem !important;
+            max-width: 700px;
         }
 
-        /* CARDS (Material Design Surfaces) */
+        /* iOS CARDS (Inset Grouped Style) */
         div[data-testid="stForm"], .info-card, div[data-testid="stExpander"] {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 24px; /* Pixel-style rounded corners */
-            padding: 32px;
-            box-shadow: var(--shadow);
-            margin-bottom: 24px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        /* BUTTONS (Material You Filled) */
-        .stButton button {
-            background-color: var(--primary);
-            color: var(--background) !important; /* Text contrast */
+            background-color: var(--ios-card);
+            border-radius: var(--radius-card);
+            padding: 24px;
+            box-shadow: var(--ios-shadow);
             border: none;
-            border-radius: 100px; /* Pill shape */
-            padding: 0.75rem 2rem;
-            font-family: 'Google Sans', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
-            text-transform: none;
-            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-        .stButton button:hover {
-            background-color: var(--primary-hover);
-            box-shadow: 0 4px 8px 3px rgba(0,0,0,0.15);
-            transform: translateY(-1px);
+            margin-bottom: 20px;
         }
         
-        /* INPUT FIELDS */
+        /* INPUT FIELDS (iOS Gray Background) */
         .stTextInput input, .stSelectbox [data-baseweb="select"] {
-            background-color: var(--input-bg);
-            border: 1px solid transparent;
-            border-radius: 8px;
-            color: var(--text-main);
-            padding: 12px;
-            font-size: 1rem;
+            background-color: var(--ios-input);
+            border: none;
+            border-radius: var(--radius-input);
+            color: var(--ios-text);
+            padding: 12px 16px;
+            font-size: 17px; /* iOS Standard Size */
         }
         .stTextInput input:focus, .stSelectbox [data-baseweb="select"]:focus-within {
-            border: 1px solid var(--primary);
-            background-color: var(--card-bg);
+            background-color: var(--ios-input); /* No change on focus, just cursor */
+            outline: 2px solid var(--ios-blue);
+        }
+
+        /* BUTTONS (Apple Blue Pills) */
+        .stButton button {
+            background-color: var(--ios-blue);
+            color: #FFFFFF !important;
+            border: none;
+            border-radius: var(--radius-button);
+            padding: 14px 20px;
+            font-size: 17px;
+            font-weight: 600;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+        .stButton button:hover {
+            opacity: 0.8; /* iOS touch feedback style */
+            box-shadow: none;
         }
         
         /* RADIO BUTTONS */
-        .stRadio {
-            background-color: transparent;
-        }
+        .stRadio { background-color: transparent; }
         div[role="radiogroup"] > label > div:first-of-type {
-            background-color: var(--card-bg) !important;
-            border: 2px solid var(--text-sub) !important;
+            background-color: var(--ios-card) !important;
+            border: 1px solid var(--ios-border) !important;
+            width: 22px; height: 22px;
         }
         div[role="radiogroup"] > label[data-checked="true"] > div:first-of-type {
-            background-color: var(--primary) !important;
-            border-color: var(--primary) !important;
+            background-color: var(--ios-blue) !important;
+            border-color: var(--ios-blue) !important;
         }
 
         /* PROGRESS BAR */
         .stProgress > div > div > div > div {
-            background-color: var(--primary);
+            background-color: var(--ios-blue);
             border-radius: 10px;
         }
 
-        /* CUSTOM CLASSES */
+        /* TEXT UTILITIES */
         .question-text {
-            font-size: 1.1rem;
+            font-size: 17px;
             font-weight: 400;
-            color: var(--text-main);
+            line-height: 1.4;
+            color: var(--ios-text);
             margin-bottom: 8px;
         }
-        
         .scale-labels {
             display: flex;
             justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--text-sub);
+            font-size: 13px;
+            color: var(--ios-subtext);
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
+        /* DIVIDER */
+        hr {
+            margin: 24px 0;
+            border: 0;
+            border-top: 1px solid var(--ios-border);
+        }
+
+        /* SCORE BARS */
         .score-container {
-            background-color: var(--score-track);
-            border-radius: 10px;
-            height: 10px;
+            background-color: var(--ios-input);
+            border-radius: 6px;
+            height: 8px;
             width: 100%;
-            margin-top: 8px;
-            margin-bottom: 20px;
+            margin-top: 6px;
+            margin-bottom: 16px;
             overflow: hidden;
         }
-        
         .score-fill {
             height: 100%;
-            border-radius: 10px;
-            background-color: var(--primary);
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 6px;
+            background-color: var(--ios-blue);
         }
         
-        hr {
-            border: 0;
-            height: 1px;
-            background-color: var(--border-color);
-            margin: 30px 0;
+        /* ALERTS / NOTIFICATIONS */
+        div[data-baseweb="notification"] {
+            border-radius: var(--radius-card);
+            background-color: var(--ios-card);
+            box-shadow: var(--ios-shadow);
+            border-left: 6px solid var(--ios-blue);
+        }
+        
+        .stAlert {
+            background-color: var(--ios-card);
+            color: var(--ios-text);
+            border-radius: var(--radius-input);
+            border: 1px solid var(--ios-border);
         }
 
-        /* ALERTS */
-        div[data-baseweb="notification"] {
-            border-radius: 16px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-        }
-        
-        /* Custom Info Card */
-        .info-card {
-            border-left: 5px solid var(--primary);
-        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -1130,7 +1118,8 @@ if st.session_state.step == 'intro':
     
     show_brand_header("Communication & Motivation Snapshot")
     st.markdown("#### 👋 Welcome")
-    st.info("This assessment helps you understand your natural patterns at work. Your insights will shape a personalized profile built to support your growth.")
+    # Tighter welcome message (removed info box for spacing)
+    st.markdown("This assessment helps you understand your natural patterns at work. Your insights will shape a personalized profile built to support your growth.")
     st.markdown("<br>", unsafe_allow_html=True)
     
     with st.form("intro_form"):
@@ -1151,9 +1140,9 @@ if st.session_state.step == 'intro':
                 st.session_state.step = 'comm'
                 st.rerun()
     
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    # Discrete Admin Access Button
-    col_spacer, col_admin = st.columns([0.8, 0.2])
+    st.markdown("<br>", unsafe_allow_html=True)
+    # Discrete Admin Access Button (Tighter spacing)
+    col_spacer, col_admin = st.columns([0.7, 0.3])
     with col_admin:
         if st.button("🔒 Supervisor Portal"):
             st.switch_page("pages/admin.py")
@@ -1360,7 +1349,7 @@ elif st.session_state.step == 'results':
     
     st.info(f"**Support Needed:** {mot_prof['roleSupport'][role_key]}")
 
-    # --- INTEGRATED SECTION ---
+        # --- INTEGRATED SECTION ---
     if int_prof:
         st.markdown("---")
         st.markdown(f"### 🔗 Integrated: {int_prof['title']}")
