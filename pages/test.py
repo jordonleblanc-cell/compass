@@ -10,326 +10,212 @@ import streamlit.components.v1 as components  # Required for scrolling
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
-    page_title="Elmcrest Leadership Compass",
-    page_icon="🧭",
-    layout="centered",
+    page_title="Elmcrest Leadership Compass", 
+    page_icon="🧭", 
+    layout="centered", 
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. CSS STYLING (Pixel / Material You-inspired) ---
-st.markdown(
-    """
-<style>
-/* ---------------------------------------------------------
-   Material You / Pixel-inspired theme for Streamlit
-   (visuals only — all logic/data unchanged)
---------------------------------------------------------- */
+# --- 2. CSS STYLING (Pixel / Material Inspired) ---
+st.markdown("""
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap');
 
-/* Fonts + Material Symbols */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..1000&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,200..700,0..1,-50..200');
+        /* --- LIGHT MODE VARIABLES (Default) --- */
+        :root {
+            --primary: #1a73e8;       /* Google Blue */
+            --primary-hover: #1557b0;
+            --background: #f0f2f5;    /* Light Grey Surface */
+            --card-bg: #ffffff;       /* Pure White */
+            --text-main: #202124;     /* High Emphasis */
+            --text-sub: #5f6368;      /* Medium Emphasis */
+            --border-color: #dadce0;  /* Divider Line */
+            --input-bg: #f1f3f4;      /* Input Field Grey */
+            --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            --score-track: #e8eaed;
+        }
 
-/* Design tokens */
-:root{
-  /* Core colors (Pixel-ish) */
-  --md-sys-color-primary: #1a73e8;         /* Google Blue */
-  --md-sys-color-secondary: #34a853;       /* Google Green */
-  --md-sys-color-tertiary: #fbbc04;        /* Google Yellow */
-  --md-sys-color-error: #ea4335;           /* Google Red */
+        /* --- DARK MODE VARIABLES (System Preference) --- */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #8ab4f8;       /* Pastel Blue for Dark Mode */
+                --primary-hover: #aecbfa;
+                --background: #202124;    /* Google Dark Grey */
+                --card-bg: #303134;       /* Lighter Dark Grey */
+                --text-main: #e8eaed;     /* High Emphasis White */
+                --text-sub: #9aa0a6;      /* Medium Emphasis Grey */
+                --border-color: #5f6368;  /* Dark Divider */
+                --input-bg: #3c4043;      /* Input Field Dark */
+                --shadow: 0 4px 8px rgba(0,0,0,0.3); /* Deeper shadow for depth */
+                --score-track: #5f6368;
+            }
+        }
 
-  /* Surfaces (light) */
-  --md-sys-color-background: #f6f8fc;
-  --md-sys-color-surface: #ffffff;
-  --md-sys-color-surface-variant: #eef2f7;
-  --md-sys-color-outline: rgba(15, 23, 42, 0.10);
-  --md-sys-color-outline-strong: rgba(15, 23, 42, 0.16);
+        /* HIDE STREAMLIT UI CHROME */
+        [data-testid="stSidebarNav"] {display: none;}
+        section[data-testid="stSidebar"] {display: none;}
+        header {visibility: hidden;}
+        footer {visibility: hidden;}
 
-  /* Text (light) */
-  --md-sys-color-on-surface: #0f172a;
-  --md-sys-color-on-surface-variant: rgba(15, 23, 42, 0.72);
-  --md-sys-color-on-primary: #ffffff;
+        /* GLOBAL STYLES */
+        html, body, [class*="css"] {
+            font-family: 'Google Sans', 'Roboto', sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+        }
+        
+        .stApp {
+            background-color: var(--background);
+        }
 
-  /* Elevation */
-  --elev-1: 0 1px 2px rgba(2, 6, 23, 0.06), 0 2px 8px rgba(2, 6, 23, 0.06);
-  --elev-2: 0 2px 6px rgba(2, 6, 23, 0.08), 0 8px 24px rgba(2, 6, 23, 0.08);
+        /* TYPOGRAPHY */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Google Sans', sans-serif;
+            color: var(--text-main) !important;
+            font-weight: 500 !important;
+            letter-spacing: -0.5px;
+        }
+        
+        p, label, .stMarkdown {
+            color: var(--text-main) !important;
+            line-height: 1.6;
+        }
+        
+        /* CONTAINER */
+        .block-container {
+            padding-top: 3rem;
+            max-width: 720px;
+        }
 
-  /* Shape (Material You tends to be rounder) */
-  --radius-xl: 28px;
-  --radius-lg: 20px;
-  --radius-md: 14px;
-  --radius-sm: 12px;
+        /* CARDS (Material Design Surfaces) */
+        div[data-testid="stForm"], .info-card, div[data-testid="stExpander"] {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px; /* Pixel-style rounded corners */
+            padding: 32px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
 
-  /* Focus ring */
-  --focus-ring: 0 0 0 4px rgba(26, 115, 232, 0.20);
+        /* BUTTONS (Material You Filled) */
+        .stButton button {
+            background-color: var(--primary);
+            color: var(--background) !important; /* Text contrast */
+            border: none;
+            border-radius: 100px; /* Pill shape */
+            padding: 0.75rem 2rem;
+            font-family: 'Google Sans', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            text-transform: none;
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .stButton button:hover {
+            background-color: var(--primary-hover);
+            box-shadow: 0 4px 8px 3px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
+        }
+        
+        /* INPUT FIELDS */
+        .stTextInput input, .stSelectbox [data-baseweb="select"] {
+            background-color: var(--input-bg);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 12px;
+            font-size: 1rem;
+        }
+        .stTextInput input:focus, .stSelectbox [data-baseweb="select"]:focus-within {
+            border: 1px solid var(--primary);
+            background-color: var(--card-bg);
+        }
+        
+        /* RADIO BUTTONS */
+        .stRadio {
+            background-color: transparent;
+        }
+        div[role="radiogroup"] > label > div:first-of-type {
+            background-color: var(--card-bg) !important;
+            border: 2px solid var(--text-sub) !important;
+        }
+        div[role="radiogroup"] > label[data-checked="true"] > div:first-of-type {
+            background-color: var(--primary) !important;
+            border-color: var(--primary) !important;
+        }
 
-  /* Motion */
-  --ease-out: cubic-bezier(0.2, 0, 0, 1);
-}
+        /* PROGRESS BAR */
+        .stProgress > div > div > div > div {
+            background-color: var(--primary);
+            border-radius: 10px;
+        }
 
-/* Dark mode tokens */
-@media (prefers-color-scheme: dark) {
-  :root{
-    --md-sys-color-background: #0b1220;
-    --md-sys-color-surface: #101a2e;
-    --md-sys-color-surface-variant: #14213a;
-    --md-sys-color-outline: rgba(226, 232, 240, 0.10);
-    --md-sys-color-outline-strong: rgba(226, 232, 240, 0.16);
+        /* CUSTOM CLASSES */
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+        
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
 
-    --md-sys-color-on-surface: #e7eefc;
-    --md-sys-color-on-surface-variant: rgba(231, 238, 252, 0.70);
+        .score-container {
+            background-color: var(--score-track);
+            border-radius: 10px;
+            height: 10px;
+            width: 100%;
+            margin-top: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .score-fill {
+            height: 100%;
+            border-radius: 10px;
+            background-color: var(--primary);
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        hr {
+            border: 0;
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 30px 0;
+        }
 
-    --elev-1: 0 2px 10px rgba(0,0,0,0.35);
-    --elev-2: 0 10px 30px rgba(0,0,0,0.40);
-  }
-}
-
-/* HIDE STREAMLIT SIDEBAR NAVIGATION */
-[data-testid="stSidebarNav"] {display: none;}
-section[data-testid="stSidebar"] {display: none;}
-
-/* Global typography */
-html, body, [class*="css"]{
-  font-family: "Roboto Flex","Roboto", system-ui, -apple-system, Segoe UI, Arial, sans-serif;
-  color: var(--md-sys-color-on-surface);
-}
-
-/* App background */
-.stApp{
-  background: radial-gradient(1200px 500px at 20% -10%, rgba(26,115,232,0.10), transparent 60%),
-              radial-gradient(1000px 500px at 90% 10%, rgba(52,168,83,0.10), transparent 55%),
-              radial-gradient(1000px 700px at 50% 110%, rgba(251,188,4,0.08), transparent 60%),
-              var(--md-sys-color-background);
-  background-attachment: fixed;
-}
-
-/* Main content container = Material surface card */
-.block-container{
-  padding: 2.25rem 1.75rem;
-  max-width: 860px;
-  margin-top: 1.75rem;
-  background: color-mix(in srgb, var(--md-sys-color-surface) 92%, transparent);
-  border: 1px solid var(--md-sys-color-outline);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--elev-2 says);
-}
-
-/* Streamlit container border tweak */
-[data-testid="stVerticalBlockBorderWrapper"]{
-  border-radius: var(--radius-lg) !important;
-  border: 1px solid var(--md-sys-color-outline) !important;
-  background: color-mix(in srgb, var(--md-sys-color-surface) 94%, transparent) !important;
-  box-shadow: var(--elev-1);
-}
-
-/* Headers */
-h1, h2, h3{
-  color: var(--md-sys-color-on-surface) !important;
-  letter-spacing: -0.02em;
-}
-h1{ font-weight: 750 !important; }
-h2{ font-weight: 700 !important; }
-h3{ font-weight: 650 !important; }
-
-p, label, li, .stMarkdown{
-  color: var(--md-sys-color-on-surface) !important;
-  line-height: 1.6;
-}
-
-/* Subtle divider */
-hr{
-  margin: 1.75rem 0;
-  border: 0;
-  border-top: 1px solid var(--md-sys-color-outline);
-  opacity: 0.9;
-}
-
-/* Buttons: filled tonal */
-.stButton button{
-  background: linear-gradient(180deg,
-    color-mix(in srgb, var(--md-sys-color-primary) 92%, white 8%),
-    var(--md-sys-color-primary)
-  );
-  color: var(--md-sys-color-on-primary) !important;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 999px;
-  padding: 0.80rem 1.25rem;
-  font-weight: 650;
-  width: 100%;
-  box-shadow: var(--elev-1);
-  transition: transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out), filter 160ms var(--ease-out);
-}
-.stButton button:hover{
-  transform: translateY(-1px);
-  box-shadow: var(--elev-2);
-  filter: brightness(1.02);
-}
-.stButton button:active{
-  transform: translateY(0px) scale(0.99);
-  filter: brightness(0.98);
-}
-
-/* Download button polish */
-div[data-testid="stDownloadButton"] button{
-  border-radius: 999px !important;
-  padding: 0.80rem 1.25rem !important;
-  font-weight: 650 !important;
-  box-shadow: var(--elev-1) !important;
-}
-
-/* Inputs */
-.stTextInput input, .stSelectbox [data-baseweb="select"]{
-  background-color: var(--md-sys-color-surface-variant) !important;
-  border-radius: var(--radius-md) !important;
-  border: 1px solid var(--md-sys-color-outline) !important;
-  color: var(--md-sys-color-on-surface) !important;
-  padding: 0.65rem 0.75rem !important;
-  transition: box-shadow 160ms var(--ease-out), border-color 160ms var(--ease-out);
-}
-.stTextInput input:focus, .stSelectbox [data-baseweb="select"]:focus-within{
-  border-color: rgba(26,115,232,0.60) !important;
-  box-shadow: var(--focus-ring) !important;
-}
-
-/* Radio group = segmented control-ish */
-.stRadio{
-  background: transparent;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.stRadio [role="radiogroup"]{
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 6px;
-  background: var(--md-sys-color-surface-variant);
-  border: 1px solid var(--md-sys-color-outline);
-  border-radius: 999px;
-  padding: 6px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
-}
-.stRadio [role="radiogroup"] label{
-  flex: 1;
-  justify-content: center;
-  margin: 0 !important;
-}
-.stRadio [role="radiogroup"] label > div{
-  justify-content: center;
-}
-.stRadio [role="radiogroup"] label span{
-  font-weight: 600;
-  color: var(--md-sys-color-on-surface-variant);
-}
-
-/* Selected radio indicator */
-div[role="radiogroup"] > label > div:first-of-type{
-  background-color: var(--md-sys-color-primary) !important;
-  border-color: var(--md-sys-color-primary) !important;
-}
-
-/* Question text */
-.question-text{
-  font-size: 1.02rem;
-  font-weight: 550;
-  color: var(--md-sys-color-on-surface);
-  line-height: 1.35;
-}
-
-/* Scale labels */
-.scale-labels{
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.72rem;
-  color: var(--md-sys-color-on-surface-variant);
-  margin-bottom: -8px;
-  padding-left: 8px;
-  padding-right: 8px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-/* Cards */
-.info-card{
-  background: var(--md-sys-color-surface-variant);
-  border-radius: var(--radius-lg);
-  padding: 1.25rem 1.25rem;
-  margin-bottom: 1rem;
-  border: 1px solid var(--md-sys-color-outline);
-  box-shadow: var(--elev-1);
-}
-
-/* Progress bars */
-.score-container{
-  background-color: color-mix(in srgb, var(--md-sys-color-outline) 22%, transparent);
-  border-radius: 999px;
-  height: 12px;
-  width: 100%;
-  margin-top: 6px;
-  margin-bottom: 14px;
-  overflow: hidden;
-}
-.score-fill{
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--md-sys-color-secondary), var(--md-sys-color-primary));
-  transition: width 900ms var(--ease-out);
-}
-
-/* Alerts: rounded + subtle borders */
-.stAlert{
-  border-radius: var(--radius-lg) !important;
-  border: 1px solid var(--md-sys-color-outline) !important;
-}
-
-/* Expanders: more Material */
-details{
-  background: transparent !important;
-}
-details > summary{
-  border-radius: var(--radius-lg) !important;
-}
-div[data-testid="stExpander"]{
-  border-radius: var(--radius-lg) !important;
-  border: 1px solid var(--md-sys-color-outline) !important;
-  background: color-mix(in srgb, var(--md-sys-color-surface) 92%, transparent) !important;
-  box-shadow: var(--elev-1) !important;
-}
-
-/* Reduce default top padding a hair on mobile */
-@media (max-width: 640px){
-  .block-container{
-    padding: 1.5rem 1.1rem;
-    border-radius: 22px;
-  }
-}
-</style>
-""",
-    unsafe_allow_html=True
-)
+        /* ALERTS */
+        div[data-baseweb="notification"] {
+            border-radius: 16px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+        
+        /* Custom Info Card */
+        .info-card {
+            border-left: 5px solid var(--primary);
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 # --- 3. CONSTANTS & DATA ---
 
 ROLE_RELATIONSHIP_LABELS = {
-    "Program Supervisor": {
-        "directReportsLabel": "Shift Supervisors",
-        "youthLabel": "youth on your units",
-        "supervisorLabel": "Residential Programs Manager",
-        "leadershipLabel": "agency leadership"
-    },
-    "Shift Supervisor": {
-        "directReportsLabel": "YDPs",
-        "youthLabel": "youth you support",
-        "supervisorLabel": "Program Supervisor",
-        "leadershipLabel": "agency leadership"
-    },
-    "YDP": {
-        "directReportsLabel": "peers",
-        "youthLabel": "youth in your care",
-        "supervisorLabel": "Shift Supervisor",
-        "leadershipLabel": "Program Supervisor"
-    }
+    "Program Supervisor": {"directReportsLabel": "Shift Supervisors", "youthLabel": "youth on your units", "supervisorLabel": "Residential Programs Manager", "leadershipLabel": "agency leadership"},
+    "Shift Supervisor": {"directReportsLabel": "YDPs", "youthLabel": "youth you support", "supervisorLabel": "Program Supervisor", "leadershipLabel": "agency leadership"},
+    "YDP": {"directReportsLabel": "peers", "youthLabel": "youth in your care", "supervisorLabel": "Shift Supervisor", "leadershipLabel": "Program Supervisor"}
 }
 
 COMM_QUESTIONS = [
@@ -378,7 +264,7 @@ MOTIVATION_QUESTIONS = [
     {"id": "mot20", "text": "I’m motivated by being trusted with projects where outcomes are clearly defined.", "style": "Achievement"},
 ]
 
-# --- DATA DICTIONARIES (Unchanged content) ---
+# --- DATA DICTIONARIES (Updated with new content) ---
 
 COMM_PROFILES = {
     "Director": {
@@ -606,7 +492,7 @@ INTEGRATED_PROFILES = {
         "strengths": [
             "**Diagnostic Speed:** You quickly identify skill gaps or process failures. You don't just see a bad shift; you see why it happened.",
             "**Fearless Innovation:** You aren't afraid to try a new schedule or a new intervention if the old one isn't working. You treat the floor like a lab.",
-            "**High-Impact Coaching:** You give feedback that is direct and developmental. You don't coddle staff; you challenge them because you believe they can be better."
+            "**High-Impact Coaching:** You give direct, developmental feedback that accelerates the growth of their peers. You don't coddle staff; you challenge them because you believe they can be better."
         ],
         "weaknesses": [
             "**The Pace Mismatch:** Your brain moves faster than the system changes. You get frustrated with staff who learn slowly.",
@@ -980,13 +866,10 @@ INTEGRATED_PROFILES = {
 # --- 4. FUNCTIONS ---
 
 def normalize_role_key(role):
-    if not role:
-        return "YDP"
+    if not role: return "YDP"
     r = role.lower()
-    if "program" in r:
-        return "Program Supervisor"
-    if "shift" in r:
-        return "Shift Supervisor"
+    if "program" in r: return "Program Supervisor"
+    if "shift" in r: return "Shift Supervisor"
     return "YDP"
 
 def get_top_two(scores):
@@ -996,18 +879,8 @@ def get_top_two(scores):
     return primary, secondary
 
 def clean_text(text):
-    if not text:
-        return ""
-    return (
-        text.replace("\u2018", "'")
-        .replace("\u2019", "'")
-        .replace("\u201c", '"')
-        .replace("\u201d", '"')
-        .replace("\u2013", "-")
-        .replace("—", "-")
-        .encode("latin-1", "replace")
-        .decode("latin-1")
-    )
+    if not text: return ""
+    return text.replace('\u2018', "'").replace('\u2019', "'").replace('\u201c', '"').replace('\u201d', '"').replace('\u2013', '-').replace('—', '-').encode('latin-1', 'replace').decode('latin-1')
 
 def submit_to_google_sheets(data, action="save"):
     # Sends data to Google Scripts
@@ -1025,14 +898,14 @@ def send_email_via_smtp(to_email, subject, body):
         # Requires secrets.toml setup
         sender_email = st.secrets["EMAIL_USER"]
         sender_password = st.secrets["EMAIL_PASSWORD"]
-
+        
         msg = MIMEMultipart()
-        msg["From"] = sender_email
-        msg["To"] = to_email
-        msg["Subject"] = subject
-        msg.attach(MIMEText(body, "plain"))
-
-        server = smtplib.SMTP("smtp.gmail.com", 587)
+        msg['From'] = sender_email
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+        
+        server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(sender_email, sender_password)
         server.sendmail(sender_email, to_email, msg.as_string())
@@ -1043,8 +916,8 @@ def send_email_via_smtp(to_email, subject, body):
         return False
 
 def generate_text_report(user_info, results, comm_prof, mot_prof, int_prof, role_key, role_labels):
-    lines = [f"Elmcrest Leadership Compass PROFILE FOR {user_info['name'].upper()}", "=" * 40, ""]
-
+    lines = [f"Elmcrest Leadership Compass PROFILE FOR {user_info['name'].upper()}", "="*40, ""]
+    
     # Comm
     lines.append(f"COMMUNICATION STYLE: {comm_prof['name']}")
     lines.append(f"Tagline: {comm_prof['tagline']}")
@@ -1052,80 +925,75 @@ def generate_text_report(user_info, results, comm_prof, mot_prof, int_prof, role
     lines.append(f"Under Stress: {comm_prof['conflictImpact']}")
     lines.append("")
     lines.append("ROLE TIPS:")
-    tips = comm_prof["roleTips"][role_key]
+    tips = comm_prof['roleTips'][role_key]
     lines.append(f"* With {role_labels['directReportsLabel']}: {tips['directReports']}")
     lines.append(f"* With {role_labels['youthLabel']}: {tips['youth']}")
     lines.append(f"* With {role_labels['supervisorLabel']}: {tips['supervisor']}")
     lines.append(f"* With {role_labels['leadershipLabel']}: {tips['leadership']}")
     lines.append("")
-
+    
     # Motiv
     lines.append(f"MOTIVATION DRIVER: {mot_prof['name']}")
     lines.append(f"Tagline: {mot_prof['tagline']}")
     lines.append(f"Summary: {mot_prof['summary']}")
     lines.append("Boosters (Energizers):")
-    for b in mot_prof["boosters"]:
-        lines.append(f"* {b}")
+    for b in mot_prof['boosters']: lines.append(f"* {b}")
     lines.append("Drainers (De-energizers):")
-    for k in mot_prof["killers"]:
-        lines.append(f"* {k}")
+    for k in mot_prof['killers']: lines.append(f"* {k}")
     lines.append(f"Support Needed: {mot_prof['roleSupport'][role_key]}")
     lines.append("")
-
+    
     # Integrated
     if int_prof:
         lines.append(f"INTEGRATED PROFILE: {int_prof['title']}")
-        lines.append(int_prof["summary"])
+        lines.append(int_prof['summary'])
         lines.append("\nSTRENGTHS:")
-        for s in int_prof["strengths"]:
-            lines.append(f"- {s}")
+        for s in int_prof['strengths']: lines.append(f"- {s}")
         lines.append("\nWEAKNESSES:")
-        for w in int_prof["weaknesses"]:
-            lines.append(f"- {w}")
+        for w in int_prof['weaknesses']: lines.append(f"- {w}")
         lines.append("\nCOMMUNICATION ARCHITECTURE:")
-        for ca in int_prof["comm_arch"]:
-            lines.append(f"- {ca}")
+        for ca in int_prof['comm_arch']: lines.append(f"- {ca}")
         lines.append("\nSTRATEGIC DEVELOPMENT ROADMAP:")
-        for r in int_prof["roadmap"]:
-            lines.append(f"- {r}")
-
+        for r in int_prof['roadmap']: lines.append(f"- {r}")
+        
     return "\n".join(lines)
 
 def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role_labels):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
-
-    blue = (26, 115, 232)  # Pixel-ish blue
+    
+    blue = (1, 91, 173)
     black = (0, 0, 0)
-
+    
     # Header
-    pdf.set_font("Arial", "B", 20)
+    pdf.set_font("Arial", 'B', 20)
     pdf.set_text_color(*blue)
-    pdf.cell(0, 10, "Elmcrest Leadership Compass Profile", ln=True, align="C")
-
-    pdf.set_font("Arial", "", 12)
+    pdf.cell(0, 10, "Elmcrest Leadership Compass Profile", ln=True, align='C')
+    
+    pdf.set_font("Arial", '', 12)
     pdf.set_text_color(*black)
-    pdf.cell(0, 8, clean_text(f"Prepared for: {user_info['name']} | Role: {user_info['role']}"), ln=True, align="C")
+    pdf.cell(0, 8, clean_text(f"Prepared for: {user_info['name']} | Role: {user_info['role']}"), ln=True, align='C')
     pdf.ln(5)
-
+    
     # Comm
-    pdf.set_font("Arial", "B", 14)
+    pdf.set_font("Arial", 'B', 14)
     pdf.set_text_color(*blue)
     pdf.cell(0, 10, clean_text(f"Communication: {comm_prof['name']}"), ln=True)
-    pdf.set_font("Arial", "", 11)
+    pdf.set_font("Arial", '', 11)
     pdf.set_text_color(*black)
-
-    overview_text = comm_prof["overview"].replace("<strong>", "").replace("</strong>", "").replace("<br><br>", "\n\n")
+    
+    # Fix for bolding: Replace HTML strong tags
+    overview_text = comm_prof['overview'].replace("<strong>", "").replace("</strong>", "").replace("<br><br>", "\n\n")
     pdf.multi_cell(0, 6, clean_text(overview_text))
     pdf.ln(3)
-
+    
     # Role Tips
-    pdf.set_font("Arial", "B", 11)
+    pdf.set_font("Arial", 'B', 11)
     pdf.set_fill_color(240, 245, 250)
     pdf.cell(0, 8, "Role-Specific Tips:", ln=True, fill=True)
-    tips = comm_prof["roleTips"][role_key]
-    pdf.set_font("Arial", "", 11)
+    tips = comm_prof['roleTips'][role_key]
+    pdf.set_font("Arial", '', 11)
     pdf.ln(2)
     pdf.multi_cell(0, 6, clean_text(f"- Direct Reports: {tips['directReports']}"))
     pdf.multi_cell(0, 6, clean_text(f"- Youth: {tips['youth']}"))
@@ -1134,172 +1002,121 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
     pdf.ln(5)
 
     # Motiv
-    pdf.set_font("Arial", "B", 14)
+    pdf.set_font("Arial", 'B', 14)
     pdf.set_text_color(*blue)
     pdf.cell(0, 10, clean_text(f"Motivation: {mot_prof['name']}"), ln=True)
-    pdf.set_font("Arial", "", 11)
+    pdf.set_font("Arial", '', 11)
     pdf.set_text_color(*black)
-    pdf.multi_cell(0, 6, clean_text(mot_prof["summary"]))
+    pdf.multi_cell(0, 6, clean_text(mot_prof['summary']))
     pdf.ln(3)
-
-    pdf.set_font("Arial", "B", 11)
+    
+    pdf.set_font("Arial", 'B', 11)
     pdf.cell(0, 8, "Boosters (Energizers):", ln=True, fill=True)
-    pdf.set_font("Arial", "", 11)
-    for b in mot_prof["boosters"]:
+    pdf.set_font("Arial", '', 11)
+    for b in mot_prof['boosters']: 
         clean_b = b.replace("**", "")
         pdf.multi_cell(0, 6, clean_text(f"- {clean_b}"))
     pdf.ln(2)
-
-    pdf.set_font("Arial", "B", 11)
+    
+    pdf.set_font("Arial", 'B', 11)
     pdf.cell(0, 8, "Drainers (De-energizers):", ln=True, fill=True)
-    pdf.set_font("Arial", "", 11)
-    for k in mot_prof["killers"]:
+    pdf.set_font("Arial", '', 11)
+    for k in mot_prof['killers']: 
         clean_k = k.replace("**", "")
         pdf.multi_cell(0, 6, clean_text(f"- {clean_k}"))
     pdf.ln(5)
-
+    
     # Integrated
     if int_prof:
-        pdf.set_font("Arial", "B", 14)
+        pdf.set_font("Arial", 'B', 14)
         pdf.set_text_color(*blue)
         pdf.cell(0, 10, clean_text(f"Integrated: {int_prof['title']}"), ln=True)
-        pdf.set_font("Arial", "", 11)
+        pdf.set_font("Arial", '', 11)
         pdf.set_text_color(*black)
-        pdf.multi_cell(0, 6, clean_text(int_prof["summary"]))
+        pdf.multi_cell(0, 6, clean_text(int_prof['summary']))
         pdf.ln(2)
-
-        pdf.set_font("Arial", "B", 11)
+        
+        # Strengths
+        pdf.set_font("Arial", 'B', 11)
         pdf.cell(0, 8, "Strengths:", ln=True, fill=True)
-        pdf.set_font("Arial", "", 11)
-        for s in int_prof["strengths"]:
-            pdf.multi_cell(0, 6, clean_text(f"- {s.replace('**', '')}"))
+        pdf.set_font("Arial", '', 11)
+        for s in int_prof['strengths']: pdf.multi_cell(0, 6, clean_text(f"- {s.replace('**', '')}"))
         pdf.ln(2)
 
-        pdf.set_font("Arial", "B", 11)
+        # Weaknesses
+        pdf.set_font("Arial", 'B', 11)
         pdf.cell(0, 8, "Weaknesses:", ln=True, fill=True)
-        pdf.set_font("Arial", "", 11)
-        for w in int_prof["weaknesses"]:
-            pdf.multi_cell(0, 6, clean_text(f"- {w.replace('**', '')}"))
+        pdf.set_font("Arial", '', 11)
+        for w in int_prof['weaknesses']: pdf.multi_cell(0, 6, clean_text(f"- {w.replace('**', '')}"))
         pdf.ln(2)
 
-        pdf.set_font("Arial", "B", 11)
+        # Comm Arch
+        pdf.set_font("Arial", 'B', 11)
         pdf.cell(0, 8, "Communication Architecture:", ln=True, fill=True)
-        pdf.set_font("Arial", "", 11)
-        for c in int_prof["comm_arch"]:
-            pdf.multi_cell(0, 6, clean_text(f"- {c.replace('**', '')}"))
+        pdf.set_font("Arial", '', 11)
+        for c in int_prof['comm_arch']: pdf.multi_cell(0, 6, clean_text(f"- {c.replace('**', '')}"))
         pdf.ln(2)
 
-        pdf.set_font("Arial", "B", 11)
+        # Roadmap
+        pdf.set_font("Arial", 'B', 11)
         pdf.cell(0, 8, "Strategic Development Roadmap:", ln=True, fill=True)
-        pdf.set_font("Arial", "", 11)
-        for r in int_prof["roadmap"]:
-            pdf.multi_cell(0, 6, clean_text(f"- {r.replace('**', '')}"))
-
-    return pdf.output(dest="S").encode("latin-1")
+        pdf.set_font("Arial", '', 11)
+        for r in int_prof['roadmap']: pdf.multi_cell(0, 6, clean_text(f"- {r.replace('**', '')}"))
+    
+    return pdf.output(dest='S').encode('latin-1')
 
 # --- 5. UI HELPERS ---
 def show_brand_header(subtitle):
-    # Pixel/Material header: rounded app bar + avatar chip
-    col1, col2 = st.columns([0.17, 0.83])
+    col1, col2 = st.columns([0.15, 0.85])
     with col1:
-        st.markdown(
-            """
-            <div style="
-              width:64px;height:64px;
-              border-radius: 20px;
-              background: linear-gradient(145deg, rgba(26,115,232,1), rgba(52,168,83,1));
-              display:flex;align-items:center;justify-content:center;
-              color:white;
-              font-weight:800;
-              letter-spacing:-0.02em;
-              font-size:1.25rem;
-              box-shadow: var(--elev-2);
-              border: 1px solid rgba(255,255,255,0.18);
-            ">
-              ELC
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.image("https://raw.githubusercontent.com/jordonleblanc-cell/compass/main/elmcrest-icon.png", width=60)
     with col2:
-        st.markdown(
-            f"""
-            <div style="
-              display:flex;flex-direction:column;justify-content:center;
-              min-height:64px;
-              padding-left: 2px;
-            ">
-              <div style="
-                font-weight: 800;
-                font-size: 1.7rem;
-                letter-spacing: -0.03em;
-                line-height: 1.15;
-                color: var(--md-sys-color-on-surface);
-              ">
-                Elmcrest Leadership Compass
-              </div>
-              <div style="
-                margin-top: 6px;
-                font-size: 0.98rem;
-                font-weight: 550;
-                color: var(--md-sys-color-on-surface-variant);
-              ">
-                {subtitle}
-              </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.markdown(f"""
+        <div style="display: flex; flex-direction: column; justify-content: center; height: 60px;">
+            <div style="color: #015bad; font-weight: 800; font-size: 1.6rem; letter-spacing: -0.03em;">Elmcrest Leadership Compass</div>
+            <div style="color: #64748b; font-size: 0.95rem; font-weight: 500;">{subtitle}</div>
+        </div>
+        """, unsafe_allow_html=True)
     st.markdown("<hr>", unsafe_allow_html=True)
 
 def draw_score_bar(label, value, max_value=25):
     pct = (value / max_value) * 100
-    st.markdown(
-        f"""
-        <div style="margin-bottom: 10px;">
-          <div style="
-            display:flex;justify-content:space-between;align-items:baseline;
-            margin-bottom: 6px;
-            font-size: 0.86rem;
-            font-weight: 650;
-            color: var(--md-sys-color-on-surface-variant);
-            letter-spacing: 0.01em;
-          ">
+    st.markdown(f"""
+    <div style="margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.85rem; font-weight: 600; color: #475569;">
             <span>{label}</span>
-            <span style="color: var(--md-sys-color-on-surface);">{value}</span>
-          </div>
-          <div class="score-container">
-            <div class="score-fill" style="width:{pct}%;"></div>
-          </div>
+            <span>{value}</span>
         </div>
-        """,
-        unsafe_allow_html=True
-    )
+        <div class="score-container">
+            <div class="score-fill" style="width: {pct}%;"></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # --- 6. APP LOGIC ---
 
+# Function to scroll to top
 def scroll_to_top():
     js = """
     <script>
-      var body = window.parent.document.body;
-      var doc = window.parent.document.documentElement;
-      doc.scrollTop = 0;
-      body.scrollTop = 0;
-
-      var main = window.parent.document.querySelector(".main");
-      if (main) main.scrollTop = 0;
-
-      var stApp = window.parent.document.querySelector(".stApp");
-      if (stApp) stApp.scrollTop = 0;
+        var body = window.parent.document.body;
+        var doc = window.parent.document.documentElement;
+        doc.scrollTop = 0;
+        body.scrollTop = 0;
+        
+        var main = window.parent.document.querySelector(".main");
+        if (main) main.scrollTop = 0;
+        
+        var stApp = window.parent.document.querySelector(".stApp");
+        if (stApp) stApp.scrollTop = 0;
     </script>
     """
     components.html(js, height=0)
 
-if "step" not in st.session_state:
-    st.session_state.step = "intro"
+if 'step' not in st.session_state:
+    st.session_state.step = 'intro'
     comm_q, motiv_q = COMM_QUESTIONS.copy(), MOTIVATION_QUESTIONS.copy()
-    random.shuffle(comm_q)
-    random.shuffle(motiv_q)
+    random.shuffle(comm_q); random.shuffle(motiv_q)
     st.session_state.shuffled_comm = comm_q
     st.session_state.shuffled_motiv = motiv_q
     st.session_state.answers_comm = {}
@@ -1307,37 +1124,34 @@ if "step" not in st.session_state:
     st.session_state.user_info = {}
 
 # --- INTRO ---
-if st.session_state.step == "intro":
+if st.session_state.step == 'intro':
+    # Force scroll to top on load (optional, but good practice)
     scroll_to_top()
+    
     show_brand_header("Communication & Motivation Snapshot")
-
     st.markdown("#### 👋 Welcome")
-    st.info(
-        "This assessment helps you understand your natural patterns at work. "
-        "Your insights will shape a personalized profile built to support your growth."
-    )
+    st.info("This assessment helps you understand your natural patterns at work. Your insights will shape a personalized profile built to support your growth.")
     st.markdown("<br>", unsafe_allow_html=True)
-
+    
     with st.form("intro_form"):
         c1, c2 = st.columns(2)
         name = c1.text_input("Full Name", placeholder="e.g. Jane Doe")
         email = c2.text_input("Email Address", placeholder="e.g. jane@elmcrest.org")
-
+        
         c3, c4 = st.columns(2)
         role = c3.selectbox("Current Role", ["Program Supervisor", "Shift Supervisor", "YDP"], index=None, placeholder="Select your role...")
         cottage = c4.selectbox("Home Program", ["Cottage 2", "Cottage 3", "Cottage 8", "Cottage 9", "Cottage 11", "Overnight"], index=None, placeholder="Select your program...")
 
         st.markdown("<br>", unsafe_allow_html=True)
         if st.form_submit_button("Start Assessment →"):
-            if not name or not email or not role or not cottage:
+            if not name or not email or not role or not cottage: 
                 st.error("Please complete all fields.")
             else:
                 st.session_state.user_info = {"name": name, "email": email, "role": role, "cottage": cottage}
-                st.session_state.step = "comm"
+                st.session_state.step = 'comm'
                 st.rerun()
-
+    
     st.markdown("<br><br>", unsafe_allow_html=True)
-
     # Discrete Admin Access Button
     col_spacer, col_admin = st.columns([0.8, 0.2])
     with col_admin:
@@ -1345,161 +1159,144 @@ if st.session_state.step == "intro":
             st.switch_page("pages/admin.py")
 
 # --- COMM ---
-elif st.session_state.step == "comm":
+elif st.session_state.step == 'comm':
     scroll_to_top()
     show_brand_header("Part 1: Communication")
-
     st.progress(33)
     st.markdown("**Instructions:** Choose how strongly each statement fits you most days.")
-
+    
     with st.form("comm_form"):
         answers = {}
         for i, q in enumerate(st.session_state.shuffled_comm):
+            # Card-like container for each question
             with st.container(border=True):
                 col_q, col_a = st.columns([0.6, 0.4], gap="medium")
-
+                
                 with col_q:
-                    st.markdown(
-                        f"<div class='question-text' style='display:flex;align-items:center;height:100%;'>{i+1}. {q['text']}</div>",
-                        unsafe_allow_html=True
-                    )
-
+                    st.markdown(f"<div class='question-text' style='display:flex;align-items:center;height:100%;'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
+                
                 with col_a:
-                    st.markdown(
-                        """
-                        <div class="scale-labels">
-                          <span>Disagree</span>
-                          <span>Agree</span>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-                    answers[q["id"]] = st.radio(
-                        f"q_{i}",
-                        options=[1, 2, 3, 4, 5],
-                        horizontal=True,
-                        index=None,
-                        key=f"c_{q['id']}",
+                    st.markdown("""
+                    <div class="scale-labels">
+                        <span>Disagree</span>
+                        <span>Agree</span>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    answers[q['id']] = st.radio(
+                        f"q_{i}", 
+                        options=[1, 2, 3, 4, 5], 
+                        horizontal=True, 
+                        index=None, 
+                        key=f"c_{q['id']}", 
                         label_visibility="collapsed"
                     )
-
+        
         st.markdown("<br>", unsafe_allow_html=True)
-
+        
+        # Validation Logic
         if st.form_submit_button("Continue to Motivation →"):
-            missed = [q["id"] for q in st.session_state.shuffled_comm if answers.get(q["id"]) is None]
+            missed = [q['id'] for q in st.session_state.shuffled_comm if answers.get(q['id']) is None]
             if missed:
                 st.error(f"Please answer all questions. You missed {len(missed)} questions.")
             else:
                 st.session_state.answers_comm = answers
-                st.session_state.step = "motiv"
+                st.session_state.step = 'motiv'
                 st.rerun()
 
 # --- MOTIV ---
-elif st.session_state.step == "motiv":
+elif st.session_state.step == 'motiv':
     scroll_to_top()
     show_brand_header("Part 2: Motivation")
-
     st.progress(66)
     st.markdown("**Instructions:** Focus on what keeps you engaged or drains you.")
 
     with st.form("motiv_form"):
         answers = {}
         for i, q in enumerate(st.session_state.shuffled_motiv):
+            # Card-like container for each question
             with st.container(border=True):
                 col_q, col_a = st.columns([0.6, 0.4], gap="medium")
-
+                
                 with col_q:
-                    st.markdown(
-                        f"<div class='question-text' style='display:flex;align-items:center;height:100%;'>{i+1}. {q['text']}</div>",
-                        unsafe_allow_html=True
-                    )
-
+                    st.markdown(f"<div class='question-text' style='display:flex;align-items:center;height:100%;'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
+                
                 with col_a:
-                    st.markdown(
-                        """
-                        <div class="scale-labels">
-                          <span>Disagree</span>
-                          <span>Agree</span>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-                    answers[q["id"]] = st.radio(
-                        f"mq_{i}",
-                        options=[1, 2, 3, 4, 5],
-                        horizontal=True,
-                        index=None,
-                        key=f"m_{q['id']}",
+                    st.markdown("""
+                    <div class="scale-labels">
+                        <span>Disagree</span>
+                        <span>Agree</span>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    answers[q['id']] = st.radio(
+                        f"mq_{i}", 
+                        options=[1, 2, 3, 4, 5], 
+                        horizontal=True, 
+                        index=None, 
+                        key=f"m_{q['id']}", 
                         label_visibility="collapsed"
                     )
-
+        
         st.markdown("<br>", unsafe_allow_html=True)
-
+        
+        # Validation Logic
         if st.form_submit_button("Complete & View Profile →"):
-            missed = [q["id"] for q in st.session_state.shuffled_motiv if answers.get(q["id"]) is None]
+            missed = [q['id'] for q in st.session_state.shuffled_motiv if answers.get(q['id']) is None]
             if missed:
                 st.error(f"Please answer all questions. You missed {len(missed)} questions.")
             else:
                 st.session_state.answers_motiv = answers
-                st.session_state.step = "processing"
+                st.session_state.step = 'processing'
                 st.rerun()
 
 # --- PROCESSING ---
-elif st.session_state.step == "processing":
+elif st.session_state.step == 'processing':
     scroll_to_top()
-
-    c_scores = {k: 0 for k in COMM_PROFILES}
-    m_scores = {k: 0 for k in MOTIVATION_PROFILES}
-
-    for q in COMM_QUESTIONS:
-        c_scores[q["style"]] += st.session_state.answers_comm[q["id"]]
-    for q in MOTIVATION_QUESTIONS:
-        m_scores[q["style"]] += st.session_state.answers_motiv[q["id"]]
-
+    c_scores = {k:0 for k in COMM_PROFILES}
+    m_scores = {k:0 for k in MOTIVATION_PROFILES}
+    for q in COMM_QUESTIONS: c_scores[q['style']] += st.session_state.answers_comm[q['id']]
+    for q in MOTIVATION_QUESTIONS: m_scores[q['style']] += st.session_state.answers_motiv[q['id']]
+    
     p_comm, s_comm = get_top_two(c_scores)
     p_mot, s_mot = get_top_two(m_scores)
-
+    
     st.session_state.results = {
-        "primaryComm": p_comm,
-        "secondaryComm": s_comm,
-        "primaryMotiv": p_mot,
-        "secondaryMotiv": s_mot,
-        "commScores": c_scores,
-        "motivScores": m_scores
+        "primaryComm": p_comm, "secondaryComm": s_comm,
+        "primaryMotiv": p_mot, "secondaryMotiv": s_mot,
+        "commScores": c_scores, "motivScores": m_scores
     }
-
-    raw_cottage = st.session_state.user_info["cottage"]
+    
+    # Logic to clean cottage name (remove "Cottage " prefix)
+    raw_cottage = st.session_state.user_info['cottage']
     clean_cottage = raw_cottage.replace("Cottage ", "")
-
+    
     payload = {
-        "name": st.session_state.user_info["name"],
-        "email": st.session_state.user_info["email"],
-        "role": st.session_state.user_info["role"],
-        "cottage": clean_cottage,
+        "name": st.session_state.user_info['name'],
+        "email": st.session_state.user_info['email'],
+        "role": st.session_state.user_info['role'],
+        "cottage": clean_cottage, # Use cleaned version
         "scores": st.session_state.results
     }
-
+    
     with st.spinner("Analyzing results..."):
         submit_to_google_sheets(payload, action="save")
         time.sleep(1.0)
-
-    st.session_state.step = "results"
+    
+    st.session_state.step = 'results'
     st.rerun()
 
 # --- RESULTS ---
-elif st.session_state.step == "results":
+elif st.session_state.step == 'results':
     scroll_to_top()
-
     st.progress(100)
     res = st.session_state.results
     user = st.session_state.user_info
-    role_key = normalize_role_key(user["role"])
+    role_key = normalize_role_key(user['role'])
     role_labels = ROLE_RELATIONSHIP_LABELS[role_key]
-
+    
     show_brand_header(f"Profile for {user['name']}")
-
-    comm_prof = COMM_PROFILES[res["primaryComm"]]
-    mot_prof = MOTIVATION_PROFILES[res["primaryMotiv"]]
+    
+    comm_prof = COMM_PROFILES[res['primaryComm']]
+    mot_prof = MOTIVATION_PROFILES[res['primaryMotiv']]
     int_key = f"{res['primaryComm']}-{res['primaryMotiv']}"
     int_prof = INTEGRATED_PROFILES.get(int_key)
 
@@ -1507,44 +1304,29 @@ elif st.session_state.step == "results":
     c1, c2 = st.columns(2)
     with c1:
         pdf_bytes = create_pdf(user, res, comm_prof, mot_prof, int_prof, role_key, role_labels)
-        st.download_button(
-            "📄 Download PDF Report",
-            data=pdf_bytes,
-            file_name="Elmcrest_Profile.pdf",
-            mime="application/pdf"
-        )
+        st.download_button("📄 Download PDF Report", data=pdf_bytes, file_name="Elmcrest_Profile.pdf", mime="application/pdf")
     with c2:
         if st.button("📧 Email Me Full Report"):
             full_text = generate_text_report(user, res, comm_prof, mot_prof, int_prof, role_key, role_labels)
             with st.spinner("Sending..."):
-                if send_email_via_smtp(user["email"], "Your Elmcrest Leadership Compass Profile", full_text):
+                if send_email_via_smtp(user['email'], "Your Elmcrest Leadership Compass Profile", full_text):
                     st.success("Sent!")
 
     st.markdown("---")
 
     # --- COMM SECTION ---
     st.markdown(f"### 🗣️ {comm_prof['name']}")
-    st.markdown(
-        f"""
-        <div class="info-card">
-          <div style="
-            font-weight:800;
-            margin-bottom:8px;
-            font-size:0.82rem;
-            letter-spacing:0.08em;
-            text-transform:uppercase;
-            color: var(--md-sys-color-on-surface-variant);
-          ">{comm_prof['tagline']}</div>
-          <div style="line-height:1.65;">{comm_prof['overview']}</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown(f"""
+    <div class="info-card">
+        <div style="color:#015bad;font-weight:700;margin-bottom:5px;text-transform:uppercase;font-size:0.85rem;">{comm_prof['tagline']}</div>
+        <div style="line-height:1.6;">{comm_prof['overview']}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
     col1, col2 = st.columns([0.6, 0.4])
     with col1:
         with st.expander("Detailed Role Tips", expanded=True):
-            tips = comm_prof["roleTips"][role_key]
+            tips = comm_prof['roleTips'][role_key]
             st.markdown(f"**With {role_labels['directReportsLabel']}:** {tips['directReports']}")
             st.markdown(f"**With Youth:** {tips['youth']}")
             st.markdown(f"**With Supervisor:** {tips['supervisor']}")
@@ -1554,69 +1336,54 @@ elif st.session_state.step == "results":
 
     with col2:
         st.markdown("**Score Breakdown**")
-        for style, score in res["commScores"].items():
+        for style, score in res['commScores'].items():
             draw_score_bar(style, score)
 
     st.markdown("---")
 
     # --- MOTIV SECTION ---
     st.markdown(f"### 🔋 {mot_prof['name']}")
-    st.markdown(
-        f"""
-        <div class="info-card">
-          <div style="
-            font-weight:800;
-            margin-bottom:8px;
-            font-size:0.82rem;
-            letter-spacing:0.08em;
-            text-transform:uppercase;
-            color: var(--md-sys-color-on-surface-variant);
-          ">{mot_prof['tagline']}</div>
-          <div style="line-height:1.65;">{mot_prof['summary']}</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
+    st.markdown(f"""
+    <div class="info-card">
+        <div style="color:#015bad;font-weight:700;margin-bottom:5px;text-transform:uppercase;font-size:0.85rem;">{mot_prof['tagline']}</div>
+        <div style="line-height:1.6;">{mot_prof['summary']}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
     c_a, c_b = st.columns(2)
-    with c_a:
+    with c_a: 
         st.markdown("#### ✅ Boosters")
-        for b in mot_prof["boosters"]:
-            st.write(f"• {b}")
+        for b in mot_prof['boosters']: st.write(f"• {b}")
     with c_b:
         st.markdown("#### 🔻 Drainers")
-        for k in mot_prof["killers"]:
-            st.write(f"• {k}")
-
+        for k in mot_prof['killers']: st.write(f"• {k}")
+    
     st.info(f"**Support Needed:** {mot_prof['roleSupport'][role_key]}")
 
     # --- INTEGRATED SECTION ---
     if int_prof:
         st.markdown("---")
         st.markdown(f"### 🔗 Integrated: {int_prof['title']}")
-        st.write(int_prof["summary"])
-
+        st.write(int_prof['summary'])
+        
+        # New Expanded Section
         with st.expander("✨ View Full Analysis (Strengths, Weaknesses, Roadmap)", expanded=True):
             st.subheader("Key Strengths")
-            for s in int_prof["strengths"]:
-                st.write(f"- {s}")
-
+            for s in int_prof['strengths']: st.write(f"- {s}")
+            
             st.subheader("Potential Weaknesses")
-            for w in int_prof["weaknesses"]:
-                st.write(f"- {w}")
-
+            for w in int_prof['weaknesses']: st.write(f"- {w}")
+            
             st.markdown("---")
             c_comm, c_road = st.columns(2)
-
+            
             with c_comm:
                 st.subheader("Communication Architecture")
-                for c in int_prof["comm_arch"]:
-                    st.write(f"- {c}")
-
+                for c in int_prof['comm_arch']: st.write(f"- {c}")
+                
             with c_road:
                 st.subheader("Strategic Development Roadmap")
-                for r in int_prof["roadmap"]:
-                    st.write(f"- {r}")
+                for r in int_prof['roadmap']: st.write(f"- {r}")
 
     st.markdown("<br><br>", unsafe_allow_html=True)
     if st.button("Start Over"):
