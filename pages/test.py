@@ -1429,54 +1429,80 @@ def show_brand_header(subtitle):
           -webkit-backdrop-filter: blur(18px) saturate(170%);
           backdrop-filter: blur(18px) saturate(170%);
         ">
-          <div style="display:flex;align-items:center;gap:14px;">
-            <div style="
-              width:46px;height:46px;
-              border-radius: 14px;
-              background: linear-gradient(180deg, rgba(0,122,255,1), rgba(0,110,245,1));
-              display:flex;align-items:center;justify-content:center;
-              color:white;
-              font-weight:800;
-              letter-spacing:-0.02em;
-              font-size: 1.02rem;
-              box-shadow: var(--shadow-1);
-              border: 1px solid rgba(255,255,255,0.20);
-              user-select:none;
-            ">ELC</div>
+         <div style="
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
 
-            <div style="display:flex;flex-direction:column;justify-content:center;">
-              <div style="
-                font-weight: 850;
-                font-size: 1.35rem;
-                letter-spacing: -0.03em;
-                line-height: 1.1;
-                color: var(--text);
-              ">Elmcrest Leadership Compass</div>
+  padding: 18px 18px;
+  border-radius: 24px;
 
-              <div style="
-                margin-top: 5px;
-                font-size: 0.95rem;
-                font-weight: 650;
-                color: var(--text-2);
-              ">{subtitle}</div>
-            </div>
-          </div>
+  background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.62));
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06), 0 10px 30px rgba(0,0,0,0.08);
 
-          <div style="
-            padding: 6px 10px;
-            border-radius: 999px;
-            background: rgba(0,122,255,0.12);
-            border: 1px solid rgba(0,122,255,0.18);
-            color: var(--text);
-            font-weight: 750;
-            font-size: 0.82rem;
-            letter-spacing: 0.02em;
-            user-select:none;
-          ">
-            🧭
-          </div>
-        </div>
-        <div style="height:14px;"></div>
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+">
+
+  <div style="display:flex;align-items:center;gap:14px;min-width:0;">
+    <div style="
+      width:48px;height:48px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(0,122,255,1), rgba(0,110,245,1));
+      display:flex;align-items:center;justify-content:center;
+      color:white;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      font-size: 1.02rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.10), 0 10px 24px rgba(0,0,0,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
+      user-select:none;
+      flex: 0 0 auto;
+    ">ELC</div>
+
+    <div style="display:flex;flex-direction:column;justify-content:center;min-width:0;">
+      <div style="
+        font-weight: 800;
+        font-size: 1.42rem;
+        letter-spacing: -0.035em;
+        line-height: 1.15;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      ">Elmcrest Leadership Compass</div>
+
+      <div style="
+        margin-top: 6px;
+        font-size: 0.96rem;
+        font-weight: 650;
+        letter-spacing: -0.01em;
+        color: var(--text-2);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      ">Communication & Motivation Snapshot</div>
+    </div>
+  </div>
+
+  <div style="
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(0,122,255,0.12);
+    border: 1px solid rgba(0,122,255,0.18);
+    color: var(--text);
+    font-weight: 750;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    user-select:none;
+    flex: 0 0 auto;
+  ">🧭</div>
+</div>
+
+<div style="height:14px;"></div>
+
         """,
         unsafe_allow_html=True,
     )
