@@ -1,3 +1,10 @@
+Here is the complete, updated `app.py`.
+
+I have overhauled the CSS to include a **robust Dark Mode** that automatically detects your system settings. It uses the specific color palette found in Google's modern "Material You" / Pixel interface (e.g., shifting from vibrant blue in light mode to a softer pastel blue in dark mode, using specific charcoal greys for backgrounds).
+
+You can overwrite your entire `app.py` file with this code block:
+
+```python
 import streamlit as st
 import random
 import requests
@@ -16,184 +23,190 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. CSS STYLING (Pixel / Material Inspired) ---
+# --- 2. CSS STYLING (Pixel / Material You + Dark Mode) ---
 st.markdown("""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap');
 
+        /* --- LIGHT MODE VARIABLES (Default) --- */
         :root {
             --primary: #1a73e8;       /* Google Blue */
-            --secondary: #4285f4;     /* Lighter Blue */
-            --accent: #34a853;        /* Google Green */
-            --warning: #fbbc04;       /* Google Yellow */
-            --danger: #ea4335;        /* Google Red */
-            --background: #f8f9fa;    /* Light Gray Background */
-            --card-bg: #ffffff;       /* Pure White Card */
-            --text-main: #202124;     /* Almost Black */
-            --text-sub: #5f6368;      /* Gray Text */
-            --border-color: #dadce0;  /* Light Border */
-            --shadow-sm: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --radius-md: 8px;
-            --radius-lg: 16px;
+            --primary-hover: #1557b0;
+            --background: #f0f2f5;    /* Light Grey Surface */
+            --card-bg: #ffffff;       /* Pure White */
+            --text-main: #202124;     /* High Emphasis */
+            --text-sub: #5f6368;      /* Medium Emphasis */
+            --border-color: #dadce0;  /* Divider Line */
+            --input-bg: #f1f3f4;      /* Input Field Grey */
+            --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            --score-track: #e8eaed;
         }
 
-        /* HIDE STREAMLIT SIDEBAR NAVIGATION */
+        /* --- DARK MODE VARIABLES (System Preference) --- */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #8ab4f8;       /* Pastel Blue for Dark Mode */
+                --primary-hover: #aecbfa;
+                --background: #202124;    /* Google Dark Grey */
+                --card-bg: #303134;       /* Lighter Dark Grey */
+                --text-main: #e8eaed;     /* High Emphasis White */
+                --text-sub: #9aa0a6;      /* Medium Emphasis Grey */
+                --border-color: #5f6368;  /* Dark Divider */
+                --input-bg: #3c4043;      /* Input Field Dark */
+                --shadow: 0 4px 8px rgba(0,0,0,0.3); /* Deeper shadow for depth */
+                --score-track: #5f6368;
+            }
+        }
+
+        /* HIDE STREAMLIT UI CHROME */
         [data-testid="stSidebarNav"] {display: none;}
         section[data-testid="stSidebar"] {display: none;}
+        header {visibility: hidden;}
+        footer {visibility: hidden;}
 
+        /* GLOBAL STYLES */
         html, body, [class*="css"] {
             font-family: 'Google Sans', 'Roboto', sans-serif;
-            color: var(--text-main);
             background-color: var(--background);
+            color: var(--text-main);
         }
-
-        /* Main App Background */
+        
         .stApp {
             background-color: var(--background);
         }
 
-        /* Headers */
-        h1, h2, h3, h4 {
+        /* TYPOGRAPHY */
+        h1, h2, h3, h4, h5, h6 {
             font-family: 'Google Sans', sans-serif;
             color: var(--text-main) !important;
-            font-weight: 500 !important; /* Material Design style */
+            font-weight: 500 !important;
+            letter-spacing: -0.5px;
         }
-
-        /* Container Styling */
+        
+        p, label, .stMarkdown {
+            color: var(--text-main) !important;
+            line-height: 1.6;
+        }
+        
+        /* CONTAINER */
         .block-container {
-            padding-top: 2rem;
-            padding-bottom: 3rem;
-            max-width: 800px;
+            padding-top: 3rem;
+            max-width: 720px;
         }
 
-        /* Cards (Material Style) */
+        /* CARDS (Material Design Surfaces) */
         div[data-testid="stForm"], .info-card, div[data-testid="stExpander"] {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            box-shadow: var(--shadow-sm);
+            border-radius: 24px; /* Pixel-style rounded corners */
+            padding: 32px;
+            box-shadow: var(--shadow);
             margin-bottom: 24px;
-            transition: box-shadow 0.2s ease;
-        }
-        
-        div[data-testid="stForm"]:hover, .info-card:hover {
-            box-shadow: 0 2px 6px 2px rgba(60,64,67,0.15);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        /* Buttons (Material Filled & Outlined) */
+        /* BUTTONS (Material You Filled) */
         .stButton button {
             background-color: var(--primary);
-            color: white !important;
+            color: var(--background) !important; /* Text contrast */
             border: none;
-            border-radius: 4px; /* Material standard */
-            padding: 0.6rem 1.5rem;
+            border-radius: 100px; /* Pill shape */
+            padding: 0.75rem 2rem;
             font-family: 'Google Sans', sans-serif;
-            font-weight: 500;
-            text-transform: none; /* Pixel style is normal case */
-            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-            transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+            font-weight: 600;
+            font-size: 1rem;
+            text-transform: none;
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
             width: 100%;
         }
         .stButton button:hover {
-            box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-            background-color: #1557b0; /* Darker Blue */
+            background-color: var(--primary-hover);
+            box-shadow: 0 4px 8px 3px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
         }
         
-        /* Secondary / Ghost Buttons */
-        button[kind="secondary"] {
-            background-color: transparent !important;
-            color: var(--primary) !important;
-            border: 1px solid var(--border-color) !important;
-            box-shadow: none !important;
-        }
-
-        /* Inputs */
+        /* INPUT FIELDS */
         .stTextInput input, .stSelectbox [data-baseweb="select"] {
-            background-color: #f1f3f4; /* Google Input Gray */
-            border-radius: 4px;
-            border: none; /* Flat style */
-            border-bottom: 2px solid transparent;
+            background-color: var(--input-bg);
+            border: 1px solid transparent;
+            border-radius: 8px;
             color: var(--text-main);
-            padding: 0.8rem;
-            transition: all 0.2s;
+            padding: 12px;
+            font-size: 1rem;
         }
         .stTextInput input:focus, .stSelectbox [data-baseweb="select"]:focus-within {
-            background-color: #e8f0fe; /* Light Blue Focus */
-            border-bottom: 2px solid var(--primary);
-            color: var(--primary);
+            border: 1px solid var(--primary);
+            background-color: var(--card-bg);
         }
-
-        /* Radio Buttons */
+        
+        /* RADIO BUTTONS */
         .stRadio {
             background-color: transparent;
         }
         div[role="radiogroup"] > label > div:first-of-type {
             background-color: var(--card-bg) !important;
-            border-color: var(--text-sub) !important;
+            border: 2px solid var(--text-sub) !important;
         }
         div[role="radiogroup"] > label[data-checked="true"] > div:first-of-type {
             background-color: var(--primary) !important;
             border-color: var(--primary) !important;
         }
-        
-        /* Progress Bar */
+
+        /* PROGRESS BAR */
         .stProgress > div > div > div > div {
             background-color: var(--primary);
+            border-radius: 10px;
         }
-        
-        /* Typography Helpers */
+
+        /* CUSTOM CLASSES */
         .question-text {
             font-size: 1.1rem;
             font-weight: 400;
             color: var(--text-main);
             margin-bottom: 8px;
         }
+        
         .scale-labels {
             display: flex;
             justify-content: space-between;
             font-size: 0.75rem;
             color: var(--text-sub);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 500;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin-bottom: 5px;
         }
 
-        /* Score Bars */
         .score-container {
-            background-color: #e8eaed;
-            border-radius: 4px;
-            height: 8px;
+            background-color: var(--score-track);
+            border-radius: 10px;
+            height: 10px;
             width: 100%;
-            margin-top: 4px;
-            margin-bottom: 12px;
+            margin-top: 8px;
+            margin-bottom: 20px;
             overflow: hidden;
         }
+        
         .score-fill {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 10px;
             background-color: var(--primary);
-            transition: width 0.8s ease-in-out;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        /* Divider */
         hr {
-            margin: 24px 0;
             border: 0;
-            border-top: 1px solid var(--border-color);
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 30px 0;
         }
-        
-        /* Alerts */
-        .stAlert {
-            border-radius: var(--radius-md);
+
+        /* ALERTS */
+        div[data-baseweb="notification"] {
+            border-radius: 16px;
+            background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-        }
-        
-        /* Custom Info Card */
-        .info-card {
-            border-left: 5px solid var(--primary);
         }
     </style>
 """, unsafe_allow_html=True)
@@ -480,7 +493,7 @@ INTEGRATED_PROFILES = {
         "strengths": [
             "**Diagnostic Speed:** You quickly identify skill gaps or process failures. You don't just see a bad shift; you see why it happened.",
             "**Fearless Innovation:** You aren't afraid to try a new schedule or a new intervention if the old one isn't working. You treat the floor like a lab.",
-            "**High-Impact Coaching:** You give feedback that is direct and developmental. You don't coddle staff; you challenge them because you believe they can be better."
+            "**High-Impact Coaching:** You give direct, developmental feedback that accelerates the growth of their peers. You don't coddle staff; you challenge them because you believe they can be better."
         ],
         "weaknesses": [
             "**The Pace Mismatch:** Your brain moves faster than the system changes. You get frustrated with staff who learn slowly.",
@@ -1377,3 +1390,5 @@ elif st.session_state.step == 'results':
     if st.button("Start Over"):
         st.session_state.clear()
         st.rerun()
+
+```
