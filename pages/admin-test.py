@@ -1,6 +1,3 @@
-Here is the code with the content preserved exactly as requested, but with the **CSS Styling** and **Brand Colors** section completely overhauled to match an "iOS 26" futuristic aesthetic (Dark Mode `#1C1C1E`, System Fonts, Glassmorphism, and Apple-style widgets).
-
-```python
 import streamlit as st
 import requests
 import pandas as pd
@@ -1912,5 +1909,3 @@ elif st.session_state.current_view == "Org Pulse":
              st.warning("No valid data found for your selection.")
 
     else: st.warning("No data available.")
-
-```
