@@ -130,21 +130,23 @@ def fetch_staff_data():
         return []
     except: return []
 
-all_staff_list = fetch_staff_data()
-# Convert to DF and Normalize Columns immediately
-df_all = pd.DataFrame(all_staff_list)
+# Initialize Session State for Data Persistence
+if "master_df" not in st.session_state:
+    all_staff_list = fetch_staff_data()
+    # Convert to DF and Normalize Columns immediately
+    df_temp = pd.DataFrame(all_staff_list)
+    if not df_temp.empty:
+        df_temp.columns = df_temp.columns.str.lower().str.strip() 
+        if 'role' in df_temp.columns:
+            df_temp['role'] = df_temp['role'].astype(str).str.strip()
+        if 'cottage' in df_temp.columns:
+            df_temp['cottage'] = df_temp['cottage'].astype(str).str.strip()
+        if 'name' in df_temp.columns:
+            df_temp['name'] = df_temp['name'].astype(str).str.strip()
+    st.session_state.master_df = df_temp
 
-if not df_all.empty:
-    # 1. Normalize Column Names (lowercase, strip)
-    df_all.columns = df_all.columns.str.lower().str.strip() 
-    
-    # 2. Normalize String Values in Critical Columns (strip whitespace)
-    if 'role' in df_all.columns:
-        df_all['role'] = df_all['role'].astype(str).str.strip()
-    if 'cottage' in df_all.columns:
-        df_all['cottage'] = df_all['cottage'].astype(str).str.strip()
-    if 'name' in df_all.columns:
-        df_all['name'] = df_all['name'].astype(str).str.strip()
+# Use the session state dataframe for the rest of the app
+df_all = st.session_state.master_df
 
 # --- 5. SECURITY & LOGIN ---
 if "authenticated" not in st.session_state:
@@ -1299,11 +1301,12 @@ st.markdown("---")
 # 1. Supervisor's Guide
 if st.session_state.current_view == "Supervisor's Guide":
     st.subheader("📝 Supervisor's Guide")
-    sub1, sub2 = st.tabs(["Database", "Manual"])
+    sub1, sub2, sub3 = st.tabs(["Database", "Manual", "Create New Profile"])
+    
     with sub1:
-        if not df.empty:
+        if not df_all.empty:
             # Create dictionary from the FILTERED dataframe, not the raw list
-            filtered_staff_list = df.to_dict('records')
+            filtered_staff_list = df_all.to_dict('records')
             options = {f"{s['name']} ({s['role']})": s for s in filtered_staff_list}
             
             sel = st.selectbox("Select Staff", options.keys(), index=None, key="t1_staff_select")
@@ -1316,6 +1319,7 @@ if st.session_state.current_view == "Supervisor's Guide":
                     st.download_button("Download PDF", pdf, f"Guide_{d['name']}.pdf", "application/pdf")
                     display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
                 st.button("Reset", on_click=reset_t1)
+    
     with sub2:
         with st.form("manual"):
             c1,c2 = st.columns(2)
@@ -1326,13 +1330,49 @@ if st.session_state.current_view == "Supervisor's Guide":
                 st.download_button("Download PDF", pdf, "guide.pdf", "application/pdf")
                 display_guide(mn, mr, mpc, None, mpm, None)
 
+    with sub3:
+        st.markdown("### ➕ Add New Staff Profile")
+        st.info("ℹ️ This adds the profile to the current session database. To make it permanent, please update the Google Sheet.")
+        with st.form("add_new_profile"):
+            c1, c2 = st.columns(2)
+            n_name = c1.text_input("Staff Name")
+            n_role = c2.selectbox("Role", ["YDP", "Shift Supervisor", "Program Supervisor", "Manager"])
+            
+            c3, c4 = st.columns(2)
+            n_comm = c3.selectbox("Communication Style", COMM_TRAITS)
+            n_mot = c4.selectbox("Motivation Driver", MOTIV_TRAITS)
+            
+            # Dynamically fetch unique cottages if available, else default list
+            cottage_options = sorted(df['cottage'].unique().tolist()) if 'cottage' in df.columns else ["All"]
+            n_cottage = st.selectbox("Cottage/Scope", cottage_options)
+            
+            if st.form_submit_button("Save Profile"):
+                if n_name:
+                    new_record = {
+                        "name": n_name,
+                        "role": n_role,
+                        "p_comm": n_comm,
+                        "p_mot": n_mot,
+                        "s_comm": None,
+                        "s_mot": None,
+                        "cottage": n_cottage
+                    }
+                    # Add to session state dataframe
+                    new_row = pd.DataFrame([new_record])
+                    st.session_state.master_df = pd.concat([st.session_state.master_df, new_row], ignore_index=True)
+                    st.success(f"✅ Added {n_name} to database!")
+                    time.sleep(1)
+                    st.rerun()
+                else:
+                    st.error("Name is required.")
+
 # 2. TEAM DNA
 elif st.session_state.current_view == "Team DNA":
     st.subheader("🧬 Team DNA")
-    if not df.empty:
-        teams = st.multiselect("Select Team Members", df['name'].tolist(), key="t2_team_select")
+    if not df_all.empty:
+        teams = st.multiselect("Select Team Members", df_all['name'].tolist(), key="t2_team_select")
         if teams:
-            tdf = df[df['name'].isin(teams)]
+            tdf = df_all[df_all['name'].isin(teams)]
             c1, c2 = st.columns(2)
             with c1:
                 comm_counts = tdf['p_comm'].value_counts()
