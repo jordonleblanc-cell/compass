@@ -172,13 +172,22 @@ st.markdown(f"""
             padding: 12px;
         }}
         
-        /* DROPDOWNS & MENUS */
+        /* DROPDOWNS & MENUS - FIX FOR VISIBILITY */
         div[data-baseweb="popover"], div[data-baseweb="menu"] {{
             background-color: var(--ios-widget) !important;
             border-radius: 12px;
             border: 1px solid #48484A;
         }}
         div[data-baseweb="option"] {{
+            color: white !important;
+        }}
+        
+        /* Force text color inside Selectbox to be white */
+        .stSelectbox div[data-baseweb="select"] span {{
+            color: white !important;
+        }}
+        /* Ensure the dropdown chevron and selected text are white */
+        .stSelectbox div[data-baseweb="select"] * {{
             color: white !important;
         }}
 
