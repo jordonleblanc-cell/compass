@@ -182,13 +182,25 @@ st.markdown(f"""
             color: white !important;
         }}
         
-        /* Force text color inside Selectbox to be white */
+        /* CRITICAL FIX: Force text color inside Selectbox to be white */
+        .stSelectbox div[data-baseweb="select"] > div:first-child {{
+            color: white !important;
+            -webkit-text-fill-color: white !important;
+        }}
+        
         .stSelectbox div[data-baseweb="select"] span {{
             color: white !important;
         }}
-        /* Ensure the dropdown chevron and selected text are white */
-        .stSelectbox div[data-baseweb="select"] * {{
+        
+        /* Force Input inside selectbox (searchable) to be white */
+        .stSelectbox input {{
             color: white !important;
+            -webkit-text-fill-color: white !important;
+        }}
+        
+        /* Ensure the dropdown chevron and selected text are white */
+        .stSelectbox div[data-baseweb="select"] svg {{
+            fill: white !important;
         }}
 
         /* DATAFRAMES & TABLES */
@@ -973,334 +985,53 @@ INTEGRATED_PROFILES = {
     }
 }
 
-# --- EXTENDED DICTIONARIES (DNA/Missing Voice/Conflict) ---
+# --- 5c. HELPER FUNCTIONS ---
 
-TEAM_CULTURE_GUIDE = {
-    "Director": {
-        "title": "The Command Center",
-        "impact_analysis": "This team moves fast and breaks things. They are highly efficient but likely suffering from low psychological safety. Quiet voices are being steamrolled. The vibe is 'High Performance, Low Patience.'\n\n**The Good:** Crises are handled instantly. Decisions are made fast.\n**The Bad:** Psychological safety is likely low. 'Feelings' are viewed as inefficiencies. Quiet dissenters (Facilitators/Trackers) are likely being steamrolled or silencing themselves to avoid conflict. You are at risk of 'Burn and Turn'—burning out staff and turning over positions.",
-        "management_strategy": "**Your Role: The Brake Pedal.**\n\nDirectors view deliberation as weakness. You must reframe it as 'risk management.'\n\n1. **Force the Pause:** Mandate a 10-minute 'Devil's Advocate' session for major decisions. Make them sit in the discomfort of silence.\n2. **Protect Dissent:** Explicitly call on the quietest person in the room first. Protect them from interruption.\n3. **Humanize the Data:** Constantly remind them that 'efficiency' with traumatized youth often looks like 'impatience.'",
-        "meeting_protocol": "**The 'No Interruption' Rule:** Directors interrupt to 'speed things up.' Enforce a strict 'one voice at a time' rule to protect slower processors.",
-        "team_building": "Vulnerability Exercises (e.g., 'Highs and Lows'). They will hate it, but they need it to humanize each other."
-    },
-    "Encourager": {
-        "title": "The Social Hub",
-        "impact_analysis": "This team has high morale but low accountability. They avoid hard conversations and tolerate underperformance to keep the peace. The vibe is 'We Are Family' (which creates toxicity when you have to fire a 'family member').\n\n**The Good:** People feel loved and supported. Retention is high among the core group.\n**The Bad:** Standards slip. Mediocrity is tolerated. High performers burn out carrying the low performers who are 'too nice to fire.'",
-        "management_strategy": "**Your Role: The Standard Bearer.**\n\n1. **Redefine Kindness:** Coach them that clear boundaries are kind, and allowing failure is cruel. Frame accountability as 'protecting the team' from toxicity.\n2. **Data-Driven Feedback:** Remove the emotion from performance reviews. Use checklists and audit scores so they can't 'nice' their way out of it.\n3. **The 'Who' vs. The 'What':** They focus on the 'Who' (person). You must constantly pivot back to the 'What' (the mission/youth safety).",
-        "meeting_protocol": "**Start with the Failure:** Begin meetings by reviewing an incident or error (blamelessly) to normalize talking about hard things.",
-        "team_building": "Debate Club or Competitive Goal-Setting. Force them to compete and disagree safely."
-    },
-    "Facilitator": {
-        "title": "The United Nations",
-        "impact_analysis": "This team is fair and inclusive but suffers from analysis paralysis. Decisions take forever because they wait for consensus. The vibe is 'Let's Talk About It.'\n\n**The Good:** Everyone feels heard. Decisions have high buy-in once made.\n**The Bad:** Urgent problems fester. Opportunities are missed. In a crisis, the team may freeze, waiting for a vote when they need a command.",
-        "management_strategy": "**Your Role: The Clock.**\n\n1. **The 51% Rule:** Establish a rule that once you have 51% certainty (or 51% consensus), you move. Perfection is the enemy of done.\n2. **Disagree and Commit:** Teach the culture that it is okay to disagree with a decision but still support its execution 100%.\n3. **Assign 'Decision Owners':** Stop making decisions by committee. Assign one person to decide, and the committee only *advises*.",
-        "meeting_protocol": "**The '51% Rule':** If we are 51% sure, we move. No revisiting decisions after the meeting ends.",
-        "team_building": "Escape Rooms. They force the team to make rapid decisions against a clock to survive."
-    },
-    "Tracker": {
-        "title": "The Audit Team",
-        "impact_analysis": "This team is safe and compliant but rigid. They fear change and will quote policy to stop innovation. The vibe is 'By The Book.'\n\n**The Good:** Audits are perfect. Safety risks are low. Documentation is flawless.\n**The Bad:** Innovation is dead. Staff escalate youth behaviors because they prioritize enforcing a minor rule over maintaining the relationship. The culture is fear-based.",
-        "management_strategy": "**Your Role: The permission Giver.**\n\n1. **'Safe to Fail' Zones:** Explicitly designate areas where staff are allowed to experiment and fail without consequence.\n2. **The 'Why' Test:** Challenge every rule. If a staff member cannot explain *why* a rule exists (beyond 'it's in the book'), they aren't leading; they are robot-ing.\n3. **Reward Adaptation:** Publicly praise staff who *bent* a rule to save a situation (safely). Show that judgment is valued over blind compliance.",
-        "meeting_protocol": "**Ban the phrase:** 'We've always done it this way.' Require a rationale for every old habit.",
-        "team_building": "Improv Games. Forcing them to react to the unexpected without a script."
-    },
-    "Balanced": {
-        "title": "The Balanced Team",
-        "impact_analysis": "No single style dominates. This reduces blindspots but may increase friction as different 'languages' are spoken.",
-        "management_strategy": "**Your Role: The Translator.**\n\nYou must constantly translate intent. 'The Director isn't being mean; they are being efficient.' 'The Tracker isn't being difficult; they are being safe.' Rotate leadership based on the task: let the Director lead the crisis, the Encourager lead the debrief, the Tracker lead the audit.",
-        "meeting_protocol": "Round Robin input to ensure the quiet ones speak and the loud ones listen.",
-        "team_building": "Role Swapping. Have the Director do the paperwork and the Tracker run the floor."
-    }
-}
+def send_pdf_via_email(to_email, subject, body, pdf_bytes, filename):
+    """Sends the generated PDF via SMTP."""
+    if "EMAIL_USER" not in st.secrets or "EMAIL_PASSWORD" not in st.secrets:
+        return False, "⚠️ SMTP credentials not found in secrets.toml."
 
-MISSING_VOICE_GUIDE = {
-    "Director": {"risk": "**The Drift.** Without a Director, the team lacks a 'spine' of urgency. Decisions linger in 'discussion mode' forever. There is no one to cut through the noise and say 'This is what we are doing.' Problems are admired, not solved.", "fix": "**Be the Bad Guy.** You must artificially inject urgency. Set artificially tight deadlines (e.g., 'Decide by 3 PM'). Use 'Command Language' rather than 'Suggestion Language' during crises."},
-    "Encourager": {"risk": "**The Cold Front.** The team is cold and transactional. Burnout is high because no one feels cared for. Staff feel like 'cogs in a machine.' Retention will plummet because people join for the mission but stay for the people.", "fix": "**Artificial Warmth.** You must operationalize care. Start every meeting with a personal check-in. Celebrate birthdays and wins aggressively. Schedule 'no agenda' time just to connect."},
-    "Facilitator": {"risk": "**Steamrolling.** The loudest voices win, and quiet dissenters check out. Decisions are made fast but often wrong because key perspectives were ignored. There is 'compliance' but not 'buy-in.'", "fix": "**Forced Input.** Use round-robin speaking. Don't let anyone speak twice until everyone speaks once. Explicitly ask: 'Who haven't we heard from?'"},
-    "Tracker": {"risk": "**Chaos.** Details are dropped, and safety issues are missed. The team has great ideas but poor execution. Audits will fail, and safety risks will slip through the cracks.", "fix": "**The Checklist.** You must become the external hard drive. Create checklists for everything. Assign a 'Safety Captain' to review every plan for risks before execution."}
-}
+    smtp_server = st.secrets.get("EMAIL_HOST", "smtp.gmail.com")
+    smtp_port = st.secrets.get("EMAIL_PORT", 587)
+    sender_email = st.secrets["EMAIL_USER"]
+    sender_password = st.secrets["EMAIL_PASSWORD"]
 
-MOTIVATION_GAP_GUIDE = {
-    "Achievement": {
-        "warning": "This team runs on **Winning**. If they cannot see the scoreboard, they will disengage.",
-        "coaching": "**Strategy: Gamify the Grind.**\n\n1. **Visual Scoreboards:** Do not just say 'do better.' Put a chart on the wall tracking 'Days Without a Restraint' or 'Paperwork Accuracy %.' They need to see the line go up.\n2. **Micro-Wins:** Youth care is a long game. Break it down. Celebrate 'One smooth transition' or 'One clean file' as a victory.\n3. **Feedback Style:** Be objective. 'You hit 90% accuracy' lands better than 'You did a good job.'\n4. **The Trap:** Watch out for them cutting corners to hit the metric. Audit the *quality*, not just the *quantity*."
-    },
-    "Connection": {
-        "warning": "This team runs on **Belonging**. If the culture feels cold or isolated, they will quit.",
-        "coaching": "**Strategy: The Tribe.**\n\n1. **Face Time:** E-mail is the enemy. Walk the floor. Sit in the office and chat. They need to feel your presence to feel safe.\n2. **Rituals:** Establish team rituals (e.g., Friday food, morning huddles). These aren't 'nice to haves'; they are the glue holding the team together.\n3. **Protect the Vibe:** Toxic peers will destroy this team faster than bad management. You must excise toxicity immediately.\n4. **The Trap:** They may form cliques. Ensure the 'connection' includes everyone, not just the favorites."
-    },
-    "Growth": {
-        "warning": "This team runs on **Competence**. If they feel stagnant or bored, they will leave.",
-        "coaching": "**Strategy: The Ladder.**\n\n1. **Micro-Promotions:** You can't promote everyone to supervisor, so create 'titles' (e.g., 'Safety Captain', 'Trainer', 'Logistics Lead'). Give them ownership of a domain.\n2. **The 'Why' Behind the Task:** Don't just assign work; explain how this task builds a skill they will need for their next job.\n3. **Mentorship:** Connect them with leaders they admire. They crave access to expertise.\n4. **The Trap:** They may get bored with routine duties. Frame the boring stuff as 'professional discipline' required for advancement."
-    },
-    "Purpose": {
-        "warning": "This team runs on **Mission**. If the work feels meaningless or bureaucratic, they will rebel.",
-        "coaching": "**Strategy: The Storyteller.**\n\n1. **Connect Dots:** Constantly draw the line between the boring task (paperwork) and the mission (getting the kid funded/safe). Never assume they see the connection.\n2. **Mission Moments:** Start meetings by sharing a specific story of a youth's success. Remind them why they are tired.\n3. **Validation:** When they vent about the system, validate their moral outrage. 'You are right, it is unfair. That's why we have to fight harder.'\n4. **The Trap:** They can become martyrs, burning themselves out for the cause. You must mandate self-care as a 'mission requirement.'"
-    }
-}
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
 
-SUPERVISOR_CLASH_MATRIX = {
-    "Director": {
-        "Director": {
-            "tension": "Power Struggle (Control vs. Control)",
-            "psychology": "When two Directors clash, it's a battle for dominance. Both value speed, autonomy, and being 'right.' The conflict usually isn't personal; it's structural.",
-            "watch_fors": ["**The Public Showdown:** Arguing in front of the team to establish who is 'Alpha'.", "**Malicious Compliance:** 'Fine, I'll do it your way, but I'll watch it fail.'", "**Siloing:** Dividing the team into 'My Crew' vs. 'Your Crew'."],
-            "intervention_steps": ["**1. Define Swim Lanes:** Explicitly divide the turf.", "**2. The 'Disagree and Commit' Pact:** Agree to back each other in public.", "**3. Scheduled Friction:** Set a weekly meeting to debate strategy behind closed doors."],
-            "scripts": {
-                "Opening": "We are both strong leaders, but right now we are canceling each other out.",
-                "Validation": "I respect your drive. I know you want the best for this program.",
-                "The Pivot": "When we battle for control, we create confusion. We need to stop competing and start coordinating.",
-                "Crisis": "We don't have time for a power struggle. Go.",
-                "Feedback": "I need you to trust me to handle my lane."
-            }
-        },
-        "Encourager": {
-            "tension": "Efficiency vs. Empathy (Safety as Control vs. Safety as Connection)",
-            "psychology": "You (Director) find safety in speed and checking boxes. They (Encourager) find safety in connection and harmony. You view 'feelings' as distractions; they view them as the work. They feel steamrolled by your brevity; you feel slowed down by their need to chat.",
-            "watch_fors": ["**The 'Shut Down':** They go silent to protect themselves from your intensity.", "**The 'Smile & Nod':** They agree to a deadline they can't meet just to end the interaction.", "**Venting:** They process their hurt feelings with peers."],
-            "intervention_steps": ["**1. Disarm the Threat:** Lower your volume. Start with the person, not the task.", "**2. Translate Intent:** State that your intensity is about the *problem*, not them.", "**3. The 'Sandwich' Reframe:** They need the relational affirmation to hear the feedback."],
-            "scripts": {
-                "Opening": "I want to talk about the task, but first—how are you doing?",
-                "Validation": "I know my style can feel intense. I value your connection with the team.",
-                "The Pivot": "However, we need to solve this problem efficiently.",
-                "Crisis": "I need to be very direct right now because of the safety risk. It isn't personal.",
-                "Feedback": "I value you. To grow, I need you to hear hard news without feeling attacked."
-            }
-        },
-        "Facilitator": {
-            "tension": "Speed vs. Process (Urgency vs. Fairness)",
-            "psychology": "You (Director) value 'Done'. They (Facilitator) value 'Fair'. You see their desire for consensus as 'Analysis Paralysis'. They see your quick decisions as reckless. You fight for results; they fight for legitimacy.",
-            "watch_fors": ["**The 'We Need to Talk':** They schedule meetings to delay decisions.", "**Passive Resistance:** They won't argue, but they won't execute the plan.", "**Moral High Ground:** They frame your speed as 'uncaring'."],
-            "intervention_steps": ["**1. Define the Sandbox:** Give them a clear deadline (e.g., 'Decide by 3 PM').", "**2. Assign the 'Who':** Limit who they need to consult.", "**3. The 'Good Enough' Agreement:** Remind them a good decision today is better than a perfect one next week."],
-            "scripts": {
-                "Opening": "I know this feels rushed. I want to respect the process, but we have a tight timeline.",
-                "Validation": "I value that you want everyone to be heard.",
-                "The Pivot": "The risk is that if we don't decide by noon, we lose the option.",
-                "Crisis": "In this moment, I have to make the call. Follow my lead.",
-                "Feedback": "Your desire for consensus is a strength, but sometimes it becomes a bottleneck."
-            }
-        },
-        "Tracker": {
-            "tension": "Innovation vs. Compliance (Change vs. Safety)",
-            "psychology": "You (Director) want to break the status quo to get results. They (Tracker) want to protect the status quo to ensure safety. You see them as the 'Department of No.' They see you as a liability.",
-            "watch_fors": ["**The Rulebook Defense:** Quoting policy to stop new ideas.", "**The 'Yes, But':** Finding 10 reasons why it will fail.", "**Anxiety:** Your speed makes them visibly nervous."],
-            "intervention_steps": ["**1. The Pre-Mortem:** Ask them to list the risks, then solve them together.", "**2. Honor the Detail:** Do not dismiss their accuracy.", "**3. Trial Runs:** Frame changes as temporary experiments."],
-            "scripts": {
-                "Opening": "I have a new idea, and I need your eyes on it to make sure it's safe.",
-                "Validation": "I appreciate your attention to detail. You keep us compliant.",
-                "The Pivot": "We need to find a way to make this work. How can we do this safely?",
-                "Crisis": "I am taking full responsibility for this decision.",
-                "Feedback": "I need you to help me find the 'Yes.' Don't just tell me why we can't."
-            }
-        }
-    },
-    "Encourager": {
-        "Encourager": {
-            "tension": "Artificial Harmony (Nice vs. Nice)",
-            "psychology": "The vibe is amazing, but accountability is low. You both value harmony so much that you avoid hard conversations. Issues fester underground. You become 'Toxic Protectors,' shielding the team from reality.",
-            "watch_fors": ["**The Vent Session:** Complaining without action.", "**The 'Reply All' Apology:** Apologizing for enforcing rules.", "**Ghosting:** Avoiding staff rather than correcting them."],
-            "intervention_steps": ["**1. The 'Safety' Contract:** Agree that giving feedback is safe.", "**2. Assign the 'Bad Guy':** Rotate who delivers bad news.", "**3. Focus on the Victim:** Remind each other of the youth suffering due to lack of structure."],
-            "scripts": {
-                "Opening": "I hate having this conversation, but we need to talk about it.",
-                "Validation": "I know we both want the team to be happy.",
-                "The Pivot": "But by not addressing this, we are hurting the team.",
-                "Crisis": "We can't hug our way out of this. We have to be firm.",
-                "Feedback": "I feel like we are dancing around the issue. Let's just say it."
-            }
-        },
-        "Director": {
-            "tension": "Warmth vs. Competence (Being Liked vs. Being Effective)",
-            "psychology": "You (Encourager) interpret their brevity as anger. They (Director) interpret your need for chat as incompetence or padding. You feel unsafe; they feel slowed down.",
-            "watch_fors": ["**Apologizing:** You apologizing for giving them work.", "**Taking it Personally:** Feeling hurt by their directness.", "**Avoidance:** Emailing instead of talking to avoid the friction."],
-            "intervention_steps": ["**1. Cut the Fluff:** Start with the headline.", "**2. Stand Your Ground:** If they push back, state your reasoning calmly.", "**3. Ask for Input:** Frame the relationship issue as a problem to be solved."],
-            "scripts": {
-                "Opening": "I'm going to get straight to the point.",
-                "Validation": "I know you are focused on getting this done.",
-                "The Pivot": "However, the way you spoke to the team caused a shutdown.",
-                "Crisis": "Stop. Listen to me. This is a safety issue.",
-                "Feedback": "You are right on the facts, but wrong on the approach."
-            }
-        }
-    },
-    "Facilitator": {
-        "Facilitator": {
-            "tension": "Process Paralysis (Talk vs. Talk)",
-            "psychology": "The infinite loop. You both want to make sure everyone is heard. You both dislike polarization. The result is meetings that never end and decisions that never happen.",
-            "watch_fors": ["**The 'Let's Circle Back':** Delaying decisions.", "**The Meeting About the Meeting:** Planning to plan.", "**Consensus Addiction:** Refusing to move without 100% agreement."],
-            "intervention_steps": ["**1. The 'Shot Clock':** Set a timer for the decision.", "**2. Limit Input:** Agree to only consult 2 people, not everyone.", "**3. The 'Good Enough' Pact:** Agree that 80% certainty is enough."],
-            "scripts": {
-                "Opening": "We are over-thinking this.",
-                "Validation": "I value that we are being thorough.",
-                "The Pivot": "But we are stuck. We need to pick a direction.",
-                "Crisis": "Process is over. I am making the call.",
-                "Feedback": "We need to stop asking for permission and start giving direction."
-            }
-        },
-        "Encourager": {
-            "tension": "Fairness vs. Favor (Process vs. Vibe)",
-            "psychology": "You (Facilitator) try to create a fair system where everyone is treated equally. They (Encourager) try to create a happy family where everyone feels liked. You clash when you try to enforce a rule for equity, and they try to bend it to save a relationship. You view them as playing favorites; they view you as cold or bureaucratic.",
-            "watch_fors": [
-                "**The 'Nice' Trap:** You both avoid conflict, so performance issues are ignored until they explode.",
-                "**The Talk Loop:** You listen to gather perspective; they talk to process. Meetings run overtime with no action items.",
-                "**Vibe over Fact:** They sell you an optimistic story ('It's going great!'). You want to believe the team is aligned, so you don't dig for the data."
-            ],
-            "intervention_steps": [
-                "**1. Data over Feeling:** They speak in generalities. You must force them to bring specific numbers/facts to supervision.",
-                "**2. The 'Bad Guy' Agreement:** You both struggle to be the enforcer. Explicitly agree on who delivers the bad news so you don't both ghost the issue.",
-                "**3. Written Action Items:** They forget details after the emotion fades. You value process. End every meeting with a written list of tasks."
-            ],
-            "scripts": {
-                "Opening": "I love the energy you bring, but we need to look at the numbers.",
-                "Validation": "I know you want to protect the team's morale.",
-                "The Pivot": "But by letting this slide, we are being unfair to the staff who follow the rules.",
-                "Crisis": "We can't worry about feelings right now. We follow the protocol.",
-                "Feedback": "You are great at the relationship, but I need you to be better at the paperwork/follow-through."
-            }
-        },
-        "Tracker": {
-            "tension": "Consensus vs. Compliance (People vs. Policy)",
-            "psychology": "You (Facilitator) want the team to agree. They (Tracker) want the team to follow the rule. You feel they are being rigid 'robots'. They feel you are treating safety rules as 'suggestions' to make people happy.",
-            "watch_fors": ["**The Policy War:** They quote the handbook; you quote the 'context'.", "**Ignoring:** You ignoring their emails because they feel like nagging.", "**Anxiety:** They get anxious when you say 'let's just see how it goes'."],
-            "intervention_steps": ["**1. Validate the Rule:** Acknowledge the policy first.", "**2. Contextualize the Exception:** Explain *why* this specific situation requires a bend.", "**3. Define the New Boundary:** Create a temporary rule so they feel safe."],
-            "scripts": {
-                "Opening": "I know this plan deviates from SOP, and I want to explain why.",
-                "Validation": "I appreciate you keeping us compliant.",
-                "The Pivot": "In this specific case, following the rule will cause escalation.",
-                "Crisis": "I am taking responsibility for this exception.",
-                "Feedback": "I need you to see the gray areas."
-            }
-        }
-    },
-    "Tracker": {
-        "Tracker": {
-            "tension": "The Micro-War (Detail vs. Detail)",
-            "psychology": "It becomes a court case over the interpretation of a rule. You both dig into details to prove you are 'technically correct.' The team gets lost in the minutiae.",
-            "watch_fors": ["**The Email War:** Sending evidence-filled emails instead of talking.", "**Malicious Audit:** Looking for errors in each other's work.", "**Stalemate:** Refusing to move until policy is clarified."],
-            "intervention_steps": ["**1. Zoom Out:** Stop talking about the rule. Talk about the goal.", "**2. Pick a Lane:** Divide compliance tasks.", "**3. The 'Human Override':** Remind each other systems serve people."],
-            "scripts": {
-                "Opening": "We are getting lost in the weeds.",
-                "Validation": "I know we both want to do this exactly right.",
-                "The Pivot": "Is this critical to safety, or just a preference?",
-                "Crisis": "The procedure doesn't matter right now. Safety matters.",
-                "Feedback": "We need to stop using the rulebook as a weapon."
-            }
-        }
-    }
-}
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload(pdf_bytes)
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', f'attachment; filename="{filename}"')
+        msg.attach(part)
 
-CAREER_PATHWAYS = {
-    "Director": {
-        "Shift Supervisor": {
-            "shift": "**From 'Individual Hero' to 'Orchestra Conductor':** This transition requires a fundamental rewiring of how you define value. As a YDP, you were the MVP—the fastest, strongest problem solver who could dive into any chaos and fix it. Your worth was tied to your personal output. As a Supervisor, your 'hero' instincts are now a liability. If you dive in, you leave the team without a leader. You must shift from being the player who scores the points to the coach who designs the plays. This means suppressing the urge to 'just do it myself' and instead investing energy into directing, observing, and correcting others. Your new win condition is not 'I fixed it,' but 'The team fixed it because I guided them.'",
-            "why": "This is an identity crisis. As a YDP, the Director was valued for their speed, their ability to put out fires, and their 'do it myself' competence. They were the MVP player. Now, as a supervisor, their job is to stay on the sidelines and call the plays. They often feel useless when they aren't physically doing the work. They fear that if they don't step in, the team will fail or be too slow. This anxiety drives them to micromanage or 'rescue' the team, which stunts the team's growth and leads to supervisor burnout.",
-            "conversation": "**The 'Hands in Pockets' Talk:**\n\n'Your value has changed. Yesterday, I paid you to be the fastest runner on the field. Today, I am paying you to make sure everyone else knows where to run. \n\nEvery time you jump in to fix a problem for a staff member, you are stealing a learning opportunity from them. You are teaching them that they don't need to be competent because you will save them. \n\nI need you to practice 'strategic patience.' Watch them struggle for 30 seconds before you intervene. Guide them with questions ('What do you think we should do?'), not commands. Your goal is to make yourself unnecessary.'",
-            "assignment_setup": "This assignment is designed to force the Director to lead through influence rather than action. It removes their ability to use their physical competence as a crutch.",
-            "assignment_task": "**The 'Chair' Challenge:**\nFor one hour during a busy shift, you must sit in a chair in the hallway or dayroom. You are not allowed to physically intervene in any routine task (chores, transitions, minor conflicts) unless there is an imminent safety threat.\n\nYou must direct the team verbally from your chair. If a staff member asks 'What should I do?', you must answer with a question: 'What is your plan?'",
-            "success_indicators": "1. The Supervisor remained in the chair for the full hour.\n2. The team successfully completed routine tasks without the Supervisor doing them.\n3. The Supervisor used coaching questions instead of barking orders.\n4. The Supervisor remained calm even when things were done slower than they would have done them.",
-            "red_flags": "1. They jumped up to 'fix' a minor issue (e.g., a messy table).\n2. They shouted orders across the room instead of coaching.\n3. The team stood around waiting for instructions instead of taking initiative.\n4. The Supervisor expressed visible frustration or anger at the team's speed.",
-            "supervisor_focus": "Watch for their anxiety levels. Are they vibrating with the need to 'do'? Debrief that anxiety—it's the core of their development."
-        },
-        "Program Supervisor": {
-            "shift": "**From 'Operational General' to 'Strategic Architect':** You have mastered the art of the daily grind, but the Program Supervisor role demands a longer horizon. You can no longer just fight today's battles; you must design the war strategy for next year. This shift requires you to stop prioritizing immediate efficiency over long-term health. You must learn to value the 'soft' work—culture building, emotional mentoring, and slow policy implementation—as much as the 'hard' work of audits and schedules. If you run the program like a machine, you will burn out the parts (your people). You must learn to be a gardener: preparing the soil, planting seeds, and waiting patiently for growth, rather than pulling on plants to make them grow faster.",
-            "why": "Directors excel at execution. They love checking boxes and hitting daily targets. However, the Program Supervisor role requires long-term thinking, culture building, and developing people over months, not minutes. They struggle to see the value in 'soft' work like mentoring or culture building because it doesn't have an immediate, visible result. They risk running a highly efficient program that burns out staff because they treat people like parts of a machine.",
-            "conversation": "**The 'Gardener' Analogy:**\n\n'You are excellent at building machines, but a team is a garden. You can't force a plant to grow faster by pulling on it. You have to create the right environment—soil, sun, water—and wait.\n\nYour job is no longer just to hit the metrics today. Your job is to build a team that can hit the metrics a year from now. This means you have to prioritize mentoring over doing. You have to tolerate short-term inefficiency for long-term growth. If you burn out your people to hit a number, you have failed.'",
-            "assignment_setup": "This assignment forces the Director to slow down and focus entirely on another person's growth, removing the dopamine hit of 'getting things done' themselves.",
-            "assignment_task": "**The Mentor Project:**\nSelect one high-potential but struggling staff member. Your goal is to teach them ONE specific administrative or leadership skill (e.g., running a shift debrief, auditing a file) over the course of two weeks.\n\nYou cannot do the task for them. You must meet with them, explain the 'why,' demonstrate the 'how,' and then observe them doing it, providing feedback. Your success is measured solely by *their* ability to do the task independently by Friday.",
-            "success_indicators": "1. The staff member can perform the task independently and correctly.\n2. The staff member reports feeling supported, not judged.\n3. The Director can articulate the staff member's learning style and barriers.\n4. The Director spent significant time listening, not just talking.",
-            "red_flags": "1. The Director just did the task for them to 'save time'.\n2. The staff member feels steamrolled or criticized.\n3. The Director complains that the staff member is 'too slow' or 'doesn't get it'.\n4. The Director cannot explain *why* the staff member struggled, only *that* they struggled."
-        }
-    },
-    "Encourager": {
-        "Shift Supervisor": {
-            "shift": "**From 'Best Friend' to 'Respected Leader':** This is the most emotionally taxing shift you will make. Your natural strength is connection, and you likely built your influence by being the person everyone feels safe with—the 'Best Friend.' Leadership requires you to trade some of that intimacy for respect. You must accept that you cannot be both their peer and their boss. The shift involves realizing that true kindness is not about keeping people happy in the moment; it is about holding them to a standard that keeps them employed and the youth safe. You must move from 'protecting feelings' to 'protecting the mission,' even if that means making your friends uncomfortable.",
-            "why": "This is the hardest shift for an Encourager. Their primary motivation is Connection—they want to be liked and part of the tribe. Becoming a supervisor separates them from the peer group. They fear that if they give feedback or enforce rules, they will be rejected or seen as 'mean.' This leads to the 'Cool Parent' trap, where they let standards slide to buy affection, eventually losing the team's respect and safety.",
-            "conversation": "**The 'Kindness vs. Niceness' Distinction:**\n\n'You are prioritizing being *nice* over being *kind*. \n\nBeing nice is about saving yourself from awkwardness. It's selfish. \nBeing kind is about telling someone the truth so they can be successful. It's selfless.\n\nWhen you let a peer break a rule because you don't want to upset them, you are setting them up to be fired by me later. That is not friendship. True care is holding them to a standard that keeps them employed and keeps kids safe. You have to be willing to be 'the bad guy' to be a good leader.'",
-            "assignment_setup": "This assignment confronts the Encourager's biggest fear: direct conflict with a peer. It forces them to choose respect over popularity.",
-            "assignment_task": "**The Audit & Feedback Loop:**\nChoose a peer who you are close with. Perform a strict audit of their documentation or shift duties. Find at least one meaningful error or area for improvement.\n\nYou must deliver this feedback face-to-face. You cannot sugarcoat it, joke about it, or blame management ('My boss is making me tell you this'). You must own the feedback: 'I noticed this, and I need you to fix it because it impacts safety.'",
-            "success_indicators": "1. The feedback was direct, clear, and serious.\n2. The Encourager did not apologize for doing their job.\n3. The peer understood the expectation.\n4. The dynamic remained professional, even if awkward.",
-            "red_flags": "1. The Encourager used the 'Feedback Sandwich' so heavily the point was lost.\n2. They blamed the policy on upper management to absolve themselves.\n3. They laughed or joked to break the tension.\n4. They avoided the conversation entirely and just fixed the error themselves.",
-            "supervisor_focus": "Watch for the 'apology tour' afterwards. Ensure they sit in the discomfort of the boundary they just set."
-        },
-        "Program Supervisor": {
-            "shift": "**From 'Team Cheerleader' to 'Culture Architect':** As a Program Supervisor, your 'niceness' can become a toxicity if not tempered with courage. You are no longer just boosting morale; you are the immune system of the program culture. This means you must be willing to identify and remove toxic elements, even if they are popular. The shift requires you to stop seeing conflict as a failure of leadership and start seeing it as a tool for clarity. You must transition from being the person who absorbs the team's stress to the person who sets the boundaries that prevent stress. You are not just there to hug the team; you are there to build a house where the team can thrive, which requires firm walls.",
-            "why": "Encouragers are great at maintaining morale, but Program Supervisors need to *build* culture, which often involves pruning toxic elements. Encouragers struggle to fire people, put people on performance plans, or make unpopular decisions that are best for the program. They can become 'toxic protectors,' shielding bad staff from accountability to keep the peace, which rots the culture from the inside.",
-            "conversation": "**The 'Protect the Hive' Talk:**\n\n'You love this team, and that is your superpower. But right now, by protecting the underperformers, you are hurting your high performers. \n\nYour high performers are tired of carrying the load for the people you won't hold accountable. They are waiting for you to lead. If you value the team, you have to protect the *standard* of the team, not just the feelings of the individual. Leadership is not about making everyone happy today; it's about making the team healthy forever.'",
-            "assignment_setup": "This assignment pushes the Encourager to address a systemic issue that requires setting a hard boundary with the entire team, risking their 'approval rating.'",
-            "assignment_task": "**The Standard Reset:**\nIdentify a culture issue where the team has become lax (e.g., cell phone use, lateness, sloppy language). You must lead a team meeting where you explicitly reset this expectation.\n\nYou must state the new standard, explain the 'why' (impact on youth), and—crucially—explain the consequence for non-compliance. You must hold the room without backing down or softening the message when they push back.",
-            "success_indicators": "1. The standard was defined clearly without ambiguity.\n2. The consequences were stated firmly.\n3. The Encourager did not backpedal when the team complained.\n4. The Encourager focused on the mission, not their popularity.",
-            "red_flags": "1. They framed it as 'a suggestion' or 'something we should try'.\n2. They apologized for the new rule.\n3. They let the team debate the rule until it lost all teeth.\n4. They ended the meeting by seeking reassurance ('Is everyone okay with me?')."
-        }
-    },
-    "Facilitator": {
-        "Shift Supervisor": {
-            "shift": "**From 'Consensus Builder' to 'Decision Maker':** Your gift for listening and ensuring everyone feels heard is vital for culture, but it can be fatal in a crisis. The shift requires you to abandon the need for 100% agreement. In the Supervisor role, 'good enough and fast' is often better than 'perfect and slow.' You must learn to recognize the moment when discussion ends and command begins. This feels unnatural and perhaps even 'mean' to you, but you must reframe decisiveness as safety. The team feels unsafe when they don't know who is driving the bus. Your new goal is not to make everyone happy with the decision, but to make everyone safe with the direction.",
-            "why": "Facilitators are excellent at hearing all sides and ensuring fairness. However, in a crisis or fast-paced shift, this strength becomes a weakness: 'Analysis Paralysis.' They delay making necessary decisions because they are waiting for everyone to agree, or they try to find a 'perfect' solution that upsets no one. On a shift, a good decision *now* is better than a perfect decision *later*. They need to get comfortable with the 51% decision.",
-            "conversation": "**The 'Captain of the Ship' Analogy:**\n\n'When the seas are calm, we can vote on where to go for dinner. When the ship is hitting an iceberg, you don't call a meeting; you give an order.\n\nYour team feels unsafe when you hesitate. They aren't looking for a vote; they are looking for a leader. I need you to practice making calls when you only have 60% of the information and 0% of the consensus. If you are wrong, we will fix it together. But you cannot be frozen.'",
-            "assignment_setup": "This simulation removes the luxury of time and consensus, forcing the Facilitator to rely on their own judgment.",
-            "assignment_task": "**The Crisis Drill (Tabletop):**\nPresent them with a complex, urgent scenario (e.g., two fights breaking out simultaneously while a staff member is injured). Give them 60 seconds to articulate a plan.\n\nThey must assign roles, prioritize safety, and make the call. Do not let them ask 'What do you think?' Stop them if they try to debate the options. Force a commitment: 'What is your order?'",
-            "success_indicators": "1. A decision was made within the time limit.\n2. The instructions to the team were clear and direct.\n3. They stood by their decision even when you challenged it.\n4. They prioritized safety over making everyone happy.",
-            "red_flags": "1. They froze or went silent.\n2. They tried to ask the group for input.\n3. They gave vague suggestions ('Someone should probably...') instead of orders.\n4. They kept changing their mind.",
-            "supervisor_focus": "Validate their *decision-making capability*. They need to know you trust their gut so they can trust it too."
-        },
-        "Program Supervisor": {
-            "shift": "**From 'Mediator' to 'Driver of Change':** You naturally seek equilibrium and stability, acting as the bridge between conflicting parties. However, a Program Supervisor often needs to *disrupt* the equilibrium to force growth. You must shift from being the neutral peacekeeper to the active driver of unpopular but necessary changes. This means you cannot just validate the staff's resistance to new admin policies; you must champion the 'Why' behind the change. You must become comfortable with the team being temporarily unhappy with you for the sake of their long-term development. Leadership is not just about servicing the team's current desires; it is about leading them to a new reality.",
-            "why": "Facilitators naturally want to balance the system and keep it stable. As a Program Supervisor, they often need to *disrupt* the system to improve it. They struggle to roll out unpopular changes or enforce new mandates from above because they empathize too deeply with the staff's resistance. They can become 'message carriers' ('Admin said we have to...') rather than leaders who own the mission.",
-            "conversation": "**The 'Sales vs. Service' Shift:**\n\n'You are used to servicing the team's needs. Now, I need you to sell them on a new reality. \n\nWe are implementing [New Protocol]. The team is going to hate it at first. Your job is not just to validate their complaints until the protocol dies. Your job is to listen, acknowledge, and then *lead them through the change*. You cannot stay neutral. You have to own this change as if it were your idea. You are the driver, not the passenger.'",
-            "assignment_setup": "This assignment tests their ability to champion a directive they didn't create, requiring them to own their authority.",
-            "assignment_task": "**The Rollout:**\nAssign them to introduce a new (minor but annoying) policy to the team (e.g., a new paperwork requirement). \n\nThey must present it to the team, explain the 'Why' (connecting it to the mission/safety), and handle the objections *without* blaming upper management or promising to 'see if we can change it.' They must hold the line.",
-            "success_indicators": "1. They used 'We' language, not 'They' (admin) language.\n2. They validated feelings ('I know this is extra work') without validating refusal.\n3. They kept the focus on the outcome/mission.\n4. The team left understanding that the change is happening.",
-            "red_flags": "1. They said 'I know this sucks, but I have to tell you...'\n2. They promised to try to get the rule cancelled.\n3. They let the meeting devolve into a complaining session.\n4. They stayed neutral/silent when staff attacked the policy."
-        }
-    },
-    "Tracker": {
-        "Shift Supervisor": {
-            "shift": "**From 'Rule Enforcer' to 'Adaptive Leader':** You find safety in the black-and-white clarity of the rulebook. The shift to Supervisor thrusts you into the gray world of human emotion and crisis management. You must learn that the policy is a map, but the terrain (the actual situation) determines the path. The transition requires you to prioritize the *outcome* (safety/connection) over the *process* (strict compliance). You must learn to ask 'What does this kid need right now?' before asking 'What does page 42 say?' This doesn't mean abandoning rules; it means mastering them so well that you know exactly when to bend them to save a situation.",
-            "why": "Trackers find safety in the black-and-white rulebook. As supervisors, they struggle with the 'gray'. They can become rigid 'policy robots' who quote the handbook while the building burns down. They risk losing the team's trust because they prioritize compliance over context. They need to learn that the rule is the map, but the territory (the reality of human behavior) is what matters.",
-            "conversation": "**The 'Spirit of the Law' Talk:**\n\n'You know the rules better than anyone. That is your strength. But leadership is about knowing when the rule serves the mission and when it blocks it.\n\nIf you enforce a rule in a way that escalates a kid into a crisis, you have failed the mission of safety, even if you were 'right' on paper. I need you to develop your intuition. I need you to read the room, not just the manual. Compliance is the baseline; safety and connection are the goal.'",
-            "assignment_setup": "This scenario forces the Tracker to choose between a rigid rule and a safer, more flexible outcome.",
-            "assignment_task": "**The Gray Area Scenario:**\nPresent a scenario where a strict rule needs to be bent for safety (e.g., A dysregulated youth refuses to wear shoes during a transition, but forcing the issue will cause a restraint). \n\nAsk them to manage the transition. The 'correct' answer is to prioritize the relationship/safety (let the kid walk in socks) rather than the rule (shoes are mandatory).",
-            "success_indicators": "1. They identified that safety > compliance.\n2. They communicated the *exception* clearly to the team ('We are making an exception for safety').\n3. They did not get into a power struggle with the youth.\n4. They debriefed it as a tactical decision, not a failure.",
-            "red_flags": "1. They quoted the rulebook and escalated the youth.\n2. They seemed paralyzed by the choice.\n3. They blamed the youth for 'not following instructions.'\n4. They were unable to explain *why* they would bend the rule.",
-            "supervisor_focus": "Praise their flexibility. They need permission to color outside the lines when it serves the mission."
-        },
-        "Program Supervisor": {
-            "shift": "**From 'Guardian' to 'Architect':** You are excellent at maintaining the integrity of existing systems. The Program Supervisor role, however, requires you to *break* systems that no longer work and build better ones. You must shift from a mindset of 'preservation' to 'innovation.' This is difficult because change feels like risk to you. You must learn to see inefficiency as a bigger threat than change. Your job is not just to ensure the forms are filled out correctly; it is to ask if we even need that form at all. You must become the designer of the machine, not just its mechanic.",
-            "why": "Trackers are excellent at maintaining existing systems. However, Program Supervisors need to *build* new systems and improve broken ones. Trackers often resist change because change feels like chaos/risk. They can become bottlenecks who stifle innovation because 'we've always done it this way.' They need to shift from protecting the status quo to designing better ways to work.",
-            "conversation": "**The 'System Upgrade' Talk:**\n\n'You are great at keeping the train on the tracks. But now I need you to build a better track.\n\nI want you to look at our systems not as sacred laws, but as tools. Some of them are broken. Some are slow. Your job is not just to make people follow the process; it's to fix the process so it's easier to follow. I need you to stop saying 'no' to new ideas and start asking 'how can we make this work safely?''",
-            "assignment_setup": "This assignment leverages their love for detail but points it toward innovation rather than compliance.",
-            "assignment_task": "**The Workflow Fix:**\nIdentify a process that is currently clunky or inefficient (e.g., shift changeover, incident reporting). Task them with designing a *new*, streamlined version.\n\nThey must map out the current problem, design the new solution, and—most importantly—sell the *efficiency* gain to the team. They cannot just add more rules; they must remove barriers.",
-            "success_indicators": "1. The new system is actually simpler/faster, not more complex.\n2. They solicited input from the team on the pain points.\n3. They can explain how the change improves safety/efficiency.\n4. They are excited about the *improvement*, not just the *compliance*.",
-            "red_flags": "1. They created a system that is just more paperwork/checklist boxes.\n2. They refused to change the old way because 'it's policy'.\n3. They did not consult the users (staff) about the friction points.\n4. The solution solves a compliance problem but creates an operational nightmare."
-        }
-    }
-}
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.send_message(msg)
+        return True, "✅ Email sent successfully!"
+    except Exception as e:
+        return False, f"❌ Error sending email: {str(e)}"
 
-# 5c. INTEGRATED PROFILES (Expanded & 10 Coaching Questions Logic)
 def generate_profile_content(comm, motiv):
-    
-    # This dictionary holds the specific text for the 16 combinations
     combo_key = f"{comm}-{motiv}"
-    
-    # Lookup individual profiles
     c_data = COMM_PROFILES.get(comm, {})
     m_data = MOTIV_PROFILES.get(motiv, {})
     i_data = INTEGRATED_PROFILES.get(combo_key, {})
 
     return {
-        "s1_b": c_data.get('bullets'),
-        "s2_b": c_data.get('supervising_bullets'),
-        "s3_b": m_data.get('bullets'),
-        "s4_b": m_data.get('strategies_bullets'),
-        # S5 is Synergy
-        "s5": f"**Profile:** {i_data.get('title')}\n\n{i_data.get('synergy')}",
-        "s6": i_data.get('support', ''),
-        "s7": i_data.get('thriving', ''), # Thriving paragraphs
-        "s8": i_data.get('struggling', ''), # Struggling paragraphs
-        "s9": "Strategies for Course Correction:", # Intervention Header
-        "s9_b": i_data.get('interventions', []),
-        "s10_b": m_data.get('celebrate_bullets'),
-        "coaching": i_data.get('questions', []),
-        "advancement": i_data.get('advancement', '')
+        "s1_b": c_data.get('bullets', []), "s2_b": c_data.get('supervising_bullets', []),
+        "s3_b": m_data.get('bullets', []), "s4_b": m_data.get('strategies_bullets', []),
+        "s5": f"**Profile:** {i_data.get('title', 'N/A')}\n\n{i_data.get('synergy', '')}",
+        "s6": i_data.get('support', ''), "s7": i_data.get('thriving', ''),
+        "s8": i_data.get('struggling', ''), "s9": "Strategies for Course Correction:",
+        "s9_b": i_data.get('interventions', []), "s10_b": m_data.get('celebrate_bullets', []),
+        "coaching": i_data.get('questions', []), "advancement": i_data.get('advancement', '')
     }
 
 def clean_text(text):
@@ -1313,32 +1044,24 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf.set_auto_page_break(auto=True, margin=15)
     blue = (1, 91, 173); black = (0, 0, 0)
     
-    # Header
     pdf.set_font("Arial", 'B', 20); pdf.set_text_color(*blue); pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align='C')
     pdf.set_font("Arial", '', 12); pdf.set_text_color(*black); pdf.cell(0, 8, clean_text(f"For: {name} ({role})"), ln=True, align='C')
     pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C'); pdf.ln(8)
     
-    # Generate Data
     data = generate_profile_content(p_comm, p_mot)
 
     def add_section(title, body, bullets=None):
         pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
         pdf.cell(0, 8, title, ln=True, fill=True); pdf.ln(2)
         pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
-        
-        if body:
-            clean_body = body.replace("**", "").replace("* ", "- ")
-            pdf.multi_cell(0, 5, clean_text(clean_body))
-        
+        if body: pdf.multi_cell(0, 5, clean_text(body.replace("**", "").replace("* ", "- ")))
         if bullets:
             pdf.ln(1)
             for b in bullets:
                 pdf.cell(5, 5, "-", 0, 0)
-                clean_b = b.replace("**", "") 
-                pdf.multi_cell(0, 5, clean_text(clean_b))
+                pdf.multi_cell(0, 5, clean_text(b.replace("**", "")))
         pdf.ln(4)
 
-    # Sections 1-10
     add_section(f"1. Communication Profile: {p_comm}", None, data['s1_b']) 
     add_section("2. Supervising Their Communication", None, data['s2_b'])
     add_section(f"3. Motivation Profile: {p_mot}", None, data['s3_b'])
@@ -1347,33 +1070,20 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     add_section("6. How You Can Best Support Them", data['s6'])
     add_section("7. What They Look Like When Thriving", data['s7'])
     add_section("8. What They Look Like When Struggling", data['s8'])
-    add_section("9. Supervisory Interventions (Roadmap)", None, data['s9_b'])
+    add_section("9. Supervisory Interventions", None, data['s9_b'])
     add_section("10. What You Should Celebrate", None, data['s10_b'])
-
-    # 11. Coaching Questions (10 questions)
-    pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
-    pdf.cell(0, 8, "11. Coaching Questions", ln=True, fill=True); pdf.ln(2)
-    pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
-    for i, q in enumerate(data['coaching']):
-        pdf.multi_cell(0, 5, clean_text(f"{i+1}. {q}"))
-    pdf.ln(4)
-
-    # 12. Advancement
-    add_section("12. Helping Them Prepare for Advancement", data['advancement'])
-
+    add_section("11. Helping Them Prepare for Advancement", data['advancement'])
     return pdf.output(dest='S').encode('latin-1')
 
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     data = generate_profile_content(p_comm, p_mot)
-
     st.markdown("---"); st.markdown(f"### 📘 Supervisory Guide: {name}"); st.divider()
     
     def show_section(title, text, bullets=None):
         st.subheader(title)
         if text: st.write(text)
         if bullets:
-            for b in bullets:
-                st.markdown(f"- {b}")
+            for b in bullets: st.markdown(f"- {b}")
         st.markdown("<br>", unsafe_allow_html=True)
 
     show_section(f"1. Communication Profile: {p_comm}", None, data['s1_b'])
@@ -1382,30 +1092,16 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     show_section("4. Motivating This Staff Member", None, data['s4_b'])
     show_section("5. Integrated Leadership Profile", data['s5'])
     show_section("6. How You Can Best Support Them", data['s6'])
-    
     c1, c2 = st.columns(2)
-    with c1:
-        st.subheader("7. Thriving")
-        st.success(data['s7']) # Green box
-    with c2:
-        st.subheader("8. Struggling")
-        st.error(data['s8'])   # Red box
-    
+    with c1: st.subheader("7. Thriving"); st.success(data['s7'])
+    with c2: st.subheader("8. Struggling"); st.error(data['s8'])
     st.markdown("<br>", unsafe_allow_html=True)
     show_section("9. Supervisory Interventions", None, data['s9_b'])
     show_section("10. What You Should Celebrate", None, data['s10_b'])
-    
-    st.subheader("11. Coaching Questions")
-    for i, q in enumerate(data['coaching']):
-        st.write(f"{i+1}. {q}")
-            
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    show_section("12. Helping Them Prepare for Advancement", data['advancement'])
+    show_section("11. Helping Them Prepare for Advancement", data['advancement'])
 
 # --- 6. MAIN APP LOGIC ---
-# Reset Helpers
-def reset_t1(): st.session_state.t1_staff_select = None
+def reset_t1(): st.session_state.t1_staff_select = None; st.session_state.pop("generated_pdf", None)
 def reset_t2(): st.session_state.t2_team_select = []
 def reset_t3(): st.session_state.p1 = None; st.session_state.p2 = None; st.session_state.messages = []
 def reset_t4(): st.session_state.career = None; st.session_state.career_target = None
@@ -1414,23 +1110,19 @@ def reset_t4(): st.session_state.career = None; st.session_state.career_target =
 st.markdown("""
 <div class="hero-box">
     <div class="hero-title">Elmcrest Leadership Intelligence</div>
-    <div class="hero-subtitle">
-        Your command center for staff development. Select a tool below to begin.
-    </div>
+    <div class="hero-subtitle">Your command center for staff development. Select a tool below to begin.</div>
 </div>
 """, unsafe_allow_html=True)
 
-# --- NAVIGATION BUTTONS ---
 nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
-
 with nav_col1:
-    if st.button("📝 Supervisor's Guide\n\nCreate 12-point coaching manuals.", use_container_width=True): set_view("Supervisor's Guide")
+    if st.button("📝 Supervisor's Guide\n\nCreate coaching manuals.", use_container_width=True): set_view("Supervisor's Guide")
 with nav_col2:
-    if st.button("🧬 Team DNA\n\nAnalyze unit culture & blindspots.", use_container_width=True): set_view("Team DNA")
+    if st.button("🧬 Team DNA\n\nAnalyze unit culture.", use_container_width=True): set_view("Team DNA")
 with nav_col3:
-    if st.button("⚖️ Conflict Mediator\n\nScripts for tough conversations.", use_container_width=True): set_view("Conflict Mediator")
+    if st.button("⚖️ Conflict Mediator\n\nScripts for tough talks.", use_container_width=True): set_view("Conflict Mediator")
 with nav_col4:
-    if st.button("🚀 Career Pathfinder\n\nPromotion readiness tests.", use_container_width=True): set_view("Career Pathfinder")
+    if st.button("🚀 Career Pathfinder\n\nPromotion readiness.", use_container_width=True): set_view("Career Pathfinder")
 st.markdown("###")
 if st.button("📈 Organization Pulse (See All Data)", use_container_width=True): set_view("Org Pulse")
 st.markdown("---")
@@ -1441,9 +1133,9 @@ st.markdown("---")
 if st.session_state.current_view == "Supervisor's Guide":
     st.subheader("📝 Supervisor's Guide")
     sub1, sub2 = st.tabs(["Database", "Manual"])
+    
     with sub1:
         if not df.empty:
-            # Create dictionary from the FILTERED dataframe, not the raw list
             filtered_staff_list = df.to_dict('records')
             options = {f"{s['name']} ({s['role']})": s for s in filtered_staff_list}
             staff_options_list = list(options.keys())
@@ -1468,20 +1160,80 @@ if st.session_state.current_view == "Supervisor's Guide":
                 d = options[sel]
                 c1,c2,c3 = st.columns(3)
                 c1.metric("Role", d['role']); c2.metric("Style", d['p_comm']); c3.metric("Drive", d['p_mot'])
+                
                 if st.button("Generate Guide", type="primary"):
-                    pdf = create_supervisor_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
-                    st.download_button("Download PDF", pdf, f"Guide_{d['name']}.pdf", "application/pdf")
+                    st.session_state.generated_pdf = create_supervisor_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
+                    st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
+                    st.session_state.generated_name = d['name']
                     display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
+
+                if "generated_pdf" in st.session_state and st.session_state.get("generated_name") == d['name']:
+                    st.divider()
+                    st.markdown("#### 📤 Actions")
+                    ac1, ac2 = st.columns([1, 2])
+                    
+                    with ac1:
+                        st.download_button(
+                            label="📥 Download PDF", 
+                            data=st.session_state.generated_pdf, 
+                            file_name=st.session_state.generated_filename, 
+                            mime="application/pdf",
+                            use_container_width=True
+                        )
+                    
+                    with ac2:
+                        with st.popover("📧 Email to Me", use_container_width=True):
+                            email_input = st.text_input("Recipient Email", placeholder="name@elmcrest.org")
+                            if st.button("Send Email"):
+                                if email_input:
+                                    with st.spinner("Sending..."):
+                                        success, msg = send_pdf_via_email(
+                                            to_email=email_input,
+                                            subject=f"Supervisor Guide: {d['name']}",
+                                            body=f"Attached is the Compass Supervisor Guide for {d['name']}.",
+                                            pdf_bytes=st.session_state.generated_pdf,
+                                            filename=st.session_state.generated_filename
+                                        )
+                                    if success: st.success(msg)
+                                    else: st.error(msg)
+                                else:
+                                    st.warning("Please enter an email address.")
+                    
                 st.button("Reset", on_click=reset_t1)
+    
     with sub2:
         with st.form("manual"):
             c1,c2 = st.columns(2)
             mn = c1.text_input("Name"); mr = c2.selectbox("Role", ["YDP", "Shift Supervisor", "Program Supervisor"])
             mpc = c1.selectbox("Comm", COMM_TRAITS); mpm = c2.selectbox("Motiv", MOTIV_TRAITS)
+            
             if st.form_submit_button("Generate") and mn:
-                pdf = create_supervisor_guide(mn, mr, mpc, None, mpm, None)
-                st.download_button("Download PDF", pdf, "guide.pdf", "application/pdf")
+                pdf_manual = create_supervisor_guide(mn, mr, mpc, None, mpm, None)
+                fname_manual = f"Guide_{mn.replace(' ', '_')}.pdf"
+                st.session_state.manual_pdf = pdf_manual
+                st.session_state.manual_fname = fname_manual
                 display_guide(mn, mr, mpc, None, mpm, None)
+
+        if "manual_pdf" in st.session_state:
+            st.divider()
+            ac1, ac2 = st.columns([1, 2])
+            with ac1:
+                st.download_button("📥 Download PDF", st.session_state.manual_pdf, st.session_state.manual_fname, "application/pdf", use_container_width=True)
+            with ac2:
+                with st.popover("📧 Email to Me", use_container_width=True):
+                    email_input_m = st.text_input("Recipient Email", key="manual_email")
+                    if st.button("Send Email", key="btn_manual_email"):
+                        if email_input_m:
+                            with st.spinner("Sending..."):
+                                success, msg = send_pdf_via_email(
+                                    email_input_m,
+                                    f"Supervisor Guide: {mn}",
+                                    f"Attached is the manually generated Compass Guide for {mn}.",
+                                    st.session_state.manual_pdf,
+                                    st.session_state.manual_fname
+                                )
+                            if success: st.success(msg)
+                            else: st.error(msg)
 
 # 2. TEAM DNA
 elif st.session_state.current_view == "Team DNA":
@@ -1495,7 +1247,6 @@ elif st.session_state.current_view == "Team DNA":
                 comm_counts = tdf['p_comm'].value_counts()
                 st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
                 
-                # DOMINANT CULTURE ANALYSIS
                 if not comm_counts.empty:
                     dom_style = comm_counts.idxmax()
                     ratio = comm_counts.max() / len(tdf)
@@ -1509,74 +1260,35 @@ elif st.session_state.current_view == "Team DNA":
                             st.markdown(f"**📋 Meeting Protocol:**\n{guide.get('meeting_protocol')}")
                             st.info(f"**🎉 Team Building Idea:** {guide.get('team_building')}")
                     else:
-                        # BALANCED CULTURE
-                        guide = TEAM_CULTURE_GUIDE.get("Balanced", {})
-                        st.info("**Balanced Culture:** No single style dominates. This reduces blindspots but may increase friction.")
-                        with st.expander("📖 Managing a Balanced Team", expanded=True):
-                             st.markdown("""**The Balanced Friction:**
-                             A diverse team has no blind spots, but it speaks 4 different languages. Your role is **The Translator**.
-                             * **Translate Intent:** 'The Director isn't being mean; they are being efficient.' 'The Tracker isn't being difficult; they are being safe.'
-                             * **Rotate Leadership:** Let the Director lead the crisis; let the Encourager lead the debrief; let the Tracker lead the audit.
-                             * **Meeting Protocol:** Use structured turn-taking (Round Robin) so the loudest voice doesn't always win.""")
-
-                # MISSING VOICE ANALYSIS
+                        st.info("**Balanced Culture:** No single style dominates.")
+                
                 present_styles = set(tdf['p_comm'].unique())
                 missing_styles = set(COMM_TRAITS) - present_styles
                 if missing_styles:
                     st.markdown("---")
                     st.error(f"🚫 **Missing Voices:** {', '.join(missing_styles)}")
-                    cols = st.columns(len(missing_styles))
-                    for idx, style in enumerate(missing_styles):
-                        with cols[idx]:
-                             data = MISSING_VOICE_GUIDE.get(style, {})
-                             with st.container(border=True):
-                                 st.markdown(f"**Without a {style}:**")
-                                 st.write(data.get('risk'))
-                                 st.success(f"**Supervisor Fix:** {data.get('fix')}")
+                    for style in missing_styles:
+                        data = MISSING_VOICE_GUIDE.get(style, {})
+                        st.write(f"**Risk:** {data.get('risk')} | **Fix:** {data.get('fix')}")
 
             with c2:
                 mot_counts = tdf['p_mot'].value_counts()
                 st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
                 
-                # MOTIVATION GAP ANALYSIS
                 if not mot_counts.empty:
                     dom_mot = mot_counts.idxmax()
                     st.markdown("---")
                     st.subheader(f"⚠️ Motivation Gap: {dom_mot} Driven")
-                    
-                    # Fetch data from new dictionary
                     mot_guide = MOTIVATION_GAP_GUIDE.get(dom_mot, {})
                     if mot_guide:
                         st.warning(mot_guide['warning'])
-                        with st.expander("💡 Coaching Strategy for this Driver", expanded=True):
-                            st.markdown(mot_guide['coaching'])
-            
+                        st.markdown(mot_guide['coaching'])
             st.button("Clear", on_click=reset_t2)
 
 # 3. CONFLICT MEDIATOR
 elif st.session_state.current_view == "Conflict Mediator":
     st.subheader("⚖️ Conflict Mediator")
     if not df.empty:
-        # Sidebar for API Key
-        with st.sidebar:
-            # Try to get key from secrets (support both names)
-            secret_key = st.secrets.get("GOOGLE_API_KEY") or st.secrets.get("GEMINI_API_KEY", "")
-            
-            # Input field (defaults to secret if found)
-            user_api_key = st.text_input(
-                "🔑 Gemini API Key", 
-                value=st.session_state.get("gemini_key_input", secret_key),
-                type="password",
-                help="Get a key at aistudio.google.com"
-            )
-            
-            # Persist input to session state
-            if user_api_key:
-                st.session_state.gemini_key_input = user_api_key
-                st.success("✅ API Key Active")
-            else:
-                st.error("❌ No API Key Found")
-
         c1, c2 = st.columns(2)
         p1 = c1.selectbox("Select Yourself (Supervisor)", df['name'].unique(), index=None, key="p1")
         p2 = c2.selectbox("Select Staff Member", df['name'].unique(), index=None, key="p2")
@@ -1584,158 +1296,15 @@ elif st.session_state.current_view == "Conflict Mediator":
         if p1 and p2 and p1 != p2:
             d1 = df[df['name']==p1].iloc[0]; d2 = df[df['name']==p2].iloc[0]
             s1, s2 = d1['p_comm'], d2['p_comm']
-            m1, m2 = d1['p_mot'], d2['p_mot']
-            
             st.divider()
             st.subheader(f"{s1} (Sup) vs. {s2} (Staff)")
             if s1 in SUPERVISOR_CLASH_MATRIX and s2 in SUPERVISOR_CLASH_MATRIX[s1]:
                 clash = SUPERVISOR_CLASH_MATRIX[s1][s2]
-                with st.expander("🔍 **Psychological Deep Dive**", expanded=True):
-                    st.markdown(f"**The Core Tension:** {clash['tension']}")
-                    st.markdown(f"{clash['psychology']}")
-                    st.markdown("**🚩 Watch For:**")
-                    for w in clash['watch_fors']: st.markdown(f"- {w}")
-                
-                c_a, c_b = st.columns(2)
-                with c_a:
-                    st.markdown("##### 🛠️ 3-Phase Coaching Protocol")
-                    for i in clash['intervention_steps']: st.info(i)
-                with c_b:
-                    st.markdown("##### 🗣️ Conflict Scripts (Click to Expand)")
-                    script_tabs = st.tabs(list(clash['scripts'].keys()))
-                    for i, (cat, text) in enumerate(clash['scripts'].items()):
-                        with script_tabs[i]:
-                            st.success(f"\"{text}\"")
-            else:
-                st.info("No specific conflict protocol exists for this combination yet. They likely work well together!")
-            
-            # --- AI SUPERVISOR BOT ---
-            st.markdown("---")
-            with st.container(border=True):
-                st.subheader("🤖 AI Supervisor Assistant")
-                
-                # Determine active key from variable
-                active_key = user_api_key
-                
-                if active_key:
-                    st.caption(f"Powered by Gemini 2.5 Flash | Ask specific questions about managing **{p2}** ({s2} x {m2}).")
-                else:
-                    st.caption("Basic Mode | Add an API Key in the sidebar to unlock full AI capabilities.")
-                
-                st.info("⬇️ **Type your question in the chat bar at the bottom of the screen.**")
-                
-                # Initialize history specifically for this view if not present
-                if "messages" not in st.session_state:
-                    st.session_state.messages = []
-
-                # Display messages
-                for message in st.session_state.messages:
-                    with st.chat_message(message["role"]):
-                        st.markdown(message["content"])
-
-                # -------------------------------------------
-                # LOGIC ENGINE: HYBRID (Rule-Based + Gemini)
-                # -------------------------------------------
-                def get_smart_response(query, comm_style, motiv_driver, key):
-                    # Prepare Context Data
-                    comm_data = COMM_PROFILES.get(comm_style, {})
-                    mot_data = MOTIV_PROFILES.get(motiv_driver, {})
-                    
-                    # If API Key exists, use Gemini
-                    if key:
-                        try:
-                            # Context Prompt Construction
-                            system_prompt = f"""
-                            You are an expert Leadership Coach for a youth care agency.
-                            You are advising a Supervisor on how to manage a staff member named {p2}.
-                            
-                            Here is the Staff Member's Profile:
-                            - **Communication Style:** {comm_style}
-                            - **Core Motivation:** {motiv_driver}
-                            - **Thriving Behaviors:** {comm_data.get('bullets', [])}
-                            - **Stress Behaviors:** They may become rigid, withdrawn, or aggressive when their need for {motiv_driver} is blocked.
-                            
-                            **Your Goal:** Answer the user's question specifically tailored to this profile.
-                            Do not give generic advice. Use the profile data to explain WHY the staff member acts this way and HOW to reach them.
-                            Be concise, practical, and empathetic.
-                            """
-                            
-                            # API Call to Gemini 2.5 Flash (Standard Endpoint)
-                            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
-                            payload = {
-                                "contents": [{
-                                    "parts": [{"text": system_prompt + "\n\nUser Question: " + query}]
-                                }]
-                            }
-                            headers = {'Content-Type': 'application/json'}
-                            response = requests.post(url, headers=headers, data=json.dumps(payload))
-                            
-                            if response.status_code == 200:
-                                return response.json()['candidates'][0]['content']['parts'][0]['text']
-                            else:
-                                return f"⚠️ **AI Error:** {response.text}. Falling back to basic database."
-                        
-                        except Exception as e:
-                            return f"⚠️ **Connection Error:** {str(e)}. Falling back to basic database."
-
-                    # FALLBACK: Rule-Based Logic (No API Key)
-                    query = query.lower()
-                    response = ""
-                    
-                    if "who is" in query or "tell me about" in query or "profile" in query:
-                         response += f"**Profile Overview:** {p2} is a **{comm_style}** driven by **{motiv_driver}**.\n\n"
-                         response += "**Communication Style:**\n"
-                         for b in comm_data.get('bullets', []):
-                             response += f"- {b}\n"
-                         response += "**Core Driver:**\n"
-                         for b in mot_data.get('bullets', []):
-                             response += f"- {b}\n"
-
-                    elif "strengths" in query or "good at" in query:
-                        response += f"**Strengths:** As a {comm_style}, they excel at: \n"
-                        for b in comm_data.get('bullets', []):
-                            response += f"- {b}\n"
-                        response += f"\nDriven by {motiv_driver}, they are motivated by: \n"
-                        for b in mot_data.get('bullets', []):
-                            response += f"- {b}\n"
-
-                    elif "feedback" in query or "critical" in query or "correct" in query:
-                        response += f"**On giving feedback to a {comm_style}:**\n"
-                        for b in comm_data.get('supervising_bullets', []):
-                            response += f"- {b}\n"
-                        response += f"\n**Motivation Tip:** Frame the feedback in a way that doesn't block their drive for {motiv_driver}. "
-                        if motiv_driver == "Connection": response += "Reassure them that the relationship is safe."
-                        elif motiv_driver == "Achievement": response += "Focus on how fixing this helps them win."
-                    
-                    elif "motivate" in query or "burnout" in query:
-                        response += f"**To motivate a {motiv_driver} driver:**\n"
-                        for b in mot_data.get('strategies_bullets', []):
-                            response += f"- {b}\n"
-                    
-                    else:
-                        # Helpful debugging info in the fallback message
-                        debug_key_info = f"Key detected: {key[:4]}..." if key else "No API Key detected"
-                        response = f"I can help you manage {p2}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\n*Note: {debug_key_info}. Please check the sidebar.*"
-                    
-                    return response
-
-                # Input
-                if prompt := st.chat_input(f"Ask about {p2}..."):
-                    st.session_state.messages.append({"role": "user", "content": prompt})
-                    with st.chat_message("user"):
-                        st.markdown(prompt)
-
-                    with st.chat_message("assistant"):
-                        with st.spinner("Consulting the Compass Database..."):
-                            # Pass the persistent key from variable
-                            bot_reply = get_smart_response(prompt, s2, m2, active_key)
-                            st.markdown(bot_reply)
-                    
-                    st.session_state.messages.append({"role": "assistant", "content": bot_reply})
-        
-        elif p1 and p2 and p1 == p2:
-             st.warning("⚠️ You selected the same person twice. Please select two **different** staff members to analyze a conflict.")
-             
+                st.markdown(f"**Tension:** {clash['tension']}")
+                st.markdown(f"**Psychology:** {clash['psychology']}")
+                st.info(f"**Intervention:** {clash['intervention_steps'][0]}")
+                st.success(f"**Script:** \"{clash['scripts']['Opening']}\"")
+            else: st.info("No specific protocol. Focus on active listening.")
         st.button("Reset", key="reset_t3", on_click=reset_t3)
 
 # 4. CAREER PATHFINDER
@@ -1744,7 +1313,7 @@ elif st.session_state.current_view == "Career Pathfinder":
     if not df.empty:
         c1, c2 = st.columns(2)
         cand = c1.selectbox("Candidate", df['name'].unique(), index=None, key="career")
-        role = c2.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor", "Manager"], index=None, key="career_target")
+        role = c2.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor"], index=None, key="career_target")
         if cand and role:
             d = df[df['name']==cand].iloc[0]
             style = d['p_comm']
@@ -1752,35 +1321,18 @@ elif st.session_state.current_view == "Career Pathfinder":
             if path:
                 st.info(f"**Shift:** {path['shift']}")
                 st.markdown(f"**Why it's hard:** {path['why']}")
-                c_a, c_b = st.columns(2)
-                with c_a:
-                    with st.container(border=True):
-                        st.markdown("##### 🗣️ The Conversation")
-                        st.write(path['conversation'])
-                        if 'supervisor_focus' in path: st.warning(f"**Watch For:** {path['supervisor_focus']}")
-                with c_b:
-                    with st.container(border=True):
-                        st.markdown("##### ✅ Assignment")
-                        st.write(f"**Setup:** {path['assignment_setup']}")
-                        st.write(f"**Task:** {path['assignment_task']}")
-                        st.divider()
-                        st.success(f"**Success:** {path['success_indicators']}")
-                        st.error(f"**Red Flags:** {path['red_flags']}")
-                if 'debrief_questions' in path:
-                    with st.expander("🧠 Post-Assignment Debrief Questions"):
-                        for q in path['debrief_questions']: st.markdown(f"- {q}")
-            st.button("Reset", key="reset_t4", on_click=reset_t4)
+                st.success(f"**Assignment:** {path['assignment_task']}")
+            else: st.warning("Path not defined in database yet.")
+        st.button("Reset", key="reset_t4", on_click=reset_t4)
 
 # 5. ORG PULSE
 elif st.session_state.current_view == "Org Pulse":
     st.subheader("📈 Organization Pulse")
     if not df.empty:
-        # --- DATA PREP ---
         total_staff = len(df)
         comm_counts = df['p_comm'].value_counts(normalize=True) * 100
         mot_counts = df['p_mot'].value_counts(normalize=True) * 100
         
-        # Top Metrics
         c1, c2, c3 = st.columns(3)
         if not comm_counts.empty:
             dom_comm = comm_counts.idxmax()
@@ -1790,8 +1342,6 @@ elif st.session_state.current_view == "Org Pulse":
             c3.metric("Total Staff Analyzed", total_staff)
             
             st.divider()
-            
-            # --- VISUALS ---
             c_a, c_b = st.columns(2)
             with c_a: 
                 st.markdown("##### 🗣️ Communication Mix")
@@ -1799,143 +1349,4 @@ elif st.session_state.current_view == "Org Pulse":
             with c_b: 
                 st.markdown("##### 🔋 Motivation Drivers")
                 st.plotly_chart(px.bar(df['p_mot'].value_counts(), orientation='h', color_discrete_sequence=[BRAND_COLORS['blue']]), use_container_width=True)
-
-            st.divider()
-            st.header("🔍 Deep Organizational Analysis")
-            
-            tab1, tab2, tab3 = st.tabs(["🛡️ Culture Risk Assessment", "🔥 Motivation Strategy", "🌱 Leadership Pipeline Health"])
-            
-            # --- TAB 1: CULTURE RISK ---
-            with tab1:
-                st.markdown(f"### The {dom_comm}-Dominant Culture")
-                
-                if dom_comm == "Director":
-                    st.error("🚨 **Risk Area: The Efficiency Trap**")
-                    st.write("Your organization is heavily weighted towards action, speed, and results. While this means you get things done, you are at high risk for **'Burn and Turn.'**")
-                    st.markdown("""
-                    **The Blindspot:**
-                    * **Low Empathy:** Staff likely feel that 'management doesn't care about us, only the numbers.'
-                    * **Steamrolling:** Quiet voices (Facilitators/Trackers) are likely being ignored in meetings because they don't speak fast enough.
-                    * **Crisis Addiction:** The culture likely rewards firefighting more than fire prevention.
-                    
-                    **🛡️ Coaching Strategy for Leadership:**
-                    1.  **Mandate 'Cooling Off' Periods:** Do not allow major decisions to be made in the same meeting they are proposed. Force a 24-hour pause to let slower processors think.
-                    2.  **Artificial Empathy:** You must operationalize care. Start every meeting with 5 minutes of personal check-ins. It will feel like a waste of time to you; it is oxygen to your staff.
-                    3.  **Protect the Dissenters:** Explicitly ask the quietest person in the room for their opinion. They see the risks you are missing.
-                    """)
-                
-                elif dom_comm == "Encourager":
-                    st.warning("⚠️ **Risk Area: The 'Nice' Trap**")
-                    st.write("Your organization prioritizes harmony, relationships, and good vibes. While morale is likely good, you are at high risk for **'Toxic Tolerance.'**")
-                    st.markdown("""
-                    **The Blindspot:**
-                    * **Lack of Accountability:** Poor performance is tolerated because no one wants to be 'mean.'
-                    * **The 'Cool Parent' Syndrome:** Leaders want to be liked more than they want to be respected.
-                    * **Hidden Conflict:** Because open conflict is avoided, issues go underground (gossip, passive-aggression).
-                    
-                    **🛡️ Coaching Strategy for Leadership:**
-                    1.  **Redefine Kindness:** Coach your leaders that holding people accountable is *kind* because it helps them succeed. Allowing failure is cruel.
-                    2.  **Standardize Feedback:** Create a rigid structure for performance reviews so leaders can't opt-out of hard conversations.
-                    3.  **Focus on the 'Who':** When making hard decisions, frame it as protecting the *team* (the collective 'who') from the toxicity of the individual.
-                    """)
-                
-                elif dom_comm == "Facilitator":
-                    st.info("🐢 **Risk Area: The Consensus Trap**")
-                    st.write("Your organization values fairness, listening, and inclusion. While people feel heard, you are at risk for **'Analysis Paralysis.'**")
-                    st.markdown("""
-                    **The Blindspot:**
-                    * **Slow Decisions:** You likely have meetings about meetings. Urgent problems fester while you wait for everyone to agree.
-                    * **The 'Lowest Common Denominator':** Solutions are often watered down to ensure no one is offended.
-                    * **Crisis Failure:** In an emergency, the team may freeze, waiting for a vote when they need a command.
-                    
-                    **🛡️ Coaching Strategy for Leadership:**
-                    1.  **The 51% Rule:** Establish a rule that once you have 51% certainty (or 51% consensus), you move. Perfection is the enemy of done.
-                    2.  **Disagree and Commit:** Teach the culture that it is okay to disagree with a decision but still support its execution 100%.
-                    3.  **Assign 'Decision Owners':** Stop making decisions by committee. Assign one person to decide, and the committee only *advises*.
-                    """)
-                
-                elif dom_comm == "Tracker":
-                    st.warning("🛑 **Risk Area: The Bureaucracy Trap**")
-                    st.write("Your organization values safety, precision, and rules. While you are compliant, you are at risk for **'Stagnation.'**")
-                    st.markdown("""
-                    **The Blindspot:**
-                    * **Innovation Death:** New ideas are killed by 'policy' before they can be tested.
-                    * **Rigidity:** Staff may escalate youth behaviors because they prioritize enforcing a minor rule over maintaining the relationship.
-                    * **Fear Based:** The culture is likely driven by a fear of getting in trouble rather than a desire to do good.
-                    
-                    **🛡️ Coaching Strategy for Leadership:**
-                    1.  **'Safe to Fail' Zones:** Explicitly designate areas where staff are allowed to experiment and fail without consequence.
-                    2.  **The 'Why' Test:** Challenge every rule. If a staff member cannot explain *why* a rule exists (beyond 'it's in the book'), they aren't leading; they are robot-ing.
-                    3.  **Reward Adaptation:** Publicly praise staff who *bent* a rule to save a situation (safely). Show that judgment is valued over blind compliance.
-                    """)
-
-            # --- TAB 2: MOTIVATION STRATEGY ---
-            with tab2:
-                st.markdown(f"### The Drive: {dom_mot}")
-                
-                if dom_mot == "Achievement":
-                    st.success("🏆 **Strategy: The Scoreboard**")
-                    st.write("Your team runs on winning. They need to know they are succeeding based on objective data.")
-                    st.markdown("""
-                    * **The Danger:** If goals are vague or 'feelings-based,' they will disengage.
-                    * **The Fix:** Visualize success. Put charts on the wall. Track days without incidents. Give out awards for 'Most Shifts Covered' or 'Best Audit Score'.
-                    * **Language:** Use words like *Goal, Target, Win, Speed, Elite.*
-                    """)
-                elif dom_mot == "Connection":
-                    st.info("🤝 **Strategy: The Tribe**")
-                    st.write("Your team runs on belonging. They will work harder for each other than for the 'company.'")
-                    st.markdown("""
-                    * **The Danger:** If they feel isolated or if management feels 'cold,' they will quit. Toxic peers destroy this culture fast.
-                    * **The Fix:** Invest in food, team outings, and face time. Start meetings with personal connection.
-                    * **Language:** Use words like *Family, Team, Support, Together, Safe.*
-                    """)
-                elif dom_mot == "Purpose":
-                    st.warning("🔥 **Strategy: The Mission**")
-                    st.write("Your team runs on meaning. They are here to change lives, not just collect a paycheck.")
-                    st.markdown("""
-                    * **The Danger:** If they feel the work is just 'paperwork' or 'warehousing kids,' they will burn out or rebel.
-                    * **The Fix:** Connect EVERY task to the youth. 'We do this paperwork so [Youth Name] can get funding for his placement.' Share success stories constantly.
-                    * **Language:** Use words like *Impact, Mission, Change, Justice, Future.*
-                    """)
-                elif dom_mot == "Growth":
-                    st.success("🌱 **Strategy: The Ladder**")
-                    st.write("Your team runs on competence. They want to get better, smarter, and more skilled.")
-                    st.markdown("""
-                    * **The Danger:** If they feel stagnant or bored, they will leave for a new challenge.
-                    * **The Fix:** create 'Micro-Promotions.' Give them special titles (e.g., 'Safety Captain'). Send them to trainings. Map out their career path visually.
-                    * **Language:** Use words like *Skill, Level Up, Career, Master, Learn.*
-                    """)
-
-            # --- TAB 3: PIPELINE HEALTH ---
-            with tab3:
-                st.markdown("### Leadership Pipeline Analysis")
-                if 'role' in df.columns:
-                    # Compare Leadership Composition to General Staff
-                    leaders = df[df['role'].isin(['Program Supervisor', 'Shift Supervisor', 'Manager'])]
-                    if not leaders.empty:
-                        l_counts = leaders['p_comm'].value_counts(normalize=True) * 100
-                        
-                        st.write("**Leadership Diversity Check:**")
-                        c1, c2 = st.columns(2)
-                        with c1:
-                            st.caption("Leadership Team Mix")
-                            st.dataframe(l_counts)
-                        with c2:
-                            st.caption("General Staff Mix")
-                            st.dataframe(comm_counts)
-                        
-                        # Clone Warning
-                        dom_lead = l_counts.idxmax()
-                        if l_counts.max() > 60:
-                            st.error(f"🚫 **Warning: Cloning Bias Detected**")
-                            st.write(f"Your leadership team is over 60% **{dom_lead}**. You are likely promoting people who 'look like you' (communication-wise).")
-                            st.write("This creates a massive blind spot. If all leaders are Directors, who is listening to the staff? If all leaders are Encouragers, who is making the hard calls?")
-                            st.info("**Recommendation:** actively recruit for the *opposite* style for your next leadership opening.")
-                    else:
-                        st.info("No leadership roles identified in the data set to analyze.")
-                else:
-                    st.warning("Role data missing. Cannot analyze pipeline.")
-        else:
-             st.warning("No valid data found for your selection.")
-
     else: st.warning("No data available.")
