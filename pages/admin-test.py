@@ -52,7 +52,7 @@ st.markdown("""
         /* --- DARK MODE VARIABLES --- */
         @media (prefers-color-scheme: dark) {
             :root {
-                --primary: #8ab4f8;
+                --primary: #889fc3;
                 --primary-hover: #aecbfa;
                 --background: #1C1C1E;    /* Dark Gray */
                 --card-bg: #2C2C2E;       /* Lighter Dark Gray */
