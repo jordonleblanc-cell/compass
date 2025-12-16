@@ -34,36 +34,41 @@ BRAND_COLORS = {
 }
 
 # --- 3. CSS STYLING ---
-st.markdown(f"""
+st.markdown("""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap');
 
-        :root {{
-            --primary: {BRAND_COLORS['blue']};
-            --secondary: {BRAND_COLORS['teal']};
-            --accent: {BRAND_COLORS['green']};
-            --text-main: #0f172a;
-            --text-sub: #475569;
-            --bg-start: #f8fafc;
-            --bg-end: #e2e8f0;
-            --card-bg: rgba(255, 255, 255, 0.9);
-            --border-color: #e2e8f0;
-            --shadow: 0 4px 20px rgba(0,0,0,0.05);
-            --input-bg: #ffffff;
-        }}
+        /* --- LIGHT MODE VARIABLES --- */
+        :root {
+            --primary: #1a73e8;       /* Google Blue */
+            --primary-hover: #1557b0;
+            --background: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #202124;
+            --text-sub: #5f6368;
+            --border-color: #dadce0;
+            --input-bg: #f1f3f4;
+            --shadow: 0 1px 3px rgba(0,0,0,0.12);
+            --score-track: #e8eaed;
+        }
 
-        @media (prefers-color-scheme: dark) {{
-            :root {{
-                --text-main: #f1f5f9;
-                --text-sub: #cbd5e1;
-                --bg-start: #0f172a;
-                --bg-end: #020617;
-                --card-bg: rgba(30, 41, 59, 0.9);
-                --border-color: #334155;
-                --shadow: 0 4px 20px rgba(0,0,0,0.4);
-                --input-bg: #0f172a;
-            }}
-        }}
+        /* --- DARK MODE VARIABLES --- */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #8ab4f8;
+                --primary-hover: #aecbfa;
+                --background: #1C1C1E;    /* Dark Gray */
+                --card-bg: #2C2C2E;       /* Lighter Dark Gray */
+                --text-main: #e8eaed;
+                --text-sub: #9aa0a6;
+                --border-color: #38383A;
+                --input-bg: #3A3A3C;
+                --shadow: 0 4px 8px rgba(0,0,0,0.3);
+                --score-track: #5f6368;
+            }
+        }
+
 
         /* HIDE SIDEBAR NAVIGATION */
         [data-testid="stSidebarNav"] {{display: none;}}
