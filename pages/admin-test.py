@@ -5,6 +5,11 @@ from fpdf import FPDF
 import plotly.express as px
 import time
 import json
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
+from email import encoders
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
@@ -25,99 +30,181 @@ def set_view(view_name):
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
 
 BRAND_COLORS = {
-    "blue": "#015bad",
+    "blue": "#1a73e8",
     "teal": "#51c3c5",
     "green": "#b9dca4",
-    "dark": "#0f172a",
-    "gray": "#64748b",
-    "light_gray": "#f8fafc"
+    "dark": "#202124",
+    "gray": "#5f6368",
+    "light_gray": "#f0f2f5"
 }
 
-# --- 3. CSS STYLING ---
+# --- 3. CSS STYLING (Pixel / Material Inspired) ---
 st.markdown(f"""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap');
 
+        /* --- LIGHT MODE VARIABLES --- */
         :root {{
-            --primary: {BRAND_COLORS['blue']};
-            --secondary: {BRAND_COLORS['teal']};
-            --accent: {BRAND_COLORS['green']};
-            --text-main: #0f172a;
-            --text-sub: #475569;
-            --bg-start: #f8fafc;
-            --bg-end: #e2e8f0;
-            --card-bg: rgba(255, 255, 255, 0.9);
-            --border-color: #e2e8f0;
-            --shadow: 0 4px 20px rgba(0,0,0,0.05);
-            --input-bg: #ffffff;
+            --primary: #1a73e8;       /* Google Blue */
+            --primary-hover: #1557b0;
+            --background: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #202124;
+            --text-sub: #5f6368;
+            --border-color: #dadce0;
+            --input-bg: #f1f3f4;
+            --shadow: 0 1px 3px rgba(0,0,0,0.12);
         }}
 
+        /* --- DARK MODE VARIABLES --- */
         @media (prefers-color-scheme: dark) {{
             :root {{
-                --text-main: #f1f5f9;
-                --text-sub: #cbd5e1;
-                --bg-start: #0f172a;
-                --bg-end: #020617;
-                --card-bg: rgba(30, 41, 59, 0.9);
-                --border-color: #334155;
-                --shadow: 0 4px 20px rgba(0,0,0,0.4);
-                --input-bg: #0f172a;
+                --primary: #8ab4f8;
+                --primary-hover: #aecbfa;
+                --background: #1C1C1E;    /* Dark Gray from app.py */
+                --card-bg: #2C2C2E;       /* Lighter Dark Gray */
+                --text-main: #e8eaed;
+                --text-sub: #9aa0a6;
+                --border-color: #38383A;
+                --input-bg: #3A3A3C;
+                --shadow: 0 4px 8px rgba(0,0,0,0.3);
             }}
         }}
 
-        /* HIDE SIDEBAR NAVIGATION */
+        /* GLOBAL TYPOGRAPHY */
+        html, body, [class*="css"] {{
+            font-family: 'Google Sans', 'Roboto', sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+        }}
+        .stApp {{ background-color: var(--background); }}
+
+        h1, h2, h3, h4 {{
+            font-family: 'Google Sans', sans-serif;
+            color: var(--text-main) !important;
+            font-weight: 500 !important;
+        }}
+        
+        /* HIDE DEFAULT NAV, BUT KEEP SIDEBAR VISIBLE FOR LOGOUT */
         [data-testid="stSidebarNav"] {{display: none;}}
-        section[data-testid="stSidebar"] {{display: none;}}
+        section[data-testid="stSidebar"] {{
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+        }}
 
-        html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; color: var(--text-main) !important; }}
-        .stApp {{ background: radial-gradient(circle at top left, var(--bg-start) 0%, var(--bg-end) 100%); }}
-        h1, h2, h3, h4 {{ color: var(--primary) !important; font-weight: 700 !important; letter-spacing: -0.02em; }}
-        
-        .custom-card {{ background-color: var(--card-bg); padding: 24px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border-color); margin-bottom: 20px; color: var(--text-main); backdrop-filter: blur(10px); }}
-        
-        .hero-box {{ background: linear-gradient(135deg, #015bad 0%, #0f172a 100%); padding: 40px; border-radius: 16px; color: white !important; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(1, 91, 173, 0.2); }}
-        .hero-title {{ color: white !important; font-size: 2.2rem; font-weight: 800; margin-bottom:10px; }}
-        .hero-subtitle {{ color: #e2e8f0 !important; font-size: 1.1rem; opacity: 0.9; max-width: 800px; line-height: 1.6; }}
+        /* CARDS & CONTAINERS */
+        .custom-card, div[data-testid="stContainer"], div[data-testid="stForm"], div[data-testid="stExpander"] {{
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+        }}
 
-        /* Navigation Buttons */
+        /* HERO SECTION */
+        .hero-box {{
+            background: linear-gradient(135deg, var(--primary) 0%, #1557b0 100%);
+            padding: 40px;
+            border-radius: 16px;
+            color: white !important;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3);
+        }}
+        .hero-title {{ color: white !important; font-size: 2.2rem; font-weight: 500; margin-bottom:10px; }}
+        .hero-subtitle {{ color: #e8eaed !important; font-size: 1.1rem; opacity: 0.9; }}
+
+        /* BUTTONS (Pill Shape) */
+        .stButton button {{
+            background-color: var(--primary);
+            color: var(--background) !important; /* Contrast text */
+            border: none;
+            border-radius: 20px;
+            padding: 0.5rem 1.5rem;
+            font-family: 'Google Sans', sans-serif;
+            font-weight: 500;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }}
+        .stButton button:hover {{
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }}
+
+        /* NAVIGATION BUTTONS (Big Cards) */
         div[data-testid="column"] .stButton button {{
-            background-color: var(--card-bg); color: var(--text-main) !important; border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: 140px; display: flex; flex-direction: column;
-            align-items: flex-start; justify-content: center; padding: 20px; white-space: pre-wrap; text-align: left; transition: all 0.2s;
+            background-color: var(--card-bg);
+            color: var(--text-main) !important;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            text-align: left;
+            border-radius: 16px;
         }}
         div[data-testid="column"] .stButton button:hover {{
-            transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); border-color: var(--primary); color: var(--primary) !important;
-        }}
-        
-        /* Action Buttons */
-        .stButton button:not([style*="height: 140px"]) {{
-            background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white !important; border: none; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 10px rgba(1, 91, 173, 0.2);
+            border-color: var(--primary);
+            color: var(--primary) !important;
+            background-color: var(--card-bg); /* Keep bg consistent */
         }}
 
-        .stTextInput input, .stSelectbox div[data-baseweb="select"] > div {{ background-color: var(--input-bg) !important; color: var(--text-main) !important; border-color: var(--border-color) !important; border-radius: 8px; }}
-        div[data-baseweb="popover"] {{ background-color: var(--card-bg) !important; }}
-        div[data-baseweb="menu"] {{ background-color: var(--card-bg) !important; color: var(--text-main) !important; }}
-        div[data-testid="stDataFrame"] {{ border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }}
-        .streamlit-expanderHeader {{ background-color: var(--card-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-color); }}
-        div[data-testid="stExpander"] {{ background-color: var(--card-bg) !important; border: 1px solid var(--border-color); border-radius: 8px; }}
+        /* INPUTS */
+        .stTextInput input, .stSelectbox [data-baseweb="select"] {{
+            background-color: var(--input-bg);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            color: var(--text-main);
+        }}
         
-        /* Login Specifics */
+        /* DROPDOWNS */
+        div[data-baseweb="popover"], div[data-baseweb="menu"] {{
+            background-color: var(--card-bg) !important;
+            color: var(--text-main) !important;
+            border: 1px solid var(--border-color);
+        }}
+        div[data-baseweb="option"] {{
+            color: var(--text-main) !important;
+        }}
+
+        /* TABS */
+        .stTabs [data-baseweb="tab-list"] {{
+            gap: 2px;
+            background-color: transparent;
+        }}
+        .stTabs [data-baseweb="tab"] {{
+            height: 50px;
+            white-space: pre-wrap;
+            background-color: transparent;
+            border-radius: 0px;
+            color: var(--text-sub);
+            font-weight: 500;
+        }}
+        .stTabs [aria-selected="true"] {{
+            background-color: transparent;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }}
+
+        /* LOGIN SPECIFICS */
         .login-card {{
             background-color: var(--card-bg);
             padding: 40px;
-            border-radius: 20px;
+            border-radius: 16px;
             box-shadow: var(--shadow);
             text-align: center;
             max-width: 400px;
             margin: 100px auto;
             border: 1px solid var(--border-color);
-            color: var(--text-main);
-            backdrop-filter: blur(12px);
         }}
-        .login-title {{ color: var(--primary) !important; font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }}
-        .login-subtitle {{ color: var(--text-sub) !important; margin-bottom: 20px; }}
-        .back-link {{ text-decoration: none; color: var(--text-sub); font-weight: 600; transition: color 0.2s; }}
+        .login-title {{ color: var(--primary) !important; font-size: 1.8rem; font-weight: 500; margin-bottom: 10px; }}
+        .back-link {{ text-decoration: none; color: var(--text-sub); font-weight: 500; }}
         .back-link:hover {{ color: var(--primary); }}
+
     </style>
 """, unsafe_allow_html=True)
 
@@ -130,7 +217,7 @@ def fetch_staff_data():
         return []
     except: return []
 
-# Initialize Session State for Data Persistence
+# Initialize Session State for Data Persistence (Allows adding new profiles)
 if "master_df" not in st.session_state:
     all_staff_list = fetch_staff_data()
     # Convert to DF and Normalize Columns immediately
@@ -1302,7 +1389,6 @@ st.markdown("---")
 if st.session_state.current_view == "Supervisor's Guide":
     st.subheader("📝 Supervisor's Guide")
     sub1, sub2, sub3 = st.tabs(["Database", "Manual", "Create New Profile"])
-    
     with sub1:
         if not df_all.empty:
             # Create dictionary from the FILTERED dataframe, not the raw list
