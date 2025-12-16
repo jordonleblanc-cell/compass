@@ -5,6 +5,11 @@ from fpdf import FPDF
 import plotly.express as px
 import time
 import json
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
+from email import encoders
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
@@ -57,12 +62,12 @@ st.markdown(f"""
         /* BASE APP STYLING */
         .stApp {{
             background-color: var(--ios-bg) !important;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
         }}
         
         html, body, [class*="css"] {{
             color: var(--text-main) !important;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
         }}
 
         /* TYPOGRAPHY */
@@ -1432,8 +1437,24 @@ if st.session_state.current_view == "Supervisor's Guide":
             # Create dictionary from the FILTERED dataframe, not the raw list
             filtered_staff_list = df.to_dict('records')
             options = {f"{s['name']} ({s['role']})": s for s in filtered_staff_list}
+            staff_options_list = list(options.keys())
             
-            sel = st.selectbox("Select Staff", options.keys(), index=None, key="t1_staff_select")
+            # --- FIX: Calculate Index for Persistence ---
+            current_selection = st.session_state.get("t1_staff_select")
+            default_index = None
+            
+            if current_selection in staff_options_list:
+                default_index = staff_options_list.index(current_selection)
+
+            sel = st.selectbox(
+                "Select Staff", 
+                staff_options_list, 
+                index=default_index, 
+                key="t1_staff_select",
+                placeholder="Choose a staff member..."
+            )
+            # --------------------------------------------
+            
             if sel:
                 d = options[sel]
                 c1,c2,c3 = st.columns(3)
