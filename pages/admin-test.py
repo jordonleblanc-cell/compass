@@ -5,11 +5,6 @@ from fpdf import FPDF
 import plotly.express as px
 import time
 import json
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email.mime.text import MIMEText
-from email import encoders
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
@@ -30,181 +25,99 @@ def set_view(view_name):
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
 
 BRAND_COLORS = {
-    "blue": "#1a73e8",
+    "blue": "#015bad",
     "teal": "#51c3c5",
     "green": "#b9dca4",
-    "dark": "#202124",
-    "gray": "#5f6368",
-    "light_gray": "#f0f2f5"
+    "dark": "#0f172a",
+    "gray": "#64748b",
+    "light_gray": "#f8fafc"
 }
 
-# --- 3. CSS STYLING (Pixel / Material Inspired) ---
+# --- 3. CSS STYLING ---
 st.markdown(f"""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-        /* --- LIGHT MODE VARIABLES --- */
         :root {{
-            --primary: #1a73e8;       /* Google Blue */
-            --primary-hover: #1557b0;
-            --background: #f0f2f5;
-            --card-bg: #ffffff;
-            --text-main: #202124;
-            --text-sub: #5f6368;
-            --border-color: #dadce0;
-            --input-bg: #f1f3f4;
-            --shadow: 0 1px 3px rgba(0,0,0,0.12);
+            --primary: {BRAND_COLORS['blue']};
+            --secondary: {BRAND_COLORS['teal']};
+            --accent: {BRAND_COLORS['green']};
+            --text-main: #0f172a;
+            --text-sub: #475569;
+            --bg-start: #f8fafc;
+            --bg-end: #e2e8f0;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 20px rgba(0,0,0,0.05);
+            --input-bg: #ffffff;
         }}
 
-        /* --- DARK MODE VARIABLES --- */
         @media (prefers-color-scheme: dark) {{
             :root {{
-                --primary: #8ab4f8;
-                --primary-hover: #aecbfa;
-                --background: #1C1C1E;    /* Dark Gray from app.py */
-                --card-bg: #2C2C2E;       /* Lighter Dark Gray */
-                --text-main: #e8eaed;
-                --text-sub: #9aa0a6;
-                --border-color: #38383A;
-                --input-bg: #3A3A3C;
-                --shadow: 0 4px 8px rgba(0,0,0,0.3);
+                --text-main: #f1f5f9;
+                --text-sub: #cbd5e1;
+                --bg-start: #0f172a;
+                --bg-end: #020617;
+                --card-bg: rgba(30, 41, 59, 0.9);
+                --border-color: #334155;
+                --shadow: 0 4px 20px rgba(0,0,0,0.4);
+                --input-bg: #0f172a;
             }}
         }}
 
-        /* GLOBAL TYPOGRAPHY */
-        html, body, [class*="css"] {{
-            font-family: 'Google Sans', 'Roboto', sans-serif;
-            background-color: var(--background);
-            color: var(--text-main);
-        }}
-        .stApp {{ background-color: var(--background); }}
-
-        h1, h2, h3, h4 {{
-            font-family: 'Google Sans', sans-serif;
-            color: var(--text-main) !important;
-            font-weight: 500 !important;
-        }}
-        
-        /* HIDE DEFAULT NAV, BUT KEEP SIDEBAR VISIBLE FOR LOGOUT */
+        /* HIDE SIDEBAR NAVIGATION */
         [data-testid="stSidebarNav"] {{display: none;}}
-        section[data-testid="stSidebar"] {{
-            background-color: var(--card-bg);
-            border-right: 1px solid var(--border-color);
-        }}
+        section[data-testid="stSidebar"] {{display: none;}}
 
-        /* CARDS & CONTAINERS */
-        .custom-card, div[data-testid="stContainer"], div[data-testid="stForm"], div[data-testid="stExpander"] {{
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            margin-bottom: 16px;
-        }}
+        html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; color: var(--text-main) !important; }}
+        .stApp {{ background: radial-gradient(circle at top left, var(--bg-start) 0%, var(--bg-end) 100%); }}
+        h1, h2, h3, h4 {{ color: var(--primary) !important; font-weight: 700 !important; letter-spacing: -0.02em; }}
+        
+        .custom-card {{ background-color: var(--card-bg); padding: 24px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border-color); margin-bottom: 20px; color: var(--text-main); backdrop-filter: blur(10px); }}
+        
+        .hero-box {{ background: linear-gradient(135deg, #015bad 0%, #0f172a 100%); padding: 40px; border-radius: 16px; color: white !important; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(1, 91, 173, 0.2); }}
+        .hero-title {{ color: white !important; font-size: 2.2rem; font-weight: 800; margin-bottom:10px; }}
+        .hero-subtitle {{ color: #e2e8f0 !important; font-size: 1.1rem; opacity: 0.9; max-width: 800px; line-height: 1.6; }}
 
-        /* HERO SECTION */
-        .hero-box {{
-            background: linear-gradient(135deg, var(--primary) 0%, #1557b0 100%);
-            padding: 40px;
-            border-radius: 16px;
-            color: white !important;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3);
-        }}
-        .hero-title {{ color: white !important; font-size: 2.2rem; font-weight: 500; margin-bottom:10px; }}
-        .hero-subtitle {{ color: #e8eaed !important; font-size: 1.1rem; opacity: 0.9; }}
-
-        /* BUTTONS (Pill Shape) */
-        .stButton button {{
-            background-color: var(--primary);
-            color: var(--background) !important; /* Contrast text */
-            border: none;
-            border-radius: 20px;
-            padding: 0.5rem 1.5rem;
-            font-family: 'Google Sans', sans-serif;
-            font-weight: 500;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
-        }}
-        .stButton button:hover {{
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }}
-
-        /* NAVIGATION BUTTONS (Big Cards) */
+        /* Navigation Buttons */
         div[data-testid="column"] .stButton button {{
-            background-color: var(--card-bg);
-            color: var(--text-main) !important;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow);
-            height: 140px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            justify-content: center;
-            text-align: left;
-            border-radius: 16px;
+            background-color: var(--card-bg); color: var(--text-main) !important; border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: 140px; display: flex; flex-direction: column;
+            align-items: flex-start; justify-content: center; padding: 20px; white-space: pre-wrap; text-align: left; transition: all 0.2s;
         }}
         div[data-testid="column"] .stButton button:hover {{
-            border-color: var(--primary);
-            color: var(--primary) !important;
-            background-color: var(--card-bg); /* Keep bg consistent */
-        }}
-
-        /* INPUTS */
-        .stTextInput input, .stSelectbox [data-baseweb="select"] {{
-            background-color: var(--input-bg);
-            border: 1px solid transparent;
-            border-radius: 8px;
-            color: var(--text-main);
+            transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); border-color: var(--primary); color: var(--primary) !important;
         }}
         
-        /* DROPDOWNS */
-        div[data-baseweb="popover"], div[data-baseweb="menu"] {{
-            background-color: var(--card-bg) !important;
-            color: var(--text-main) !important;
-            border: 1px solid var(--border-color);
-        }}
-        div[data-baseweb="option"] {{
-            color: var(--text-main) !important;
+        /* Action Buttons */
+        .stButton button:not([style*="height: 140px"]) {{
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white !important; border: none; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 10px rgba(1, 91, 173, 0.2);
         }}
 
-        /* TABS */
-        .stTabs [data-baseweb="tab-list"] {{
-            gap: 2px;
-            background-color: transparent;
-        }}
-        .stTabs [data-baseweb="tab"] {{
-            height: 50px;
-            white-space: pre-wrap;
-            background-color: transparent;
-            border-radius: 0px;
-            color: var(--text-sub);
-            font-weight: 500;
-        }}
-        .stTabs [aria-selected="true"] {{
-            background-color: transparent;
-            color: var(--primary);
-            border-bottom: 2px solid var(--primary);
-        }}
-
-        /* LOGIN SPECIFICS */
+        .stTextInput input, .stSelectbox div[data-baseweb="select"] > div {{ background-color: var(--input-bg) !important; color: var(--text-main) !important; border-color: var(--border-color) !important; border-radius: 8px; }}
+        div[data-baseweb="popover"] {{ background-color: var(--card-bg) !important; }}
+        div[data-baseweb="menu"] {{ background-color: var(--card-bg) !important; color: var(--text-main) !important; }}
+        div[data-testid="stDataFrame"] {{ border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }}
+        .streamlit-expanderHeader {{ background-color: var(--card-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-color); }}
+        div[data-testid="stExpander"] {{ background-color: var(--card-bg) !important; border: 1px solid var(--border-color); border-radius: 8px; }}
+        
+        /* Login Specifics */
         .login-card {{
             background-color: var(--card-bg);
             padding: 40px;
-            border-radius: 16px;
+            border-radius: 20px;
             box-shadow: var(--shadow);
             text-align: center;
             max-width: 400px;
             margin: 100px auto;
             border: 1px solid var(--border-color);
+            color: var(--text-main);
+            backdrop-filter: blur(12px);
         }}
-        .login-title {{ color: var(--primary) !important; font-size: 1.8rem; font-weight: 500; margin-bottom: 10px; }}
-        .back-link {{ text-decoration: none; color: var(--text-sub); font-weight: 500; }}
+        .login-title {{ color: var(--primary) !important; font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }}
+        .login-subtitle {{ color: var(--text-sub) !important; margin-bottom: 20px; }}
+        .back-link {{ text-decoration: none; color: var(--text-sub); font-weight: 600; transition: color 0.2s; }}
         .back-link:hover {{ color: var(--primary); }}
-
     </style>
 """, unsafe_allow_html=True)
 
@@ -217,23 +130,21 @@ def fetch_staff_data():
         return []
     except: return []
 
-# Initialize Session State for Data Persistence (Allows adding new profiles)
-if "master_df" not in st.session_state:
-    all_staff_list = fetch_staff_data()
-    # Convert to DF and Normalize Columns immediately
-    df_temp = pd.DataFrame(all_staff_list)
-    if not df_temp.empty:
-        df_temp.columns = df_temp.columns.str.lower().str.strip() 
-        if 'role' in df_temp.columns:
-            df_temp['role'] = df_temp['role'].astype(str).str.strip()
-        if 'cottage' in df_temp.columns:
-            df_temp['cottage'] = df_temp['cottage'].astype(str).str.strip()
-        if 'name' in df_temp.columns:
-            df_temp['name'] = df_temp['name'].astype(str).str.strip()
-    st.session_state.master_df = df_temp
+all_staff_list = fetch_staff_data()
+# Convert to DF and Normalize Columns immediately
+df_all = pd.DataFrame(all_staff_list)
 
-# Use the session state dataframe for the rest of the app
-df_all = st.session_state.master_df
+if not df_all.empty:
+    # 1. Normalize Column Names (lowercase, strip)
+    df_all.columns = df_all.columns.str.lower().str.strip() 
+    
+    # 2. Normalize String Values in Critical Columns (strip whitespace)
+    if 'role' in df_all.columns:
+        df_all['role'] = df_all['role'].astype(str).str.strip()
+    if 'cottage' in df_all.columns:
+        df_all['cottage'] = df_all['cottage'].astype(str).str.strip()
+    if 'name' in df_all.columns:
+        df_all['name'] = df_all['name'].astype(str).str.strip()
 
 # --- 5. SECURITY & LOGIN ---
 if "authenticated" not in st.session_state:
@@ -1105,6 +1016,27 @@ SUPERVISOR_CLASH_MATRIX = {
                 "Feedback": "You are great at the relationship, but I need you to be better at the paperwork/follow-through."
             }
         },
+        "Director": {
+            "tension": "Speed vs. Process (Action vs. Consensus)",
+            "psychology": "You (Facilitator) prioritize hearing everyone out. They (Director) prioritize checking the box. You feel steamrolled; they feel slowed down. They may interpret your listening as indecision and try to take over.",
+            "watch_fors": [
+                "**The Coup:** They start running the meeting because you are 'taking too long'.",
+                "**The Bypass:** They make decisions without asking you.",
+                "**Eye Rolling:** Visible signs of impatience during group discussions."
+            ],
+            "intervention_steps": [
+                "**1. Define Authority:** You must establish that while you value their speed, you own the decision.",
+                "**2. Give Them a Lane:** Delegate a project they can own entirely so they don't feel stifled.",
+                "**3. The 'Wait' Rule:** Tell them, 'I hear you, but I need to hear from X before we move.'"
+            ],
+            "scripts": {
+                "Opening": "I value your drive, but I need you to respect the process.",
+                "Validation": "I know you see the solution clearly and want to move fast.",
+                "The Pivot": "However, we need the team's buy-in or this solution won't stick.",
+                "Crisis": "I am the supervisor. We are doing it this way.",
+                "Feedback": "Your speed is an asset, but right now it is intimidating the team."
+            }
+        },
         "Tracker": {
             "tension": "Consensus vs. Compliance (People vs. Policy)",
             "psychology": "You (Facilitator) want the team to agree. They (Tracker) want the team to follow the rule. You feel they are being rigid 'robots'. They feel you are treating safety rules as 'suggestions' to make people happy.",
@@ -1388,11 +1320,11 @@ st.markdown("---")
 # 1. Supervisor's Guide
 if st.session_state.current_view == "Supervisor's Guide":
     st.subheader("📝 Supervisor's Guide")
-    sub1, sub2, sub3 = st.tabs(["Database", "Manual", "Create New Profile"])
+    sub1, sub2 = st.tabs(["Database", "Manual"])
     with sub1:
-        if not df_all.empty:
+        if not df.empty:
             # Create dictionary from the FILTERED dataframe, not the raw list
-            filtered_staff_list = df_all.to_dict('records')
+            filtered_staff_list = df.to_dict('records')
             options = {f"{s['name']} ({s['role']})": s for s in filtered_staff_list}
             
             sel = st.selectbox("Select Staff", options.keys(), index=None, key="t1_staff_select")
@@ -1405,7 +1337,6 @@ if st.session_state.current_view == "Supervisor's Guide":
                     st.download_button("Download PDF", pdf, f"Guide_{d['name']}.pdf", "application/pdf")
                     display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
                 st.button("Reset", on_click=reset_t1)
-    
     with sub2:
         with st.form("manual"):
             c1,c2 = st.columns(2)
@@ -1416,49 +1347,13 @@ if st.session_state.current_view == "Supervisor's Guide":
                 st.download_button("Download PDF", pdf, "guide.pdf", "application/pdf")
                 display_guide(mn, mr, mpc, None, mpm, None)
 
-    with sub3:
-        st.markdown("### ➕ Add New Staff Profile")
-        st.info("ℹ️ This adds the profile to the current session database. To make it permanent, please update the Google Sheet.")
-        with st.form("add_new_profile"):
-            c1, c2 = st.columns(2)
-            n_name = c1.text_input("Staff Name")
-            n_role = c2.selectbox("Role", ["YDP", "Shift Supervisor", "Program Supervisor", "Manager"])
-            
-            c3, c4 = st.columns(2)
-            n_comm = c3.selectbox("Communication Style", COMM_TRAITS)
-            n_mot = c4.selectbox("Motivation Driver", MOTIV_TRAITS)
-            
-            # Dynamically fetch unique cottages if available, else default list
-            cottage_options = sorted(df['cottage'].unique().tolist()) if 'cottage' in df.columns else ["All"]
-            n_cottage = st.selectbox("Cottage/Scope", cottage_options)
-            
-            if st.form_submit_button("Save Profile"):
-                if n_name:
-                    new_record = {
-                        "name": n_name,
-                        "role": n_role,
-                        "p_comm": n_comm,
-                        "p_mot": n_mot,
-                        "s_comm": None,
-                        "s_mot": None,
-                        "cottage": n_cottage
-                    }
-                    # Add to session state dataframe
-                    new_row = pd.DataFrame([new_record])
-                    st.session_state.master_df = pd.concat([st.session_state.master_df, new_row], ignore_index=True)
-                    st.success(f"✅ Added {n_name} to database!")
-                    time.sleep(1)
-                    st.rerun()
-                else:
-                    st.error("Name is required.")
-
 # 2. TEAM DNA
 elif st.session_state.current_view == "Team DNA":
     st.subheader("🧬 Team DNA")
-    if not df_all.empty:
-        teams = st.multiselect("Select Team Members", df_all['name'].tolist(), key="t2_team_select")
+    if not df.empty:
+        teams = st.multiselect("Select Team Members", df['name'].tolist(), key="t2_team_select")
         if teams:
-            tdf = df_all[df_all['name'].isin(teams)]
+            tdf = df[df['name'].isin(teams)]
             c1, c2 = st.columns(2)
             with c1:
                 comm_counts = tdf['p_comm'].value_counts()
