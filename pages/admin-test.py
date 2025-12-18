@@ -582,7 +582,7 @@ INTEGRATED_PROFILES = {
             "Where are you moving too fast for the team? (Brings them back to the group.)",
             "How does your tone land when you are stressed? (Checks if passion is perceived as aggression.)"
         ],
-        "advancement": "**Delegate Effectively:** Build a team that protects children. They must learn that can multiply their impact by teaching others to care, rather than doing all the caring themselves. Trusting others' hearts is a key step.\n\n**Allow Safe Failure:** Trust that others also care. They need to learn that a mistake by a staff member doesn't mean that staff member is 'bad.' They must separate competence from character.\n\n**Focus on Strategy:** Build systems that prevent injustice. They need to move from reacting to individual crises to preventing them through policy and culture. This is the shift from tactical advocacy to strategic advocacy."
+        "advancement": "**Delegate Effectively:** Build a team that protects children. They must learn that can multiply their impact by teaching others to care, rather than doing all the caring themselves. Trusting others' hearts is a key step.\n\n**Allow Safe Failure:** Trust that others also care. They need to learn that a mistake by a staff member doesn't mean that staff member is 'bad.' They must separate competence from character.\n\n**Focus on Strategy:** Build systems that prevent injustice. They need to move from reacting to individual crises to preventing them through policy and culture. This is the shift to executive thinking."
     },
     "Director-Connection": {
         "title": "The Protective Captain",
@@ -1102,7 +1102,7 @@ SUPERVISOR_CLASH_MATRIX = {
             "intervention_steps": ["**1. Validate the Rule:** Acknowledge the policy first.", "**2. Contextualize the Exception:** Explain *why* this specific situation requires a bend.", "**3. Define the New Boundary:** Create a temporary rule so they feel safe."],
             "scripts": {
                 "Opening": "I know this plan deviates from SOP, and I want to explain why.",
-                "Validation": "I appreciate you keeping us compliant.",
+                "Validation": "I appreciate your attention to detail. You keep us compliant.",
                 "The Pivot": "In this specific case, following the rule will cause escalation.",
                 "Crisis": "I am taking responsibility for this exception.",
                 "Feedback": "I need you to see the gray areas."
@@ -1305,12 +1305,14 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 def send_pdf_via_email(to_email, subject, body, pdf_bytes, filename):
     try:
         # Get credentials from st.secrets
-        # Ensure you have .streamlit/secrets.toml set up with these keys
-        email_sender = st.secrets.get("EMAIL_SENDER")
+        # We look for "EMAIL_USER" based on your provided secrets
+        email_sender = st.secrets.get("EMAIL_USER")
         email_password = st.secrets.get("EMAIL_PASSWORD")
         
-        if not email_sender or not email_password:
-            return False, "Missing email credentials in secrets."
+        if not email_sender:
+            return False, "Missing 'EMAIL_USER' in .streamlit/secrets.toml"
+        if not email_password:
+            return False, "Missing 'EMAIL_PASSWORD' in .streamlit/secrets.toml"
 
         msg = MIMEMultipart()
         msg['From'] = email_sender
@@ -1490,7 +1492,7 @@ if st.session_state.current_view == "Supervisor's Guide":
                 
                 # Logic now inside display_guide checks session state name match
                 if "generated_name" in st.session_state and st.session_state.generated_name == d['name']:
-                     display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
+                      display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
 
                 st.button("Reset", on_click=reset_t1)
 
