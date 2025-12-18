@@ -9,178 +9,178 @@ from email.mime.multipart import MIMEMultipart
 import streamlit.components.v1 as components  # Required for scrolling
 
 # --- 1. CONFIGURATION ---
-st.set_page_config(page_title="Elmcrest Leadership Compass", page_icon="🧭", layout="centered", initial_sidebar_state="collapsed")
+st.set_page_config(
+    page_title="Elmcrest Leadership Compass", 
+    page_icon="🧭", 
+    layout="centered", 
+    initial_sidebar_state="collapsed"
+)
 
-# --- 2. CSS STYLING (Modern Glassmorphism) ---
+# --- 2. CSS STYLING (Pixel / Material Inspired + Compact) ---
 st.markdown("""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap');
 
+        /* --- LIGHT MODE VARIABLES --- */
         :root {
-            --primary: #015bad;
-            --secondary: #51c3c5;
-            --accent: #b9dca4;
-            --bg-gradient-light: radial-gradient(circle at top left, #e0f2fe 0%, #ffffff 40%, #dcfce7 100%);
-            --bg-gradient-dark: radial-gradient(circle at top left, #0f172a 0%, #1e293b 40%, #064e3b 100%);
-            --text-main: #0f172a;
-            --text-sub: #475569;
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --card-border: rgba(255, 255, 255, 0.6);
-            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
-            --input-bg: #f8fafc;
+            --primary: #1a73e8;       /* Google Blue */
+            --primary-hover: #1557b0;
+            --background: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #202124;
+            --text-sub: #5f6368;
+            --border-color: #dadce0;
+            --input-bg: #f1f3f4;
+            --shadow: 0 1px 3px rgba(0,0,0,0.12);
+            --score-track: #e8eaed;
         }
 
-        /* HIDE STREAMLIT SIDEBAR NAVIGATION */
-        [data-testid="stSidebarNav"] {display: none;}
-        section[data-testid="stSidebar"] {display: none;}
-
+        /* --- DARK MODE VARIABLES --- */
         @media (prefers-color-scheme: dark) {
             :root {
-                --text-main: #f1f5f9;
-                --text-sub: #94a3b8;
-                --card-bg: rgba(30, 41, 59, 0.85);
-                --card-border: rgba(255, 255, 255, 0.1);
-                --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
-                --input-bg: #0f172a;
+                --primary: #8ab4f8;
+                --primary-hover: #aecbfa;
+                --background: #1C1C1E;    /* Dark Gray */
+                --card-bg: #2C2C2E;       /* Lighter Dark Gray */
+                --text-main: #e8eaed;
+                --text-sub: #9aa0a6;
+                --border-color: #38383A;
+                --input-bg: #3A3A3C;
+                --shadow: 0 4px 8px rgba(0,0,0,0.3);
+                --score-track: #5f6368;
             }
         }
 
+        /* HIDE DEFAULT UI */
+        [data-testid="stSidebarNav"] {display: none;}
+        section[data-testid="stSidebar"] {display: none;}
+        header {visibility: hidden;}
+        footer {visibility: hidden;}
+
+        /* GLOBAL */
         html, body, [class*="css"] {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Google Sans', 'Roboto', sans-serif;
+            background-color: var(--background);
             color: var(--text-main);
         }
+        .stApp { background-color: var(--background); }
 
-        /* Main App Background */
-        .stApp {
-            background-image: var(--bg-gradient-light);
-            background-attachment: fixed;
-        }
-        @media (prefers-color-scheme: dark) {
-            .stApp { background-image: var(--bg-gradient-dark); }
-        }
-
-        /* Headers */
-        h1, h2, h3 {
-            color: var(--primary) !important;
-            font-weight: 700 !important;
-            letter-spacing: -0.02em;
-        }
-        p, label, li, .stMarkdown {
+        /* TYPOGRAPHY */
+        h1, h2, h3, h4 {
+            font-family: 'Google Sans', sans-serif;
             color: var(--text-main) !important;
-            line-height: 1.6;
+            font-weight: 500 !important;
+            margin-bottom: 0.5rem !important;
+        }
+        p, label, .stMarkdown {
+            color: var(--text-main) !important;
+            line-height: 1.5;
+            font-size: 0.95rem;
         }
 
-        /* Glassmorphism Container */
+        /* COMPACT CONTAINER */
         .block-container {
-            padding: 3rem 2rem;
-            max-width: 800px;
-            background-color: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
-            border-radius: 24px;
-            box-shadow: var(--shadow);
-            margin-top: 2rem;
+            padding-top: 2rem !important;
+            padding-bottom: 2rem !important;
+            max-width: 850px; /* Widened for radio buttons */
         }
 
-        /* Buttons */
+        /* CARDS */
+        div[data-testid="stForm"], .info-card, div[data-testid="stExpander"] {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+        }
+
+        /* BUTTONS */
         .stButton button {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white !important;
+            background-color: var(--primary);
+            color: var(--background) !important;
             border: none;
-            border-radius: 12px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            width: 100%;
-            box-shadow: 0 4px 12px rgba(1, 91, 173, 0.2);
+            border-radius: 20px;
+            padding: 0.5rem 1.5rem;
+            font-family: 'Google Sans', sans-serif;
+            font-weight: 500;
+            text-transform: none;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
             transition: all 0.2s ease;
+            width: 100%;
         }
         .stButton button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(1, 91, 173, 0.3);
-            opacity: 0.95;
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
         }
 
-        /* Inputs */
+        /* INPUTS */
         .stTextInput input, .stSelectbox [data-baseweb="select"] {
             background-color: var(--input-bg);
-            border-radius: 12px;
-            border: 1px solid var(--card-border);
+            border: 1px solid transparent;
+            border-radius: 8px;
             color: var(--text-main);
-            padding: 0.5rem;
+            padding: 8px 12px;
+            font-size: 0.95rem;
+            min-height: 40px;
         }
-
-        /* Centered Radio Buttons */
-        .stRadio {
-            background-color: transparent;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .stRadio [role="radiogroup"] {
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 4px;
-        }
+        
+        /* RADIO */
+        .stRadio { background-color: transparent; }
         div[role="radiogroup"] > label > div:first-of-type {
+            background-color: var(--card-bg) !important;
+            border: 2px solid var(--text-sub) !important;
+            width: 18px; height: 18px;
+        }
+        div[role="radiogroup"] > label[data-checked="true"] > div:first-of-type {
             background-color: var(--primary) !important;
             border-color: var(--primary) !important;
         }
-        
-        /* Assessment Question Styling */
+
+        /* PROGRESS BAR */
+        .stProgress > div > div > div > div {
+            background-color: var(--primary);
+            border-radius: 10px;
+        }
+
+        /* UTILS */
         .question-text {
             font-size: 1rem;
-            font-weight: 500;
+            font-weight: 400;
             color: var(--text-main);
-            line-height: 1.4;
+            margin-bottom: 4px;
         }
-        
-        /* Labels for Scale */
         .scale-labels {
             display: flex;
             justify-content: space-between;
             font-size: 0.7rem;
             color: var(--text-sub);
-            margin-bottom: -8px;
-            padding-left: 4px;
-            padding-right: 4px;
-            font-weight: 500;
-        }
-
-        /* Custom Cards & Bars */
-        .info-card {
-            background-color: var(--input-bg);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--card-border);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 2px;
         }
         .score-container {
-            background-color: var(--input-bg);
-            border-radius: 8px;
-            height: 12px;
+            background-color: var(--score-track);
+            border-radius: 6px;
+            height: 8px;
             width: 100%;
-            margin-top: 5px;
-            margin-bottom: 15px;
+            margin-top: 4px;
+            margin-bottom: 12px;
             overflow: hidden;
         }
         .score-fill {
             height: 100%;
-            border-radius: 8px;
-            background: linear-gradient(90deg, var(--secondary), var(--primary));
-            transition: width 1s ease-in-out;
+            border-radius: 6px;
+            background-color: var(--primary);
         }
-        
         hr {
-            margin: 2rem 0;
             border: 0;
-            border-top: 1px solid var(--card-border);
-            opacity: 0.5;
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 16px 0;
         }
-        
-        /* Alerts */
-        .stAlert { border-radius: 12px; }
+        .info-card { border-left: 5px solid var(--primary); }
     </style>
 """, unsafe_allow_html=True)
 
@@ -466,7 +466,7 @@ INTEGRATED_PROFILES = {
         "strengths": [
             "**Diagnostic Speed:** You quickly identify skill gaps or process failures. You don't just see a bad shift; you see why it happened.",
             "**Fearless Innovation:** You aren't afraid to try a new schedule or a new intervention if the old one isn't working. You treat the floor like a lab.",
-            "**High-Impact Coaching:** You give feedback that is direct and developmental. You don't coddle staff; you challenge them because you believe they can be better."
+            "**High-Impact Coaching:** You give direct, developmental feedback that accelerates the growth of their peers. You don't coddle staff; you challenge them because you believe they can be better."
         ],
         "weaknesses": [
             "**The Pace Mismatch:** Your brain moves faster than the system changes. You get frustrated with staff who learn slowly.",
@@ -937,7 +937,7 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
     
-    blue = (1, 91, 173)
+    blue = (0, 122, 255) # iOS Blue
     black = (0, 0, 0)
     
     # Header
@@ -1043,12 +1043,12 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
 def show_brand_header(subtitle):
     col1, col2 = st.columns([0.15, 0.85])
     with col1:
-        st.markdown("<div style='width:60px;height:60px;background:linear-gradient(135deg,#015bad,#51c3c5);border-radius:14px;color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.4rem;box-shadow:0 4px 10px rgba(1,91,173,0.3);'>ELC</div>", unsafe_allow_html=True)
+        st.image("https://raw.githubusercontent.com/jordonleblanc-cell/compass/main/elmcrest-icon.png", width=60)
     with col2:
         st.markdown(f"""
         <div style="display: flex; flex-direction: column; justify-content: center; height: 60px;">
-            <div style="color: #015bad; font-weight: 800; font-size: 1.6rem; letter-spacing: -0.03em;">Elmcrest Leadership Compass</div>
-            <div style="color: #64748b; font-size: 0.95rem; font-weight: 500;">{subtitle}</div>
+            <div style="color: #007AFF; font-weight: 700; font-size: 1.5rem; letter-spacing: -0.02em;">Elmcrest Leadership Compass</div>
+            <div style="color: #8E8E93; font-size: 0.9rem; font-weight: 500;">{subtitle}</div>
         </div>
         """, unsafe_allow_html=True)
     st.markdown("<hr>", unsafe_allow_html=True)
@@ -1056,8 +1056,8 @@ def show_brand_header(subtitle):
 def draw_score_bar(label, value, max_value=25):
     pct = (value / max_value) * 100
     st.markdown(f"""
-    <div style="margin-bottom: 10px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.85rem; font-weight: 600; color: #475569;">
+    <div style="margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; font-weight: 500; color: #8E8E93;">
             <span>{label}</span>
             <span>{value}</span>
         </div>
@@ -1104,7 +1104,8 @@ if st.session_state.step == 'intro':
     
     show_brand_header("Communication & Motivation Snapshot")
     st.markdown("#### 👋 Welcome")
-    st.info("This assessment helps you understand your natural patterns at work. Your insights will shape a personalized profile built to support your growth.")
+    # Tighter welcome message
+    st.markdown("This assessment helps you understand your natural patterns at work. Your insights will shape a personalized profile built to support your growth.")
     st.markdown("<br>", unsafe_allow_html=True)
     
     with st.form("intro_form"):
@@ -1125,9 +1126,9 @@ if st.session_state.step == 'intro':
                 st.session_state.step = 'comm'
                 st.rerun()
     
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    # Discrete Admin Access Button
-    col_spacer, col_admin = st.columns([0.8, 0.2])
+    st.markdown("<br>", unsafe_allow_html=True)
+    # Discrete Admin Access Button (Tighter spacing)
+    col_spacer, col_admin = st.columns([0.7, 0.3])
     with col_admin:
         if st.button("🔒 Supervisor Portal"):
             st.switch_page("pages/admin.py")
@@ -1144,7 +1145,7 @@ elif st.session_state.step == 'comm':
         for i, q in enumerate(st.session_state.shuffled_comm):
             # Card-like container for each question
             with st.container(border=True):
-                col_q, col_a = st.columns([0.6, 0.4], gap="medium")
+                col_q, col_a = st.columns([0.45, 0.55], gap="medium") # Adjusted ratio to give radios more space
                 
                 with col_q:
                     st.markdown(f"<div class='question-text' style='display:flex;align-items:center;height:100%;'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
@@ -1189,7 +1190,7 @@ elif st.session_state.step == 'motiv':
         for i, q in enumerate(st.session_state.shuffled_motiv):
             # Card-like container for each question
             with st.container(border=True):
-                col_q, col_a = st.columns([0.6, 0.4], gap="medium")
+                col_q, col_a = st.columns([0.45, 0.55], gap="medium") # Adjusted ratio
                 
                 with col_q:
                     st.markdown(f"<div class='question-text' style='display:flex;align-items:center;height:100%;'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
@@ -1292,7 +1293,7 @@ elif st.session_state.step == 'results':
     st.markdown(f"### 🗣️ {comm_prof['name']}")
     st.markdown(f"""
     <div class="info-card">
-        <div style="color:#015bad;font-weight:700;margin-bottom:5px;text-transform:uppercase;font-size:0.85rem;">{comm_prof['tagline']}</div>
+        <div style="color:#007AFF;font-weight:700;margin-bottom:5px;text-transform:uppercase;font-size:0.85rem;">{comm_prof['tagline']}</div>
         <div style="line-height:1.6;">{comm_prof['overview']}</div>
     </div>
     """, unsafe_allow_html=True)
@@ -1319,7 +1320,7 @@ elif st.session_state.step == 'results':
     st.markdown(f"### 🔋 {mot_prof['name']}")
     st.markdown(f"""
     <div class="info-card">
-        <div style="color:#015bad;font-weight:700;margin-bottom:5px;text-transform:uppercase;font-size:0.85rem;">{mot_prof['tagline']}</div>
+        <div style="color:#007AFF;font-weight:700;margin-bottom:5px;text-transform:uppercase;font-size:0.85rem;">{mot_prof['tagline']}</div>
         <div style="line-height:1.6;">{mot_prof['summary']}</div>
     </div>
     """, unsafe_allow_html=True)
