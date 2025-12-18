@@ -28,6 +28,12 @@ def set_view(view_name):
 
 # --- 2. CONSTANTS ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
+BRAND_COLORS = {
+    'blue': '#1a73e8',
+    'green': '#0f9d58',
+    'teal': '#00acc1',
+    'gray': '#5f6368'
+}
 
 # --- 3. CSS STYLING ---
 st.markdown("""
@@ -562,7 +568,7 @@ INTEGRATED_PROFILES = {
         "interventions": [
             "**Phase 1: The Gray Zone (0-6 Months):** Practice identifying validity in opposing viewpoints. Require them to argue the 'other side' of an ethical debate to build cognitive flexibility. They must learn that not everyone who disagrees with them is evil. This reduces their judgmental tendencies. You are teaching them complexity.",
             "**Phase 2: Sustainable Advocacy (6-12 Months):** Coach them to use a 'Tier System' for battles (Tier 1: Fight, Tier 2: Debate, Tier 3: Let go). They cannot die on every hill; they must learn to prioritize their moral outrage. This prevents compassion fatigue and keeps them effective for the big issues. You are teaching them strategy.",
-            "**Phase 3: Cultural Architecture (12-18 Months):** Move from fighting battles to building systems that prevent injustice. Challenge them to write the policy rather than just complaining about the lack of one. This shifts them from a 'warrior' mindset to a 'builder' mindset. You are teaching them legacy."
+            "**Phase 3: Cultural Architecture (12-18 Months):** Move from fighting battles to building systems that prevent injustice. Challenge them to write the policy rather than just complaining about the lack of one. This shifts them from a 'warrior' mindset to a 'builder' mindset. You are teaching legacy."
         ],
         "questions": [
             "Where do you feel the system is failing your values? (Validates feelings and opens constructive problem solving.)",
@@ -1084,7 +1090,7 @@ SUPERVISOR_CLASH_MATRIX = {
             "scripts": {
                 "Opening": "I love the energy you bring, but we need to look at the numbers.",
                 "Validation": "I know you want to protect the team's morale.",
-                "The Pivot": "But by letting this slide, we are being unfair to the staff who follow the rules.",
+                "The Pivot": "But by not letting this slide, we are being unfair to the staff who follow the rules.",
                 "Crisis": "We can't worry about feelings right now. We follow the protocol.",
                 "Feedback": "You are great at the relationship, but I need you to be better at the paperwork/follow-through."
             }
@@ -1207,7 +1213,7 @@ CAREER_PATHWAYS = {
     }
 }
 
-# 5c. INTEGRATED PROFILES (Expanded & 10 Coaching Questions Logic)
+# 5c. INTEGRATED PROFILES Logic
 def generate_profile_content(comm, motiv):
     
     # This dictionary holds the specific text for the 16 combinations
@@ -1219,10 +1225,10 @@ def generate_profile_content(comm, motiv):
     i_data = INTEGRATED_PROFILES.get(combo_key, {})
 
     return {
-        "s1_b": c_data.get('bullets'),
-        "s2_b": c_data.get('supervising_bullets'),
-        "s3_b": m_data.get('bullets'),
-        "s4_b": m_data.get('strategies_bullets'),
+        "s1_b": c_data.get('bullets', []),
+        "s2_b": c_data.get('supervising_bullets', []),
+        "s3_b": m_data.get('bullets', []),
+        "s4_b": m_data.get('strategies_bullets', []),
         # S5 is Synergy
         "s5": f"**Profile:** {i_data.get('title')}\n\n{i_data.get('synergy')}",
         "s6": i_data.get('support', ''),
@@ -1230,7 +1236,7 @@ def generate_profile_content(comm, motiv):
         "s8": i_data.get('struggling', ''), # Struggling paragraphs
         "s9": "Strategies for Course Correction:", # Intervention Header
         "s9_b": i_data.get('interventions', []),
-        "s10_b": m_data.get('celebrate_bullets'),
+        "s10_b": m_data.get('celebrate_bullets', []),
         "coaching": i_data.get('questions', []),
         "advancement": i_data.get('advancement', '')
     }
@@ -1243,7 +1249,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
-    blue = (1, 91, 173); black = (0, 0, 0)
+    blue = (26, 115, 232); black = (0, 0, 0)
     
     # Header
     pdf.set_font("Arial", 'B', 20); pdf.set_text_color(*blue); pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align='C')
@@ -1295,11 +1301,87 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
     return pdf.output(dest='S').encode('latin-1')
 
+# --- EMAIL FUNCTIONALITY ---
+def send_pdf_via_email(to_email, subject, body, pdf_bytes, filename):
+    try:
+        # Get credentials from st.secrets
+        # Ensure you have .streamlit/secrets.toml set up with these keys
+        email_sender = st.secrets.get("EMAIL_SENDER")
+        email_password = st.secrets.get("EMAIL_PASSWORD")
+        
+        if not email_sender or not email_password:
+            return False, "Missing email credentials in secrets."
+
+        msg = MIMEMultipart()
+        msg['From'] = email_sender
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Attachment
+        part = MIMEBase('application', "octet-stream")
+        part.set_payload(pdf_bytes)
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', f'attachment; filename="{filename}"')
+        msg.attach(part)
+
+        # SMTP Setup (Assuming Gmail, change if different)
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(email_sender, email_password)
+        text = msg.as_string()
+        server.sendmail(email_sender, to_email, text)
+        server.quit()
+        return True, "Email sent successfully!"
+    except Exception as e:
+        return False, f"Failed to send email: {e}"
+
+# --- MODIFIED DISPLAY GUIDE FUNCTION ---
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     data = generate_profile_content(p_comm, p_mot)
 
-    st.markdown("---"); st.markdown(f"### 📘 Supervisory Guide: {name}"); st.divider()
+    # --- HEADER ---
+    st.markdown("---")
+    st.markdown(f"### 📘 Supervisory Guide: {name}")
+    st.divider()
     
+    # --- MOVED "ACTIONS" SECTION HERE ---
+    # We check if the PDF generated matches the person currently being displayed
+    if "generated_pdf" in st.session_state and st.session_state.get("generated_name") == name:
+        st.markdown("#### 📤 Actions")
+        ac1, ac2 = st.columns([1, 2])
+        
+        with ac1:
+            st.download_button(
+                label="📥 Download PDF", 
+                data=st.session_state.generated_pdf, 
+                file_name=st.session_state.generated_filename, 
+                mime="application/pdf",
+                use_container_width=True
+            )
+        
+        with ac2:
+            with st.popover("📧 Email to Me", use_container_width=True):
+                # Added unique keys to prevent widget duplication
+                email_input = st.text_input("Recipient Email", placeholder="name@elmcrest.org", key=f"email_input_{name}")
+                if st.button("Send Email", key=f"email_btn_{name}"):
+                    if email_input:
+                        with st.spinner("Sending..."):
+                            success, msg = send_pdf_via_email(
+                                to_email=email_input,
+                                subject=f"Supervisor Guide: {name}",
+                                body=f"Attached is the Compass Supervisor Guide for {name}.",
+                                pdf_bytes=st.session_state.generated_pdf,
+                                filename=st.session_state.generated_filename
+                            )
+                            if success: st.success(msg)
+                            else: st.error(msg)
+                    else:
+                        st.warning("Please enter an email address.")
+        
+        st.divider() # Visual separation
+    # -------------------------------------
+
     def show_section(title, text, bullets=None):
         st.subheader(title)
         if text: st.write(text)
@@ -1405,40 +1487,11 @@ if st.session_state.current_view == "Supervisor's Guide":
                     st.session_state.generated_pdf = create_supervisor_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
                     st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
                     st.session_state.generated_name = d['name']
-                    display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
+                
+                # Logic now inside display_guide checks session state name match
+                if "generated_name" in st.session_state and st.session_state.generated_name == d['name']:
+                     display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
 
-                if "generated_pdf" in st.session_state and st.session_state.get("generated_name") == d['name']:
-                    st.divider()
-                    st.markdown("#### 📤 Actions")
-                    ac1, ac2 = st.columns([1, 2])
-                    
-                    with ac1:
-                        st.download_button(
-                            label="📥 Download PDF", 
-                            data=st.session_state.generated_pdf, 
-                            file_name=st.session_state.generated_filename, 
-                            mime="application/pdf",
-                            use_container_width=True
-                        )
-                    
-                    with ac2:
-                        with st.popover("📧 Email to Me", use_container_width=True):
-                            email_input = st.text_input("Recipient Email", placeholder="name@elmcrest.org")
-                            if st.button("Send Email"):
-                                if email_input:
-                                    with st.spinner("Sending..."):
-                                        success, msg = send_pdf_via_email(
-                                            to_email=email_input,
-                                            subject=f"Supervisor Guide: {d['name']}",
-                                            body=f"Attached is the Compass Supervisor Guide for {d['name']}.",
-                                            pdf_bytes=st.session_state.generated_pdf,
-                                            filename=st.session_state.generated_filename
-                                        )
-                                    if success: st.success(msg)
-                                    else: st.error(msg)
-                                else:
-                                    st.warning("Please enter an email address.")
-                    
                 st.button("Reset", on_click=reset_t1)
 
     # --- MANUAL TAB ---
@@ -1451,30 +1504,11 @@ if st.session_state.current_view == "Supervisor's Guide":
             if st.form_submit_button("Generate") and mn:
                 pdf_manual = create_supervisor_guide(mn, mr, mpc, None, mpm, None)
                 fname_manual = f"Guide_{mn.replace(' ', '_')}.pdf"
-                st.session_state.manual_pdf = pdf_manual
-                st.session_state.manual_fname = fname_manual
+                st.session_state.generated_pdf = pdf_manual
+                st.session_state.generated_filename = fname_manual
+                st.session_state.generated_name = mn
+                # Manually Trigger display
                 display_guide(mn, mr, mpc, None, mpm, None)
-
-        if "manual_pdf" in st.session_state:
-            st.divider()
-            ac1, ac2 = st.columns([1, 2])
-            with ac1:
-                st.download_button("📥 Download PDF", st.session_state.manual_pdf, st.session_state.manual_fname, "application/pdf", use_container_width=True)
-            with ac2:
-                with st.popover("📧 Email to Me", use_container_width=True):
-                    email_input_m = st.text_input("Recipient Email", key="manual_email")
-                    if st.button("Send Email", key="btn_manual_email"):
-                        if email_input_m:
-                            with st.spinner("Sending..."):
-                                success, msg = send_pdf_via_email(
-                                    email_input_m,
-                                    f"Supervisor Guide: {mn}",
-                                    f"Attached is the manually generated Compass Guide for {mn}.",
-                                    st.session_state.manual_pdf,
-                                    st.session_state.manual_fname
-                                )
-                            if success: st.success(msg)
-                            else: st.error(msg)
 
 # 2. TEAM DNA
 elif st.session_state.current_view == "Team DNA":
@@ -1550,26 +1584,6 @@ elif st.session_state.current_view == "Team DNA":
 elif st.session_state.current_view == "Conflict Mediator":
     st.subheader("⚖️ Conflict Mediator")
     if not df.empty:
-        # Sidebar for API Key
-        with st.sidebar:
-            # Try to get key from secrets (support both names)
-            secret_key = st.secrets.get("GOOGLE_API_KEY") or st.secrets.get("GEMINI_API_KEY", "")
-            
-            # Input field (defaults to secret if found)
-            user_api_key = st.text_input(
-                "🔑 Gemini API Key", 
-                value=st.session_state.get("gemini_key_input", secret_key),
-                type="password",
-                help="Get a key at aistudio.google.com"
-            )
-            
-            # Persist input to session state
-            if user_api_key:
-                st.session_state.gemini_key_input = user_api_key
-                st.success("✅ API Key Active")
-            else:
-                st.error("❌ No API Key Found")
-
         c1, c2 = st.columns(2)
         p1 = c1.selectbox("Select Yourself (Supervisor)", df['name'].unique(), index=None, key="p1")
         p2 = c2.selectbox("Select Staff Member", df['name'].unique(), index=None, key="p2")
@@ -1602,132 +1616,8 @@ elif st.session_state.current_view == "Conflict Mediator":
             else:
                 st.info("No specific conflict protocol exists for this combination yet. They likely work well together!")
             
-            # --- AI SUPERVISOR BOT ---
-            st.markdown("---")
-            with st.container(border=True):
-                st.subheader("🤖 AI Supervisor Assistant")
-                
-                # Determine active key from variable
-                active_key = user_api_key
-                
-                if active_key:
-                    st.caption(f"Powered by Gemini 2.5 Flash | Ask specific questions about managing **{p2}** ({s2} x {m2}).")
-                else:
-                    st.caption("Basic Mode | Add an API Key in the sidebar to unlock full AI capabilities.")
-                
-                st.info("⬇️ **Type your question in the chat bar at the bottom of the screen.**")
-                
-                # Initialize history specifically for this view if not present
-                if "messages" not in st.session_state:
-                    st.session_state.messages = []
-
-                # Display messages
-                for message in st.session_state.messages:
-                    with st.chat_message(message["role"]):
-                        st.markdown(message["content"])
-
-                # -------------------------------------------
-                # LOGIC ENGINE: HYBRID (Rule-Based + Gemini)
-                # -------------------------------------------
-                def get_smart_response(query, comm_style, motiv_driver, key):
-                    # Prepare Context Data
-                    comm_data = COMM_PROFILES.get(comm_style, {})
-                    mot_data = MOTIV_PROFILES.get(motiv_driver, {})
-                    
-                    # If API Key exists, use Gemini
-                    if key:
-                        try:
-                            # Context Prompt Construction
-                            system_prompt = f"""
-                            You are an expert Leadership Coach for a youth care agency.
-                            You are advising a Supervisor on how to manage a staff member named {p2}.
-                            
-                            Here is the Staff Member's Profile:
-                            - **Communication Style:** {comm_style}
-                            - **Core Motivation:** {motiv_driver}
-                            - **Thriving Behaviors:** {comm_data.get('bullets', [])}
-                            - **Stress Behaviors:** They may become rigid, withdrawn, or aggressive when their need for {motiv_driver} is blocked.
-                            
-                            **Your Goal:** Answer the user's question specifically tailored to this profile.
-                            Do not give generic advice. Use the profile data to explain WHY the staff member acts this way and HOW to reach them.
-                            Be concise, practical, and empathetic.
-                            """
-                            
-                            # API Call to Gemini 2.5 Flash (Standard Endpoint)
-                            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
-                            payload = {
-                                "contents": [{
-                                    "parts": [{"text": system_prompt + "\n\nUser Question: " + query}]
-                                }]
-                            }
-                            headers = {'Content-Type': 'application/json'}
-                            response = requests.post(url, headers=headers, data=json.dumps(payload))
-                            
-                            if response.status_code == 200:
-                                return response.json()['candidates'][0]['content']['parts'][0]['text']
-                            else:
-                                return f"⚠️ **AI Error:** {response.text}. Falling back to basic database."
-                        
-                        except Exception as e:
-                            return f"⚠️ **Connection Error:** {str(e)}. Falling back to basic database."
-
-                    # FALLBACK: Rule-Based Logic (No API Key)
-                    query = query.lower()
-                    response = ""
-                    
-                    if "who is" in query or "tell me about" in query or "profile" in query:
-                         response += f"**Profile Overview:** {p2} is a **{comm_style}** driven by **{motiv_driver}**.\n\n"
-                         response += "**Communication Style:**\n"
-                         for b in comm_data.get('bullets', []):
-                             response += f"- {b}\n"
-                         response += "**Core Driver:**\n"
-                         for b in mot_data.get('bullets', []):
-                             response += f"- {b}\n"
-
-                    elif "strengths" in query or "good at" in query:
-                        response += f"**Strengths:** As a {comm_style}, they excel at: \n"
-                        for b in comm_data.get('bullets', []):
-                            response += f"- {b}\n"
-                        response += f"\nDriven by {motiv_driver}, they are motivated by: \n"
-                        for b in mot_data.get('bullets', []):
-                            response += f"- {b}\n"
-
-                    elif "feedback" in query or "critical" in query or "correct" in query:
-                        response += f"**On giving feedback to a {comm_style}:**\n"
-                        for b in comm_data.get('supervising_bullets', []):
-                            response += f"- {b}\n"
-                        response += f"\n**Motivation Tip:** Frame the feedback in a way that doesn't block their drive for {motiv_driver}. "
-                        if motiv_driver == "Connection": response += "Reassure them that the relationship is safe."
-                        elif motiv_driver == "Achievement": response += "Focus on how fixing this helps them win."
-                    
-                    elif "motivate" in query or "burnout" in query:
-                        response += f"**To motivate a {motiv_driver} driver:**\n"
-                        for b in mot_data.get('strategies_bullets', []):
-                            response += f"- {b}\n"
-                    
-                    else:
-                        # Helpful debugging info in the fallback message
-                        debug_key_info = f"Key detected: {key[:4]}..." if key else "No API Key detected"
-                        response = f"I can help you manage {p2}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\n*Note: {debug_key_info}. Please check the sidebar.*"
-                    
-                    return response
-
-                # Input
-                if prompt := st.chat_input(f"Ask about {p2}..."):
-                    st.session_state.messages.append({"role": "user", "content": prompt})
-                    with st.chat_message("user"):
-                        st.markdown(prompt)
-
-                    with st.chat_message("assistant"):
-                        with st.spinner("Consulting the Compass Database..."):
-                            # Pass the persistent key from variable
-                            bot_reply = get_smart_response(prompt, s2, m2, active_key)
-                            st.markdown(bot_reply)
-                    
-                    st.session_state.messages.append({"role": "assistant", "content": bot_reply})
-        
         elif p1 and p2 and p1 == p2:
-             st.warning("⚠️ You selected the same person twice. Please select two **different** staff members to analyze a conflict.")
+             st.warning("⚠️ Select two different staff members.")
              
         st.button("Reset", key="reset_t3", on_click=reset_t3)
 
@@ -1738,6 +1628,7 @@ elif st.session_state.current_view == "Career Pathfinder":
         c1, c2 = st.columns(2)
         cand = c1.selectbox("Candidate", df['name'].unique(), index=None, key="career")
         role = c2.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor", "Manager"], index=None, key="career_target")
+        
         if cand and role:
             d = df[df['name']==cand].iloc[0]
             style = d['p_comm']
@@ -1762,18 +1653,16 @@ elif st.session_state.current_view == "Career Pathfinder":
                 if 'debrief_questions' in path:
                     with st.expander("🧠 Post-Assignment Debrief Questions"):
                         for q in path['debrief_questions']: st.markdown(f"- {q}")
-            st.button("Reset", key="reset_t4", on_click=reset_t4)
+        st.button("Reset", key="reset_t4", on_click=reset_t4)
 
 # 5. ORG PULSE
 elif st.session_state.current_view == "Org Pulse":
     st.subheader("📈 Organization Pulse")
     if not df.empty:
-        # --- DATA PREP ---
         total_staff = len(df)
         comm_counts = df['p_comm'].value_counts(normalize=True) * 100
         mot_counts = df['p_mot'].value_counts(normalize=True) * 100
         
-        # Top Metrics
         c1, c2, c3 = st.columns(3)
         if not comm_counts.empty:
             dom_comm = comm_counts.idxmax()
@@ -1784,7 +1673,6 @@ elif st.session_state.current_view == "Org Pulse":
             
             st.divider()
             
-            # --- VISUALS ---
             c_a, c_b = st.columns(2)
             with c_a: 
                 st.markdown("##### 🗣️ Communication Mix")
@@ -1928,7 +1816,4 @@ elif st.session_state.current_view == "Org Pulse":
                         st.info("No leadership roles identified in the data set to analyze.")
                 else:
                     st.warning("Role data missing. Cannot analyze pipeline.")
-        else:
-             st.warning("No valid data found for your selection.")
-
     else: st.warning("No data available.")
