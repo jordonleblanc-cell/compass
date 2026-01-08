@@ -192,50 +192,77 @@ ROLE_RELATIONSHIP_LABELS = {
     "YDP": {"directReportsLabel": "peers", "youthLabel": "youth in your care", "supervisorLabel": "Shift Supervisor", "leadershipLabel": "Program Supervisor"}
 }
 
+# Updated Communication Questions (24 Total, with Reverse Keying)
 COMM_QUESTIONS = [
-    {"id": "comm1", "text": "When a situation becomes chaotic, I naturally step in and start directing people toward a plan.", "style": "Director"},
-    {"id": "comm2", "text": "I feel most effective when I can make quick decisions and move the team forward.", "style": "Director"},
-    {"id": "comm3", "text": "In a crisis, I’d rather take charge and apologize later than wait too long for consensus.", "style": "Director"},
-    {"id": "comm4", "text": "If expectations are unclear, I tend to define them myself and communicate them to others.", "style": "Director"},
-    {"id": "comm5", "text": "I’m comfortable giving direct feedback, even when it may be hard for someone to hear.", "style": "Director"},
-    {"id": "comm6", "text": "I pay close attention to the emotional tone of the team and lift people up when morale is low.", "style": "Encourager"},
-    {"id": "comm7", "text": "I often use encouragement, humor, or positive energy to help staff get through hard shifts.", "style": "Encourager"},
-    {"id": "comm8", "text": "I notice small wins and like to name them out loud so people know they’re seen.", "style": "Encourager"},
-    {"id": "comm9", "text": "I tend to talk things through with people rather than just giving short instructions.", "style": "Encourager"},
-    {"id": "comm10", "text": "I’m often the one coworkers come to when they need to vent or feel understood.", "style": "Encourager"},
-    {"id": "comm11", "text": "I’m good at slowing conversations down so that different perspectives can be heard.", "style": "Facilitator"},
-    {"id": "comm12", "text": "I try to stay calm and balanced when others are escalated or upset.", "style": "Facilitator"},
-    {"id": "comm13", "text": "I often find myself summarizing what others are saying to move toward shared understanding.", "style": "Facilitator"},
-    {"id": "comm14", "text": "I prefer to build agreement and buy-in rather than rely only on authority.", "style": "Facilitator"},
-    {"id": "comm15", "text": "I pay attention to process (how we talk to each other) as much as the final decision.", "style": "Facilitator"},
-    {"id": "comm16", "text": "I naturally notice details in documentation, routines, or schedules others overlook.", "style": "Tracker"},
-    {"id": "comm17", "text": "I feel responsible for keeping procedures on track, even when others get distracted.", "style": "Tracker"},
-    {"id": "comm18", "text": "I tend to ask clarifying questions when expectations or instructions feel vague.", "style": "Tracker"},
-    {"id": "comm19", "text": "I’m more comfortable when I know exactly who is doing what and when it needs to be done.", "style": "Tracker"},
-    {"id": "comm20", "text": "If something seems out of compliance, it really sticks with me until it’s addressed.", "style": "Tracker"},
+    # Director
+    {"id": "c1", "text": "When a situation becomes chaotic, I naturally step in and start directing people toward a plan.", "style": "Director"},
+    {"id": "c2", "text": "I feel most effective when I can make quick decisions and move the team forward.", "style": "Director"},
+    {"id": "c3", "text": "In a crisis, I’d rather take charge and apologize later than wait too long for consensus.", "style": "Director"},
+    {"id": "c4", "text": "If expectations are unclear, I tend to define them myself and communicate them to others.", "style": "Director"},
+    {"id": "c5", "text": "I’m comfortable giving direct feedback, even when it may be hard for someone to hear.", "style": "Director"},
+    {"id": "c6", "text": "I hesitate to take the lead until I’m confident everyone agrees.", "style": "Director", "reverse": True},
+    
+    # Encourager
+    {"id": "c7", "text": "I pay close attention to the emotional tone of the team and lift people up when morale is low.", "style": "Encourager"},
+    {"id": "c8", "text": "I often use encouragement, humor, or positive energy to help staff get through hard shifts.", "style": "Encourager"},
+    {"id": "c9", "text": "I notice small wins and like to name them out loud so people know they’re seen.", "style": "Encourager"},
+    {"id": "c10", "text": "I tend to talk things through with people rather than just giving short instructions.", "style": "Encourager"},
+    {"id": "c11", "text": "I’m often the one coworkers come to when they need to vent or feel understood.", "style": "Encourager"},
+    {"id": "c12", "text": "I tend to focus on tasks and outcomes more than how people are feeling.", "style": "Encourager", "reverse": True},
+    
+    # Facilitator
+    {"id": "c13", "text": "I’m good at slowing conversations down so that different perspectives can be heard.", "style": "Facilitator"},
+    {"id": "c14", "text": "I try to stay calm and balanced when others are escalated or upset.", "style": "Facilitator"},
+    {"id": "c15", "text": "I often find myself summarizing what others are saying to move toward shared understanding.", "style": "Facilitator"},
+    {"id": "c16", "text": "I prefer to build agreement and buy-in rather than rely only on authority.", "style": "Facilitator"},
+    {"id": "c17", "text": "I pay attention to process (how we talk to each other) as much as the final decision.", "style": "Facilitator"},
+    {"id": "c18", "text": "I get impatient with long discussions and prefer to move to action quickly.", "style": "Facilitator", "reverse": True},
+    
+    # Tracker
+    {"id": "c19", "text": "I naturally notice details in documentation, routines, or schedules others overlook.", "style": "Tracker"},
+    {"id": "c20", "text": "I feel responsible for keeping procedures on track, even when others get distracted.", "style": "Tracker"},
+    {"id": "c21", "text": "I tend to ask clarifying questions when expectations or instructions feel vague.", "style": "Tracker"},
+    {"id": "c22", "text": "I’m more comfortable when I know exactly who is doing what and when it needs to be done.", "style": "Tracker"},
+    {"id": "c23", "text": "If something seems out of compliance, it really sticks with me until it’s addressed.", "style": "Tracker"},
+    {"id": "c24", "text": "I’m comfortable proceeding even when processes or expectations feel loosely defined.", "style": "Tracker", "reverse": True},
 ]
 
+# Updated Motivation Questions (25 Total, with Reverse Keying & Context Item)
 MOTIVATION_QUESTIONS = [
-    {"id": "mot1", "text": "I feel energized when I’m learning new skills or being stretched in healthy ways.", "style": "Growth"},
-    {"id": "mot2", "text": "It’s important to me that I can look back and see I’m becoming more effective over time.", "style": "Growth"},
-    {"id": "mot3", "text": "When I feel stuck in the same patterns with no development, my motivation drops.", "style": "Growth"},
-    {"id": "mot4", "text": "I appreciate feedback that helps me improve, even if it’s uncomfortable in the moment.", "style": "Growth"},
-    {"id": "mot5", "text": "Access to training, coaching, or new responsibilities matters a lot for my commitment.", "style": "Growth"},
-    {"id": "mot6", "text": "I need to feel that what I’m doing connects to a bigger purpose for youth and families.", "style": "Purpose"},
-    {"id": "mot7", "text": "I feel strongest when my work lines up with my values about dignity, justice, and safety.", "style": "Purpose"},
-    {"id": "mot8", "text": "It’s hard for me to stay engaged when policies don’t make sense for the youth we serve.", "style": "Purpose"},
-    {"id": "mot9", "text": "I’m often the one raising questions about whether a decision is really best for kids.", "style": "Purpose"},
-    {"id": "mot10", "text": "I feel proudest when I can see real positive impact, not just tasks checked off.", "style": "Purpose"},
-    {"id": "mot11", "text": "Having strong relationships with coworkers makes a big difference in my energy.", "style": "Connection"},
-    {"id": "mot12", "text": "When the team feels disconnected, I feel it in my body and it’s harder to stay motivated.", "style": "Connection"},
-    {"id": "mot13", "text": "I value feeling known and supported by my team and supervisor, not just evaluated.", "style": "Connection"},
-    {"id": "mot14", "text": "I’m often thinking about the emotional climate of the unit and how people are relating.", "style": "Connection"},
-    {"id": "mot15", "text": "I’m more likely to go above and beyond when I feel a sense of belonging.", "style": "Connection"},
-    {"id": "mot16", "text": "I like having clear goals and being able to see, in concrete ways, when we’ve met them.", "style": "Achievement"},
-    {"id": "mot17", "text": "I feel satisfied when I can see that that my effort led to specific improvements.", "style": "Achievement"},
-    {"id": "mot18", "text": "It’s frustrating when expectations keep shifting and I’m not sure what success looks like.", "style": "Achievement"},
-    {"id": "mot19", "text": "I appreciate data, tracking tools, or simple dashboards that help show progress.", "style": "Achievement"},
-    {"id": "mot20", "text": "I’m motivated by being trusted with projects where outcomes are clearly defined.", "style": "Achievement"},
+    # Growth
+    {"id": "m1", "text": "I feel energized when I’m learning new skills or being stretched in healthy ways.", "style": "Growth"},
+    {"id": "m2", "text": "It’s important to me that I can look back and see I’m becoming more effective over time.", "style": "Growth"},
+    {"id": "m3", "text": "When I feel stuck in the same patterns with no development, my motivation drops.", "style": "Growth"},
+    {"id": "m4", "text": "I appreciate feedback that helps me improve, even if it’s uncomfortable in the moment.", "style": "Growth"},
+    {"id": "m5", "text": "Access to training, coaching, or new responsibilities matters a lot for my commitment.", "style": "Growth"},
+    {"id": "m6", "text": "I’m generally satisfied doing the same work as long as things feel stable.", "style": "Growth", "reverse": True},
+    
+    # Purpose
+    {"id": "m7", "text": "I need to feel that what I’m doing connects to a bigger purpose for youth and families.", "style": "Purpose"},
+    {"id": "m8", "text": "I feel strongest when my work lines up with my values about dignity, justice, and safety.", "style": "Purpose"},
+    {"id": "m9", "text": "It’s hard for me to stay engaged when policies don’t make sense for the youth we serve.", "style": "Purpose"},
+    {"id": "m10", "text": "I’m often the one raising questions about whether a decision is really best for kids.", "style": "Purpose"},
+    {"id": "m11", "text": "I feel proudest when I can see real positive impact, not just tasks checked off.", "style": "Purpose"},
+    {"id": "m12", "text": "As long as the job gets done, the deeper meaning doesn't affect my motivation much.", "style": "Purpose", "reverse": True},
+    
+    # Connection
+    {"id": "m13", "text": "Having strong relationships with coworkers makes a big difference in my energy.", "style": "Connection"},
+    {"id": "m14", "text": "When the team feels disconnected, I feel it in my body and it’s harder to stay motivated.", "style": "Connection"},
+    {"id": "m15", "text": "I value feeling known and supported by my team and supervisor, not just evaluated.", "style": "Connection"},
+    {"id": "m16", "text": "I’m often thinking about the emotional climate of the unit and how people are relating.", "style": "Connection"},
+    {"id": "m17", "text": "I’m more likely to go above and beyond when I feel a sense of belonging.", "style": "Connection"},
+    {"id": "m18", "text": "I’m able to stay motivated even when I feel disconnected from the team.", "style": "Connection", "reverse": True},
+    
+    # Achievement
+    {"id": "m19", "text": "I like having clear goals and being able to see, in concrete ways, when we’ve met them.", "style": "Achievement"},
+    {"id": "m20", "text": "I feel satisfied when I can see that my effort led to specific improvements.", "style": "Achievement"},
+    {"id": "m21", "text": "It’s frustrating when expectations keep shifting and I’m not sure what success looks like.", "style": "Achievement"},
+    {"id": "m22", "text": "I appreciate data, tracking tools, or simple dashboards that help show progress.", "style": "Achievement"},
+    {"id": "m23", "text": "Clear goals help me feel calmer and more effective in my work with youth.", "style": "Achievement"},
+    {"id": "m24", "text": "I’m comfortable doing my best work even when success isn’t clearly defined.", "style": "Achievement", "reverse": True},
+    
+    # Context (Burnout)
+    {"id": "m25", "text": "When I feel emotionally exhausted, even meaningful work becomes hard to stay engaged with.", "style": "Context"}
 ]
 
 # --- DATA DICTIONARIES (Updated with new content) ---
@@ -305,7 +332,7 @@ COMM_PROFILES = {
             "Program Supervisor": {
                 "directReports": "Name explicitly when you are shifting from listening mode to decision mode: 'I've heard the input; here's the decision.' Staff may assume the decision is still up for debate unless you clearly mark the transition.",
                 "youth": "Hold steady when they test limits. Remind yourself that pushback is a sign you are holding needed structure. You don't need to be loud to be firm; your consistency is your strength.",
-                "supervisor": "Be candid about how much time it takes to bring people along and where you need their backing. Ensure your supervisor understands that your 'slowness' is actually an investment in long-term buy-in.",
+                "supervisor": "Be candid about how much time it takes to bring people along and where you need backing. Ensure your supervisor understands that your 'slowness' is actually an investment in long-term buy-in.",
                 "leadership": "Don't over-own the team's reactions; you can care without carrying all of their feelings. Differentiate between 'listening to' their frustration and 'solving' their frustration."
             },
             "Shift Supervisor": {
@@ -867,6 +894,18 @@ def submit_to_google_sheets(data, action="save"):
         st.error(f"Connection Error: {e}")
         return False
 
+def fetch_user_data(email):
+    # Attempts to fetch data from Google Scripts
+    # NOTE: Your Google Script must handle the 'retrieve' action for this to work.
+    url = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
+    try:
+        response = requests.post(url, json={"action": "retrieve", "email": email})
+        if response.status_code == 200:
+            return response.json()
+        return None
+    except Exception as e:
+        return None
+
 def send_email_via_smtp(to_email, subject, body):
     try:
         # Requires secrets.toml setup
@@ -1053,7 +1092,7 @@ def show_brand_header(subtitle):
         """, unsafe_allow_html=True)
     st.markdown("<hr>", unsafe_allow_html=True)
 
-def draw_score_bar(label, value, max_value=25):
+def draw_score_bar(label, value, max_value=30):
     pct = (value / max_value) * 100
     st.markdown(f"""
     <div style="margin-bottom: 12px;">
@@ -1127,6 +1166,57 @@ if st.session_state.step == 'intro':
                 st.rerun()
     
     st.markdown("<br>", unsafe_allow_html=True)
+
+    # --- RECOVERY SECTION (NEW) ---
+    with st.expander("Already took the assessment? Recover your results"):
+        st.info("Enter your email to receive a verification code and retrieve your past results.")
+        
+        if 'recovery_stage' not in st.session_state:
+            st.session_state.recovery_stage = 'email_input'
+
+        if st.session_state.recovery_stage == 'email_input':
+            rec_email = st.text_input("Email for recovery", key="rec_email_input")
+            if st.button("Send Access Code"):
+                if rec_email:
+                    code = str(random.randint(100000, 999999))
+                    st.session_state.recovery_code = code
+                    st.session_state.recovery_email = rec_email
+                    
+                    if send_email_via_smtp(rec_email, "Your Access Code - Elmcrest Leadership Compass", f"Your access code is: {code}"):
+                        st.session_state.recovery_stage = 'code_verify'
+                        st.success("Code sent! Check your email.")
+                        st.rerun()
+                    else:
+                        st.error("Could not send email. Please try again.")
+                else:
+                    st.error("Please enter an email address.")
+        
+        elif st.session_state.recovery_stage == 'code_verify':
+            entered_code = st.text_input("Enter 6-digit code", key="rec_code_input")
+            if st.button("Verify & Load"):
+                if entered_code == st.session_state.recovery_code:
+                    with st.spinner("Fetching your results..."):
+                        data = fetch_user_data(st.session_state.recovery_email)
+                        if data and data.get("found"):
+                            # Hydrate session state with fetched data
+                            fetched_user = data.get("user_info")
+                            fetched_results = data.get("scores")
+                            
+                            st.session_state.user_info = fetched_user
+                            st.session_state.results = fetched_results
+                            st.session_state.step = 'results'
+                            st.success("Results loaded! Redirecting...")
+                            time.sleep(1)
+                            st.rerun()
+                        else:
+                            st.error("No results found for this email, or database connection failed.")
+                else:
+                    st.error("Incorrect code.")
+            
+            if st.button("Cancel / Try Different Email"):
+                st.session_state.recovery_stage = 'email_input'
+                st.rerun()
+
     # Discrete Admin Access Button (Tighter spacing)
     col_spacer, col_admin = st.columns([0.7, 0.3])
     with col_admin:
@@ -1148,6 +1238,7 @@ elif st.session_state.step == 'comm':
                 col_q, col_a = st.columns([0.45, 0.55], gap="medium") # Adjusted ratio to give radios more space
                 
                 with col_q:
+                    # Append (reverse) text only if debugging, otherwise keep clean
                     st.markdown(f"<div class='question-text' style='display:flex;align-items:center;height:100%;'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
                 
                 with col_a:
@@ -1226,10 +1317,31 @@ elif st.session_state.step == 'motiv':
 # --- PROCESSING ---
 elif st.session_state.step == 'processing':
     scroll_to_top()
+    
+    # Calculate Scores with Reverse Keying Logic
+    def calculate_points(raw_score, is_reverse):
+        if is_reverse:
+            return 6 - raw_score
+        return raw_score
+
     c_scores = {k:0 for k in COMM_PROFILES}
     m_scores = {k:0 for k in MOTIVATION_PROFILES}
-    for q in COMM_QUESTIONS: c_scores[q['style']] += st.session_state.answers_comm[q['id']]
-    for q in MOTIVATION_QUESTIONS: m_scores[q['style']] += st.session_state.answers_motiv[q['id']]
+    context_score = 0
+    
+    # Process Comm
+    for q in COMM_QUESTIONS:
+        raw_val = st.session_state.answers_comm[q['id']]
+        points = calculate_points(raw_val, q.get('reverse', False))
+        c_scores[q['style']] += points
+        
+    # Process Motiv
+    for q in MOTIVATION_QUESTIONS:
+        raw_val = st.session_state.answers_motiv[q['id']]
+        if q['style'] == "Context":
+            context_score = raw_val # Just store raw val
+        else:
+            points = calculate_points(raw_val, q.get('reverse', False))
+            m_scores[q['style']] += points
     
     p_comm, s_comm = get_top_two(c_scores)
     p_mot, s_mot = get_top_two(m_scores)
@@ -1237,7 +1349,8 @@ elif st.session_state.step == 'processing':
     st.session_state.results = {
         "primaryComm": p_comm, "secondaryComm": s_comm,
         "primaryMotiv": p_mot, "secondaryMotiv": s_mot,
-        "commScores": c_scores, "motivScores": m_scores
+        "commScores": c_scores, "motivScores": m_scores,
+        "burnoutScore": context_score
     }
     
     # Logic to clean cottage name (remove "Cottage " prefix)
@@ -1279,7 +1392,12 @@ elif st.session_state.step == 'results':
     c1, c2 = st.columns(2)
     with c1:
         pdf_bytes = create_pdf(user, res, comm_prof, mot_prof, int_prof, role_key, role_labels)
-        st.download_button("📄 Download PDF Report", data=pdf_bytes, file_name="Elmcrest_Profile.pdf", mime="application/pdf")
+        
+        # Create dynamic filename
+        clean_name = user['name'].strip().replace(" ", "_").lower()
+        file_name_str = f"{clean_name}_compass.pdf"
+        
+        st.download_button("📄 Download PDF Report", data=pdf_bytes, file_name=file_name_str, mime="application/pdf")
     with c2:
         if st.button("📧 Email Me Full Report"):
             full_text = generate_text_report(user, res, comm_prof, mot_prof, int_prof, role_key, role_labels)
@@ -1311,8 +1429,12 @@ elif st.session_state.step == 'results':
 
     with col2:
         st.markdown("**Score Breakdown**")
-        for style, score in res['commScores'].items():
-            draw_score_bar(style, score)
+        # Check if scores exist (handles legacy retrieved data that might be empty)
+        if res.get('commScores') and len(res['commScores']) > 0:
+            for style, score in res['commScores'].items():
+                draw_score_bar(style, score, max_value=30) # Max is now 30 (6 questions * 5)
+        else:
+            st.caption("Detailed score breakdown is not available for this record.")
 
     st.markdown("---")
 
