@@ -305,7 +305,7 @@ COMM_PROFILES = {
             "Program Supervisor": {
                 "directReports": "Name explicitly when you are shifting from listening mode to decision mode: 'I've heard the input; here's the decision.' Staff may assume the decision is still up for debate unless you clearly mark the transition.",
                 "youth": "Hold steady when they test limits. Remind yourself that pushback is a sign you are holding needed structure. You don't need to be loud to be firm; your consistency is your strength.",
-                "supervisor": "Be candid about how much time it takes to bring people along and where you need their backing. Ensure your supervisor understands that your 'slowness' is actually an investment in long-term buy-in.",
+                "supervisor": "Be candid about how much time it takes to bring people along and where you need backing. Ensure your supervisor understands that your 'slowness' is actually an investment in long-term buy-in.",
                 "leadership": "Don't over-own the team's reactions; you can care without carrying all of their feelings. Differentiate between 'listening to' their frustration and 'solving' their frustration."
             },
             "Shift Supervisor": {
@@ -867,6 +867,18 @@ def submit_to_google_sheets(data, action="save"):
         st.error(f"Connection Error: {e}")
         return False
 
+def fetch_user_data(email):
+    # Attempts to fetch data from Google Scripts
+    # NOTE: Your Google Script must handle the 'retrieve' action for this to work.
+    url = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
+    try:
+        response = requests.post(url, json={"action": "retrieve", "email": email})
+        if response.status_code == 200:
+            return response.json()
+        return None
+    except Exception as e:
+        return None
+
 def send_email_via_smtp(to_email, subject, body):
     try:
         # Requires secrets.toml setup
@@ -1127,6 +1139,57 @@ if st.session_state.step == 'intro':
                 st.rerun()
     
     st.markdown("<br>", unsafe_allow_html=True)
+
+    # --- RECOVERY SECTION (NEW) ---
+    with st.expander("Already took the assessment? Recover your results"):
+        st.info("Enter your email to receive a verification code and retrieve your past results.")
+        
+        if 'recovery_stage' not in st.session_state:
+            st.session_state.recovery_stage = 'email_input'
+
+        if st.session_state.recovery_stage == 'email_input':
+            rec_email = st.text_input("Email for recovery", key="rec_email_input")
+            if st.button("Send Access Code"):
+                if rec_email:
+                    code = str(random.randint(100000, 999999))
+                    st.session_state.recovery_code = code
+                    st.session_state.recovery_email = rec_email
+                    
+                    if send_email_via_smtp(rec_email, "Your Access Code - Elmcrest Leadership Compass", f"Your access code is: {code}"):
+                        st.session_state.recovery_stage = 'code_verify'
+                        st.success("Code sent! Check your email.")
+                        st.rerun()
+                    else:
+                        st.error("Could not send email. Please try again.")
+                else:
+                    st.error("Please enter an email address.")
+        
+        elif st.session_state.recovery_stage == 'code_verify':
+            entered_code = st.text_input("Enter 6-digit code", key="rec_code_input")
+            if st.button("Verify & Load"):
+                if entered_code == st.session_state.recovery_code:
+                    with st.spinner("Fetching your results..."):
+                        data = fetch_user_data(st.session_state.recovery_email)
+                        if data and data.get("found"):
+                            # Hydrate session state with fetched data
+                            fetched_user = data.get("user_info")
+                            fetched_results = data.get("scores")
+                            
+                            st.session_state.user_info = fetched_user
+                            st.session_state.results = fetched_results
+                            st.session_state.step = 'results'
+                            st.success("Results loaded! Redirecting...")
+                            time.sleep(1)
+                            st.rerun()
+                        else:
+                            st.error("No results found for this email, or database connection failed.")
+                else:
+                    st.error("Incorrect code.")
+            
+            if st.button("Cancel / Try Different Email"):
+                st.session_state.recovery_stage = 'email_input'
+                st.rerun()
+
     # Discrete Admin Access Button (Tighter spacing)
     col_spacer, col_admin = st.columns([0.7, 0.3])
     with col_admin:
