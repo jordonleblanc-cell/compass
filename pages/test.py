@@ -238,7 +238,7 @@ MOTIVATION_QUESTIONS = [
     {"id": "mot20", "text": "I’m motivated by being trusted with projects where outcomes are clearly defined.", "style": "Achievement"},
 ]
 
-# --- DATA DICTIONARIES (Updated with new content) ---
+# --- DATA DICTIONARIES ---
 
 COMM_PROFILES = {
     "Director": {
@@ -1342,7 +1342,12 @@ elif st.session_state.step == 'results':
     c1, c2 = st.columns(2)
     with c1:
         pdf_bytes = create_pdf(user, res, comm_prof, mot_prof, int_prof, role_key, role_labels)
-        st.download_button("📄 Download PDF Report", data=pdf_bytes, file_name="Elmcrest_Profile.pdf", mime="application/pdf")
+        
+        # Create dynamic filename
+        clean_name = user['name'].strip().replace(" ", "_").lower()
+        file_name_str = f"{clean_name}_compass.pdf"
+        
+        st.download_button("📄 Download PDF Report", data=pdf_bytes, file_name=file_name_str, mime="application/pdf")
     with c2:
         if st.button("📧 Email Me Full Report"):
             full_text = generate_text_report(user, res, comm_prof, mot_prof, int_prof, role_key, role_labels)
@@ -1374,8 +1379,12 @@ elif st.session_state.step == 'results':
 
     with col2:
         st.markdown("**Score Breakdown**")
-        for style, score in res['commScores'].items():
-            draw_score_bar(style, score)
+        # Check if scores exist (handles legacy retrieved data that might be empty)
+        if res.get('commScores') and len(res['commScores']) > 0:
+            for style, score in res['commScores'].items():
+                draw_score_bar(style, score)
+        else:
+            st.caption("Detailed score breakdown is not available for this record.")
 
     st.markdown("---")
 
