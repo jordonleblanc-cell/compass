@@ -1162,7 +1162,7 @@ if st.session_state.step == 'intro':
         role_other = c3.text_input("If 'Other', please specify:", placeholder="e.g. Maintenance, Clinician")
 
         # Updated Program List
-        prog_options = ["Admin (Building #10)", "Cottage 2", "Cottage 3", "Cottage 7", "Cottage 8", "Cottage 9", "Cottage 11", "Euclid", "Overnight", "Skeele Valley", "TSS Staff"]
+        prog_options = ["Building 10", "Cottage 2", "Cottage 3", "Cottage 7", "Cottage 8", "Cottage 9", "Cottage 11", "Euclid", "Overnight", "Skeele Valley", "TSS Staff"]
         cottage = c4.selectbox("Home Program", prog_options, index=None, placeholder="Select your program...")
 
         st.markdown("<br>", unsafe_allow_html=True)
