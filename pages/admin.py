@@ -13,9 +13,9 @@ from email import encoders
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
-    page_title="Elmcrest Supervisor Platform",
-    page_icon="📊",
-    layout="wide",
+    page_title="Elmcrest Supervisor Platform", 
+    page_icon="📊", 
+    layout="wide", 
     initial_sidebar_state="collapsed"
 )
 
@@ -28,6 +28,16 @@ def set_view(view_name):
 
 # --- 2. CONSTANTS ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
+
+# [FIX] Added missing BRAND_COLORS dictionary
+BRAND_COLORS = {
+    "blue": "#1a73e8",
+    "green": "#34a853",
+    "teal": "#12b5cb",
+    "gray": "#5f6368",
+    "red": "#ea4335",
+    "yellow": "#fbbc04"
+}
 
 # --- 3. CSS STYLING ---
 st.markdown("""
@@ -1239,6 +1249,33 @@ def clean_text(text):
     if not text: return ""
     return str(text).replace('\u2018', "'").replace('\u2019', "'").encode('latin-1', 'replace').decode('latin-1')
 
+# [FIX] Added missing email function
+def send_pdf_via_email(to_email, subject, body, pdf_bytes, filename="Guide.pdf"):
+    try:
+        sender_email = st.secrets["EMAIL_USER"]
+        sender_password = st.secrets["EMAIL_PASSWORD"]
+        
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+        
+        part = MIMEBase('application', "octet-stream")
+        part.set_payload(pdf_bytes)
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', f'attachment; filename="{filename}"')
+        msg.attach(part)
+        
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.sendmail(sender_email, to_email, msg.as_string())
+        server.quit()
+        return True, "Email sent successfully!"
+    except Exception as e:
+        return False, f"Email Error: {str(e)}"
+
 def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf = FPDF()
     pdf.add_page()
@@ -1434,8 +1471,8 @@ if st.session_state.current_view == "Supervisor's Guide":
                                             pdf_bytes=st.session_state.generated_pdf,
                                             filename=st.session_state.generated_filename
                                         )
-                                    if success: st.success(msg)
-                                    else: st.error(msg)
+                                        if success: st.success(msg)
+                                        else: st.error(msg)
                                 else:
                                     st.warning("Please enter an email address.")
                     
