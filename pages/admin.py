@@ -394,24 +394,27 @@ if not st.session_state.authenticated:
 
 # --- 6. DATA FILTERING ENGINE (RBAC) ---
 def get_filtered_dataframe():
-    user_role = st.session_state.current_user_role
-    user_cottage = st.session_state.current_user_cottage
-    current_user = st.session_state.current_user_name
+    user_role = str(st.session_state.current_user_role)
+    user_cottage = str(st.session_state.current_user_cottage)
+    current_user = str(st.session_state.current_user_name)
     
     current_df = st.session_state.staff_df
 
-    if user_role == "Admin" or current_user == "Administrator":
+    # 1. High Level Access (Admin, Director, Manager) - See All
+    if user_role == "Admin" or current_user == "Administrator" or "Director" in user_role or "Manager" in user_role:
         return current_df
     
     filtered_df = current_df.copy()
     
+    # 2. Cottage Filter (Applied to PS, SS, YDP unless their cottage is "All")
     if 'cottage' in current_df.columns and user_cottage != "All":
          filtered_df = filtered_df[filtered_df['cottage'] == user_cottage]
     
+    # 3. Role Filters
     if 'role' in current_df.columns:
         if "Program Supervisor" in user_role:
-            condition = (filtered_df['role'].isin(['Shift Supervisor', 'YDP'])) | (filtered_df['name'] == current_user)
-            filtered_df = filtered_df[condition]
+            # Can see everyone in their cottage (already filtered above)
+            pass
         elif "Shift Supervisor" in user_role:
             condition = (filtered_df['role'] == 'YDP') | (filtered_df['name'] == current_user)
             filtered_df = filtered_df[condition]
@@ -1110,6 +1113,32 @@ SUPERVISOR_CLASH_MATRIX = {
                 "Crisis": "Stop. Listen to me. This is a safety issue.",
                 "Feedback": "You are right on the facts, but wrong on the approach."
             }
+        },
+        "Facilitator": {
+            "tension": "Energy Mismatch (Vibes vs. Process)",
+            "psychology": "You (Encourager) want enthusiasm and connection. They (Facilitator) want calm and structure. You feel they are disengaged or low-energy. They feel you are chaotic and exhausting.",
+            "watch_fors": ["**Withdrawal:** They stop talking to escape your high energy.", "**Over-Talking:** You talk to fill the silence, making them withdraw further.", "**Misinterpretation:** You think their quietness means they are mad."],
+            "intervention_steps": ["**1. Slow Down:** Match their energy level. Lower your volume.", "**2. Ask Specifics:** Don't ask 'How are you feeling?' Ask 'What do you think about X?'", "**3. Respect the Pause:** Wait 5 seconds after asking a question."],
+            "scripts": {
+                "Opening": "I want to slow down and hear your thoughts.",
+                "Validation": "I know I bring a lot of energy to the room.",
+                "The Pivot": "I need you to tell me if I'm moving too fast or missing a detail.",
+                "Crisis": "I need you to speak up right now, even if you aren't 100% sure.",
+                "Feedback": "When you go silent, I feel like you are checking out. I need your voice."
+            }
+        },
+        "Tracker": {
+            "tension": "Order vs. Chaos (Flexibility vs. Rules)",
+            "psychology": "You (Encourager) prioritize morale and exceptions. They (Tracker) prioritize the rulebook. You feel nitpicked and controlled. They feel unsafe because you are 'loose' with the rules.",
+            "watch_fors": ["**The Email Audit:** They send you long lists of errors.", "**Ignoring Details:** You stop reading their emails because they are 'negative'.", "**Passive-Aggression:** They follow your 'bad' instructions maliciously."],
+            "intervention_steps": ["**1. Honor the Rule:** Start by agreeing the rule is important.", "**2. Frame the Exception:** Explain that you are bending the rule for a *person*, not because you are lazy.", "**3. Ask for Help:** Ask them to help you organize the chaos."],
+            "scripts": {
+                "Opening": "I know this looks messy to you.",
+                "Validation": "I value that you keep us compliant and safe.",
+                "The Pivot": "In this moment, I need to prioritize the relationship over the paperwork.",
+                "Crisis": "We will fix the form later. Right now, handle the kid.",
+                "Feedback": "I need you to be flexible without feeling like we are breaking the law."
+            }
         }
     },
     "Facilitator": {
@@ -1124,6 +1153,19 @@ SUPERVISOR_CLASH_MATRIX = {
                 "The Pivot": "But we are stuck. We need to pick a direction.",
                 "Crisis": "Process is over. I am making the call.",
                 "Feedback": "We need to stop asking for permission and start giving direction."
+            }
+        },
+        "Director": {
+            "tension": "Pace Mismatch (Consensus vs. Action)",
+            "psychology": "You (Facilitator) want to talk it out. They (Director) want to get it done. You feel steamrolled and disrespected. They feel slowed down and frustrated by 'pointless' discussion.",
+            "watch_fors": ["**Going Rogue:** They act without your permission to 'save time'.", "**Tuning Out:** They stop listening in meetings.", "**The Takeover:** They start running your meeting because you are 'too slow'."],
+            "intervention_steps": ["**1. Bottom Line Up Front:** Start with the decision, then discuss.", "**2. Give Autonomy:** Define the goal and let them run.", "**3. Be Firm:** Do not let them interrupt the process if the process is necessary."],
+            "scripts": {
+                "Opening": "I know you want to move fast.",
+                "Validation": "I appreciate your bias for action.",
+                "The Pivot": "However, we need to align the team first or we will crash.",
+                "Crisis": "I hear you. But the decision is X.",
+                "Feedback": "You are moving faster than the team can follow. Slow down to speed up."
             }
         },
         "Encourager": {
@@ -1173,6 +1215,45 @@ SUPERVISOR_CLASH_MATRIX = {
                 "The Pivot": "Is this critical to safety, or just a preference?",
                 "Crisis": "The procedure doesn't matter right now. Safety matters.",
                 "Feedback": "We need to stop using the rulebook as a weapon."
+            }
+        },
+        "Director": {
+            "tension": "Control vs. Autonomy (Rules vs. Results)",
+            "psychology": "You (Tracker) want compliance and safety. They (Director) want speed and results. You try to rein them in with rules; they try to run past you. You view them as a loose cannon; they view you as a bottleneck.",
+            "watch_fors": ["**Asking Forgiveness:** They do it their way and apologize later.", "**Over-Auditing:** You check their work excessively to 'catch' them.", "**Power Struggles:** Fighting over who has the final say on an SOP."],
+            "intervention_steps": ["**1. The 'Why' Explanation:** Don't just say 'No.' Explain the specific risk.", "**2. Pick Your Battles:** Only fight them on safety/legal issues, not preferences.", "**3. Give Them a Lane:** Define where they have total freedom."],
+            "scripts": {
+                "Opening": "I need to pump the brakes on this idea.",
+                "Validation": "I know you want to get this done fast.",
+                "The Pivot": "But if we skip this step, we risk a lawsuit/safety failure.",
+                "Crisis": "Stop. This is a compliance violation.",
+                "Feedback": "I want to help you win, but you have to let me safety-check the plan first."
+            }
+        },
+        "Encourager": {
+            "tension": "Task vs. Relationship (Business vs. Social)",
+            "psychology": "You (Tracker) focus on the error. They (Encourager) focus on the effort. You feel they are sloppy and unprofessional. They feel you are cold and mean. You speak data; they speak emotion.",
+            "watch_fors": ["**Tears:** They cry or shut down when you give feedback.", "**The Silent Treatment:** They withdraw warmth to punish you.", "**The 'Nice' Defense:** They excuse errors because 'they tried hard'."],
+            "intervention_steps": ["**1. Start with Warmth:** You must ask 'How are you?' before 'Here is the error.'", "**2. The Compliment Sandwich:** It feels fake to you, but it is necessary for them.", "**3. Focus on Support:** Frame the correction as 'helping them succeed.'"],
+            "scripts": {
+                "Opening": "I want to help you get this right so you don't have to redo it.",
+                "Validation": "I know you are working hard for the team.",
+                "The Pivot": "However, this documentation error puts us at risk.",
+                "Crisis": "I need you to focus on the details right now.",
+                "Feedback": "When you ignore the details, it makes more work for the team."
+            }
+        },
+        "Facilitator": {
+            "tension": "Rules vs. Context (Black & White vs. Gray)",
+            "psychology": "You (Tracker) want to follow the book. They (Facilitator) want to consider the context and feelings of the group. You see them as wishy-washy and inconsistent. They see you as rigid and uncaring.",
+            "watch_fors": ["**The Policy Debate:** You quote the handbook; they quote 'team sentiment'.", "**Stalled Decisions:** They won't enforce a rule because 'it's complicated'.", "**Frustration:** You feel like the only one holding the standard."],
+            "intervention_steps": ["**1. Define the Hard Line:** Agree on which rules are non-negotiable.", "**2. Allow the Gray:** Agree on which rules are up for interpretation.", "**3. United Front:** Do not disagree on policy in front of staff."],
+            "scripts": {
+                "Opening": "We need to be clear on the standard.",
+                "Validation": "I know you want to be fair to everyone.",
+                "The Pivot": "But a rule that isn't enforced isn't a rule.",
+                "Crisis": "We follow the protocol. We can debrief feelings later.",
+                "Feedback": "I need you to back me up when I enforce the policy."
             }
         }
     }
