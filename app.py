@@ -1153,15 +1153,33 @@ if st.session_state.step == 'intro':
         email = c2.text_input("Email Address", placeholder="e.g. jane@elmcrest.org")
         
         c3, c4 = st.columns(2)
-        role = c3.selectbox("Current Role", ["Program Supervisor", "Shift Supervisor", "YDP"], index=None, placeholder="Select your role...")
-        cottage = c4.selectbox("Home Program", ["Cottage 2", "Cottage 3", "Cottage 8", "Cottage 9", "Cottage 11", "Overnight"], index=None, placeholder="Select your program...")
+        
+        # Updated Roles with "Other" Logic
+        role_options = ["Program Supervisor", "Shift Supervisor", "YDP", "TSS Staff", "Student Advocate", "Other"]
+        role = c3.selectbox("Current Role", role_options, index=None, placeholder="Select your role...")
+        
+        # New text input for 'Other' specification
+        role_other = c3.text_input("If 'Other', please specify:", placeholder="e.g. Maintenance, Clinician")
+
+        # Updated Program List
+        prog_options = ["Building 10", "Cottage 2", "Cottage 3", "Cottage 7", "Cottage 8", "Cottage 9", "Cottage 11", "Euclid", "Overnight", "Skeele Valley", "TSS Staff"]
+        cottage = c4.selectbox("Home Program", prog_options, index=None, placeholder="Select your program...")
 
         st.markdown("<br>", unsafe_allow_html=True)
         if st.form_submit_button("Start Assessment →"):
             if not name or not email or not role or not cottage: 
                 st.error("Please complete all fields.")
             else:
-                st.session_state.user_info = {"name": name, "email": email, "role": role, "cottage": cottage}
+                # Handle 'Other' Role logic
+                final_role = role
+                if role == "Other":
+                    if role_other.strip():
+                        final_role = role_other.strip()
+                    else:
+                        st.error("Please specify your role in the text box provided.")
+                        st.stop()
+
+                st.session_state.user_info = {"name": name, "email": email, "role": final_role, "cottage": cottage}
                 st.session_state.step = 'comm'
                 st.rerun()
     
