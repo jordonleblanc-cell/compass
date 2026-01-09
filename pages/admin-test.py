@@ -362,7 +362,7 @@ if not st.session_state.authenticated:
     """, unsafe_allow_html=True)
     
     if not df_all.empty and 'name' in df_all.columns:
-        leadership_roles = ["Program Supervisor", "Shift Supervisor", "Manager", "Admin"]
+        leadership_roles = ["Program Supervisor", "Shift Supervisor", "Manager", "Director"]
         eligible_staff = df_all[df_all['role'].str.contains('|'.join(leadership_roles), case=False, na=False)]['name'].unique().tolist()
         user_names = ["Administrator"] + sorted(eligible_staff)
         st.selectbox("Who are you?", user_names, key="user_select")
