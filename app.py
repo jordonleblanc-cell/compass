@@ -1145,6 +1145,18 @@ if st.session_state.step == 'intro':
     st.markdown("#### 👋 Welcome")
     # Tighter welcome message
     st.markdown("This assessment helps you understand your natural patterns at work. Your insights will shape a personalized profile built to support your growth.")
+    
+    # NEW INSTRUCTIONS ADDED HERE
+    st.info("""
+    **Important:**
+    This assessment looks at patterns, not perfection.
+    
+    Most people show strong tendencies in more than one area. There is no “right” profile—only information that helps you work more effectively and sustainably.
+    
+    **How to answer:**
+    Please answer based on how you usually show up at work on most days, not how you wish you showed up or how you are on your very best day.
+    """)
+    
     st.markdown("<br>", unsafe_allow_html=True)
     
     with st.form("intro_form"):
