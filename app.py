@@ -1159,7 +1159,7 @@ if st.session_state.step == 'intro':
         role = c3.selectbox("Current Role", role_options, index=None, placeholder="Select your role...")
         
         # New text input for 'Other' specification
-        role_other = c3.text_input("If 'Other', please specify:", placeholder="e.g. Maintenance, Clinician")
+        role_other = c3.text_input("If 'Other', please specify:", placeholder="e.g. Director, Manager")
 
         # Updated Program List
         prog_options = ["Building 10", "Cottage 2", "Cottage 3", "Cottage 7", "Cottage 8", "Cottage 9", "Cottage 11", "Euclid", "Overnight", "Skeele Valley", "TSS Staff"]
