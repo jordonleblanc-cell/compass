@@ -29,7 +29,6 @@ def set_view(view_name):
 # --- 2. CONSTANTS ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
 
-# [FIX] Added missing BRAND_COLORS dictionary
 BRAND_COLORS = {
     "blue": "#1a73e8",
     "green": "#34a853",
@@ -244,6 +243,35 @@ def fetch_staff_data():
         if response.status_code == 200: return response.json()
         return []
     except: return []
+
+def submit_data_to_google(payload):
+    """
+    Submits offline data to Google Sheets via the Apps Script.
+    Expects a payload dictionary with name, email, role, cottage, and scores.
+    """
+    try:
+        # Structure payload to match what the Google Script expects for the "save" action
+        data_to_send = {
+            "action": "save",
+            "name": payload['name'],
+            "email": payload.get('email', ''),
+            "role": payload['role'],
+            "cottage": payload['cottage'],
+            "scores": {
+                "primaryComm": payload['p_comm'],
+                "secondaryComm": payload['s_comm'],
+                "primaryMotiv": payload['p_mot'],
+                "secondaryMotiv": payload['s_mot']
+            }
+        }
+        
+        response = requests.post(GOOGLE_SCRIPT_URL, json=data_to_send)
+        if response.status_code == 200:
+            return True
+        return False
+    except Exception as e:
+        st.error(f"Connection Error: {e}")
+        return False
 
 # Initialize Session State Data (Mutable Database)
 if 'staff_df' not in st.session_state:
@@ -595,7 +623,7 @@ INTEGRATED_PROFILES = {
         "thriving": "**Decisive Care:** They fix problems for people immediately. They don't just sympathize; they solve. They use their Director power to remove obstacles for their people.\n\n**Crisis Stabilization:** They become the calm human shield during a crisis. Staff look to them for physical and emotional safety. Their presence alone can de-escalate a room.\n\n**Team Loyalty:** They build a strong 'Us.' The team has a distinct identity and high morale. People protect each other and cover for each other because the Captain has set the standard.",
         "struggling": "**Us vs. Them:** They become hostile toward outsiders (admin, other units). They circle the wagons and view any critique of their team as an attack. They can create a silo that is hard to penetrate.\n\n**Over-Functioning:** They do everyone's job to protect them. They burn themselves out trying to carry the load for 'weaker' team members. They enable underperformance in the name of loyalty.\n\n**Taking Conflict Personally:** They conflate professional disagreement with personal betrayal. If you correct them, they feel unloved. This makes supervision very tricky and emotional.",
         "interventions": [
-            "**Phase 1: Delegation of Care (0-6 Months):** Stop being the only fixer; assign care tasks to others. Require them to let someone else handle a crisis or plan a party. They must learn that the team can survive without their constant intervention. You are breaking the dependency cycle.",
+            "**Phase 1: Delegation of Care (0-6 Months):** Stop being the only fixer; assign care tasks to others. Require them to let someone handle a crisis or plan a party. They must learn that the team can survive without their constant intervention. You are breaking the dependency cycle.",
             "**Phase 2: Organizational Citizenship (6-12 Months):** Expand the circle of loyalty to the whole agency. Challenge them to partner with another unit or department. They need to see that 'Us' includes the whole organization, not just their shift. You are breaking down silos.",
             "**Phase 3: Mentorship (12-18 Months):** Transition from Captain to Admiral (teaching others to build loyalty). Task them with training a new supervisor on how to build culture. This moves them from doing the leading to teaching the leading."
         ],
@@ -1249,7 +1277,6 @@ def clean_text(text):
     if not text: return ""
     return str(text).replace('\u2018', "'").replace('\u2019', "'").encode('latin-1', 'replace').decode('latin-1')
 
-# [FIX] Added missing email function
 def send_pdf_via_email(to_email, subject, body, pdf_bytes, filename="Guide.pdf"):
     try:
         sender_email = st.secrets["EMAIL_USER"]
@@ -1409,7 +1436,8 @@ st.markdown("---")
 # 1. Supervisor's Guide
 if st.session_state.current_view == "Supervisor's Guide":
     st.subheader("📝 Supervisor's Guide")
-    sub1, sub2 = st.tabs(["Database", "Manual"])
+    
+    sub1, sub2, sub3 = st.tabs(["Database", "Manual Generator", "📥 Input Offline Data"])
     
     # --- DATABASE TAB ---
     with sub1:
@@ -1512,6 +1540,57 @@ if st.session_state.current_view == "Supervisor's Guide":
                                 )
                             if success: st.success(msg)
                             else: st.error(msg)
+
+    # --- [NEW] INPUT OFFLINE DATA TAB ---
+    with sub3:
+        st.markdown("### 📥 Input Offline Results")
+        st.info("Use this form to enter results from paper assessments. This will save the data to the Google Sheet and update the database.")
+        
+        with st.form("offline_input_form"):
+            col_a, col_b = st.columns(2)
+            
+            with col_a:
+                off_name = st.text_input("Staff Name (Required)")
+                off_email = st.text_input("Email (Optional)")
+                off_role = st.selectbox("Role", ["YDP", "Shift Supervisor", "Program Supervisor", "Clinician", "TSS Staff", "Other"])
+                off_cottage = st.selectbox("Program/Cottage", ["Building 10", "Cottage 2", "Cottage 3", "Cottage 7", "Cottage 8", "Cottage 9", "Cottage 11", "Euclid", "Overnight", "Skeele Valley", "TSS Staff", "Other"])
+            
+            with col_b:
+                st.markdown("**Assessment Results**")
+                off_p_comm = st.selectbox("Primary Communication", COMM_TRAITS, key="off_pc")
+                off_s_comm = st.selectbox("Secondary Communication", COMM_TRAITS, key="off_sc")
+                off_p_mot = st.selectbox("Primary Motivation", MOTIV_TRAITS, key="off_pm")
+                off_s_mot = st.selectbox("Secondary Motivation", MOTIV_TRAITS, key="off_sm")
+            
+            st.markdown("---")
+            if st.form_submit_button("💾 Save to Database", type="primary"):
+                if off_name:
+                    with st.spinner("Saving to Google Sheets..."):
+                        payload = {
+                            "name": off_name,
+                            "email": off_email,
+                            "role": off_role,
+                            "cottage": off_cottage,
+                            "p_comm": off_p_comm,
+                            "s_comm": off_s_comm,
+                            "p_mot": off_p_mot,
+                            "s_mot": off_s_mot
+                        }
+                        
+                        success = submit_data_to_google(payload)
+                        
+                        if success:
+                            st.success(f"Successfully saved {off_name}!")
+                            
+                            # Manually update local session state so we don't have to reload to see them
+                            new_row = payload.copy()
+                            st.session_state.staff_df = pd.concat([st.session_state.staff_df, pd.DataFrame([new_row])], ignore_index=True)
+                            time.sleep(1)
+                            st.rerun()
+                        else:
+                            st.error("Failed to save. Please check your internet connection or the Google Script URL.")
+                else:
+                    st.error("Name is required.")
 
 # 2. TEAM DNA
 elif st.session_state.current_view == "Team DNA":
