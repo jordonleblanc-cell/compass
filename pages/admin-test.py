@@ -323,21 +323,41 @@ def check_password():
         role_raw = user_row.get('role', 'YDP')
         cottage_raw = user_row.get('cottage', 'All')
         
-        if "Program Supervisor" in role_raw:
-            if input_pw == PS_PW or input_pw == MASTER_PW: authorized = True
-            else:
-                st.error("Incorrect Access Code for Program Supervisors.")
-                return
-        elif "Shift Supervisor" in role_raw:
-            if input_pw == SS_PW or input_pw == MASTER_PW: authorized = True
-            else:
-                st.error("Incorrect Access Code for Shift Supervisors.")
-                return
+        # 1. Master Override (Universal Access)
+        if input_pw == MASTER_PW:
+            authorized = True
+            
+        # 2. Individual Password Check (Priority)
+        # Looks for secrets like "LeBlanc_password" based on Last Name
         else:
-            if input_pw == MASTER_PW: authorized = True
-            else:
-                st.error("Access Restricted. Please contact your administrator.")
-                return
+            try:
+                # Extract Last Name (assumes "First Last" format)
+                last_name = selected_user.strip().split()[-1]
+                secret_key = f"{last_name}_password"
+                individual_pw = st.secrets.get(secret_key)
+            except:
+                individual_pw = None
+
+            # If individual password exists and matches
+            if individual_pw and str(input_pw).strip() == str(individual_pw).strip():
+                authorized = True
+            
+            # 3. Fallback to Role-Based Passwords (if no individual match found)
+            # This ensures staff without specific IDs can still log in with the shared code
+            elif not authorized:
+                if "Program Supervisor" in role_raw or "Director" in role_raw or "Manager" in role_raw:
+                    if input_pw == PS_PW: authorized = True
+                    else:
+                        st.error("Incorrect Access Code.")
+                        return
+                elif "Shift Supervisor" in role_raw:
+                    if input_pw == SS_PW: authorized = True
+                    else:
+                        st.error("Incorrect Access Code.")
+                        return
+                else:
+                    st.error("Access Restricted. Please contact your administrator.")
+                    return
 
         if authorized:
             st.session_state.current_user_name = user_row['name']
