@@ -1809,14 +1809,22 @@ elif st.session_state.current_view == "Conflict Mediator":
         
         if p1 and p2 and p1 != p2:
             d1 = df[df['name']==p1].iloc[0]; d2 = df[df['name']==p2].iloc[0]
-            s1, s2 = d1['p_comm'], d2['p_comm']
-            m1, m2 = d1['p_mot'], d2['p_mot']
+            
+            # [CHANGE] Extract Primary AND Secondary styles
+            s1_p, s1_s = d1['p_comm'], d1['s_comm']
+            m1_p, m1_s = d1['p_mot'], d1['s_mot']
+            
+            s2_p, s2_s = d2['p_comm'], d2['s_comm']
+            m2_p, m2_s = d2['p_mot'], d2['s_mot']
             
             st.divider()
-            st.subheader(f"{s1} (Sup) vs. {s2} (Staff)")
-            if s1 in SUPERVISOR_CLASH_MATRIX and s2 in SUPERVISOR_CLASH_MATRIX[s1]:
-                clash = SUPERVISOR_CLASH_MATRIX[s1][s2]
-                with st.expander("🔍 **Psychological Deep Dive**", expanded=True):
+            # [CHANGE] Display full profile in header
+            st.subheader(f"{s1_p}/{s1_s} (Sup) vs. {s2_p}/{s2_s} (Staff)")
+            
+            # Matrix uses Primary as the dominant stress behavior
+            if s1_p in SUPERVISOR_CLASH_MATRIX and s2_p in SUPERVISOR_CLASH_MATRIX[s1_p]:
+                clash = SUPERVISOR_CLASH_MATRIX[s1_p][s2_p]
+                with st.expander("🔍 **Psychological Deep Dive (Primary Style Clash)**", expanded=True):
                     st.markdown(f"**The Core Tension:** {clash['tension']}")
                     st.markdown(f"{clash['psychology']}")
                     st.markdown("**🚩 Watch For:**")
@@ -1838,13 +1846,13 @@ elif st.session_state.current_view == "Conflict Mediator":
             # --- AI SUPERVISOR BOT ---
             st.markdown("---")
             with st.container(border=True):
-                st.subheader("🤖 AI Supervisor Assistant")
+                st.subheader("🤖 AI Supervisor Assistant (Enhanced Context)")
                 
                 # Determine active key from variable
                 active_key = user_api_key
                 
                 if active_key:
-                    st.caption(f"Powered by Gemini 2.5 Flash | Ask specific questions about managing **{p2}** ({s2} x {m2}).")
+                    st.caption(f"Powered by Gemini 2.5 Flash | analyzing full profile dynamics.")
                 else:
                     st.caption("Basic Mode | Add an API Key in the sidebar to unlock full AI capabilities.")
                 
@@ -1862,28 +1870,33 @@ elif st.session_state.current_view == "Conflict Mediator":
                 # -------------------------------------------
                 # LOGIC ENGINE: HYBRID (Rule-Based + Gemini)
                 # -------------------------------------------
-                def get_smart_response(query, comm_style, motiv_driver, key):
-                    # Prepare Context Data
-                    comm_data = COMM_PROFILES.get(comm_style, {})
-                    mot_data = MOTIV_PROFILES.get(motiv_driver, {})
+                # [CHANGE] Updated function to accept full profiles
+                def get_smart_response(query, p2_name, s2_p, s2_s, m2_p, m2_s, s1_p, s1_s, m1_p, m1_s, key):
+                    # Prepare Context Data (Primary)
+                    comm_data = COMM_PROFILES.get(s2_p, {})
+                    mot_data = MOTIV_PROFILES.get(m2_p, {})
                     
                     # If API Key exists, use Gemini
                     if key:
                         try:
-                            # Context Prompt Construction
+                            # [CHANGE] Enhanced System Prompt with Secondary Styles
                             system_prompt = f"""
                             You are an expert Leadership Coach for a youth care agency.
-                            You are advising a Supervisor on how to manage a staff member named {p2}.
+                            You are advising a Supervisor on how to manage a staff member named {p2_name}.
                             
-                            Here is the Staff Member's Profile:
-                            - **Communication Style:** {comm_style}
-                            - **Core Motivation:** {motiv_driver}
-                            - **Thriving Behaviors:** {comm_data.get('bullets', [])}
-                            - **Stress Behaviors:** They may become rigid, withdrawn, or aggressive when their need for {motiv_driver} is blocked.
+                            **Staff Member Profile ({p2_name}):**
+                            - **Communication:** Primary: {s2_p}, Secondary: {s2_s}
+                            - **Motivation:** Primary: {m2_p}, Secondary: {m2_s}
+                            - **Thriving Behaviors (Primary):** {comm_data.get('bullets', [])}
                             
-                            **Your Goal:** Answer the user's question specifically tailored to this profile.
-                            Do not give generic advice. Use the profile data to explain WHY the staff member acts this way and HOW to reach them.
-                            Be concise, practical, and empathetic.
+                            **Supervisor Profile (You):**
+                            - **Communication:** Primary: {s1_p}, Secondary: {s1_s}
+                            - **Motivation:** Primary: {m1_p}, Secondary: {m1_s}
+                            
+                            **Your Goal:** Answer the user's question by analyzing the dynamic between these specific profiles.
+                            - Incorporate the *Secondary* styles to add nuance (e.g., A Director with a Facilitator secondary is softer than a pure Director).
+                            - Identify potential friction points between the Supervisor's style and the Staff's style.
+                            - Give concise, actionable advice suitable for a residential care environment.
                             """
                             
                             # API Call to Gemini 2.5 Flash (Standard Endpoint)
@@ -1907,7 +1920,6 @@ elif st.session_state.current_view == "Conflict Mediator":
                                     time.sleep(2 ** (attempt + 1)) # Exponential backoff: 2s, 4s, 8s
                                     continue
                                 else:
-                                    # Return raw error for debugging if it's not a 503
                                     return f"⚠️ **AI Error ({response.status_code}):** {response.text}. Falling back to basic database."
                             
                             return "⚠️ **AI Service Busy:** The model is currently overloaded. Falling back to basic database."
@@ -1920,39 +1932,29 @@ elif st.session_state.current_view == "Conflict Mediator":
                     response = ""
                     
                     if "who is" in query or "tell me about" in query or "profile" in query:
-                         response += f"**Profile Overview:** {p2} is a **{comm_style}** driven by **{motiv_driver}**.\n\n"
-                         response += "**Communication Style:**\n"
+                         response += f"**Profile Overview:** {p2_name} is a **{s2_p}/{s2_s}** driven by **{m2_p}/{m2_s}**.\n\n"
+                         response += "**Primary Style:**\n"
                          for b in comm_data.get('bullets', []):
-                             response += f"- {b}\n"
-                         response += "**Core Driver:**\n"
-                         for b in mot_data.get('bullets', []):
                              response += f"- {b}\n"
 
                     elif "strengths" in query or "good at" in query:
-                        response += f"**Strengths:** As a {comm_style}, they excel at: \n"
+                        response += f"**Strengths:** As a {s2_p}, they excel at: \n"
                         for b in comm_data.get('bullets', []):
-                            response += f"- {b}\n"
-                        response += f"\nDriven by {motiv_driver}, they are motivated by: \n"
-                        for b in mot_data.get('bullets', []):
                             response += f"- {b}\n"
 
                     elif "feedback" in query or "critical" in query or "correct" in query:
-                        response += f"**On giving feedback to a {comm_style}:**\n"
+                        response += f"**On giving feedback to a {s2_p}:**\n"
                         for b in comm_data.get('supervising_bullets', []):
                             response += f"- {b}\n"
-                        response += f"\n**Motivation Tip:** Frame the feedback in a way that doesn't block their drive for {motiv_driver}. "
-                        if motiv_driver == "Connection": response += "Reassure them that the relationship is safe."
-                        elif motiv_driver == "Achievement": response += "Focus on how fixing this helps them win."
                     
                     elif "motivate" in query or "burnout" in query:
-                        response += f"**To motivate a {motiv_driver} driver:**\n"
+                        response += f"**To motivate a {m2_p} driver:**\n"
                         for b in mot_data.get('strategies_bullets', []):
                             response += f"- {b}\n"
                     
                     else:
-                        # Helpful debugging info in the fallback message
                         debug_key_info = f"Key detected: {key[:4]}..." if key else "No API Key detected"
-                        response = f"I can help you manage {p2}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\n*Note: {debug_key_info}. Please check the sidebar.*"
+                        response = f"I can help you manage {p2_name}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\n*Note: {debug_key_info}. Please check the sidebar.*"
                     
                     return response
 
@@ -1964,8 +1966,8 @@ elif st.session_state.current_view == "Conflict Mediator":
 
                     with st.chat_message("assistant"):
                         with st.spinner("Consulting the Compass Database..."):
-                            # Pass the persistent key from variable
-                            bot_reply = get_smart_response(prompt, s2, m2, active_key)
+                            # Pass all profile data to the AI
+                            bot_reply = get_smart_response(prompt, p2, s2_p, s2_s, m2_p, m2_s, s1_p, s1_s, m1_p, m1_s, active_key)
                             st.markdown(bot_reply)
                     
                     st.session_state.messages.append({"role": "assistant", "content": bot_reply})
