@@ -1700,19 +1700,29 @@ elif st.session_state.current_view == "Team DNA":
         teams = st.multiselect("Select Team Members", df['name'].tolist(), key="t2_team_select")
         if teams:
             tdf = df[df['name'].isin(teams)]
+            
+            # Helper for weighted calculation (Primary=1.0, Secondary=0.5)
+            def calculate_weighted_counts(dframe, p_col, s_col):
+                p = dframe[p_col].value_counts() * 1.0
+                s = dframe[s_col].value_counts() * 0.5
+                return p.add(s, fill_value=0).sort_values(ascending=False)
+
             c1, c2 = st.columns(2)
             with c1:
-                comm_counts = tdf['p_comm'].value_counts()
-                st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
+                # Weighted Communication
+                comm_counts = calculate_weighted_counts(tdf, 'p_comm', 's_comm')
+                
+                st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix (Weighted)", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
                 
                 # DOMINANT CULTURE ANALYSIS
                 if not comm_counts.empty:
                     dom_style = comm_counts.idxmax()
-                    ratio = comm_counts.max() / len(tdf)
+                    # Calculate dominance based on share of total weighted points
+                    ratio = comm_counts.max() / comm_counts.sum()
                     
-                    if ratio > 0.5:
+                    if ratio > 0.4: # Slightly lower threshold for weighted dominance
                         guide = TEAM_CULTURE_GUIDE.get(dom_style, {})
-                        st.warning(f"⚠️ **Dominant Culture:** This team is {int(ratio*100)}% **{dom_style}**.")
+                        st.warning(f"⚠️ **Dominant Culture:** This team is {int(ratio*100)}% **{dom_style}** (incl. secondary styles).")
                         with st.expander(f"📖 Managing the {guide.get('title', dom_style)}", expanded=True):
                             st.markdown(f"**The Vibe:**\n{guide.get('impact_analysis')}")
                             st.markdown(guide.get('management_strategy'))
@@ -1721,7 +1731,7 @@ elif st.session_state.current_view == "Team DNA":
                     else:
                         # BALANCED CULTURE
                         guide = TEAM_CULTURE_GUIDE.get("Balanced", {})
-                        st.info("**Balanced Culture:** No single style dominates. This reduces blindspots but may increase friction.")
+                        st.info("**Balanced Culture:** No single style dominates significantly. This reduces blindspots but may increase friction.")
                         with st.expander("📖 Managing a Balanced Team", expanded=True):
                              st.markdown("""**The Balanced Friction:**
                              A diverse team has no blind spots, but it speaks 4 different languages. Your role is **The Translator**.
@@ -1730,8 +1740,13 @@ elif st.session_state.current_view == "Team DNA":
                              * **Meeting Protocol:** Use structured turn-taking (Round Robin) so the loudest voice doesn't always win.""")
 
                 # MISSING VOICE ANALYSIS
-                present_styles = set(tdf['p_comm'].unique())
-                missing_styles = set(COMM_TRAITS) - present_styles
+                # Check presence in Primary OR Secondary
+                p_present = set(tdf['p_comm'].unique())
+                s_present = set(tdf['s_comm'].unique())
+                all_present = p_present.union(s_present)
+                
+                missing_styles = set(COMM_TRAITS) - all_present
+                
                 if missing_styles:
                     st.markdown("---")
                     st.error(f"🚫 **Missing Voices:** {', '.join(missing_styles)}")
@@ -1745,8 +1760,9 @@ elif st.session_state.current_view == "Team DNA":
                                  st.success(f"**Supervisor Fix:** {data.get('fix')}")
 
             with c2:
-                mot_counts = tdf['p_mot'].value_counts()
-                st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
+                # Weighted Motivation
+                mot_counts = calculate_weighted_counts(tdf, 'p_mot', 's_mot')
+                st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers (Weighted)", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
                 
                 # MOTIVATION GAP ANALYSIS
                 if not mot_counts.empty:
@@ -1996,18 +2012,25 @@ elif st.session_state.current_view == "Career Pathfinder":
 elif st.session_state.current_view == "Org Pulse":
     st.subheader("📈 Organization Pulse")
     if not df.empty:
-        # --- DATA PREP ---
+        # --- DATA PREP (Weighted) ---
         total_staff = len(df)
-        comm_counts = df['p_comm'].value_counts(normalize=True) * 100
-        mot_counts = df['p_mot'].value_counts(normalize=True) * 100
+        
+        def calculate_weighted_pct(dframe, p_col, s_col):
+            p = dframe[p_col].value_counts() * 1.0
+            s = dframe[s_col].value_counts() * 0.5
+            total = p.add(s, fill_value=0)
+            return (total / total.sum()) * 100
+
+        comm_counts = calculate_weighted_pct(df, 'p_comm', 's_comm').sort_values(ascending=False)
+        mot_counts = calculate_weighted_pct(df, 'p_mot', 's_mot').sort_values(ascending=False)
         
         # Top Metrics
         c1, c2, c3 = st.columns(3)
         if not comm_counts.empty:
             dom_comm = comm_counts.idxmax()
             dom_mot = mot_counts.idxmax()
-            c1.metric("Dominant Style", f"{dom_comm} ({int(comm_counts.max())}%)")
-            c2.metric("Top Driver", f"{dom_mot} ({int(mot_counts.max())}%)") 
+            c1.metric("Dominant Style (Weighted)", f"{dom_comm} ({int(comm_counts.max())}%)")
+            c2.metric("Top Driver (Weighted)", f"{dom_mot} ({int(mot_counts.max())}%)") 
             c3.metric("Total Staff Analyzed", total_staff)
             
             st.divider()
@@ -2015,11 +2038,14 @@ elif st.session_state.current_view == "Org Pulse":
             # --- VISUALS ---
             c_a, c_b = st.columns(2)
             with c_a: 
-                st.markdown("##### 🗣️ Communication Mix")
-                st.plotly_chart(px.pie(df, names='p_comm', color='p_comm', color_discrete_map={'Director':BRAND_COLORS['blue'], 'Encourager':BRAND_COLORS['green'], 'Facilitator':BRAND_COLORS['teal'], 'Tracker':BRAND_COLORS['gray']}), use_container_width=True)
+                st.markdown("##### 🗣️ Communication Mix (Weighted)")
+                # Use pre-calculated weighted counts for the chart
+                fig_comm = px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']])
+                st.plotly_chart(fig_comm, use_container_width=True)
             with c_b: 
-                st.markdown("##### 🔋 Motivation Drivers")
-                st.plotly_chart(px.bar(df['p_mot'].value_counts(), orientation='h', color_discrete_sequence=[BRAND_COLORS['blue']]), use_container_width=True)
+                st.markdown("##### 🔋 Motivation Drivers (Weighted)")
+                fig_mot = px.bar(x=mot_counts.values, y=mot_counts.index, orientation='h', color_discrete_sequence=[BRAND_COLORS['blue']])
+                st.plotly_chart(fig_mot, use_container_width=True)
 
             st.divider()
             st.header("🔍 Deep Organizational Analysis")
@@ -2134,9 +2160,10 @@ elif st.session_state.current_view == "Org Pulse":
                     # Compare Leadership Composition to General Staff
                     leaders = df[df['role'].isin(['Program Supervisor', 'Shift Supervisor', 'Manager'])]
                     if not leaders.empty:
-                        l_counts = leaders['p_comm'].value_counts(normalize=True) * 100
+                        # Use weighted counts for Leadership Analysis as well
+                        l_counts = calculate_weighted_pct(leaders, 'p_comm', 's_comm').sort_values(ascending=False)
                         
-                        st.write("**Leadership Diversity Check:**")
+                        st.write("**Leadership Diversity Check (Weighted):**")
                         c1, c2 = st.columns(2)
                         with c1:
                             st.caption("Leadership Team Mix")
