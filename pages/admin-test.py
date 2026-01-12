@@ -1463,7 +1463,85 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     data = generate_profile_content(p_comm, p_mot)
 
-    st.markdown("---"); st.markdown(f"### 📘 Supervisory Guide: {name}"); st.divider()
+    st.markdown("---")
+    
+    # --- DASHBOARD HEADER ---
+    st.markdown(f"### 📘 Supervisory Guide: {name}")
+    st.caption(f"Role: {role} | Profile: {p_comm}/{s_comm} • {p_mot}/{s_mot}")
+    
+    # --- VISUALIZATION SECTION (NEW) ---
+    with st.container(border=True):
+        st.subheader("📊 Profile At-A-Glance")
+        vc1, vc2 = st.columns(2)
+        
+        with vc1:
+            # 1. COMMUNICATION RADAR
+            # Assign weights for visualization
+            comm_scores = {"Director": 2, "Encourager": 2, "Facilitator": 2, "Tracker": 2}
+            if p_comm in comm_scores: comm_scores[p_comm] = 10
+            if s_comm in comm_scores: comm_scores[s_comm] = 7
+            
+            # Prepare Data for Plotly
+            radar_df = pd.DataFrame(dict(
+                r=list(comm_scores.values()),
+                theta=list(comm_scores.keys())
+            ))
+            fig_comm = px.line_polar(radar_df, r='r', theta='theta', line_close=True, 
+                                     title="Communication Footprint",
+                                     range_r=[0,10])
+            fig_comm.update_traces(fill='toself', line_color=BRAND_COLORS['blue'])
+            fig_comm.update_layout(height=300, margin=dict(t=30, b=30, l=30, r=30))
+            st.plotly_chart(fig_comm, use_container_width=True)
+            
+        with vc2:
+            # 2. MOTIVATION BATTERY
+            # Assign weights
+            mot_scores = {"Achievement": 2, "Growth": 2, "Purpose": 2, "Connection": 2}
+            if p_mot in mot_scores: mot_scores[p_mot] = 10
+            if s_mot in mot_scores: mot_scores[s_mot] = 7
+            
+            # Sort for visual hierarchy
+            sorted_mot = dict(sorted(mot_scores.items(), key=lambda item: item[1], reverse=True))
+            
+            mot_df = pd.DataFrame(dict(
+                Driver=list(sorted_mot.keys()),
+                Intensity=list(sorted_mot.values())
+            ))
+            
+            fig_mot = px.bar(mot_df, x="Intensity", y="Driver", orientation='h', 
+                             title="Motivation Drivers",
+                             color="Intensity",
+                             color_continuous_scale=[BRAND_COLORS['gray'], BRAND_COLORS['blue']])
+            fig_mot.update_layout(height=300, showlegend=False, margin=dict(t=30, b=30, l=30, r=30))
+            fig_mot.update_xaxes(visible=False)
+            st.plotly_chart(fig_mot, use_container_width=True)
+
+    # --- CHEAT SHEET SECTION (NEW) ---
+    with st.expander("⚡ Rapid Interaction Cheat Sheet", expanded=True):
+        cc1, cc2, cc3 = st.columns(3)
+        with cc1:
+            st.markdown("##### ✅ Do This")
+            for b in data['s2_b']:
+                # Extract bolded header if possible, or just print
+                st.success(b.split("**")[1] if "**" in b else b)
+        with cc2:
+            st.markdown("##### ⛔ Avoid This")
+            # We derive avoidance from the "Struggling" section risks or hardcode generic avoidances based on style
+            avoid_map = {
+                "Director": ["Wasting time with small talk", "Vague answers or indecision", "Micromanaging their process"],
+                "Encourager": ["Public criticism or coldness", "Ignoring the team's feelings", "Skipping the 'human' check-in"],
+                "Facilitator": ["Pushing for instant decisions", "Aggressive confrontation", "Dismissing group concerns"],
+                "Tracker": ["Vague or changing instructions", "Asking them to break policy", "Disorganized/Chaotic meetings"]
+            }
+            for avoid in avoid_map.get(p_comm, []):
+                st.error(avoid)
+        with cc3:
+            st.markdown("##### 🔋 Fuel")
+            # Motivation boosters from s4_b
+            for b in data['s4_b']:
+                 st.info(b.split("**")[1] if "**" in b else b)
+
+    st.divider()
     
     def show_section(title, text, bullets=None):
         st.subheader(title)
@@ -1810,7 +1888,7 @@ elif st.session_state.current_view == "Conflict Mediator":
         if p1 and p2 and p1 != p2:
             d1 = df[df['name']==p1].iloc[0]; d2 = df[df['name']==p2].iloc[0]
             
-            # [CHANGE] Extract Primary AND Secondary styles
+            # Extract Primary AND Secondary styles
             s1_p, s1_s = d1['p_comm'], d1['s_comm']
             m1_p, m1_s = d1['p_mot'], d1['s_mot']
             
@@ -1818,10 +1896,10 @@ elif st.session_state.current_view == "Conflict Mediator":
             m2_p, m2_s = d2['p_mot'], d2['s_mot']
             
             st.divider()
-            # [CHANGE] Display full profile in header
+            # Display full profile in header
             st.subheader(f"{s1_p}/{s1_s} (Sup) vs. {s2_p}/{s2_s} (Staff)")
             
-            # [CHANGE] Updated Logic to display BOTH Primary and Secondary clashes
+            # Updated Logic to display BOTH Primary and Secondary clashes
             if s1_p in SUPERVISOR_CLASH_MATRIX and s2_p in SUPERVISOR_CLASH_MATRIX[s1_p]:
                 clash_p = SUPERVISOR_CLASH_MATRIX[s1_p][s2_p]
                 
@@ -1903,7 +1981,7 @@ elif st.session_state.current_view == "Conflict Mediator":
                 # -------------------------------------------
                 # LOGIC ENGINE: HYBRID (Rule-Based + Gemini)
                 # -------------------------------------------
-                # [CHANGE] Updated function to accept full profiles
+                # Updated function to accept full profiles
                 def get_smart_response(query, p2_name, s2_p, s2_s, m2_p, m2_s, s1_p, s1_s, m1_p, m1_s, key):
                     # Prepare Context Data (Primary)
                     comm_data = COMM_PROFILES.get(s2_p, {})
@@ -1912,7 +1990,7 @@ elif st.session_state.current_view == "Conflict Mediator":
                     # If API Key exists, use Gemini
                     if key:
                         try:
-                            # [CHANGE] Enhanced System Prompt with Secondary Styles
+                            # Enhanced System Prompt with Secondary Styles
                             system_prompt = f"""
                             You are an expert Leadership Coach for a youth care agency.
                             You are advising a Supervisor on how to manage a staff member named {p2_name}.
