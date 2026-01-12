@@ -1040,11 +1040,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "watch_fors": ["**The Public Showdown:** Arguing in front of the team to establish who is 'Alpha'.", "**Malicious Compliance:** 'Fine, I'll do it your way, but I'll watch it fail.'", "**Siloing:** Dividing the team into 'My Crew' vs. 'Your Crew'."],
             "intervention_steps": ["**1. Define Swim Lanes:** Explicitly divide the turf.", "**2. The 'Disagree and Commit' Pact:** Agree to back each other in public.", "**3. Scheduled Friction:** Set a weekly meeting to debate strategy behind closed doors."],
             "scripts": {
-                "Opening": "We are both strong leaders, but right now we are canceling each other out.",
-                "Validation": "I respect your drive. I know you want the best for this program.",
-                "The Pivot": "When we battle for control, we create confusion. We need to stop competing and start coordinating.",
-                "Crisis": "We don't have time for a power struggle. Go.",
-                "Feedback": "I need you to trust me to handle my lane."
+                "Opening": "**Script:** \"We are both strong leaders, but right now we are canceling each other out. We need to align forces instead of colliding.\"\n\n**Rationale:** Acknowledges their power immediately to prevent a status battle. Framing it as 'canceling out' highlights the inefficiency, which Directors hate.",
+                "Validation": "**Script:** \"I respect your drive and your need for autonomy. I know you want the best for this program and you want it done fast.\"\n\n**Rationale:** Validates their core intent (speed and impact) so they don't feel the need to defend their motives.",
+                "The Pivot": "**Script:** \"When we battle for control, we create confusion for the team. We need to stop competing for authority and start coordinating our attacks on the problem.\"\n\n**Rationale:** Shifts the opponent from 'You' to 'The Problem.' Directors will unite against a common enemy (confusion).",
+                "Crisis": "**Script:** \"We don't have time for a power struggle. In this specific instance, I need you to execute my play. We can debrief the strategy later.\"\n\n**Rationale:** Appeals to urgency. Uses command language ('execute my play') which Directors respect in emergencies.",
+                "Feedback": "**Script:** \"I need you to trust me to handle my lane. When you step in without asking, it undermines my authority, not just the task.\"\n\n**Rationale:** Defines the boundary in terms of authority and trust, which are the currencies Directors trade in."
             }
         },
         "Encourager": {
@@ -1053,11 +1053,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "watch_fors": ["**The 'Shut Down':** They go silent to protect themselves from your intensity.", "**The 'Smile & Nod':** They agree to a deadline they can't meet just to end the interaction.", "**Venting:** They process their hurt feelings with peers."],
             "intervention_steps": ["**1. Disarm the Threat:** Lower your volume. Start with the person, not the task.", "**2. Translate Intent:** State that your intensity is about the *problem*, not them.", "**3. The 'Sandwich' Reframe:** They need the relational affirmation to hear the feedback."],
             "scripts": {
-                "Opening": "I want to talk about the task, but first—how are you doing?",
-                "Validation": "I know my style can feel intense. I value your connection with the team.",
-                "The Pivot": "However, we need to solve this problem efficiently.",
-                "Crisis": "I need to be very direct right now because of the safety risk. It isn't personal.",
-                "Feedback": "I value you. To grow, I need you to hear hard news without feeling attacked."
+                "Opening": "**Script:** \"I want to talk about the task, but I sense some hesitation. How are you doing with this assignment?\"\n\n**Rationale:** Forces the Director to pause and check the 'human gauge.' Encouragers need to feel seen before they can work.",
+                "Validation": "**Script:** \"I know my style can feel intense or abrupt. I value your connection with the team and how much you care about the vibe.\"\n\n**Rationale:** The Supervisor owns their own intensity (disarming the threat) and validates the Encourager's superpower (connection).",
+                "The Pivot": "**Script:** \"However, we need to solve this problem efficiently. My directness is about fixing the issue quickly, not about being upset with you.\"\n\n**Rationale:** Clarifies intent. Encouragers often mistake speed for anger. This separates the task from the relationship.",
+                "Crisis": "**Script:** \"I need to be very direct right now because of the safety risk. It isn't personal, it's operational. Please trust my intent.\"\n\n**Rationale:** Pre-frames the intensity as safety-driven, protecting the relationship from the upcoming command.",
+                "Feedback": "**Script:** \"I value you. To grow, I need you to hear hard news without feeling attacked. Can we separate the 'what' from the 'who' for a moment?\"\n\n**Rationale:** Encouragers conflate performance with identity. This script explicitly asks them to separate the two."
             }
         },
         "Facilitator": {
@@ -1066,11 +1066,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "watch_fors": ["**The 'We Need to Talk':** They schedule meetings to delay decisions.", "**Passive Resistance:** They won't argue, but they won't execute the plan.", "**Moral High Ground:** They frame your speed as 'uncaring'."],
             "intervention_steps": ["**1. Define the Sandbox:** Give them a clear deadline (e.g., 'Decide by 3 PM').", "**2. Assign the 'Who':** Limit who they need to consult.", "**3. The 'Good Enough' Agreement:** Remind them a good decision today is better than a perfect one next week."],
             "scripts": {
-                "Opening": "I know this feels rushed. I want to respect the process, but we have a tight timeline.",
-                "Validation": "I value that you want everyone to be heard.",
-                "The Pivot": "The risk is that if we don't decide by noon, we lose the option.",
-                "Crisis": "In this moment, I have to make the call. Follow my lead.",
-                "Feedback": "Your desire for consensus is a strength, but sometimes it becomes a bottleneck."
+                "Opening": "**Script:** \"I know this feels rushed and you want more time to process. I want to respect that need.\"\n\n**Rationale:** Validates the Facilitator's need for process, preventing them from digging in their heels.",
+                "Validation": "**Script:** \"I value that you want everyone to be heard and that you are thinking about the long-term impact.\"\n\n**Rationale:** Acknowledges that their hesitation comes from wisdom/care, not laziness.",
+                "The Pivot": "**Script:** \"The risk is that if we don't decide by noon, we lose the option entirely. We have to prioritize speed over consensus right now.\"\n\n**Rationale:** Reframes 'speed' as a necessity to save the option. Appeals to the risk of doing nothing.",
+                "Crisis": "**Script:** \"In this moment, the time for debate has passed. I have to make the call to keep us safe. Please follow my lead.\"\n\n**Rationale:** Sets a hard boundary. Facilitators respect safety; framing the command as a safety necessity overrides their need for consensus.",
+                "Feedback": "**Script:** \"Your desire for consensus is a strength, but sometimes it becomes a bottleneck. I need you to be willing to make a call even if people aren't 100% happy.\"\n\n**Rationale:** Identifies the specific behavior (bottlenecking) while affirming the intent (consensus)."
             }
         },
         "Tracker": {
@@ -1079,11 +1079,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "watch_fors": ["**The Rulebook Defense:** Quoting policy to stop new ideas.", "**The 'Yes, But':** Finding 10 reasons why it will fail.", "**Anxiety:** Your speed makes them visibly nervous."],
             "intervention_steps": ["**1. The Pre-Mortem:** Ask them to list the risks, then solve them together.", "**2. Honor the Detail:** Do not dismiss their accuracy.", "**3. Trial Runs:** Frame changes as temporary experiments."],
             "scripts": {
-                "Opening": "I have a new idea, and I need your eyes on it to make sure it's safe.",
-                "Validation": "I appreciate your attention to detail. You keep us compliant.",
-                "The Pivot": "We need to find a way to make this work. How can we do this safely?",
-                "Crisis": "I am taking full responsibility for this decision.",
-                "Feedback": "I need you to help me find the 'Yes.' Don't just tell me why we can't."
+                "Opening": "**Script:** \"I have a new idea, and I need your eyes on it to make sure it's safe before we launch.\"\n\n**Rationale:** Invites the Tracker in as an expert rather than an obstacle. Gives them a specific role (safety check).",
+                "Validation": "**Script:** \"I appreciate your attention to detail. You keep us compliant and prevent me from making reckless mistakes.\"\n\n**Rationale:** Validates their anxiety (fear of mistakes) and frames it as a value-add.",
+                "The Pivot": "**Script:** \"We need to find a way to make this work, not just reasons why it won't. How can we do this safely, rather than just saying 'no'?\"\n\n**Rationale:** Shifts them from 'Blocker' mode to 'Problem Solver' mode.",
+                "Crisis": "**Script:** \"I am taking full responsibility for this decision. I need you to trust me on the risk assessment right now.\"\n\n**Rationale:** Trackers fear getting in trouble. Taking full responsibility alleviates their anxiety.",
+                "Feedback": "**Script:** \"I need you to help me find the 'Yes.' Don't just tell me why we can't do it; tell me what it would take to make it possible.\"\n\n**Rationale:** Coaches them to use their knowledge to enable the mission, not just protect the policy."
             }
         }
     },
@@ -1094,11 +1094,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "watch_fors": ["**The Vent Session:** Complaining without action.", "**The 'Reply All' Apology:** Apologizing for enforcing rules.", "**Ghosting:** Avoiding staff rather than correcting them."],
             "intervention_steps": ["**1. The 'Safety' Contract:** Agree that giving feedback is safe.", "**2. Assign the 'Bad Guy':** Rotate who delivers bad news.", "**3. Focus on the Victim:** Remind each other of the youth suffering due to lack of structure."],
             "scripts": {
-                "Opening": "I hate having this conversation, but we need to talk about it.",
-                "Validation": "I know we both want the team to be happy.",
-                "The Pivot": "But by not addressing this, we are hurting the team.",
-                "Crisis": "We can't hug our way out of this. We have to be firm.",
-                "Feedback": "I feel like we are dancing around the issue. Let's just say it."
+                "Opening": "**Script:** \"I hate having this conversation because I value our friendship, but we need to talk about the work.\"\n\n**Rationale:** Acknowledges the awkwardness (which is the elephant in the room) to clear the air.",
+                "Validation": "**Script:** \"I know we both want the team to be happy and for the vibe to be good.\"\n\n**Rationale:** Reaffirms shared values so the feedback doesn't feel like a betrayal.",
+                "The Pivot": "**Script:** \"But by not addressing this performance issue, we are actually hurting the team. We are letting the standards slip, which isn't fair to the hard workers.\"\n\n**Rationale:** Reframes 'accountability' as an act of care for the *rest* of the team.",
+                "Crisis": "**Script:** \"We can't hug our way out of this. We have to be firm or safety will be compromised.\"\n\n**Rationale:** A stark reality check that 'nice' is not the right tool for 'safe'.",
+                "Feedback": "**Script:** \"I feel like we are dancing around the issue to be nice. Let's just say it directly so we can fix it and move on.\"\n\n**Rationale:** Calls out the 'nice trap' explicitly and invites directness."
             }
         },
         "Director": {
@@ -1107,11 +1107,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "watch_fors": ["**Apologizing:** You apologizing for giving them work.", "**Taking it Personally:** Feeling hurt by their directness.", "**Avoidance:** Emailing instead of talking to avoid the friction."],
             "intervention_steps": ["**1. Cut the Fluff:** Start with the headline.", "**2. Stand Your Ground:** If they push back, state your reasoning calmly.", "**3. Ask for Input:** Frame the relationship issue as a problem to be solved."],
             "scripts": {
-                "Opening": "I'm going to get straight to the point.",
-                "Validation": "I know you are focused on getting this done.",
-                "The Pivot": "However, the way you spoke to the team caused a shutdown.",
-                "Crisis": "Stop. Listen to me. This is a safety issue.",
-                "Feedback": "You are right on the facts, but wrong on the approach."
+                "Opening": "**Script:** \"I'm going to get straight to the point because I know you value efficiency.\"\n\n**Rationale:** Signals that you respect their time, which gains their attention immediately.",
+                "Validation": "**Script:** \"I know you are focused on getting this done and you want results.\"\n\n**Rationale:** Validates their driver (Achievement) so they don't dismiss you as 'soft'.",
+                "The Pivot": "**Script:** \"However, the way you spoke to the team caused a shutdown. You got the task done, but you damaged the relationship we need for next time.\"\n\n**Rationale:** Frames the 'feelings' issue as a pragmatic 'effectiveness' issue. Directors listen to effectiveness.",
+                "Crisis": "**Script:** \"Stop. Listen to me. This is a safety issue and I need you to hear me.\"\n\n**Rationale:** Uses short, command-style sentences. Matches their energy intensity.",
+                "Feedback": "**Script:** \"You are right on the facts, but wrong on the approach. If they don't trust you, they won't follow you next time.\"\n\n**Rationale:** Shows them that their 'winning' style is actually 'losing' the team."
             }
         },
         "Facilitator": {
@@ -1120,11 +1120,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "watch_fors": ["**Withdrawal:** They stop talking to escape your high energy.", "**Over-Talking:** You talk to fill the silence, making them withdraw further.", "**Misinterpretation:** You think their quietness means they are mad."],
             "intervention_steps": ["**1. Slow Down:** Match their energy level. Lower your volume.", "**2. Ask Specifics:** Don't ask 'How are you feeling?' Ask 'What do you think about X?'", "**3. Respect the Pause:** Wait 5 seconds after asking a question."],
             "scripts": {
-                "Opening": "I want to slow down and hear your thoughts.",
-                "Validation": "I know I bring a lot of energy to the room.",
-                "The Pivot": "I need you to tell me if I'm moving too fast or missing a detail.",
-                "Crisis": "I need you to speak up right now, even if you aren't 100% sure.",
-                "Feedback": "When you go silent, I feel like you are checking out. I need your voice."
+                "Opening": "**Script:** \"I want to slow down and hear your thoughts. I feel like I've been doing all the talking.\"\n\n**Rationale:** Signals a shift in energy. Gives them permission to enter the conversation.",
+                "Validation": "**Script:** \"I know I bring a lot of energy to the room and that can be overwhelming.\"\n\n**Rationale:** Owns the dynamic so the Facilitator doesn't feel responsible for the disconnect.",
+                "The Pivot": "**Script:** \"I need you to tell me if I'm moving too fast or missing a detail. Your silence makes me nervous—I need to know what you are really thinking.\"\n\n**Rationale:** Vulnerability. Admitting their silence makes you nervous invites them to help you by speaking.",
+                "Crisis": "**Script:** \"I need you to speak up right now, even if you aren't 100% sure. I need your gut check.\"\n\n**Rationale:** Lowers the bar for entry. They don't need a perfect answer, just a gut check.",
+                "Feedback": "**Script:** \"When you go silent, I feel like you are checking out. I need your voice in the room, not just your presence.\"\n\n**Rationale:** Frames their silence as a lack of connection, which motivates the Facilitator to re-engage."
             }
         },
         "Tracker": {
@@ -1133,11 +1133,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "watch_fors": ["**The Email Audit:** They send you long lists of errors.", "**Ignoring Details:** You stop reading their emails because they are 'negative'.", "**Passive-Aggression:** They follow your 'bad' instructions maliciously."],
             "intervention_steps": ["**1. Honor the Rule:** Start by agreeing the rule is important.", "**2. Frame the Exception:** Explain that you are bending the rule for a *person*, not because you are lazy.", "**3. Ask for Help:** Ask them to help you organize the chaos."],
             "scripts": {
-                "Opening": "I know this looks messy to you.",
-                "Validation": "I value that you keep us compliant and safe.",
-                "The Pivot": "In this moment, I need to prioritize the relationship over the paperwork.",
-                "Crisis": "We will fix the form later. Right now, handle the kid.",
-                "Feedback": "I need you to be flexible without feeling like we are breaking the law."
+                "Opening": "**Script:** \"I know this looks messy to you and you're worried about the procedure.\"\n\n**Rationale:** Validates their anxiety about disorder immediately.",
+                "Validation": "**Script:** \"I value that you keep us compliant and safe. I know the rules matter.\"\n\n**Rationale:** Affirms their role as protector, reducing their need to fight you.",
+                "The Pivot": "**Script:** \"In this moment, I need to prioritize the relationship over the paperwork. We will fix the form, but first we have to fix the trust.\"\n\n**Rationale:** Explains the hierarchy of needs. Relationship > Paperwork (in this moment).",
+                "Crisis": "**Script:** \"We will fix the form later. Right now, handle the kid. The relationship is the intervention.\"\n\n**Rationale:** Gives them permission to let go of the rule by defining the new priority.",
+                "Feedback": "**Script:** \"I need you to be flexible without feeling like we are breaking the law. Sometimes the right thing to do isn't in the handbook.\"\n\n**Rationale:** Challenges their rigid thinking by appealing to a higher moral purpose."
             }
         }
     },
@@ -1148,11 +1148,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "watch_fors": ["**The 'Let's Circle Back':** Delaying decisions.", "**The Meeting About the Meeting:** Planning to plan.", "**Consensus Addiction:** Refusing to move without 100% agreement."],
             "intervention_steps": ["**1. The 'Shot Clock':** Set a timer for the decision.", "**2. Limit Input:** Agree to only consult 2 people, not everyone.", "**3. The 'Good Enough' Pact:** Agree that 80% certainty is enough."],
             "scripts": {
-                "Opening": "We are over-thinking this.",
-                "Validation": "I value that we are being thorough.",
-                "The Pivot": "But we are stuck. We need to pick a direction.",
-                "Crisis": "Process is over. I am making the call.",
-                "Feedback": "We need to stop asking for permission and start giving direction."
+                "Opening": "**Script:** \"We are over-thinking this and spinning in circles.\"\n\n**Rationale:** Naming the dynamic breaks the loop. Someone has to call it out.",
+                "Validation": "**Script:** \"I value that we are being thorough and want everyone on board.\"\n\n**Rationale:** Validates the intent so they don't feel guilty about moving fast.",
+                "The Pivot": "**Script:** \"But we are stuck. We need to pick a direction even if it isn't perfect. Doing nothing is becoming a decision itself.\"\n\n**Rationale:** Reframes inaction as a risky decision. Facilitators dislike risk.",
+                "Crisis": "**Script:** \"Process is over. I am making the call. We can debrief the feelings later.\"\n\n**Rationale:** Takes the burden of the decision off the peer. 'I am making the call' frees them.",
+                "Feedback": "**Script:** \"We need to stop asking for permission and start giving direction. The team is waiting for us to lead.\"\n\n**Rationale:** Reminds them of their responsibility to the team, which motivates them."
             }
         },
         "Director": {
@@ -1161,11 +1161,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "watch_fors": ["**Going Rogue:** They act without your permission to 'save time'.", "**Tuning Out:** They stop listening in meetings.", "**The Takeover:** They start running your meeting because you are 'too slow'."],
             "intervention_steps": ["**1. Bottom Line Up Front:** Start with the decision, then discuss.", "**2. Give Autonomy:** Define the goal and let them run.", "**3. Be Firm:** Do not let them interrupt the process if the process is necessary."],
             "scripts": {
-                "Opening": "I know you want to move fast.",
-                "Validation": "I appreciate your bias for action.",
-                "The Pivot": "However, we need to align the team first or we will crash.",
-                "Crisis": "I hear you. But the decision is X.",
-                "Feedback": "You are moving faster than the team can follow. Slow down to speed up."
+                "Opening": "**Script:** \"I know you want to move fast and just get this done.\"\n\n**Rationale:** Validates the Director's drive, showing you aren't oblivious to the clock.",
+                "Validation": "**Script:** \"I appreciate your bias for action. You drive us forward.\"\n\n**Rationale:** Frames their impatience as a positive trait (drive).",
+                "The Pivot": "**Script:** \"However, we need to align the team first or we will crash. If we don't get buy-in now, we will pay for it later with resistance.\"\n\n**Rationale:** Uses a pragmatic argument: 'Speed now = Crash later.' Directors hate crashing.",
+                "Crisis": "**Script:** \"I hear you. But the decision is X. We are moving.\"\n\n**Rationale:** Matching their directness. Short sentences signal authority.",
+                "Feedback": "**Script:** \"You are moving faster than the team can follow. Slow down to speed up. If you lose them, you aren't leading, you're just walking alone.\"\n\n**Rationale:** Hits them where it hurts: Ineffectiveness. Walking alone is failed leadership."
             }
         },
         "Encourager": {
@@ -1182,11 +1182,11 @@ SUPERVISOR_CLASH_MATRIX = {
                 "**3. Written Action Items:** They forget details after the emotion fades. You value process. End every meeting with a written list of tasks."
             ],
             "scripts": {
-                "Opening": "I love the energy you bring, but we need to look at the numbers.",
-                "Validation": "I know you want to protect the team's morale.",
-                "The Pivot": "But by letting this slide, we are being unfair to the staff who follow the rules.",
-                "Crisis": "We can't worry about feelings right now. We follow the protocol.",
-                "Feedback": "You are great at the relationship, but I need you to be better at the paperwork/follow-through."
+                "Opening": "**Script:** \"I love the energy you bring, but we need to look at the numbers and the plan.\"\n\n**Rationale:** Separation of 'Energy' and 'Plan.' You validate the person but pivot to the task.",
+                "Validation": "**Script:** \"I know you want to protect the team's morale and keep everyone happy.\"\n\n**Rationale:** Validates their motive so they don't feel 'caught' avoiding the work.",
+                "The Pivot": "**Script:** \"But by letting this slide, we are being unfair to the staff who follow the rules. Fairness means holding everyone to the same standard.\"\n\n**Rationale:** Appeals to the Facilitator's core value: Fairness. Playing favorites is unfair.",
+                "Crisis": "**Script:** \"We can't worry about feelings right now. We follow the protocol. Safety is the priority.\"\n\n**Rationale:** Externalizes the authority to the 'Protocol.' It makes the rule the bad guy, not you.",
+                "Feedback": "**Script:** \"You are great at the relationship, but I need you to be better at the paperwork/follow-through. The team needs structure as much as they need love.\"\n\n**Rationale:** Frames structure as a form of care, which appeals to the Encourager."
             }
         },
         "Tracker": {
@@ -1195,11 +1195,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "watch_fors": ["**The Policy War:** They quote the handbook; you quote the 'context'.", "**Ignoring:** You ignoring their emails because they feel like nagging.", "**Anxiety:** They get anxious when you say 'let's just see how it goes'."],
             "intervention_steps": ["**1. Validate the Rule:** Acknowledge the policy first.", "**2. Contextualize the Exception:** Explain *why* this specific situation requires a bend.", "**3. Define the New Boundary:** Create a temporary rule so they feel safe."],
             "scripts": {
-                "Opening": "I know this plan deviates from SOP, and I want to explain why.",
-                "Validation": "I appreciate you keeping us compliant.",
-                "The Pivot": "In this specific case, following the rule will cause escalation.",
-                "Crisis": "I am taking responsibility for this exception.",
-                "Feedback": "I need you to see the gray areas."
+                "Opening": "**Script:** \"I know this plan deviates from SOP, and I want to explain why.\"\n\n**Rationale:** Heads off the objection immediately. Shows you know the rule exists.",
+                "Validation": "**Script:** \"I appreciate you keeping us compliant. You are our safety net.\"\n\n**Rationale:** Defines their role as 'Safety Net' rather than 'Nag.'",
+                "The Pivot": "**Script:** \"In this specific case, following the rule strictly will cause escalation. We need to look at the context, not just the text.\"\n\n**Rationale:** Introduces 'Context' as a variable that matters as much as the rule.",
+                "Crisis": "**Script:** \"I am taking responsibility for this exception. Log it.\"\n\n**Rationale:** 'Log it' gives them a task and a way to protect themselves. 'Taking responsibility' removes their risk.",
+                "Feedback": "**Script:** \"I need you to see the gray areas. Leadership happens in the exceptions.\"\n\n**Rationale:** Philosophically reframes leadership. Rules manage the norm; leaders manage the exception."
             }
         }
     },
@@ -1210,11 +1210,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "watch_fors": ["**The Email War:** Sending evidence-filled emails instead of talking.", "**Malicious Audit:** Looking for errors in each other's work.", "**Stalemate:** Refusing to move until policy is clarified."],
             "intervention_steps": ["**1. Zoom Out:** Stop talking about the rule. Talk about the goal.", "**2. Pick a Lane:** Divide compliance tasks.", "**3. The 'Human Override':** Remind each other systems serve people."],
             "scripts": {
-                "Opening": "We are getting lost in the weeds.",
-                "Validation": "I know we both want to do this exactly right.",
-                "The Pivot": "Is this critical to safety, or just a preference?",
-                "Crisis": "The procedure doesn't matter right now. Safety matters.",
-                "Feedback": "We need to stop using the rulebook as a weapon."
+                "Opening": "**Script:** \"We are getting lost in the weeds and arguing over details.\"\n\n**Rationale:** Names the dynamic (The Weeds). Trackers hate inefficiency, and this argument is inefficient.",
+                "Validation": "**Script:** \"I know we both want to do this exactly right.\"\n\n**Rationale:** Confirms shared intent (Accuracy). We are on the same side.",
+                "The Pivot": "**Script:** \"Is this critical to safety, or just a preference? We are spending $100 of energy on a $10 problem.\"\n\n**Rationale:** Cost-Benefit Analysis. Trackers respond to logic and resource allocation.",
+                "Crisis": "**Script:** \"The procedure doesn't matter right now. Safety matters. Drop the checklist and look at the situation.\"\n\n**Rationale:** Re-prioritizes the ultimate rule: Safety.",
+                "Feedback": "**Script:** \"We need to stop using the rulebook as a weapon against each other.\"\n\n**Rationale:** A hard truth. Using rules to win an argument is weaponization, not leadership."
             }
         },
         "Director": {
@@ -1223,11 +1223,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "watch_fors": ["**Asking Forgiveness:** They do it their way and apologize later.", "**Over-Auditing:** You check their work excessively to 'catch' them.", "**Power Struggles:** Fighting over who has the final say on an SOP."],
             "intervention_steps": ["**1. The 'Why' Explanation:** Don't just say 'No.' Explain the specific risk.", "**2. Pick Your Battles:** Only fight them on safety/legal issues, not preferences.", "**3. Give Them a Lane:** Define where they have total freedom."],
             "scripts": {
-                "Opening": "I need to pump the brakes on this idea.",
-                "Validation": "I know you want to get this done fast.",
-                "The Pivot": "But if we skip this step, we risk a lawsuit/safety failure.",
-                "Crisis": "Stop. This is a compliance violation.",
-                "Feedback": "I want to help you win, but you have to let me safety-check the plan first."
+                "Opening": "**Script:** \"I need to pump the brakes on this idea before we crash.\"\n\n**Rationale:** Uses driving metaphors ('pump the brakes') which imply speed/movement, speaking their language.",
+                "Validation": "**Script:** \"I know you want to get this done fast and see results.\"\n\n**Rationale:** Validates their driver (Results).",
+                "The Pivot": "**Script:** \"But if we skip this step, we risk a lawsuit/safety failure. I'm not trying to stop you; I'm trying to keep you safe.\"\n\n**Rationale:** Reframes 'Stopping' as 'Protecting.' Directors hate being stopped, but they like being safe.",
+                "Crisis": "**Script:** \"Stop. This is a compliance violation. We cannot do this.\"\n\n**Rationale:** Hard stop. No fluff. Directors respect a hard wall if it's real.",
+                "Feedback": "**Script:** \"I want to help you win, but you have to let me safety-check the plan first. Don't view me as an obstacle.\"\n\n**Rationale:** Explicitly asks to be viewed as an ally, not a bottleneck."
             }
         },
         "Encourager": {
@@ -1236,11 +1236,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "watch_fors": ["**Tears:** They cry or shut down when you give feedback.", "**The Silent Treatment:** They withdraw warmth to punish you.", "**The 'Nice' Defense:** They excuse errors because 'they tried hard'."],
             "intervention_steps": ["**1. Start with Warmth:** You must ask 'How are you?' before 'Here is the error.'", "**2. The Compliment Sandwich:** It feels fake to you, but it is necessary for them.", "**3. Focus on Support:** Frame the correction as 'helping them succeed.'"],
             "scripts": {
-                "Opening": "I want to help you get this right so you don't have to redo it.",
-                "Validation": "I know you are working hard for the team.",
-                "The Pivot": "However, this documentation error puts us at risk.",
-                "Crisis": "I need you to focus on the details right now.",
-                "Feedback": "When you ignore the details, it makes more work for the team."
+                "Opening": "**Script:** \"I want to help you get this right so you don't have to redo it later.\"\n\n**Rationale:** Frames the correction as 'Help,' not 'Punishment.'",
+                "Validation": "**Script:** \"I know you are working hard for the team and you care about them.\"\n\n**Rationale:** Validates Effort. Trackers usually ignore effort if the result is wrong; you must acknowledge it here.",
+                "The Pivot": "**Script:** \"However, this documentation error puts us at risk. Being 'nice' doesn't help if we lose funding.\"\n\n**Rationale:** Connects the boring detail (documentation) to the emotional outcome (losing funding/hurting the team).",
+                "Crisis": "**Script:** \"I need you to focus on the details right now. Empathy won't fix this audit finding.\"\n\n**Rationale:** A reality check. Sometimes facts > feelings.",
+                "Feedback": "**Script:** \"When you ignore the details, it makes more work for the team. True care includes accuracy.\"\n\n**Rationale:** Redefines 'Care.' If they care about the team, they should care about the details."
             }
         },
         "Facilitator": {
@@ -1249,11 +1249,11 @@ SUPERVISOR_CLASH_MATRIX = {
             "watch_fors": ["**The Policy Debate:** You quote the handbook; they quote 'team sentiment'.", "**Stalled Decisions:** They won't enforce a rule because 'it's complicated'.", "**Frustration:** You feel like the only one holding the standard."],
             "intervention_steps": ["**1. Define the Hard Line:** Agree on which rules are non-negotiable.", "**2. Allow the Gray:** Agree on which rules are up for interpretation.", "**3. United Front:** Do not disagree on policy in front of staff."],
             "scripts": {
-                "Opening": "We need to be clear on the standard.",
-                "Validation": "I know you want to be fair to everyone.",
-                "The Pivot": "But a rule that isn't enforced isn't a rule.",
-                "Crisis": "We follow the protocol. We can debrief feelings later.",
-                "Feedback": "I need you to back me up when I enforce the policy."
+                "Opening": "**Script:** \"We need to be clear on the standard. Ambiguity is dangerous.\"\n\n**Rationale:** Trackers hate ambiguity. Stating that it is 'dangerous' appeals to the Facilitator's desire to protect the group.",
+                "Validation": "**Script:** \"I know you want to be fair to everyone and hear all sides.\"\n\n**Rationale:** Validates their process (Fairness).",
+                "The Pivot": "**Script:** \"But a rule that isn't enforced isn't a rule. If we make an exception every time, we don't have a policy.\"\n\n**Rationale:** Logical argument. Facilitators value systems; show them the system is breaking.",
+                "Crisis": "**Script:** \"We follow the protocol. We can debrief feelings later.\"\n\n**Rationale:** Separates 'Action' from 'Processing.' Do the action now; process the feelings later.",
+                "Feedback": "**Script:** \"I need you to back me up when I enforce the policy. Don't undermine the rules to keep the peace.\"\n\n**Rationale:** Direct request for support. Facilitators want to be supportive; tell them how."
             }
         }
     }
@@ -1700,19 +1700,29 @@ elif st.session_state.current_view == "Team DNA":
         teams = st.multiselect("Select Team Members", df['name'].tolist(), key="t2_team_select")
         if teams:
             tdf = df[df['name'].isin(teams)]
+            
+            # Helper for weighted calculation (Primary=1.0, Secondary=0.5)
+            def calculate_weighted_counts(dframe, p_col, s_col):
+                p = dframe[p_col].value_counts() * 1.0
+                s = dframe[s_col].value_counts() * 0.5
+                return p.add(s, fill_value=0).sort_values(ascending=False)
+
             c1, c2 = st.columns(2)
             with c1:
-                comm_counts = tdf['p_comm'].value_counts()
-                st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
+                # Weighted Communication
+                comm_counts = calculate_weighted_counts(tdf, 'p_comm', 's_comm')
+                
+                st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix (Weighted)", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
                 
                 # DOMINANT CULTURE ANALYSIS
                 if not comm_counts.empty:
                     dom_style = comm_counts.idxmax()
-                    ratio = comm_counts.max() / len(tdf)
+                    # Calculate dominance based on share of total weighted points
+                    ratio = comm_counts.max() / comm_counts.sum()
                     
-                    if ratio > 0.5:
+                    if ratio > 0.4: # Slightly lower threshold for weighted dominance
                         guide = TEAM_CULTURE_GUIDE.get(dom_style, {})
-                        st.warning(f"⚠️ **Dominant Culture:** This team is {int(ratio*100)}% **{dom_style}**.")
+                        st.warning(f"⚠️ **Dominant Culture:** This team is {int(ratio*100)}% **{dom_style}** (incl. secondary styles).")
                         with st.expander(f"📖 Managing the {guide.get('title', dom_style)}", expanded=True):
                             st.markdown(f"**The Vibe:**\n{guide.get('impact_analysis')}")
                             st.markdown(guide.get('management_strategy'))
@@ -1721,7 +1731,7 @@ elif st.session_state.current_view == "Team DNA":
                     else:
                         # BALANCED CULTURE
                         guide = TEAM_CULTURE_GUIDE.get("Balanced", {})
-                        st.info("**Balanced Culture:** No single style dominates. This reduces blindspots but may increase friction.")
+                        st.info("**Balanced Culture:** No single style dominates significantly. This reduces blindspots but may increase friction.")
                         with st.expander("📖 Managing a Balanced Team", expanded=True):
                              st.markdown("""**The Balanced Friction:**
                              A diverse team has no blind spots, but it speaks 4 different languages. Your role is **The Translator**.
@@ -1730,8 +1740,13 @@ elif st.session_state.current_view == "Team DNA":
                              * **Meeting Protocol:** Use structured turn-taking (Round Robin) so the loudest voice doesn't always win.""")
 
                 # MISSING VOICE ANALYSIS
-                present_styles = set(tdf['p_comm'].unique())
-                missing_styles = set(COMM_TRAITS) - present_styles
+                # Check presence in Primary OR Secondary
+                p_present = set(tdf['p_comm'].unique())
+                s_present = set(tdf['s_comm'].unique())
+                all_present = p_present.union(s_present)
+                
+                missing_styles = set(COMM_TRAITS) - all_present
+                
                 if missing_styles:
                     st.markdown("---")
                     st.error(f"🚫 **Missing Voices:** {', '.join(missing_styles)}")
@@ -1745,8 +1760,9 @@ elif st.session_state.current_view == "Team DNA":
                                  st.success(f"**Supervisor Fix:** {data.get('fix')}")
 
             with c2:
-                mot_counts = tdf['p_mot'].value_counts()
-                st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
+                # Weighted Motivation
+                mot_counts = calculate_weighted_counts(tdf, 'p_mot', 's_mot')
+                st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers (Weighted)", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
                 
                 # MOTIVATION GAP ANALYSIS
                 if not mot_counts.empty:
@@ -1793,42 +1809,83 @@ elif st.session_state.current_view == "Conflict Mediator":
         
         if p1 and p2 and p1 != p2:
             d1 = df[df['name']==p1].iloc[0]; d2 = df[df['name']==p2].iloc[0]
-            s1, s2 = d1['p_comm'], d2['p_comm']
-            m1, m2 = d1['p_mot'], d2['p_mot']
+            
+            # [CHANGE] Extract Primary AND Secondary styles
+            s1_p, s1_s = d1['p_comm'], d1['s_comm']
+            m1_p, m1_s = d1['p_mot'], d1['s_mot']
+            
+            s2_p, s2_s = d2['p_comm'], d2['s_comm']
+            m2_p, m2_s = d2['p_mot'], d2['s_mot']
             
             st.divider()
-            st.subheader(f"{s1} (Sup) vs. {s2} (Staff)")
-            if s1 in SUPERVISOR_CLASH_MATRIX and s2 in SUPERVISOR_CLASH_MATRIX[s1]:
-                clash = SUPERVISOR_CLASH_MATRIX[s1][s2]
-                with st.expander("🔍 **Psychological Deep Dive**", expanded=True):
-                    st.markdown(f"**The Core Tension:** {clash['tension']}")
-                    st.markdown(f"{clash['psychology']}")
-                    st.markdown("**🚩 Watch For:**")
-                    for w in clash['watch_fors']: st.markdown(f"- {w}")
+            # [CHANGE] Display full profile in header
+            st.subheader(f"{s1_p}/{s1_s} (Sup) vs. {s2_p}/{s2_s} (Staff)")
+            
+            # [CHANGE] Updated Logic to display BOTH Primary and Secondary clashes
+            if s1_p in SUPERVISOR_CLASH_MATRIX and s2_p in SUPERVISOR_CLASH_MATRIX[s1_p]:
+                clash_p = SUPERVISOR_CLASH_MATRIX[s1_p][s2_p]
                 
-                c_a, c_b = st.columns(2)
-                with c_a:
-                    st.markdown("##### 🛠️ 3-Phase Coaching Protocol")
-                    for i in clash['intervention_steps']: st.info(i)
-                with c_b:
-                    st.markdown("##### 🗣️ Conflict Scripts (Click to Expand)")
-                    script_tabs = st.tabs(list(clash['scripts'].keys()))
-                    for i, (cat, text) in enumerate(clash['scripts'].items()):
-                        with script_tabs[i]:
-                            st.success(f"\"{text}\"")
+                # Retrieve Secondary Clash if applicable
+                clash_s = None
+                if s1_s and s2_s and s1_s in SUPERVISOR_CLASH_MATRIX and s2_s in SUPERVISOR_CLASH_MATRIX.get(s1_s, {}):
+                    clash_s = SUPERVISOR_CLASH_MATRIX[s1_s][s2_s]
+
+                with st.expander("🔍 **Psychological Deep Dive (Primary & Secondary)**", expanded=True):
+                    
+                    # Create Tabs for the two layers of conflict
+                    t_prime, t_sec = st.tabs([f"🔥 Major Tension ({s1_p} vs {s2_p})", f"🌊 Minor Tension ({s1_s} vs {s2_s})"])
+                    
+                    # --- TAB 1: PRIMARY (STRESS) ---
+                    with t_prime:
+                        st.caption(f"This dynamic dominates during **crises, deadlines, and high-pressure moments**.")
+                        st.markdown(f"**The Core Tension:** {clash_p['tension']}")
+                        st.markdown(f"{clash_p['psychology']}")
+                        st.markdown("**🚩 Watch For (Stress Behaviors):**")
+                        for w in clash_p['watch_fors']: st.markdown(f"- {w}")
+                        
+                        st.divider()
+                        c_a, c_b = st.columns(2)
+                        with c_a:
+                            st.markdown("##### 🛠️ Coaching Protocol")
+                            for i in clash_p['intervention_steps']: st.info(i)
+                        with c_b:
+                            st.markdown("##### 🗣️ Conflict Scripts")
+                            script_tabs = st.tabs(list(clash_p['scripts'].keys()))
+                            for i, (cat, text) in enumerate(clash_p['scripts'].items()):
+                                with script_tabs[i]:
+                                    st.success(f"\"{text}\"")
+
+                    # --- TAB 2: SECONDARY (ROUTINE) ---
+                    with t_sec:
+                        if clash_s:
+                            st.caption(f"This dynamic influences **routine planning, low-stress interactions, and daily workflow**.")
+                            st.markdown(f"**The Core Tension:** {clash_s['tension']}")
+                            st.markdown(f"{clash_s['psychology']}")
+                            st.markdown("**🚩 Watch For (Subtle Friction):**")
+                            for w in clash_s['watch_fors']: st.markdown(f"- {w}")
+                            
+                            st.divider()
+                            st.markdown("##### 🛠️ Routine Adjustments")
+                            for i in clash_s['intervention_steps']: 
+                                # Formatting slightly differently to distinguish from primary protocol
+                                clean_step = i.replace("**", "").replace("1. ", "").replace("2. ", "").replace("3. ", "")
+                                st.markdown(f"- {clean_step}")
+                        else:
+                            st.info("Secondary styles are undefined or identical. Focus on the Primary dynamic.")
+
             else:
                 st.info("No specific conflict protocol exists for this combination yet. They likely work well together!")
             
             # --- AI SUPERVISOR BOT ---
             st.markdown("---")
             with st.container(border=True):
-                st.subheader("🤖 AI Supervisor Assistant")
+                st.subheader("🤖 AI Supervisor Assistant (Enhanced Context)")
                 
                 # Determine active key from variable
                 active_key = user_api_key
                 
                 if active_key:
-                    st.caption(f"Powered by Gemini 2.5 Flash | Ask specific questions about managing **{p2}** ({s2} x {m2}).")
+                    st.caption(f"Powered by Gemini 2.5 Flash | analyzing full profile dynamics.")
                 else:
                     st.caption("Basic Mode | Add an API Key in the sidebar to unlock full AI capabilities.")
                 
@@ -1846,28 +1903,33 @@ elif st.session_state.current_view == "Conflict Mediator":
                 # -------------------------------------------
                 # LOGIC ENGINE: HYBRID (Rule-Based + Gemini)
                 # -------------------------------------------
-                def get_smart_response(query, comm_style, motiv_driver, key):
-                    # Prepare Context Data
-                    comm_data = COMM_PROFILES.get(comm_style, {})
-                    mot_data = MOTIV_PROFILES.get(motiv_driver, {})
+                # [CHANGE] Updated function to accept full profiles
+                def get_smart_response(query, p2_name, s2_p, s2_s, m2_p, m2_s, s1_p, s1_s, m1_p, m1_s, key):
+                    # Prepare Context Data (Primary)
+                    comm_data = COMM_PROFILES.get(s2_p, {})
+                    mot_data = MOTIV_PROFILES.get(m2_p, {})
                     
                     # If API Key exists, use Gemini
                     if key:
                         try:
-                            # Context Prompt Construction
+                            # [CHANGE] Enhanced System Prompt with Secondary Styles
                             system_prompt = f"""
                             You are an expert Leadership Coach for a youth care agency.
-                            You are advising a Supervisor on how to manage a staff member named {p2}.
+                            You are advising a Supervisor on how to manage a staff member named {p2_name}.
                             
-                            Here is the Staff Member's Profile:
-                            - **Communication Style:** {comm_style}
-                            - **Core Motivation:** {motiv_driver}
-                            - **Thriving Behaviors:** {comm_data.get('bullets', [])}
-                            - **Stress Behaviors:** They may become rigid, withdrawn, or aggressive when their need for {motiv_driver} is blocked.
+                            **Staff Member Profile ({p2_name}):**
+                            - **Communication:** Primary: {s2_p}, Secondary: {s2_s}
+                            - **Motivation:** Primary: {m2_p}, Secondary: {m2_s}
+                            - **Thriving Behaviors (Primary):** {comm_data.get('bullets', [])}
                             
-                            **Your Goal:** Answer the user's question specifically tailored to this profile.
-                            Do not give generic advice. Use the profile data to explain WHY the staff member acts this way and HOW to reach them.
-                            Be concise, practical, and empathetic.
+                            **Supervisor Profile (You):**
+                            - **Communication:** Primary: {s1_p}, Secondary: {s1_s}
+                            - **Motivation:** Primary: {m1_p}, Secondary: {m1_s}
+                            
+                            **Your Goal:** Answer the user's question by analyzing the dynamic between these specific profiles.
+                            - Incorporate the *Secondary* styles to add nuance (e.g., A Director with a Facilitator secondary is softer than a pure Director).
+                            - Identify potential friction points between the Supervisor's style and the Staff's style.
+                            - Give concise, actionable advice suitable for a residential care environment.
                             """
                             
                             # API Call to Gemini 2.5 Flash (Standard Endpoint)
@@ -1891,7 +1953,6 @@ elif st.session_state.current_view == "Conflict Mediator":
                                     time.sleep(2 ** (attempt + 1)) # Exponential backoff: 2s, 4s, 8s
                                     continue
                                 else:
-                                    # Return raw error for debugging if it's not a 503
                                     return f"⚠️ **AI Error ({response.status_code}):** {response.text}. Falling back to basic database."
                             
                             return "⚠️ **AI Service Busy:** The model is currently overloaded. Falling back to basic database."
@@ -1904,39 +1965,29 @@ elif st.session_state.current_view == "Conflict Mediator":
                     response = ""
                     
                     if "who is" in query or "tell me about" in query or "profile" in query:
-                         response += f"**Profile Overview:** {p2} is a **{comm_style}** driven by **{motiv_driver}**.\n\n"
-                         response += "**Communication Style:**\n"
+                         response += f"**Profile Overview:** {p2_name} is a **{s2_p}/{s2_s}** driven by **{m2_p}/{m2_s}**.\n\n"
+                         response += "**Primary Style:**\n"
                          for b in comm_data.get('bullets', []):
-                             response += f"- {b}\n"
-                         response += "**Core Driver:**\n"
-                         for b in mot_data.get('bullets', []):
                              response += f"- {b}\n"
 
                     elif "strengths" in query or "good at" in query:
-                        response += f"**Strengths:** As a {comm_style}, they excel at: \n"
+                        response += f"**Strengths:** As a {s2_p}, they excel at: \n"
                         for b in comm_data.get('bullets', []):
-                            response += f"- {b}\n"
-                        response += f"\nDriven by {motiv_driver}, they are motivated by: \n"
-                        for b in mot_data.get('bullets', []):
                             response += f"- {b}\n"
 
                     elif "feedback" in query or "critical" in query or "correct" in query:
-                        response += f"**On giving feedback to a {comm_style}:**\n"
+                        response += f"**On giving feedback to a {s2_p}:**\n"
                         for b in comm_data.get('supervising_bullets', []):
                             response += f"- {b}\n"
-                        response += f"\n**Motivation Tip:** Frame the feedback in a way that doesn't block their drive for {motiv_driver}. "
-                        if motiv_driver == "Connection": response += "Reassure them that the relationship is safe."
-                        elif motiv_driver == "Achievement": response += "Focus on how fixing this helps them win."
                     
                     elif "motivate" in query or "burnout" in query:
-                        response += f"**To motivate a {motiv_driver} driver:**\n"
+                        response += f"**To motivate a {m2_p} driver:**\n"
                         for b in mot_data.get('strategies_bullets', []):
                             response += f"- {b}\n"
                     
                     else:
-                        # Helpful debugging info in the fallback message
                         debug_key_info = f"Key detected: {key[:4]}..." if key else "No API Key detected"
-                        response = f"I can help you manage {p2}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\n*Note: {debug_key_info}. Please check the sidebar.*"
+                        response = f"I can help you manage {p2_name}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\n*Note: {debug_key_info}. Please check the sidebar.*"
                     
                     return response
 
@@ -1948,8 +1999,8 @@ elif st.session_state.current_view == "Conflict Mediator":
 
                     with st.chat_message("assistant"):
                         with st.spinner("Consulting the Compass Database..."):
-                            # Pass the persistent key from variable
-                            bot_reply = get_smart_response(prompt, s2, m2, active_key)
+                            # Pass all profile data to the AI
+                            bot_reply = get_smart_response(prompt, p2, s2_p, s2_s, m2_p, m2_s, s1_p, s1_s, m1_p, m1_s, active_key)
                             st.markdown(bot_reply)
                     
                     st.session_state.messages.append({"role": "assistant", "content": bot_reply})
@@ -1996,18 +2047,25 @@ elif st.session_state.current_view == "Career Pathfinder":
 elif st.session_state.current_view == "Org Pulse":
     st.subheader("📈 Organization Pulse")
     if not df.empty:
-        # --- DATA PREP ---
+        # --- DATA PREP (Weighted) ---
         total_staff = len(df)
-        comm_counts = df['p_comm'].value_counts(normalize=True) * 100
-        mot_counts = df['p_mot'].value_counts(normalize=True) * 100
+        
+        def calculate_weighted_pct(dframe, p_col, s_col):
+            p = dframe[p_col].value_counts() * 1.0
+            s = dframe[s_col].value_counts() * 0.5
+            total = p.add(s, fill_value=0)
+            return (total / total.sum()) * 100
+
+        comm_counts = calculate_weighted_pct(df, 'p_comm', 's_comm').sort_values(ascending=False)
+        mot_counts = calculate_weighted_pct(df, 'p_mot', 's_mot').sort_values(ascending=False)
         
         # Top Metrics
         c1, c2, c3 = st.columns(3)
         if not comm_counts.empty:
             dom_comm = comm_counts.idxmax()
             dom_mot = mot_counts.idxmax()
-            c1.metric("Dominant Style", f"{dom_comm} ({int(comm_counts.max())}%)")
-            c2.metric("Top Driver", f"{dom_mot} ({int(mot_counts.max())}%)") 
+            c1.metric("Dominant Style (Weighted)", f"{dom_comm} ({int(comm_counts.max())}%)")
+            c2.metric("Top Driver (Weighted)", f"{dom_mot} ({int(mot_counts.max())}%)") 
             c3.metric("Total Staff Analyzed", total_staff)
             
             st.divider()
@@ -2015,11 +2073,14 @@ elif st.session_state.current_view == "Org Pulse":
             # --- VISUALS ---
             c_a, c_b = st.columns(2)
             with c_a: 
-                st.markdown("##### 🗣️ Communication Mix")
-                st.plotly_chart(px.pie(df, names='p_comm', color='p_comm', color_discrete_map={'Director':BRAND_COLORS['blue'], 'Encourager':BRAND_COLORS['green'], 'Facilitator':BRAND_COLORS['teal'], 'Tracker':BRAND_COLORS['gray']}), use_container_width=True)
+                st.markdown("##### 🗣️ Communication Mix (Weighted)")
+                # Use pre-calculated weighted counts for the chart
+                fig_comm = px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']])
+                st.plotly_chart(fig_comm, use_container_width=True)
             with c_b: 
-                st.markdown("##### 🔋 Motivation Drivers")
-                st.plotly_chart(px.bar(df['p_mot'].value_counts(), orientation='h', color_discrete_sequence=[BRAND_COLORS['blue']]), use_container_width=True)
+                st.markdown("##### 🔋 Motivation Drivers (Weighted)")
+                fig_mot = px.bar(x=mot_counts.values, y=mot_counts.index, orientation='h', color_discrete_sequence=[BRAND_COLORS['blue']])
+                st.plotly_chart(fig_mot, use_container_width=True)
 
             st.divider()
             st.header("🔍 Deep Organizational Analysis")
@@ -2134,9 +2195,10 @@ elif st.session_state.current_view == "Org Pulse":
                     # Compare Leadership Composition to General Staff
                     leaders = df[df['role'].isin(['Program Supervisor', 'Shift Supervisor', 'Manager'])]
                     if not leaders.empty:
-                        l_counts = leaders['p_comm'].value_counts(normalize=True) * 100
+                        # Use weighted counts for Leadership Analysis as well
+                        l_counts = calculate_weighted_pct(leaders, 'p_comm', 's_comm').sort_values(ascending=False)
                         
-                        st.write("**Leadership Diversity Check:**")
+                        st.write("**Leadership Diversity Check (Weighted):**")
                         c1, c2 = st.columns(2)
                         with c1:
                             st.caption("Leadership Team Mix")
