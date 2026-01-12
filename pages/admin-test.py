@@ -1522,24 +1522,40 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         with cc1:
             st.markdown("##### ✅ Do This")
             for b in data['s2_b']:
-                # Extract bolded header if possible, or just print
-                st.success(b.split("**")[1] if "**" in b else b)
+                # [CHANGE] Now printing full bullet text to include rationale
+                st.success(b)
         with cc2:
             st.markdown("##### ⛔ Avoid This")
-            # We derive avoidance from the "Struggling" section risks or hardcode generic avoidances based on style
+            # [CHANGE] Updated map with specific rationales
             avoid_map = {
-                "Director": ["Wasting time with small talk", "Vague answers or indecision", "Micromanaging their process"],
-                "Encourager": ["Public criticism or coldness", "Ignoring the team's feelings", "Skipping the 'human' check-in"],
-                "Facilitator": ["Pushing for instant decisions", "Aggressive confrontation", "Dismissing group concerns"],
-                "Tracker": ["Vague or changing instructions", "Asking them to break policy", "Disorganized/Chaotic meetings"]
+                "Director": [
+                    "**Wasting time with small talk:** This signals disrespect for their time.",
+                    "**Vague answers:** They interpret ambiguity as incompetence.",
+                    "**Micromanaging:** This signals you don't trust their capability."
+                ],
+                "Encourager": [
+                    "**Public criticism:** This feels like a rejection of their identity.",
+                    "**Ignoring feelings:** They view emotion as data; ignoring it misses the point.",
+                    "**Transactional talk:** Skipping the 'hello' makes them feel used."
+                ],
+                "Facilitator": [
+                    "**Pushing for instant decisions:** This feels reckless and unsafe to them.",
+                    "**Aggressive confrontation:** This shuts them down instantly.",
+                    "**Dismissing group concerns:** This violates their core value of fairness."
+                ],
+                "Tracker": [
+                    "**Vague instructions:** This triggers anxiety about 'doing it wrong'.",
+                    "**Asking to break policy:** This feels unethical and unsafe to them.",
+                    "**Chaos/Disorganization:** They cannot respect a leader who is messy."
+                ]
             }
             for avoid in avoid_map.get(p_comm, []):
                 st.error(avoid)
         with cc3:
             st.markdown("##### 🔋 Fuel")
-            # Motivation boosters from s4_b
+            # [CHANGE] Now printing full bullet text to include rationale
             for b in data['s4_b']:
-                 st.info(b.split("**")[1] if "**" in b else b)
+                 st.info(b)
 
     st.divider()
     
