@@ -1878,12 +1878,23 @@ elif st.session_state.current_view == "Conflict Mediator":
                                 }]
                             }
                             headers = {'Content-Type': 'application/json'}
-                            response = requests.post(url, headers=headers, data=json.dumps(payload))
                             
-                            if response.status_code == 200:
-                                return response.json()['candidates'][0]['content']['parts'][0]['text']
-                            else:
-                                return f"⚠️ **AI Error:** {response.text}. Falling back to basic database."
+                            # Retry logic for 503 (Overloaded) errors
+                            max_retries = 3
+                            for attempt in range(max_retries):
+                                response = requests.post(url, headers=headers, data=json.dumps(payload))
+                                
+                                if response.status_code == 200:
+                                    return response.json()['candidates'][0]['content']['parts'][0]['text']
+                                elif response.status_code == 503:
+                                    # Server overloaded, wait and retry
+                                    time.sleep(2 ** (attempt + 1)) # Exponential backoff: 2s, 4s, 8s
+                                    continue
+                                else:
+                                    # Return raw error for debugging if it's not a 503
+                                    return f"⚠️ **AI Error ({response.status_code}):** {response.text}. Falling back to basic database."
+                            
+                            return "⚠️ **AI Service Busy:** The model is currently overloaded. Falling back to basic database."
                         
                         except Exception as e:
                             return f"⚠️ **Connection Error:** {str(e)}. Falling back to basic database."
