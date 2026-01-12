@@ -1821,25 +1821,58 @@ elif st.session_state.current_view == "Conflict Mediator":
             # [CHANGE] Display full profile in header
             st.subheader(f"{s1_p}/{s1_s} (Sup) vs. {s2_p}/{s2_s} (Staff)")
             
-            # Matrix uses Primary as the dominant stress behavior
+            # [CHANGE] Updated Logic to display BOTH Primary and Secondary clashes
             if s1_p in SUPERVISOR_CLASH_MATRIX and s2_p in SUPERVISOR_CLASH_MATRIX[s1_p]:
-                clash = SUPERVISOR_CLASH_MATRIX[s1_p][s2_p]
-                with st.expander("🔍 **Psychological Deep Dive (Primary Style Clash)**", expanded=True):
-                    st.markdown(f"**The Core Tension:** {clash['tension']}")
-                    st.markdown(f"{clash['psychology']}")
-                    st.markdown("**🚩 Watch For:**")
-                    for w in clash['watch_fors']: st.markdown(f"- {w}")
+                clash_p = SUPERVISOR_CLASH_MATRIX[s1_p][s2_p]
                 
-                c_a, c_b = st.columns(2)
-                with c_a:
-                    st.markdown("##### 🛠️ 3-Phase Coaching Protocol")
-                    for i in clash['intervention_steps']: st.info(i)
-                with c_b:
-                    st.markdown("##### 🗣️ Conflict Scripts (Click to Expand)")
-                    script_tabs = st.tabs(list(clash['scripts'].keys()))
-                    for i, (cat, text) in enumerate(clash['scripts'].items()):
-                        with script_tabs[i]:
-                            st.success(f"\"{text}\"")
+                # Retrieve Secondary Clash if applicable
+                clash_s = None
+                if s1_s and s2_s and s1_s in SUPERVISOR_CLASH_MATRIX and s2_s in SUPERVISOR_CLASH_MATRIX.get(s1_s, {}):
+                    clash_s = SUPERVISOR_CLASH_MATRIX[s1_s][s2_s]
+
+                with st.expander("🔍 **Psychological Deep Dive (Primary & Secondary)**", expanded=True):
+                    
+                    # Create Tabs for the two layers of conflict
+                    t_prime, t_sec = st.tabs([f"🔥 Major Tension ({s1_p} vs {s2_p})", f"🌊 Minor Tension ({s1_s} vs {s2_s})"])
+                    
+                    # --- TAB 1: PRIMARY (STRESS) ---
+                    with t_prime:
+                        st.caption(f"This dynamic dominates during **crises, deadlines, and high-pressure moments**.")
+                        st.markdown(f"**The Core Tension:** {clash_p['tension']}")
+                        st.markdown(f"{clash_p['psychology']}")
+                        st.markdown("**🚩 Watch For (Stress Behaviors):**")
+                        for w in clash_p['watch_fors']: st.markdown(f"- {w}")
+                        
+                        st.divider()
+                        c_a, c_b = st.columns(2)
+                        with c_a:
+                            st.markdown("##### 🛠️ Coaching Protocol")
+                            for i in clash_p['intervention_steps']: st.info(i)
+                        with c_b:
+                            st.markdown("##### 🗣️ Conflict Scripts")
+                            script_tabs = st.tabs(list(clash_p['scripts'].keys()))
+                            for i, (cat, text) in enumerate(clash_p['scripts'].items()):
+                                with script_tabs[i]:
+                                    st.success(f"\"{text}\"")
+
+                    # --- TAB 2: SECONDARY (ROUTINE) ---
+                    with t_sec:
+                        if clash_s:
+                            st.caption(f"This dynamic influences **routine planning, low-stress interactions, and daily workflow**.")
+                            st.markdown(f"**The Core Tension:** {clash_s['tension']}")
+                            st.markdown(f"{clash_s['psychology']}")
+                            st.markdown("**🚩 Watch For (Subtle Friction):**")
+                            for w in clash_s['watch_fors']: st.markdown(f"- {w}")
+                            
+                            st.divider()
+                            st.markdown("##### 🛠️ Routine Adjustments")
+                            for i in clash_s['intervention_steps']: 
+                                # Formatting slightly differently to distinguish from primary protocol
+                                clean_step = i.replace("**", "").replace("1. ", "").replace("2. ", "").replace("3. ", "")
+                                st.markdown(f"- {clean_step}")
+                        else:
+                            st.info("Secondary styles are undefined or identical. Focus on the Primary dynamic.")
+
             else:
                 st.info("No specific conflict protocol exists for this combination yet. They likely work well together!")
             
