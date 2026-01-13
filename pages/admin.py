@@ -46,30 +46,30 @@ st.markdown("""
 
         /* --- LIGHT MODE VARIABLES --- */
         :root {
-            --primary: #1a73e8;       /* Google Blue */
+            --primary: #1a73e8;       
             --primary-hover: #1557b0;
-            --background: #f0f2f5;
+            --background: #f8f9fa;
             --card-bg: #ffffff;
             --text-main: #202124;
             --text-sub: #5f6368;
-            --border-color: #dadce0;
-            --input-bg: #f1f3f4;
-            --shadow: 0 1px 3px rgba(0,0,0,0.12);
+            --border-color: #e0e0e0;
+            --input-bg: #ffffff;
+            --shadow: 0 2px 5px rgba(0,0,0,0.05);
             --score-track: #e8eaed;
         }
 
         /* --- DARK MODE VARIABLES --- */
         @media (prefers-color-scheme: dark) {
             :root {
-                --primary: #445164;
+                --primary: #8ab4f8;
                 --primary-hover: #aecbfa;
-                --background: #1C1C1E;    /* Dark Gray */
-                --card-bg: #2C2C2E;       /* Lighter Dark Gray */
+                --background: #131314;
+                --card-bg: #1e1e1f;
                 --text-main: #e8eaed;
                 --text-sub: #9aa0a6;
-                --border-color: #38383A;
-                --input-bg: #3A3A3C;
-                --shadow: 0 4px 8px rgba(0,0,0,0.3);
+                --border-color: #444746;
+                --input-bg: #1e1e1f;
+                --shadow: 0 4px 8px rgba(0,0,0,0.4);
                 --score-track: #5f6368;
             }
         }
@@ -81,7 +81,6 @@ st.markdown("""
             background-color: var(--background);
         }
         
-        /* Streamlit Main Container */
         .stApp {
             background-color: var(--background);
         }
@@ -89,7 +88,8 @@ st.markdown("""
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Google Sans', sans-serif !important;
             color: var(--text-main) !important;
-            font-weight: 700 !important;
+            font-weight: 600 !important;
+            letter-spacing: -0.5px;
         }
 
         /* --- COMPONENTS --- */
@@ -101,38 +101,27 @@ st.markdown("""
             border-right: 1px solid var(--border-color);
         }
 
-        /* Custom Card */
-        .custom-card {
-            background-color: var(--card-bg);
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-            margin-bottom: 20px;
-        }
-
         /* Hero Box */
         .hero-box {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, #1557b0 100%);
             padding: 40px;
             border-radius: 16px;
             color: white !important;
             margin-bottom: 30px;
-            box-shadow: var(--shadow);
+            box-shadow: 0 4px 15px rgba(26, 115, 232, 0.2);
         }
         .hero-title {
             color: white !important;
             font-size: 2.2rem;
             font-weight: 800;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-family: 'Google Sans', sans-serif;
         }
         .hero-subtitle {
-            color: #e8eaed !important;
+            color: rgba(255, 255, 255, 0.9) !important;
             font-size: 1.1rem;
-            opacity: 0.9;
             max-width: 800px;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         /* Navigation Buttons (Big Tiles) */
@@ -146,20 +135,22 @@ st.markdown("""
             flex-direction: column;
             align-items: flex-start;
             justify-content: center;
-            padding: 20px;
+            padding: 24px;
             white-space: pre-wrap;
             text-align: left;
-            transition: all 0.2s;
-            border-radius: 12px;
+            transition: all 0.2s ease-in-out;
+            border-radius: 16px;
         }
         div[data-testid="column"] .stButton button:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
             border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             color: var(--primary) !important;
         }
         div[data-testid="column"] .stButton button p {
             font-family: 'Google Sans', sans-serif;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 1.1rem;
         }
 
         /* Standard Buttons */
@@ -168,12 +159,14 @@ st.markdown("""
             color: white !important;
             border: none;
             border-radius: 8px;
-            font-weight: 600;
+            font-weight: 500;
             font-family: 'Google Sans', sans-serif;
             transition: background-color 0.2s;
+            padding: 0.5rem 1rem;
         }
         .stButton button:not([style*="height: 140px"]):hover {
             background-color: var(--primary-hover);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         /* Inputs & Selectboxes */
@@ -182,56 +175,63 @@ st.markdown("""
             color: var(--text-main) !important;
             border: 1px solid var(--border-color);
             border-radius: 8px;
+            min-height: 45px;
         }
         
-        /* Dropdown Menu Items */
-        div[data-baseweb="popover"] { background-color: var(--card-bg) !important; }
-        div[data-baseweb="menu"] { background-color: var(--card-bg) !important; }
-        div[data-baseweb="option"] { color: var(--text-main) !important; }
-
-        /* Dataframes & Expanders */
-        div[data-testid="stDataFrame"] { border: 1px solid var(--border-color); border-radius: 8px; }
-        div[data-testid="stExpander"] {
-            background-color: var(--card-bg) !important;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+        /* Containers */
+        div[data-testid="stContainer"] {
+            border-radius: 12px;
         }
-        .streamlit-expanderHeader {
-            background-color: var(--card-bg) !important;
-            color: var(--text-main) !important;
-            font-family: 'Google Sans', sans-serif;
+        
+        /* Metric Cards */
+        div[data-testid="stMetric"] {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
         }
 
         /* Login Card */
         .login-card {
             background-color: var(--card-bg);
             padding: 40px;
-            border-radius: 20px;
-            box-shadow: var(--shadow);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             text-align: center;
-            max-width: 400px;
-            margin: 100px auto;
+            max-width: 450px;
+            margin: 80px auto;
             border: 1px solid var(--border-color);
             color: var(--text-main);
         }
         .login-title {
             color: var(--primary) !important;
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 700;
             margin-bottom: 10px;
         }
         .login-subtitle {
             color: var(--text-sub) !important;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            font-size: 1rem;
         }
         .back-link {
             text-decoration: none;
             color: var(--text-sub);
             font-weight: 600;
             transition: color 0.2s;
+            display: inline-block;
+            margin-bottom: 20px;
         }
         .back-link:hover { color: var(--primary); }
 
+        /* Expander Headers */
+        .streamlit-expanderHeader {
+            font-weight: 600;
+            color: var(--text-main);
+            background-color: var(--card-bg);
+            border-radius: 8px;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -247,10 +247,8 @@ def fetch_staff_data():
 def submit_data_to_google(payload):
     """
     Submits offline data to Google Sheets via the Apps Script.
-    Expects a payload dictionary with name, email, role, cottage, and scores.
     """
     try:
-        # Structure payload to match what the Google Script expects for the "save" action
         data_to_send = {
             "action": "save",
             "name": payload['name'],
@@ -273,7 +271,6 @@ def submit_data_to_google(payload):
         st.error(f"Connection Error: {e}")
         return False
 
-# Initialize Session State Data (Mutable Database)
 if 'staff_df' not in st.session_state:
     raw_data = fetch_staff_data()
     df_raw = pd.DataFrame(raw_data)
@@ -323,27 +320,23 @@ def check_password():
         role_raw = user_row.get('role', 'YDP')
         cottage_raw = user_row.get('cottage', 'All')
         
-        # 1. Master Override (Universal Access)
+        # 1. Master Override
         if input_pw == MASTER_PW:
             authorized = True
             
-        # 2. Individual Password Check (Priority)
-        # Looks for secrets like "LeBlanc_password" based on Last Name
+        # 2. Individual Password Check
         else:
             try:
-                # Extract Last Name (assumes "First Last" format)
                 last_name = selected_user.strip().split()[-1]
                 secret_key = f"{last_name}_password"
                 individual_pw = st.secrets.get(secret_key)
             except:
                 individual_pw = None
 
-            # If individual password exists and matches
             if individual_pw and str(input_pw).strip() == str(individual_pw).strip():
                 authorized = True
             
-            # 3. Fallback to Role-Based Passwords (if no individual match found)
-            # This ensures staff without specific IDs can still log in with the shared code
+            # 3. Fallback to Role-Based
             elif not authorized:
                 if "Program Supervisor" in role_raw or "Director" in role_raw or "Manager" in role_raw:
                     if input_pw == PS_PW: authorized = True
@@ -373,12 +366,11 @@ def check_password():
 if not st.session_state.authenticated:
     st.markdown("""
         <div style="position: absolute; top: 20px; left: 20px;">
-            <a href="/" target="_self" class="back-link">← Back</a>
+            <a href="/" target="_self" class="back-link">← Back to Assessment</a>
         </div>
         <div class='login-card'>
             <div class='login-title'>Supervisor Access</div>
-            <div class='login-subtitle'>Select your name and enter your role's access code.</div>
-        </div>
+            <div class='login-subtitle'>Select your name and enter your role's access code to manage your team.</div>
     """, unsafe_allow_html=True)
     
     if not df_all.empty and 'name' in df_all.columns:
@@ -390,6 +382,7 @@ if not st.session_state.authenticated:
         st.selectbox("Who are you?", ["Administrator"], key="user_select")
         
     st.text_input("Access Code", type="password", key="password_input", on_change=check_password)
+    st.markdown("</div>", unsafe_allow_html=True)
     st.stop()
 
 # --- 6. DATA FILTERING ENGINE (RBAC) ---
@@ -400,20 +393,16 @@ def get_filtered_dataframe():
     
     current_df = st.session_state.staff_df
 
-    # 1. High Level Access (Admin, Director, Manager) - See All
     if user_role == "Admin" or current_user == "Administrator" or "Director" in user_role or "Manager" in user_role:
         return current_df
     
     filtered_df = current_df.copy()
     
-    # 2. Cottage Filter (Applied to PS, SS, YDP unless their cottage is "All")
     if 'cottage' in current_df.columns and user_cottage != "All":
          filtered_df = filtered_df[filtered_df['cottage'] == user_cottage]
     
-    # 3. Role Filters
     if 'role' in current_df.columns:
         if "Program Supervisor" in user_role:
-            # Can see everyone in their cottage (already filtered above)
             pass
         elif "Shift Supervisor" in user_role:
             condition = (filtered_df['role'] == 'YDP') | (filtered_df['name'] == current_user)
@@ -428,7 +417,8 @@ df = get_filtered_dataframe()
 with st.sidebar:
     st.caption(f"Logged in as: **{st.session_state.current_user_name}**")
     st.caption(f"Role: **{st.session_state.current_user_role}**")
-    if st.button("Logout"):
+    st.divider()
+    if st.button("Logout", type="secondary"):
         st.session_state.authenticated = False
         st.rerun()
 
@@ -440,7 +430,7 @@ COMM_TRAITS = ["Director", "Encourager", "Facilitator", "Tracker"]
 MOTIV_TRAITS = ["Achievement", "Growth", "Purpose", "Connection"]
 
 # --- MASTER DATA PROFILES ---
-
+# (Content dictionaries are retained exactly as requested)
 COMM_PROFILES = {
     "Director": {
         "bullets": [
@@ -1279,6 +1269,24 @@ CAREER_PATHWAYS = {
             "assignment_task": "**The Mentor Project:**\nSelect one high-potential but struggling staff member. Your goal is to teach them ONE specific administrative or leadership skill (e.g., running a shift debrief, auditing a file) over the course of two weeks.\n\nYou cannot do the task for them. You must meet with them, explain the 'why,' demonstrate the 'how,' and then observe them doing it, providing feedback. Your success is measured solely by *their* ability to do the task independently by Friday.",
             "success_indicators": "1. The staff member can perform the task independently and correctly.\n2. The staff member reports feeling supported, not judged.\n3. The Director can articulate the staff member's learning style and barriers.\n4. The Director spent significant time listening, not just talking.",
             "red_flags": "1. The Director just did the task for them to 'save time'.\n2. The staff member feels steamrolled or criticized.\n3. The Director complains that the staff member is 'too slow' or 'doesn't get it'.\n4. The Director cannot explain *why* the staff member struggled, only *that* they struggled."
+        },
+        "Manager": {
+            "shift": "**From 'Battle Commander' to 'Diplomat & Strategist':** As a Program Supervisor, you led the troops. As a Manager, you lead the Generals. You can no longer rely on 'command and control' because your direct reports (Program Supervisors) are strong leaders who need autonomy. Your value shifts from 'solving the problem' to 'managing the politics and resources so *they* can solve the problem.' You must move from tactical execution to organizational strategy. You have to care about the agency's liability, public image, and budget as much as the kids. You must learn to lose small battles to win the war.",
+            "why": "Directors want to fix the crisis *now*. At the Manager level, 'fixing it now' might cause a lawsuit or a budget crisis later. They struggle with the red tape and the indirect influence. They get frustrated that they can't just 'order' a Program Supervisor to change culture. They have to learn to influence through questions and vision, not just authority.",
+            "conversation": "**The 'Chess Player' Talk:**\n\n'You are used to playing checkers—fast moves, jumping opponents, clear wins. Management is chess. You have to think five moves ahead.\n\nYour job is no longer to run the floor. Your job is to protect the agency so the floor can exist. This means you will spend less time with kids and more time with spreadsheets, lawyers, and angry parents. You have to be okay with not being the hero in the moment. You are the architect of the system.'",
+            "assignment_setup": "This assignment forces them to solve a problem where 'speed' and 'command' are not the answers—where they must navigate complexity and competing interests.",
+            "assignment_task": "**The Strategic Compromise:**\nIdentify a conflict between two Program Supervisors (e.g., resource sharing, staffing, or policy interpretation). Do not solve it for them.\n\nFacilitate a resolution where *both* sides feel heard and the solution serves the *agency*, not just one program. You cannot issue a directive. You must negotiate a treaty.",
+            "success_indicators": "1. A resolution was reached that aligns with agency policy.\n2. Both Program Supervisors felt respected.\n3. The Director did not just 'pick a winner' based on who was faster/louder.\n4. They considered the long-term impact on agency culture.",
+            "red_flags": "1. They just barked an order to end the conflict.\n2. They picked the side of the PS who is most like them (another Director).\n3. They ignored the emotional fallout of the decision.\n4. They complained that 'this is a waste of time'."
+        },
+        "Director": {
+            "shift": "**From 'Strategist' to 'Enterprise Leader':** You now oversee a diverse ecosystem: AOBH, TIPS, EPIC, Student Advocates, and TSS. Each has a different language, funding stream, and culture. Your natural instinct is to 'run' the one you know best (likely Residential) and ignore the others. The shift requires you to govern the whole, not just your favorite part. You must resist the urge to step down into operations and instead focus on the 'connective tissue' between these departments. Your value is no longer in running a program; it is in creating synergy between programs.",
+            "why": "Directors are used to being the expert in the room. Now they oversee areas (like EPIC or TIPS) where they may not be the subject matter expert. They often micromanage the Residential side because it feels safe, while neglecting the satellite programs. This leads to silos and 'forgotten' departments.",
+            "conversation": "**The 'Portfolio Manager' Talk:**\n\n'You are not just the Residential Director anymore; you are the Director of Services. That means TIPS, EPIC, and Advocates are your children too.\n\nWhen you spend 80% of your time on AOBH because it's loud, you are neglecting the future growth of the agency. I need you to stop playing favorites with your time. You have to trust your Managers to run the units so you can build the bridges between them.'",
+            "assignment_setup": "This assignment forces them to look at the agency horizontally (across departments) rather than vertically (down into the weeds).",
+            "assignment_task": "**The Synergy Project:**\nIdentify a gap where two departments are not communicating (e.g., AOBH youth not utilizing EPIC services effectively). \n\nDesign a structural bridge—not just a meeting, but a process or policy—that forces collaboration between them. You must get the leaders of both divisions to agree to it.",
+            "success_indicators": "1. The solution involved input from both 'silos'.\n2. They delegated the execution to the managers of those areas.\n3. They focused on the *system* of referral/hand-off, not just one case.\n4. They can articulate the value proposition for *both* departments.",
+            "red_flags": "1. They just ordered AOBH to 'do more'.\n2. They ignored the unique constraints of TIPS/EPIC.\n3. They tried to run the meeting themselves instead of empowering the leaders.\n4. They viewed the satellite programs as 'lesser' than Residential."
         }
     },
     "Encourager": {
@@ -1300,6 +1308,24 @@ CAREER_PATHWAYS = {
             "assignment_task": "**The Standard Reset:**\nIdentify a culture issue where the team has become lax (e.g., cell phone use, lateness, sloppy language). You must lead a team meeting where you explicitly reset this expectation.\n\nYou must state the new standard, explain the 'why' (impact on youth), and—crucially—explain the consequence for non-compliance. You must hold the room without backing down or softening the message when they push back.",
             "success_indicators": "1. The standard was defined clearly without ambiguity.\n2. The consequences were stated firmly.\n3. The Encourager did not backpedal when the team complained.\n4. The Encourager focused on the mission, not their popularity.",
             "red_flags": "1. They framed it as 'a suggestion' or 'something we should try'.\n2. They apologized for the new rule.\n3. They let the team debate the rule until it lost all teeth.\n4. They ended the meeting by seeking reassurance ('Is everyone okay with me?')."
+        },
+        "Manager": {
+            "shift": "**From 'Nurturer' to 'Protector of the Agency':** The hardest truth for an Encourager at the Manager level is that you cannot save everyone. You are responsible for the survival of the entire residential program, not just the happiness of the staff. This means making cold, hard decisions—cutting budgets, firing popular but ineffective leaders, or closing programs—to ensure the agency survives. You must move from 'personal care' to 'systemic care.' You have to protect the agency from liability even if it means being the 'bad guy' to the staff.",
+            "why": "Encouragers define success by how people feel. Managers often have to make decisions that make people feel bad (for a while) to ensure the agency is safe. They struggle with the 'distance' required at the Manager level. They can't be friends with the Program Supervisors in the same way. They risk burnout by absorbing the emotional weight of the entire agency.",
+            "conversation": "**The 'Surgeon' Analogy:**\n\n'A surgeon cannot cry while they are cutting. It doesn't mean they don't care; it means they are focused on saving the life.\n\nAs a Manager, you are the surgeon. If you let a toxic Program Supervisor stay because you like them, the infection spreads to the whole campus. You have to love the mission more than you love being liked. Your compassion must be for the 100 kids we serve, not just the one staff member in your office crying.'",
+            "assignment_setup": "This assignment tests their ability to prioritize organizational health over individual relationship.",
+            "assignment_task": "**The Performance Intervention:**\nIdentify a Program Supervisor who is underperforming or allowing a toxic culture. You must deliver a formal Performance Improvement Plan (PIP) or a final warning.\n\nFocus on the data and the outcome. You cannot soften the blow to the point where the message is lost. You must prioritize the agency's standard over the relationship.",
+            "success_indicators": "1. The message was delivered clearly without excessive apology.\n2. They documented the conversation formally.\n3. They did not take the employee's reaction personally.\n4. They can articulate why this was necessary for the agency.",
+            "red_flags": "1. They walked back the consequences when the PS got emotional.\n2. They made it about 'Admin making me do this'.\n3. They lost sleep or spiraled emotionally after the conversation.\n4. They tried to 'fix' the PS's feelings instead of the PS's performance."
+        },
+        "Director": {
+            "shift": "**From 'Chief of Tribe' to 'Architect of Unity':** You oversee 5 different departments (AOBH, TIPS, EPIC, Advocates, TSS). Your natural desire is to be deeply connected to all of them, but you can't. If you try to be the 'emotional glue' for that many people, you will burn out. You must shift from creating connection *personally* to creating *systems* that foster connection. You have to build a 'One Elmcrest' culture where the TIPS staff feels as valued as the Residential staff, without you having to have coffee with every single person. You must lead through culture, not just relationship.",
+            "why": "Encouragers scale poorly if they rely on 1:1 connection. At the Director level, they often feel disconnected and guilty because they don't know everyone's name anymore. They might over-focus on the team they like best (the 'in-group') and unintentionally alienate the satellite programs (TIPS/EPIC), creating a fractured culture.",
+            "conversation": "**The 'Town Square' Talk:**\n\n'You can't visit every house in the village every day anymore. You have to build the Town Square where everyone comes together.\n\nYour job is to define the culture that binds AOBH to TIPS to EPIC. Why are we all here? I need you to stop trying to be everyone's friend and start being the symbol of our shared mission. If TIPS feels like the step-child of the agency, that is a cultural failure, and only you can fix it.'",
+            "assignment_setup": "This assignment forces them to use their superpower (connection) at a systemic level rather than an individual level.",
+            "assignment_task": "**The Culture Summit:**\nPlan and lead a joint leadership meeting with the heads of TIPS, EPIC, Advocates, and Residential. \n\nThe goal is not just 'updates'. The goal is to define 3 Shared Values that apply to all departments. You must facilitate this so that the smaller programs feel just as heard as the big ones. Build the bridge.",
+            "success_indicators": "1. The satellite programs spoke as much as Residential.\n2. The values created apply to everyone, not just AOBH.\n3. The Director facilitated, rather than dominated with their own feelings.\n4. There is a concrete plan to roll these values out.",
+            "red_flags": "1. They let the Residential team dominate the room.\n2. They focused on 'fun' rather than 'alignment'.\n3. They avoided the friction between departments to keep the peace.\n4. They left the meeting feeling exhausted from managing everyone's emotions."
         }
     },
     "Facilitator": {
@@ -1321,6 +1347,24 @@ CAREER_PATHWAYS = {
             "assignment_task": "**The Rollout:**\nAssign them to introduce a new (minor but annoying) policy to the team (e.g., a new paperwork requirement). \n\nThey must present it to the team, explain the 'Why' (connecting it to the mission/safety), and handle the objections *without* blaming upper management or promising to 'see if we can change it.' They must hold the line.",
             "success_indicators": "1. They used 'We' language, not 'They' (admin) language.\n2. They validated feelings ('I know this is extra work') without validating refusal.\n3. They kept the focus on the outcome/mission.\n4. The team left understanding that the change is happening.",
             "red_flags": "1. They said 'I know this sucks, but I have to tell you...'\n2. They promised to try to get the rule cancelled.\n3. They let the meeting devolve into a complaining session.\n4. They stayed neutral/silent when staff attacked the policy."
+        },
+        "Manager": {
+            "shift": "**From 'Voice of the People' to 'Voice of the Mission':** As a PS, you were the advocate for your team against the system. As a Manager, you *are* the system. This is an identity crisis for Facilitators. You have to arbitrate disputes between Program Supervisors without 'splitting the difference.' You have to make decisions that favor the agency's long-term health over a specific program's comfort. You must become comfortable with the fact that in every decision, someone will feel unheard or unhappy. You are no longer the mediator; you are the judge.",
+            "why": "Facilitators want everyone to win. In management, resources are finite. Sometimes one program gets the budget and the other doesn't. They struggle to make 'Zero-Sum' decisions. They risk stalling the entire agency by trying to find a solution that pleases everyone.",
+            "conversation": "**The 'Judge' Analogy:**\n\n'A mediator tries to get everyone to agree. A judge looks at the law (mission) and makes a ruling.\n\nYou are now the judge. When two Program Supervisors come to you with a conflict over resources, you can't just tell them to work it out. You have to decide who gets the resource based on the strategic needs of the agency. Someone will lose. That is okay. Your job is to make the decision fair, not to make it popular.'",
+            "assignment_setup": "This assignment forces them to make a resource allocation decision where compromise is impossible.",
+            "assignment_task": "**The Resource War:**\nScenario: We have budget for only one new clinician or one facility upgrade. Program A wants the clinician; Program B wants the upgrade. \n\nDecide which one gets funded. You cannot split the money. You must announce the decision to both PSs and explain the strategic 'Why' without apologizing for the reality of the budget.",
+            "success_indicators": "1. A definitive decision was made.\n2. The decision was tied to strategic data, not just who complained loudest.\n3. They communicated the 'No' to the losing party with clarity and firmness.\n4. They did not try to hide from the fallout.",
+            "red_flags": "1. They tried to 'split the baby' (giving a little to both, satisfying neither).\n2. They delayed the decision hoping more money would appear.\n3. They apologized excessively for the budget reality.\n4. They let the PSs argue it out indefinitely."
+        },
+        "Director": {
+            "shift": "**From 'Consensus Builder' to 'Executive Decider':** You are overseeing 5 distinct departments (AOBH, TIPS, EPIC, Advocates, TSS). They have competing needs and limited resources. You cannot run this by committee. If you wait for TIPS and AOBH to agree on everything, the agency will stall. You must shift from 'bottom-up' listening to 'top-down' direction setting. You are the only one who sees the whole board. You must be willing to make decisions that benefit the whole agency even if it hurts a specific department. You are not a representative of the parts; you are the leader of the whole.",
+            "why": "Facilitators get stuck in the 'Middle'—trying to negotiate between departments. At the Director level, this leads to gridlock. They need to learn that their job isn't to make the departments agree; it's to align them to the mission, even forcibly if necessary.",
+            "conversation": "**The 'Hub and Spoke' Talk:**\n\n'Right now, you are acting like the hub of a wheel, trying to keep all the spokes (departments) happy. That is exhausting and slow.\n\nI need you to be the driver of the car. You decide where we are going. If TIPS wants to go left and EPIC wants to go right, you don't negotiate a middle path. You look at the map and decide. Leadership at this level is about disappointment management. Someone will always be unhappy with your resource allocation. That means you are doing it right.'",
+            "assignment_setup": "This assignment requires them to resolve a structural conflict between departments without compromise.",
+            "assignment_task": "**The Budget Cut:**\nScenario: We have to cut 5% of the operating budget. You have to decide where it comes from. \n\nDo not ask the managers to 'volunteer' cuts (they won't). You must analyze the P&L and make the strategic decision on where to cut to minimize impact on care. Present the decision to the leadership team as a final plan, not a discussion starter.",
+            "success_indicators": "1. The decision was strategic, not just 'across the board' cuts (which is lazy fairness).\n2. They owned the decision completely.\n3. They explained the 'Why' clearly.\n4. They did not let the meeting devolve into bargaining.",
+            "red_flags": "1. They asked everyone to 'share the pain' equally to avoid conflict.\n2. They delayed the decision to 'get more feedback'.\n3. They blamed the cut on the Board/CEO.\n4. They apologized for leading."
         }
     },
     "Tracker": {
@@ -1342,6 +1386,24 @@ CAREER_PATHWAYS = {
             "assignment_task": "**The Workflow Fix:**\nIdentify a process that is currently clunky or inefficient (e.g., shift changeover, incident reporting). Task them with designing a *new*, streamlined version.\n\nThey must map out the current problem, design the new solution, and—most importantly—sell the *efficiency* gain to the team. They cannot just add more rules; they must remove barriers.",
             "success_indicators": "1. The new system is actually simpler/faster, not more complex.\n2. They solicited input from the team on the pain points.\n3. They can explain how the change improves safety/efficiency.\n4. They are excited about the *improvement*, not just the *compliance*.",
             "red_flags": "1. They created a system that is just more paperwork/checklist boxes.\n2. They refused to change the old way because 'it's policy'.\n3. They did not consult the users (staff) about the friction points.\n4. The solution solves a compliance problem but creates an operational nightmare."
+        },
+        "Manager": {
+            "shift": "**From 'Compliance Officer' to 'Risk Manager':** Compliance is black and white—you either followed the rule or you didn't. Risk Management is gray—it is about calculating probabilities and making bets. As a Manager, you have to operate in the gray. You will face situations where every option carries risk (e.g., admitting a high-needs youth to balance the budget vs. denying them to protect staff). You cannot just quote the policy book because the policy book doesn't cover this. You must learn to tolerate the anxiety of not having a perfect answer.",
+            "why": "Trackers want certainty. Management is inherently uncertain. They struggle with ambiguity and 'wicked problems' that have no clean solution. They can become paralyzed by the fear of making a mistake that leads to a lawsuit or audit failure.",
+            "conversation": "**The 'Poker' Analogy:**\n\n'You are used to playing chess where all the pieces are visible. Management is poker. You have to bet on incomplete information.\n\nI need you to stop looking for the 'perfectly safe' option because it doesn't exist. I need you to tell me: 'Option A has 20% risk, Option B has 40% risk.' Then we choose Option A and live with the anxiety. Your job isn't to eliminate risk; it's to manage it.'",
+            "assignment_setup": "This assignment forces them to make a decision where policy offers no clear guidance.",
+            "assignment_task": "**The Gray Zone Admission:**\nScenario: We have a referral for a youth who is a marginal fit (risky behaviors) but we desperately need the census/revenue. \n\nAnalyze the referral. You cannot just say 'No' because of risk. You must design a 'Risk Mitigation Plan' that allows us to take the youth safely. Outline the extra staffing/protocols needed to make the 'Yes' possible.",
+            "success_indicators": "1. They found a pathway to 'Yes' rather than defaulting to 'No'.\n2. The mitigation plan is realistic and detailed.\n3. They quantified the risk rather than just fearing it.\n4. They accepted that some residual risk remains.",
+            "red_flags": "1. They rejected the youth immediately to avoid all risk.\n2. They demanded guarantees of safety that are impossible.\n3. They got stuck in the details of the past history.\n4. They refused to make a recommendation."
+        },
+        "Director": {
+            "shift": "**From 'Risk Manager' to 'Organizational Architect':** You are now responsible for the stability of AOBH, TIPS, EPIC, Advocates, and TSS. The complexity of this system is too high for you to track every detail yourself. If you try to audit every file in 5 departments, you will fail. You must shift from 'inspecting quality' to 'designing systems that ensure quality.' You have to trust the data, not just your eyes. You must build a dashboard that tells you the health of the organization at a glance, and trust your managers to handle the weeds.",
+            "why": "Trackers often try to scale by just working harder/longer. At the Director level, the volume of detail is impossible to manage personally. They risk becoming the bottleneck of the entire agency because they won't sign off on things until they have personally checked them. They need to learn to manage by exception (looking at data outliers) rather than inspection.",
+            "conversation": "**The 'Air Traffic Controller' Talk:**\n\n'You are no longer the mechanic fixing the plane; you are the air traffic controller watching 50 planes at once. \n\nYou cannot go down to the runway to check the tires on every plane. You have to trust your instruments (data). I need you to build me a dashboard that tells me which department is in trouble. Stop trying to read every incident report and start looking for the patterns in the data.'",
+            "assignment_setup": "This assignment forces them to synthesize complex data into a simple, high-level view.",
+            "assignment_task": "**The Master Dashboard:**\nCreate a 1-page weekly report that summarizes the health of AOBH, TIPS, EPIC, and TSS. \n\nYou have to pick only 3 metrics per department (e.g., Census, Incidents, Staffing). You cannot include narrative. You must design the system that gathers this info from the managers automatically. The goal is a 'pulse check', not an autopsy.",
+            "success_indicators": "1. The dashboard is concise (1 page).\n2. They identified the *critical* metrics, not just *all* metrics.\n3. They created a process for managers to submit data (delegation).\n4. They can explain the 'story' the data is telling.",
+            "red_flags": "1. They created a 20-page report.\n2. They are gathering the data themselves instead of making managers do it.\n3. They get stuck on minor inaccuracies.\n4. They cannot see the trend line, only the individual data points."
         }
     }
 }
@@ -1522,11 +1584,11 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         with cc1:
             st.markdown("##### ✅ Do This")
             for b in data['s2_b']:
-                # [CHANGE] Now printing full bullet text to include rationale
+                # Now printing full bullet text to include rationale
                 st.success(b)
         with cc2:
             st.markdown("##### ⛔ Avoid This")
-            # [CHANGE] Updated map with specific rationales
+            # Updated map with specific rationales
             avoid_map = {
                 "Director": [
                     "**Wasting time with small talk:** This signals disrespect for their time.",
@@ -1553,7 +1615,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 st.error(avoid)
         with cc3:
             st.markdown("##### 🔋 Fuel")
-            # [CHANGE] Now printing full bullet text to include rationale
+            # Now printing full bullet text to include rationale
             for b in data['s4_b']:
                  st.info(b)
 
@@ -1647,73 +1709,75 @@ if st.session_state.current_view == "Supervisor's Guide":
             if current_selection in staff_options_list:
                 default_index = staff_options_list.index(current_selection)
 
-            sel = st.selectbox(
-                "Select Staff", 
-                staff_options_list, 
-                index=default_index, 
-                key="t1_staff_select",
-                placeholder="Choose a staff member..."
-            )
-            # --------------------------------------------
-            
-            if sel:
-                d = options[sel]
-                c1,c2,c3 = st.columns(3)
-                c1.metric("Role", d['role']); c2.metric("Style", d['p_comm']); c3.metric("Drive", d['p_mot'])
+            with st.container(border=True):
+                sel = st.selectbox(
+                    "Select Staff", 
+                    staff_options_list, 
+                    index=default_index, 
+                    key="t1_staff_select",
+                    placeholder="Choose a staff member..."
+                )
                 
-                if st.button("Generate Guide", type="primary"):
-                    st.session_state.generated_pdf = create_supervisor_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
-                    st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
-                    st.session_state.generated_name = d['name']
-                    display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
+                if sel:
+                    d = options[sel]
+                    c1,c2,c3 = st.columns(3)
+                    c1.metric("Role", d['role']); c2.metric("Style", d['p_comm']); c3.metric("Drive", d['p_mot'])
+                    
+                    if st.button("Generate Guide", type="primary", use_container_width=True):
+                        st.session_state.generated_pdf = create_supervisor_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
+                        st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
+                        st.session_state.generated_name = d['name']
+                        display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
 
-                if "generated_pdf" in st.session_state and st.session_state.get("generated_name") == d['name']:
-                    st.divider()
-                    st.markdown("#### 📤 Actions")
-                    ac1, ac2 = st.columns([1, 2])
-                    
-                    with ac1:
-                        st.download_button(
-                            label="📥 Download PDF", 
-                            data=st.session_state.generated_pdf, 
-                            file_name=st.session_state.generated_filename, 
-                            mime="application/pdf",
-                            use_container_width=True
-                        )
-                    
-                    with ac2:
-                        with st.popover("📧 Email to Me", use_container_width=True):
-                            email_input = st.text_input("Recipient Email", placeholder="name@elmcrest.org")
-                            if st.button("Send Email"):
-                                if email_input:
-                                    with st.spinner("Sending..."):
-                                        success, msg = send_pdf_via_email(
-                                            to_email=email_input,
-                                            subject=f"Supervisor Guide: {d['name']}",
-                                            body=f"Attached is the Compass Supervisor Guide for {d['name']}.",
-                                            pdf_bytes=st.session_state.generated_pdf,
-                                            filename=st.session_state.generated_filename
-                                        )
-                                        if success: st.success(msg)
-                                        else: st.error(msg)
-                                else:
-                                    st.warning("Please enter an email address.")
-                    
-                st.button("Reset", on_click=reset_t1)
+            if "generated_pdf" in st.session_state and st.session_state.get("generated_name") == d['name']:
+                st.divider()
+                st.markdown("#### 📤 Actions")
+                ac1, ac2 = st.columns([1, 2])
+                
+                with ac1:
+                    st.download_button(
+                        label="📥 Download PDF", 
+                        data=st.session_state.generated_pdf, 
+                        file_name=st.session_state.generated_filename, 
+                        mime="application/pdf",
+                        use_container_width=True
+                    )
+                
+                with ac2:
+                    with st.popover("📧 Email to Me", use_container_width=True):
+                        email_input = st.text_input("Recipient Email", placeholder="name@elmcrest.org")
+                        if st.button("Send Email"):
+                            if email_input:
+                                with st.spinner("Sending..."):
+                                    success, msg = send_pdf_via_email(
+                                        to_email=email_input,
+                                        subject=f"Supervisor Guide: {d['name']}",
+                                        body=f"Attached is the Compass Supervisor Guide for {d['name']}.",
+                                        pdf_bytes=st.session_state.generated_pdf,
+                                        filename=st.session_state.generated_filename
+                                    )
+                                    if success: st.success(msg)
+                                    else: st.error(msg)
+                            else:
+                                st.warning("Please enter an email address.")
+                
+            st.button("Reset", on_click=reset_t1)
 
     # --- MANUAL TAB ---
     with sub2:
-        with st.form("manual"):
-            c1,c2 = st.columns(2)
-            mn = c1.text_input("Name"); mr = c2.selectbox("Role", ["YDP", "Shift Supervisor", "Program Supervisor"])
-            mpc = c1.selectbox("Comm", COMM_TRAITS); mpm = c2.selectbox("Motiv", MOTIV_TRAITS)
-            
-            if st.form_submit_button("Generate") and mn:
-                pdf_manual = create_supervisor_guide(mn, mr, mpc, None, mpm, None)
-                fname_manual = f"Guide_{mn.replace(' ', '_')}.pdf"
-                st.session_state.manual_pdf = pdf_manual
-                st.session_state.manual_fname = fname_manual
-                display_guide(mn, mr, mpc, None, mpm, None)
+        with st.container(border=True):
+            st.info("Use this tab to generate a PDF for someone who isn't in the database yet, without saving them.")
+            with st.form("manual"):
+                c1,c2 = st.columns(2)
+                mn = c1.text_input("Name"); mr = c2.selectbox("Role", ["YDP", "Shift Supervisor", "Program Supervisor"])
+                mpc = c1.selectbox("Comm", COMM_TRAITS); mpm = c2.selectbox("Motiv", MOTIV_TRAITS)
+                
+                if st.form_submit_button("Generate PDF Only") and mn:
+                    pdf_manual = create_supervisor_guide(mn, mr, mpc, None, mpm, None)
+                    fname_manual = f"Guide_{mn.replace(' ', '_')}.pdf"
+                    st.session_state.manual_pdf = pdf_manual
+                    st.session_state.manual_fname = fname_manual
+                    display_guide(mn, mr, mpc, None, mpm, None)
 
         if "manual_pdf" in st.session_state:
             st.divider()
@@ -1738,60 +1802,63 @@ if st.session_state.current_view == "Supervisor's Guide":
 
     # --- [NEW] INPUT OFFLINE DATA TAB ---
     with sub3:
-        st.markdown("### 📥 Input Offline Results")
-        st.info("Use this form to enter results from paper assessments. This will save the data to the Google Sheet and update the database.")
-        
-        with st.form("offline_input_form"):
-            col_a, col_b = st.columns(2)
+        with st.container(border=True):
+            st.markdown("### 📥 Input Offline Results")
+            st.info("Use this form to enter results from paper assessments. This will save the data to the Google Sheet and update the database.")
             
-            with col_a:
-                off_name = st.text_input("Staff Name (Required)")
-                off_email = st.text_input("Email (Optional)")
-                off_role = st.selectbox("Role", ["YDP", "Shift Supervisor", "Program Supervisor", "Clinician", "TSS Staff", "Other"])
-                off_cottage = st.selectbox("Program/Cottage", ["Building 10", "Cottage 2", "Cottage 3", "Cottage 7", "Cottage 8", "Cottage 9", "Cottage 11", "Euclid", "Overnight", "Skeele Valley", "TSS Staff", "Other"])
-            
-            with col_b:
-                st.markdown("**Assessment Results**")
-                off_p_comm = st.selectbox("Primary Communication", COMM_TRAITS, key="off_pc")
-                off_s_comm = st.selectbox("Secondary Communication", COMM_TRAITS, key="off_sc")
-                off_p_mot = st.selectbox("Primary Motivation", MOTIV_TRAITS, key="off_pm")
-                off_s_mot = st.selectbox("Secondary Motivation", MOTIV_TRAITS, key="off_sm")
-            
-            st.markdown("---")
-            if st.form_submit_button("💾 Save to Database", type="primary"):
-                if off_name:
-                    with st.spinner("Saving to Google Sheets..."):
-                        payload = {
-                            "name": off_name,
-                            "email": off_email,
-                            "role": off_role,
-                            "cottage": off_cottage,
-                            "p_comm": off_p_comm,
-                            "s_comm": off_s_comm,
-                            "p_mot": off_p_mot,
-                            "s_mot": off_s_mot
-                        }
-                        
-                        success = submit_data_to_google(payload)
-                        
-                        if success:
-                            st.success(f"Successfully saved {off_name}!")
+            with st.form("offline_input_form"):
+                col_a, col_b = st.columns(2)
+                
+                with col_a:
+                    off_name = st.text_input("Staff Name (Required)")
+                    off_email = st.text_input("Email (Optional)")
+                    off_role = st.selectbox("Role", ["YDP", "Shift Supervisor", "Program Supervisor", "Clinician", "TSS Staff", "Other"])
+                    off_cottage = st.selectbox("Program/Cottage", ["Building 10", "Cottage 2", "Cottage 3", "Cottage 7", "Cottage 8", "Cottage 9", "Cottage 11", "Euclid", "Overnight", "Skeele Valley", "TSS Staff", "Other"])
+                
+                with col_b:
+                    st.markdown("**Assessment Results**")
+                    off_p_comm = st.selectbox("Primary Communication", COMM_TRAITS, key="off_pc")
+                    off_s_comm = st.selectbox("Secondary Communication", COMM_TRAITS, key="off_sc")
+                    off_p_mot = st.selectbox("Primary Motivation", MOTIV_TRAITS, key="off_pm")
+                    off_s_mot = st.selectbox("Secondary Motivation", MOTIV_TRAITS, key="off_sm")
+                
+                st.markdown("---")
+                if st.form_submit_button("💾 Save to Database", type="primary"):
+                    if off_name:
+                        with st.spinner("Saving to Google Sheets..."):
+                            payload = {
+                                "name": off_name,
+                                "email": off_email,
+                                "role": off_role,
+                                "cottage": off_cottage,
+                                "p_comm": off_p_comm,
+                                "s_comm": off_s_comm,
+                                "p_mot": off_p_mot,
+                                "s_mot": off_s_mot
+                            }
                             
-                            # Manually update local session state so we don't have to reload to see them
-                            new_row = payload.copy()
-                            st.session_state.staff_df = pd.concat([st.session_state.staff_df, pd.DataFrame([new_row])], ignore_index=True)
-                            time.sleep(1)
-                            st.rerun()
-                        else:
-                            st.error("Failed to save. Please check your internet connection or the Google Script URL.")
-                else:
-                    st.error("Name is required.")
+                            success = submit_data_to_google(payload)
+                            
+                            if success:
+                                st.success(f"Successfully saved {off_name}!")
+                                
+                                # Manually update local session state so we don't have to reload to see them
+                                new_row = payload.copy()
+                                st.session_state.staff_df = pd.concat([st.session_state.staff_df, pd.DataFrame([new_row])], ignore_index=True)
+                                time.sleep(1)
+                                st.rerun()
+                            else:
+                                st.error("Failed to save. Please check your internet connection or the Google Script URL.")
+                    else:
+                        st.error("Name is required.")
 
 # 2. TEAM DNA
 elif st.session_state.current_view == "Team DNA":
     st.subheader("🧬 Team DNA")
     if not df.empty:
-        teams = st.multiselect("Select Team Members", df['name'].tolist(), key="t2_team_select")
+        with st.container(border=True):
+            teams = st.multiselect("Select Team Members", df['name'].tolist(), key="t2_team_select")
+        
         if teams:
             tdf = df[df['name'].isin(teams)]
             
@@ -1803,10 +1870,10 @@ elif st.session_state.current_view == "Team DNA":
 
             c1, c2 = st.columns(2)
             with c1:
-                # Weighted Communication
-                comm_counts = calculate_weighted_counts(tdf, 'p_comm', 's_comm')
-                
-                st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix (Weighted)", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
+                with st.container(border=True):
+                    # Weighted Communication
+                    comm_counts = calculate_weighted_counts(tdf, 'p_comm', 's_comm')
+                    st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
                 
                 # DOMINANT CULTURE ANALYSIS
                 if not comm_counts.empty:
@@ -1816,22 +1883,24 @@ elif st.session_state.current_view == "Team DNA":
                     
                     if ratio > 0.4: # Slightly lower threshold for weighted dominance
                         guide = TEAM_CULTURE_GUIDE.get(dom_style, {})
-                        st.warning(f"⚠️ **Dominant Culture:** This team is {int(ratio*100)}% **{dom_style}** (incl. secondary styles).")
-                        with st.expander(f"📖 Managing the {guide.get('title', dom_style)}", expanded=True):
-                            st.markdown(f"**The Vibe:**\n{guide.get('impact_analysis')}")
-                            st.markdown(guide.get('management_strategy'))
-                            st.markdown(f"**📋 Meeting Protocol:**\n{guide.get('meeting_protocol')}")
-                            st.info(f"**🎉 Team Building Idea:** {guide.get('team_building')}")
+                        with st.container(border=True):
+                            st.warning(f"⚠️ **Dominant Culture:** This team is {int(ratio*100)}% **{dom_style}** (incl. secondary styles).")
+                            with st.expander(f"📖 Managing the {guide.get('title', dom_style)}", expanded=True):
+                                st.markdown(f"**The Vibe:**\n{guide.get('impact_analysis')}")
+                                st.markdown(guide.get('management_strategy'))
+                                st.markdown(f"**📋 Meeting Protocol:**\n{guide.get('meeting_protocol')}")
+                                st.info(f"**🎉 Team Building Idea:** {guide.get('team_building')}")
                     else:
                         # BALANCED CULTURE
                         guide = TEAM_CULTURE_GUIDE.get("Balanced", {})
-                        st.info("**Balanced Culture:** No single style dominates significantly. This reduces blindspots but may increase friction.")
-                        with st.expander("📖 Managing a Balanced Team", expanded=True):
-                             st.markdown("""**The Balanced Friction:**
-                             A diverse team has no blind spots, but it speaks 4 different languages. Your role is **The Translator**.
-                             * **Translate Intent:** 'The Director isn't being mean; they are being efficient.' 'The Tracker isn't being difficult; they are being safe.'
-                             * **Rotate Leadership:** Let the Director lead the crisis; let the Encourager lead the debrief; let the Tracker lead the audit.
-                             * **Meeting Protocol:** Use structured turn-taking (Round Robin) so the loudest voice doesn't always win.""")
+                        with st.container(border=True):
+                            st.info("**Balanced Culture:** No single style dominates significantly. This reduces blindspots but may increase friction.")
+                            with st.expander("📖 Managing a Balanced Team", expanded=True):
+                                st.markdown("""**The Balanced Friction:**
+                                A diverse team has no blind spots, but it speaks 4 different languages. Your role is **The Translator**.
+                                * **Translate Intent:** 'The Director isn't being mean; they are being efficient.' 'The Tracker isn't being difficult; they are being safe.'
+                                * **Rotate Leadership:** Let the Director lead the crisis; let the Encourager lead the debrief; let the Tracker lead the audit.
+                                * **Meeting Protocol:** Use structured turn-taking (Round Robin) so the loudest voice doesn't always win.""")
 
                 # MISSING VOICE ANALYSIS
                 # Check presence in Primary OR Secondary
@@ -1842,34 +1911,34 @@ elif st.session_state.current_view == "Team DNA":
                 missing_styles = set(COMM_TRAITS) - all_present
                 
                 if missing_styles:
-                    st.markdown("---")
-                    st.error(f"🚫 **Missing Voices:** {', '.join(missing_styles)}")
-                    cols = st.columns(len(missing_styles))
-                    for idx, style in enumerate(missing_styles):
-                        with cols[idx]:
-                             data = MISSING_VOICE_GUIDE.get(style, {})
-                             with st.container(border=True):
-                                 st.markdown(f"**Without a {style}:**")
-                                 st.write(data.get('risk'))
-                                 st.success(f"**Supervisor Fix:** {data.get('fix')}")
+                    with st.container(border=True):
+                        st.error(f"🚫 **Missing Voices:** {', '.join(missing_styles)}")
+                        cols = st.columns(len(missing_styles))
+                        for idx, style in enumerate(missing_styles):
+                            with cols[idx]:
+                                data = MISSING_VOICE_GUIDE.get(style, {})
+                                st.markdown(f"**Without a {style}:**")
+                                st.write(data.get('risk'))
+                                st.success(f"**Supervisor Fix:** {data.get('fix')}")
 
             with c2:
-                # Weighted Motivation
-                mot_counts = calculate_weighted_counts(tdf, 'p_mot', 's_mot')
-                st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers (Weighted)", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
+                with st.container(border=True):
+                    # Weighted Motivation
+                    mot_counts = calculate_weighted_counts(tdf, 'p_mot', 's_mot')
+                    st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
                 
                 # MOTIVATION GAP ANALYSIS
                 if not mot_counts.empty:
                     dom_mot = mot_counts.idxmax()
-                    st.markdown("---")
-                    st.subheader(f"⚠️ Motivation Gap: {dom_mot} Driven")
-                    
-                    # Fetch data from new dictionary
-                    mot_guide = MOTIVATION_GAP_GUIDE.get(dom_mot, {})
-                    if mot_guide:
-                        st.warning(mot_guide['warning'])
-                        with st.expander("💡 Coaching Strategy for this Driver", expanded=True):
-                            st.markdown(mot_guide['coaching'])
+                    with st.container(border=True):
+                        st.subheader(f"⚠️ Motivation Gap: {dom_mot} Driven")
+                        
+                        # Fetch data from new dictionary
+                        mot_guide = MOTIVATION_GAP_GUIDE.get(dom_mot, {})
+                        if mot_guide:
+                            st.warning(mot_guide['warning'])
+                            with st.expander("💡 Coaching Strategy for this Driver", expanded=True):
+                                st.markdown(mot_guide['coaching'])
             
             st.button("Clear", on_click=reset_t2)
 
@@ -1897,9 +1966,10 @@ elif st.session_state.current_view == "Conflict Mediator":
             else:
                 st.error("❌ No API Key Found")
 
-        c1, c2 = st.columns(2)
-        p1 = c1.selectbox("Select Yourself (Supervisor)", df['name'].unique(), index=None, key="p1")
-        p2 = c2.selectbox("Select Staff Member", df['name'].unique(), index=None, key="p2")
+        with st.container(border=True):
+            c1, c2 = st.columns(2)
+            p1 = c1.selectbox("Select Yourself (Supervisor)", df['name'].unique(), index=None, key="p1")
+            p2 = c2.selectbox("Select Staff Member", df['name'].unique(), index=None, key="p2")
         
         if p1 and p2 and p1 != p2:
             d1 = df[df['name']==p1].iloc[0]; d2 = df[df['name']==p2].iloc[0]
@@ -2108,16 +2178,23 @@ elif st.session_state.current_view == "Conflict Mediator":
 elif st.session_state.current_view == "Career Pathfinder":
     st.subheader("🚀 Career Pathfinder")
     if not df.empty:
-        c1, c2 = st.columns(2)
-        cand = c1.selectbox("Candidate", df['name'].unique(), index=None, key="career")
-        role = c2.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor", "Manager"], index=None, key="career_target")
+        with st.container(border=True):
+            c1, c2 = st.columns(2)
+            cand = c1.selectbox("Candidate", df['name'].unique(), index=None, key="career")
+            # [CHANGE] Added "Director" to the list of target roles
+            role = c2.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor", "Manager", "Director"], index=None, key="career_target")
+        
         if cand and role:
             d = df[df['name']==cand].iloc[0]
             style = d['p_comm']
             path = CAREER_PATHWAYS.get(style, {}).get(role)
             if path:
                 st.info(f"**Shift:** {path['shift']}")
-                st.markdown(f"**Why it's hard:** {path['why']}")
+                
+                with st.container(border=True):
+                    st.markdown("### 🧠 The Psychological Block")
+                    st.markdown(f"**Why it's hard:** {path['why']}")
+                
                 c_a, c_b = st.columns(2)
                 with c_a:
                     with st.container(border=True):
@@ -2154,35 +2231,39 @@ elif st.session_state.current_view == "Org Pulse":
         mot_counts = calculate_weighted_pct(df, 'p_mot', 's_mot').sort_values(ascending=False)
         
         # Top Metrics
-        c1, c2, c3 = st.columns(3)
-        if not comm_counts.empty:
-            dom_comm = comm_counts.idxmax()
-            dom_mot = mot_counts.idxmax()
-            c1.metric("Dominant Style (Weighted)", f"{dom_comm} ({int(comm_counts.max())}%)")
-            c2.metric("Top Driver (Weighted)", f"{dom_mot} ({int(mot_counts.max())}%)") 
-            c3.metric("Total Staff Analyzed", total_staff)
+        with st.container(border=True):
+            c1, c2, c3 = st.columns(3)
+            if not comm_counts.empty:
+                dom_comm = comm_counts.idxmax()
+                dom_mot = mot_counts.idxmax()
+                c1.metric("Dominant Style", f"{dom_comm} ({int(comm_counts.max())}%)")
+                c2.metric("Top Driver", f"{dom_mot} ({int(mot_counts.max())}%)") 
+                c3.metric("Total Staff Analyzed", total_staff)
             
-            st.divider()
-            
-            # --- VISUALS ---
-            c_a, c_b = st.columns(2)
-            with c_a: 
-                st.markdown("##### 🗣️ Communication Mix (Weighted)")
+        st.divider()
+        
+        # --- VISUALS ---
+        c_a, c_b = st.columns(2)
+        with c_a: 
+            with st.container(border=True):
+                st.markdown("##### 🗣️ Communication Mix")
                 # Use pre-calculated weighted counts for the chart
                 fig_comm = px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']])
                 st.plotly_chart(fig_comm, use_container_width=True)
-            with c_b: 
-                st.markdown("##### 🔋 Motivation Drivers (Weighted)")
+        with c_b: 
+            with st.container(border=True):
+                st.markdown("##### 🔋 Motivation Drivers")
                 fig_mot = px.bar(x=mot_counts.values, y=mot_counts.index, orientation='h', color_discrete_sequence=[BRAND_COLORS['blue']])
                 st.plotly_chart(fig_mot, use_container_width=True)
 
-            st.divider()
-            st.header("🔍 Deep Organizational Analysis")
-            
-            tab1, tab2, tab3 = st.tabs(["🛡️ Culture Risk Assessment", "🔥 Motivation Strategy", "🌱 Leadership Pipeline Health"])
-            
-            # --- TAB 1: CULTURE RISK ---
-            with tab1:
+        st.divider()
+        st.header("🔍 Deep Organizational Analysis")
+        
+        tab1, tab2, tab3 = st.tabs(["🛡️ Culture Risk Assessment", "🔥 Motivation Strategy", "🌱 Leadership Pipeline Health"])
+        
+        # --- TAB 1: CULTURE RISK ---
+        with tab1:
+            with st.container(border=True):
                 st.markdown(f"### The {dom_comm}-Dominant Culture")
                 
                 if dom_comm == "Director":
@@ -2245,8 +2326,9 @@ elif st.session_state.current_view == "Org Pulse":
                     3.  **Reward Adaptation:** Publicly praise staff who *bent* a rule to save a situation (safely). Show that judgment is valued over blind compliance.
                     """)
 
-            # --- TAB 2: MOTIVATION STRATEGY ---
-            with tab2:
+        # --- TAB 2: MOTIVATION STRATEGY ---
+        with tab2:
+            with st.container(border=True):
                 st.markdown(f"### The Drive: {dom_mot}")
                 
                 if dom_mot == "Achievement":
@@ -2282,6 +2364,7 @@ elif st.session_state.current_view == "Org Pulse":
                     * **Language:** Use words like *Skill, Level Up, Career, Master, Learn.*
                     """)
 
+        # --- TAB 3: PIPELINE HEALTH ---
             # --- TAB 3: PIPELINE HEALTH ---
             with tab3:
                 st.markdown("### Leadership Pipeline Analysis")
@@ -2292,7 +2375,7 @@ elif st.session_state.current_view == "Org Pulse":
                         # Use weighted counts for Leadership Analysis as well
                         l_counts = calculate_weighted_pct(leaders, 'p_comm', 's_comm').sort_values(ascending=False)
                         
-                        st.write("**Leadership Diversity Check (Weighted):**")
+                        st.write("**Leadership Diversity Check:**")
                         c1, c2 = st.columns(2)
                         with c1:
                             st.caption("Leadership Team Mix")
@@ -2312,7 +2395,4 @@ elif st.session_state.current_view == "Org Pulse":
                         st.info("No leadership roles identified in the data set to analyze.")
                 else:
                     st.warning("Role data missing. Cannot analyze pipeline.")
-        else:
-             st.warning("No valid data found for your selection.")
-
     else: st.warning("No data available.")
