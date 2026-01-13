@@ -4,6 +4,7 @@ import requests
 import time
 from fpdf import FPDF
 import smtplib
+import json
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import streamlit.components.v1 as components  # Required for scrolling
@@ -1163,12 +1164,14 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
         pdf.multi_cell(0, 6, clean_text(int_prof['summary']))
         pdf.ln(2)
         
+        # Strengths
         pdf.set_font("Arial", 'B', 11)
         pdf.cell(0, 8, "Strengths:", ln=True, fill=True)
         pdf.set_font("Arial", '', 11)
         for s in int_prof['strengths']: pdf.multi_cell(0, 6, clean_text(f"- {s.replace('**', '')}"))
         pdf.ln(2)
 
+        # Weaknesses
         pdf.set_font("Arial", 'B', 11)
         pdf.cell(0, 8, "Weaknesses:", ln=True, fill=True)
         pdf.set_font("Arial", '', 11)
@@ -1344,7 +1347,17 @@ if st.session_state.step == 'intro':
                             fetched_user = data.get("user_info")
                             fetched_results = data.get("scores")
                             
-                            if not fetched_results:
+                            # [FIX] Handle potential stringified JSON or invalid types
+                            if isinstance(fetched_results, str):
+                                try:
+                                    fetched_results = json.loads(fetched_results)
+                                except:
+                                    pass
+                            
+                            # [FIX] Strict type check
+                            if not isinstance(fetched_results, dict):
+                                st.error(f"Error: Stored data is in an invalid format ({type(fetched_results).__name__}). Please retake the assessment.")
+                            elif not fetched_results:
                                 st.error("Found user but no scores recorded.")
                             else:
                                 st.session_state.user_info = fetched_user
@@ -1522,9 +1535,9 @@ elif st.session_state.step == 'results':
     scroll_to_top()
     st.progress(100)
     
-    # [FIX] Guard clause for missing data
-    if "results" not in st.session_state or st.session_state.results is None:
-        st.error("No results found. Please restart the assessment.")
+    # [FIX] Enhanced Guard clause for missing or corrupted data
+    if "results" not in st.session_state or not isinstance(st.session_state.results, dict):
+        st.error("No valid results found. Please restart the assessment.")
         if st.button("Restart"):
             st.session_state.clear()
             st.rerun()
