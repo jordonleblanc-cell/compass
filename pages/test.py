@@ -958,17 +958,125 @@ def fetch_user_data(email):
     except Exception as e:
         return None
 
-def send_email_via_smtp(to_email, subject, body):
+def generate_html_report(user_info, results, comm_prof, mot_prof, int_prof, role_key, role_labels):
+    """
+    Generates a rich HTML report for email body, mirroring the online dashboard style.
+    """
+    
+    # Generate Cheat Sheet Data
+    cheat_data = generate_profile_content_user(results['primaryComm'], results['primaryMotiv'])
+
+    # CSS for Email (Inline styles are safest for email clients)
+    style_card = "background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);"
+    style_header = "background-color: #1a73e8; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;"
+    style_h2 = "color: #1a73e8; margin-top: 0;"
+    style_h3 = "color: #202124; margin-bottom: 5px; font-size: 16px;"
+    style_list = "margin: 0; padding-left: 20px; color: #5f6368;"
+    
+    # Construct HTML
+    html = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; color: #202124;">
+        
+        <!-- HEADER -->
+        <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; overflow: hidden;">
+            <div style="{style_header}">
+                <h1 style="margin: 0; font-size: 24px;">Elmcrest Leadership Compass</h1>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">Profile Report for {user_info['name']}</p>
+            </div>
+            
+            <div style="padding: 30px;">
+            
+                <!-- SUMMARY CARD -->
+                <div style="{style_card} border-left: 5px solid #1a73e8;">
+                    <h2 style="{style_h2}">Your Profile Snapshot</h2>
+                    <p><strong>Communication Style:</strong> {comm_prof['name']}</p>
+                    <p><strong>Motivation Driver:</strong> {mot_prof['name']}</p>
+                    <p><strong>Leadership Archetype:</strong> {int_prof['title'] if int_prof else 'N/A'}</p>
+                </div>
+
+                <!-- CHEAT SHEET -->
+                <div style="{style_card} background-color: #f8f9fa;">
+                    <h2 style="{style_h2}">⚡ Rapid Interaction Cheat Sheet</h2>
+                    <p style="font-size: 12px; color: #666;">How you operate best:</p>
+                    
+                    <h3 style="color: #34a853;">✅ Your Core Strengths</h3>
+                    <ul style="{style_list}">
+                        {''.join([f"<li>{item}</li>" for item in cheat_data['cheat_strengths']])}
+                    </ul>
+                    
+                    <h3 style="color: #ea4335; margin-top: 15px;">⛔ Potential Blindspots</h3>
+                    <ul style="{style_list}">
+                        {''.join([f"<li>{item}</li>" for item in cheat_data['cheat_blindspots']])}
+                    </ul>
+
+                     <h3 style="color: #1a73e8; margin-top: 15px;">🔋 What Fuels You</h3>
+                    <ul style="{style_list}">
+                        {''.join([f"<li>{item}</li>" for item in cheat_data['cheat_fuel']])}
+                    </ul>
+                </div>
+
+                <!-- COMM DETAILED -->
+                <div style="{style_card}">
+                    <h2 style="{style_h2}">🗣️ Communication: {comm_prof['name']}</h2>
+                    <p>{comm_prof['overview']}</p>
+                    <div style="background-color: #e8f0fe; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                        <strong>Under Stress:</strong> {comm_prof['conflictImpact']}
+                    </div>
+                </div>
+
+                <!-- MOTIV DETAILED -->
+                <div style="{style_card}">
+                    <h2 style="{style_h2}">🔋 Motivation: {mot_prof['name']}</h2>
+                    <p>{mot_prof['summary']}</p>
+                    
+                    <h3 style="{style_h3}">Boosters (Energizers)</h3>
+                    <ul style="{style_list}">
+                        {''.join([f"<li>{b}</li>" for b in mot_prof['boosters']])}
+                    </ul>
+                    
+                    <h3 style="{style_h3}; margin-top: 10px;">Drainers (De-energizers)</h3>
+                    <ul style="{style_list}">
+                        {''.join([f"<li>{k}</li>" for k in mot_prof['killers']])}
+                    </ul>
+                </div>
+                
+                <!-- INTEGRATED -->
+                <div style="{style_card}">
+                    <h2 style="{style_h2}">🔗 Integrated Leadership</h2>
+                    <p><strong>{int_prof['title'] if int_prof else ''}</strong></p>
+                    <p>{int_prof['summary'] if int_prof else ''}</p>
+                    
+                    <h3 style="{style_h3}">Strategic Development Roadmap</h3>
+                    <ul style="{style_list}">
+                        {''.join([f"<li>{r}</li>" for r in int_prof.get('roadmap', [])]) if int_prof else ''}
+                    </ul>
+                </div>
+
+                <div style="text-align: center; color: #999; font-size: 12px; margin-top: 20px;">
+                    <p>Generated by Elmcrest Leadership Compass</p>
+                </div>
+            
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return html
+
+def send_email_via_smtp(to_email, subject, html_content):
     try:
         # Requires secrets.toml setup
         sender_email = st.secrets["EMAIL_USER"]
         sender_password = st.secrets["EMAIL_PASSWORD"]
         
-        msg = MIMEMultipart()
+        msg = MIMEMultipart('alternative')
         msg['From'] = sender_email
         msg['To'] = to_email
         msg['Subject'] = subject
-        msg.attach(MIMEText(body, 'plain'))
+        
+        # Attach HTML content
+        msg.attach(MIMEText(html_content, 'html'))
         
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
@@ -979,49 +1087,6 @@ def send_email_via_smtp(to_email, subject, body):
     except Exception as e:
         st.error(f"Email Error: {e}")
         return False
-
-def generate_text_report(user_info, results, comm_prof, mot_prof, int_prof, role_key, role_labels):
-    lines = [f"Elmcrest Leadership Compass PROFILE FOR {user_info['name'].upper()}", "="*40, ""]
-    
-    # Comm
-    lines.append(f"COMMUNICATION STYLE: {comm_prof['name']}")
-    lines.append(f"Tagline: {comm_prof['tagline']}")
-    lines.append(f"Overview: {comm_prof['overview']}")
-    lines.append(f"Under Stress: {comm_prof['conflictImpact']}")
-    lines.append("")
-    lines.append("ROLE TIPS:")
-    tips = comm_prof['roleTips'][role_key]
-    lines.append(f"* With {role_labels['directReportsLabel']}: {tips['directReports']}")
-    lines.append(f"* With {role_labels['youthLabel']}: {tips['youth']}")
-    lines.append(f"* With {role_labels['supervisorLabel']}: {tips['supervisor']}")
-    lines.append(f"* With {role_labels['leadershipLabel']}: {tips['leadership']}")
-    lines.append("")
-    
-    # Motiv
-    lines.append(f"MOTIVATION DRIVER: {mot_prof['name']}")
-    lines.append(f"Tagline: {mot_prof['tagline']}")
-    lines.append(f"Summary: {mot_prof['summary']}")
-    lines.append("Boosters (Energizers):")
-    for b in mot_prof['boosters']: lines.append(f"* {b}")
-    lines.append("Drainers (De-energizers):")
-    for k in mot_prof['killers']: lines.append(f"* {k}")
-    lines.append(f"Support Needed: {mot_prof['roleSupport'][role_key]}")
-    lines.append("")
-    
-    # Integrated
-    if int_prof:
-        lines.append(f"INTEGRATED PROFILE: {int_prof['title']}")
-        lines.append(int_prof['summary'])
-        lines.append("\nSTRENGTHS:")
-        for s in int_prof['strengths']: lines.append(f"- {s}")
-        lines.append("\nWEAKNESSES:")
-        for w in int_prof['weaknesses']: lines.append(f"- {w}")
-        lines.append("\nCOMMUNICATION ARCHITECTURE:")
-        for ca in int_prof['comm_arch']: lines.append(f"- {ca}")
-        lines.append("\nSTRATEGIC DEVELOPMENT ROADMAP:")
-        for r in int_prof['roadmap']: lines.append(f"- {r}")
-        
-    return "\n".join(lines)
 
 # [CHANGE] Updated Generator Helper for PDF and UI consistency
 def generate_profile_content_user(comm, motiv):
@@ -1594,9 +1659,10 @@ elif st.session_state.step == 'results':
         st.download_button("📄 Download PDF Report", data=pdf_bytes, file_name=file_name_str, mime="application/pdf")
     with c2:
         if st.button("📧 Email Me Full Report"):
-            full_text = generate_text_report(user, res, comm_prof, mot_prof, int_prof, role_key, role_labels)
+            # [CHANGE] Now calls the HTML generator function
+            full_html = generate_html_report(user, res, comm_prof, mot_prof, int_prof, role_key, role_labels)
             with st.spinner("Sending..."):
-                if send_email_via_smtp(user['email'], "Your Elmcrest Leadership Compass Profile", full_text):
+                if send_email_via_smtp(user['email'], "Your Elmcrest Leadership Compass Profile", full_html):
                     st.success("Sent!")
 
     st.markdown("---")
