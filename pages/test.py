@@ -1025,36 +1025,60 @@ def generate_text_report(user_info, results, comm_prof, mot_prof, int_prof, role
 
 # [CHANGE] Updated Generator Helper for PDF and UI consistency
 def generate_profile_content_user(comm, motiv):
-    c_data = COMM_PROFILES.get(comm, {})
     m_data = MOTIVATION_PROFILES.get(motiv, {})
     
-    avoid_map = {
+    # Self-Coaching Blindspots (Internal View)
+    blindspot_map = {
         "Director": [
-            "**Wasting time with small talk:** This signals disrespect for my time.",
-            "**Vague answers:** I interpret ambiguity as incompetence.",
-            "**Micromanaging:** This signals you don't trust my capability."
+            "**Pace Mismatch:** You likely process faster than your team. Pause to let them catch up.",
+            "**Steamrolling:** You may accidentally silence quiet voices. Explicitly ask for input.",
+            "**Intensity:** Your directness can feel like aggression. Soften your approach."
         ],
         "Encourager": [
-            "**Public criticism:** This feels like a rejection of my identity.",
-            "**Ignoring feelings:** I view emotion as data; ignoring it misses the point.",
-            "**Transactional talk:** Skipping the 'hello' makes me feel used."
+            "**The 'Nice' Trap:** You might avoid hard feedback to keep the peace. Remember: Clarity is kind.",
+            "**Over-Promising:** Your optimism can lead to committing to things you can't deliver.",
+            "**Taking it Personally:** You tend to view professional critique as personal rejection."
         ],
         "Facilitator": [
-            "**Pushing for instant decisions:** This feels reckless and unsafe to me.",
-            "**Aggressive confrontation:** This shuts me down instantly.",
-            "**Dismissing group concerns:** This violates my core value of fairness."
+            "**Analysis Paralysis:** You wait for 100% consensus. Sometimes a 51% decision is needed.",
+            "**Conflict Avoidance:** You may delay necessary conflict, letting issues fester.",
+            "**Indecision:** In a crisis, the team needs a command, not a committee."
         ],
         "Tracker": [
-            "**Vague instructions:** This triggers anxiety about 'doing it wrong'.",
-            "**Asking to break policy:** This feels unethical and unsafe to me.",
-            "**Chaos/Disorganization:** I cannot respect a leader who is messy."
+            "**Rigidity:** You may prioritize the rule over the relationship. Context matters.",
+            "**The Weeds:** You get lost in details and miss the big picture or the human element.",
+            "**Risk Aversion:** Your fear of mistakes can stifle necessary innovation."
+        ]
+    }
+
+    # Strengths Map (Internal View)
+    strength_map = {
+        "Director": [
+            "**Decisive Action:** You provide clarity and direction when things feel chaotic.",
+            "**Momentum:** You keep things moving and prevent stagnation.",
+            "**Problem Solving:** You view obstacles as challenges to be overcome, not dead ends."
+        ],
+        "Encourager": [
+            "**Morale Building:** You are the emotional glue that holds the team together.",
+            "**Optimism:** You see potential in people and situations where others see failure.",
+            "**Connection:** You make people feel seen, valued, and safe."
+        ],
+        "Facilitator": [
+            "**Consensus Building:** You ensure everyone feels heard, increasing long-term buy-in.",
+            "**De-escalation:** Your calm presence lowers the temperature in the room.",
+            "**Fairness:** You look at decisions from all angles to ensure equity."
+        ],
+        "Tracker": [
+            "**Accuracy:** You ensure we don't make sloppy mistakes that hurt the agency.",
+            "**Consistency:** You provide the stability and routine that traumatized youth need.",
+            "**Process:** You build the systems that allow the work to happen smoothly."
         ]
     }
 
     return {
-        "cheat_do": c_data.get('supervising_bullets', []),
-        "cheat_avoid": avoid_map.get(comm, []),
-        "cheat_fuel": m_data.get('strategies_bullets', [])
+        "cheat_strengths": strength_map.get(comm, []),
+        "cheat_blindspots": blindspot_map.get(comm, []),
+        "cheat_fuel": m_data.get('boosters', [])
     }
 
 def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role_labels):
@@ -1082,7 +1106,7 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
     
     pdf.set_fill_color(240, 240, 240)
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, "Rapid Interaction Cheat Sheet (How to work with me)", ln=True, fill=True, align='C')
+    pdf.cell(0, 10, "Personal Leadership Cheat Sheet", ln=True, fill=True, align='C')
     pdf.ln(2)
 
     def print_cheat_column(title, items, color_rgb):
@@ -1096,9 +1120,9 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
             pdf.multi_cell(0, 5, clean_text(f"- {clean_item}"))
         pdf.ln(2)
 
-    print_cheat_column("DO THIS (My Communication Style):", data['cheat_do'], green)
-    print_cheat_column("AVOID THIS (My Triggers):", data['cheat_avoid'], red)
-    print_cheat_column("FUEL (My Motivation):", data['cheat_fuel'], blue)
+    print_cheat_column("YOUR CORE STRENGTHS:", data['cheat_strengths'], green)
+    print_cheat_column("YOUR BLINDSPOTS:", data['cheat_blindspots'], red)
+    print_cheat_column("WHAT FUELS YOU:", data['cheat_fuel'], blue)
     
     pdf.ln(5)
     pdf.line(10, pdf.get_y(), 200, pdf.get_y()) # Horizontal line
@@ -1606,11 +1630,11 @@ elif st.session_state.step == 'results':
     with st.expander("⚡ Rapid Interaction Cheat Sheet (How others experience you)", expanded=True):
         cc1, cc2, cc3 = st.columns(3)
         with cc1:
-            st.markdown("##### ✅ Your Natural Style")
-            for b in cheat_data['cheat_do']: st.success(b)
+            st.markdown("##### ✅ Your Core Strengths")
+            for b in cheat_data['cheat_strengths']: st.success(b)
         with cc2:
-            st.markdown("##### ⛔ Your Potential Blindspots")
-            for avoid in cheat_data['cheat_avoid']: st.error(avoid)
+            st.markdown("##### ⛔ Potential Blindspots")
+            for avoid in cheat_data['cheat_blindspots']: st.error(avoid)
         with cc3:
             st.markdown("##### 🔋 What Fuels You")
             for b in cheat_data['cheat_fuel']: st.info(b)
