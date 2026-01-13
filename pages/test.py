@@ -7,6 +7,8 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import streamlit.components.v1 as components  # Required for scrolling
+import pandas as pd
+import plotly.express as px
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
@@ -87,7 +89,7 @@ st.markdown("""
         }
 
         /* CARDS */
-        div[data-testid="stForm"], .info-card, div[data-testid="stExpander"] {
+        div[data-testid="stForm"], .info-card, div[data-testid="stExpander"], div[data-testid="stContainer"] {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
@@ -186,6 +188,15 @@ st.markdown("""
 
 # --- 3. CONSTANTS & DATA ---
 
+BRAND_COLORS = {
+    "blue": "#1a73e8",
+    "green": "#34a853",
+    "teal": "#12b5cb",
+    "gray": "#5f6368",
+    "red": "#ea4335",
+    "yellow": "#fbbc04"
+}
+
 ROLE_RELATIONSHIP_LABELS = {
     "Program Supervisor": {"directReportsLabel": "Shift Supervisors", "youthLabel": "youth on your units", "supervisorLabel": "Residential Programs Manager", "leadershipLabel": "agency leadership"},
     "Shift Supervisor": {"directReportsLabel": "YDPs", "youthLabel": "youth you support", "supervisorLabel": "Program Supervisor", "leadershipLabel": "agency leadership"},
@@ -274,6 +285,11 @@ COMM_PROFILES = {
         "overview": "<strong>Core Style:</strong> You blend decisive, crisis-ready leadership with a bias for action. You are likely to set direction quickly and then rally people to move with you. You prioritize efficiency and competence, often serving as the 'adult in the room' who keeps things calm while making necessary calls. You rarely suffer from 'analysis paralysis,' preferring to make a wrong decision that can be fixed rather than no decision at all.<br><br><strong>Your Superpower:</strong> In high-pressure moments, you step in and organize. Staff see you as fair and decisive—they know you will act, so they aren't stuck in limbo. When everyone else is panicking, your clarity acts as an anchor.",
         "conflictImpact": "Under stress, you may move faster than staff can realistically integrate, making them feel like they are always 'behind' or incompetent. You might default to control before curiosity, issuing orders rather than asking questions.",
         "traumaStrategy": "Your consistency and clear boundaries can be regulating for youth who need predictability, though some may find your intensity intimidating. Traumatized brains often crave structure to feel safe.",
+        "supervising_bullets": [
+            "**Be Concise:** Get to the point immediately.",
+            "**Focus on Outcomes:** Tell them what needs to be achieved, leave the how to them.",
+            "**Respect Autonomy:** Give them space to operate independently."
+        ],
         "roleTips": {
             "Program Supervisor": {
                 "directReports": "Before finalizing a decision, ask Shift Supervisors: 'What are we not seeing from the floor?' and genuinely pause to listen. Your speed can sometimes silence their hesitation.",
@@ -301,6 +317,11 @@ COMM_PROFILES = {
         "overview": "<strong>Core Style:</strong> You lead with enthusiasm, vision, and warmth. You act as the emotional glue of the team, paying attention to how people feel and ensuring they feel seen and supported. You help change feel both human and organized. You are likely the person others come to when they are discouraged.<br><br><strong>Your Superpower:</strong> You keep the 'why' of the work alive when others are exhausted. You are often the one who notices and names growth in youth or staff.",
         "conflictImpact": "You may avoid giving sharp feedback because you don't want to discourage someone or damage the relationship. You might also overcommit your emotional energy when many people need you, leading to 'empathy fatigue'.",
         "traumaStrategy": "Your ability to foster belonging helps youth feel that adults are approachable, kind, and on their side. For youth who expect rejection or harshness, your consistent warmth disrupts their negative worldview.",
+        "supervising_bullets": [
+            "**Allow Discussion:** Need the relational runway to take off.",
+            "**Ask for Specifics:** Drill down to find the reality beneath the enthusiasm.",
+            "**Follow Up in Writing:** Document the boring parts for them."
+        ],
         "roleTips": {
             "Program Supervisor": {
                 "directReports": "Create explicit space for them to say no or negotiate capacity: 'If this feels like too much right now, tell me and we'll prioritize.' Your enthusiasm can sometimes feel like pressure.",
@@ -328,6 +349,11 @@ COMM_PROFILES = {
         "overview": "<strong>Core Style:</strong> You prefer to listen first and build consensus. You blend a calm, listening posture with a genuine desire to keep relationships steady. You create calmer, more predictable environments. You operate on the belief that the collective wisdom of the group is stronger than any single directive.<br><br><strong>Your Superpower:</strong> You de-escalate tension by staying steady and non-threatening. People feel safe bringing mistakes or worries to you without fear of shame.",
         "conflictImpact": "You might stay neutral too long when a strong stance is needed, hoping the group will self-correct. You may quietly carry moral distress or frustration without voicing it.",
         "traumaStrategy": "Your steady presence helps youth feel safe enough to open up, especially when they aren't ready for intensity. Hyper-vigilant youth often scan for aggression; your low-affect, calm demeanor signals 'no threat'.",
+        "supervising_bullets": [
+            "**Advance Notice:** Give them time to think before asking for a decision.",
+            "**Deadlines:** Set clear 'decision dates' to prevent endless deliberation.",
+            "**Solicit Opinion:** Ask them explicitly what they think during meetings."
+        ],
         "roleTips": {
             "Program Supervisor": {
                 "directReports": "Name explicitly when you are shifting from listening mode to decision mode: 'I've heard the input; here's the decision.' Staff may assume the decision is still up for debate unless you clearly mark the transition.",
@@ -355,6 +381,11 @@ COMM_PROFILES = {
         "overview": "<strong>Core Style:</strong> You lead with structure, detail, and a strong respect for procedure. You want plans to be sound and aligned before you move. You believe the path to success is through good systems and accurate work.<br><br><strong>Your Superpower:</strong> You protect youth and staff by ensuring documentation and procedures support ethical, safe care. You notice small patterns that could become big risks. You check the smoke detectors to ensure the fire doesn't happen.",
         "conflictImpact": "You may feel intolerant of what looks like carelessness in others, interpreting a missed checkbox as a lack of care. You can focus so much on accurate reporting that you under-communicate empathy.",
         "traumaStrategy": "Your consistency creates a predictable environment that feels safe for youth with trauma histories. Chaos is a trigger for trauma; your ability to create order acts as a soothing balm for dysregulated nervous systems.",
+        "supervising_bullets": [
+            "**Be Specific:** Give the metric, not vague encouragement.",
+            "**Provide Data:** Bring the numbers and the facts to persuade.",
+            "**Written Instructions:** Follow up verbal conversation with an email."
+        ],
         "roleTips": {
             "Program Supervisor": {
                 "directReports": "Occasionally invite rough drafts: 'Bring me your early thoughts, not just the final proposal.' Perfectionism can silence your team; show them you value their raw ideas too.",
@@ -383,6 +414,11 @@ MOTIVATION_PROFILES = {
         "name": "Growth Motivation",
         "tagline": "The Learner/Builder",
         "summary": "You are fueled by learning and development that clearly connects to the mission. You're hungry to improve and want to keep leveling up how you and your team support youth. You view every shift as a classroom and every challenge as a curriculum; stagnation is your enemy, and competence is your currency.",
+        "strategies_bullets": [
+            "**Stretch Assignments:** Tasks slightly above current skill level.",
+            "**Career Pathing:** Regular discussion of professional future.",
+            "**Mentorship:** Connection with leaders they admire."
+        ],
         "boosters": [
             "**Focused Projects:** Ask for a small number of focused growth projects rather than trying to improve everything at once. You thrive on depth.",
             "**Peer Learning:** You light up when sharing strategies with peers rather than learning alone from a manual. The social aspect validates your expertise.",
@@ -403,6 +439,11 @@ MOTIVATION_PROFILES = {
         "name": "Purpose Motivation",
         "tagline": "The Mission Keeper",
         "summary": "You are driven to make decisions that align with your values and with what's right for youth and staff. You care not just about order, but about justice and integrity. You need to know that your work matters in a cosmic sense; you can endure difficult shifts if you believe the work is meaningful.",
+        "strategies_bullets": [
+            "**The Why:** Explain the mission behind every mandate.",
+            "**Storytelling:** Share narratives of redemption and impact.",
+            "**Ethics:** Allow space to voice moral concerns."
+        ],
         "boosters": [
             "**Value Alignment:** You are motivated when goals align with safety, healing, and justice for youth. When you can see a direct line between a task and a youth's dignity, you have infinite energy.",
             "**Advocacy:** You thrive when advocating for youth or staff when something is not in their best interest. Being the 'voice for the voiceless' gives you a rush of purpose.",
@@ -423,6 +464,11 @@ MOTIVATION_PROFILES = {
         "name": "Connection Motivation",
         "tagline": "The Community Builder",
         "summary": "You are fueled by strong relationships and a sense of 'we're in this together'. You make staff feel less alone in the hard work and foster a climate where it's okay to ask for help. For you, the *people* are the work. You believe that a healthy team can handle any crisis.",
+        "strategies_bullets": [
+            "**Face Time:** Prioritize in-person check-ins.",
+            "**Team Rituals:** Encourage meals, huddles, and traditions.",
+            "**Personal Care:** Ask about life outside work."
+        ],
         "boosters": [
             "**Reflective Space:** You need regular reflective space, not just task-focused check-ins. You need time to process the 'emotional residue' of the shift.",
             "**Shared Wins:** You are motivated by seeing the whole team succeed, not just being the 'star'. A high-five after a successful group intervention means more to you than an award.",
@@ -443,6 +489,11 @@ MOTIVATION_PROFILES = {
         "name": "Achievement Motivation",
         "tagline": "The Results Architect",
         "summary": "You are results-focused and decisive. You want to see tangible improvements in safety, documentation, and outcomes. You believe the path to success is through good systems and accurate work. You treat the unit like a puzzle to be solved.",
+        "strategies_bullets": [
+            "**Visual Goals:** Use charts, dashboards, or checklists.",
+            "**Public Wins:** Acknowledge success in front of peers.",
+            "**Autonomy:** Give them the goal and let them design the strategy."
+        ],
         "boosters": [
             "**Clear Goals:** You like clear indicators that your effort is making a difference. 'Reduce incidents by 10%' is motivating because it has a finish line.",
             "**Data & Progress:** You are strong at tracking metrics and helping the team adjust based on data. Seeing a graph go in the right direction gives you a dopamine hit.",
@@ -454,7 +505,7 @@ MOTIVATION_PROFILES = {
             "**Slow Progress:** You judge yourself harshly when progress is slower than you'd like. You tend to take systemic failures as personal failures."
         ],
         "roleSupport": {
-            "Program Supervisor": "Set process goals (e.g., 'We debriefed every incident') not just outcome goals (e.g., 'Fewer incidents').",
+            "Program Supervisor": "Set process goals (e.g., 'We debrief every incident') not just outcome goals (e.g., 'Fewer incidents').",
             "Shift Supervisor": "Partner with clinicians to define realistic pacing for youth progress so you don't burn out.",
             "YDP": "Ask your supervisor to help you differentiate between what is in your control and what is system-level."
         }
@@ -971,12 +1022,48 @@ def generate_text_report(user_info, results, comm_prof, mot_prof, int_prof, role
         
     return "\n".join(lines)
 
+# [CHANGE] Updated Generator Helper for PDF and UI consistency
+def generate_profile_content_user(comm, motiv):
+    c_data = COMM_PROFILES.get(comm, {})
+    m_data = MOTIVATION_PROFILES.get(motiv, {})
+    
+    avoid_map = {
+        "Director": [
+            "**Wasting time with small talk:** This signals disrespect for my time.",
+            "**Vague answers:** I interpret ambiguity as incompetence.",
+            "**Micromanaging:** This signals you don't trust my capability."
+        ],
+        "Encourager": [
+            "**Public criticism:** This feels like a rejection of my identity.",
+            "**Ignoring feelings:** I view emotion as data; ignoring it misses the point.",
+            "**Transactional talk:** Skipping the 'hello' makes me feel used."
+        ],
+        "Facilitator": [
+            "**Pushing for instant decisions:** This feels reckless and unsafe to me.",
+            "**Aggressive confrontation:** This shuts me down instantly.",
+            "**Dismissing group concerns:** This violates my core value of fairness."
+        ],
+        "Tracker": [
+            "**Vague instructions:** This triggers anxiety about 'doing it wrong'.",
+            "**Asking to break policy:** This feels unethical and unsafe to me.",
+            "**Chaos/Disorganization:** I cannot respect a leader who is messy."
+        ]
+    }
+
+    return {
+        "cheat_do": c_data.get('supervising_bullets', []),
+        "cheat_avoid": avoid_map.get(comm, []),
+        "cheat_fuel": m_data.get('strategies_bullets', [])
+    }
+
 def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role_labels):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
     
-    blue = (0, 122, 255) # iOS Blue
+    blue = (26, 115, 232)
+    green = (52, 168, 83)
+    red = (234, 67, 53)
     black = (0, 0, 0)
     
     # Header
@@ -989,6 +1076,34 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
     pdf.cell(0, 8, clean_text(f"Prepared for: {user_info['name']} | Role: {user_info['role']}"), ln=True, align='C')
     pdf.ln(5)
     
+    # --- [CHANGE] Cheat Sheet Section Added ---
+    data = generate_profile_content_user(results['primaryComm'], results['primaryMotiv'])
+    
+    pdf.set_fill_color(240, 240, 240)
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(0, 10, "Rapid Interaction Cheat Sheet (How to work with me)", ln=True, fill=True, align='C')
+    pdf.ln(2)
+
+    def print_cheat_column(title, items, color_rgb):
+        pdf.set_font("Arial", 'B', 12)
+        pdf.set_text_color(*color_rgb)
+        pdf.cell(0, 8, title, ln=True)
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_font("Arial", '', 10)
+        for item in items:
+            clean_item = item.replace("**", "")
+            pdf.multi_cell(0, 5, clean_text(f"- {clean_item}"))
+        pdf.ln(2)
+
+    print_cheat_column("DO THIS (My Communication Style):", data['cheat_do'], green)
+    print_cheat_column("AVOID THIS (My Triggers):", data['cheat_avoid'], red)
+    print_cheat_column("FUEL (My Motivation):", data['cheat_fuel'], blue)
+    
+    pdf.ln(5)
+    pdf.line(10, pdf.get_y(), 200, pdf.get_y()) # Horizontal line
+    pdf.ln(5)
+    
+    # --- Original Content Resumes ---
     # Comm
     pdf.set_font("Arial", 'B', 14)
     pdf.set_text_color(*blue)
@@ -996,7 +1111,6 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
     pdf.set_font("Arial", '', 11)
     pdf.set_text_color(*black)
     
-    # Fix for bolding: Replace HTML strong tags
     overview_text = comm_prof['overview'].replace("<strong>", "").replace("</strong>", "").replace("<br><br>", "\n\n")
     pdf.multi_cell(0, 6, clean_text(overview_text))
     pdf.ln(3)
@@ -1417,6 +1531,9 @@ elif st.session_state.step == 'results':
     mot_prof = MOTIVATION_PROFILES[res['primaryMotiv']]
     int_key = f"{res['primaryComm']}-{res['primaryMotiv']}"
     int_prof = INTEGRATED_PROFILES.get(int_key)
+    
+    # Generate content for cheat sheet
+    cheat_data = generate_profile_content_user(res['primaryComm'], res['primaryMotiv'])
 
     # --- ACTION BAR ---
     c1, c2 = st.columns(2)
@@ -1436,6 +1553,44 @@ elif st.session_state.step == 'results':
                     st.success("Sent!")
 
     st.markdown("---")
+    
+    # --- [NEW] VISUALIZATION SECTION ---
+    with st.container(border=True):
+        st.subheader("📊 Profile At-A-Glance")
+        vc1, vc2 = st.columns(2)
+        
+        with vc1:
+            # 1. COMMUNICATION RADAR
+            # Use real scores from the assessment results
+            radar_df = pd.DataFrame(dict(r=list(res['commScores'].values()), theta=list(res['commScores'].keys())))
+            fig_comm = px.line_polar(radar_df, r='r', theta='theta', line_close=True, title="Communication Footprint", range_r=[0,30])
+            fig_comm.update_traces(fill='toself', line_color=BRAND_COLORS['blue'])
+            fig_comm.update_layout(height=300, margin=dict(t=30, b=30, l=30, r=30))
+            st.plotly_chart(fig_comm, use_container_width=True)
+            
+        with vc2:
+            # 2. MOTIVATION BATTERY
+            # Use real scores from the assessment results
+            sorted_mot = dict(sorted(res['motivScores'].items(), key=lambda item: item[1], reverse=True))
+            mot_df = pd.DataFrame(dict(Driver=list(sorted_mot.keys()), Intensity=list(sorted_mot.values())))
+            
+            fig_mot = px.bar(mot_df, x="Intensity", y="Driver", orientation='h', title="Motivation Drivers", color="Intensity", color_continuous_scale=[BRAND_COLORS['gray'], BRAND_COLORS['blue']])
+            fig_mot.update_layout(height=300, showlegend=False, margin=dict(t=30, b=30, l=30, r=30))
+            fig_mot.update_xaxes(visible=False)
+            st.plotly_chart(fig_mot, use_container_width=True)
+
+    # --- [NEW] CHEAT SHEET SECTION ---
+    with st.expander("⚡ Rapid Interaction Cheat Sheet (How others experience you)", expanded=True):
+        cc1, cc2, cc3 = st.columns(3)
+        with cc1:
+            st.markdown("##### ✅ Your Natural Style")
+            for b in cheat_data['cheat_do']: st.success(b)
+        with cc2:
+            st.markdown("##### ⛔ Your Potential Blindspots")
+            for avoid in cheat_data['cheat_avoid']: st.error(avoid)
+        with cc3:
+            st.markdown("##### 🔋 What Fuels You")
+            for b in cheat_data['cheat_fuel']: st.info(b)
 
     # --- COMM SECTION ---
     st.markdown(f"### 🗣️ {comm_prof['name']}")
