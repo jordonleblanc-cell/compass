@@ -1885,7 +1885,7 @@ elif st.session_state.current_view == "Team DNA":
                 with st.container(border=True):
                     # Weighted Communication
                     comm_counts = calculate_weighted_counts(tdf, 'p_comm', 's_comm')
-                    st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix ", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
+                    st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix (Weighted)", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
                 
                 # DOMINANT CULTURE ANALYSIS
                 if not comm_counts.empty:
@@ -1937,7 +1937,7 @@ elif st.session_state.current_view == "Team DNA":
                 with st.container(border=True):
                     # Weighted Motivation
                     mot_counts = calculate_weighted_counts(tdf, 'p_mot', 's_mot')
-                    st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers ", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
+                    st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers (Weighted)", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
                 
                 # MOTIVATION GAP ANALYSIS
                 if not mot_counts.empty:
@@ -2230,7 +2230,7 @@ elif st.session_state.current_view == "Career Pathfinder":
 elif st.session_state.current_view == "Org Pulse":
     st.subheader("📈 Organization Pulse")
     if not df.empty:
-        # --- DATA PREP  ---
+        # --- DATA PREP (Weighted) ---
         total_staff = len(df)
         
         def calculate_weighted_pct(dframe, p_col, s_col):
@@ -2248,8 +2248,8 @@ elif st.session_state.current_view == "Org Pulse":
             if not comm_counts.empty:
                 dom_comm = comm_counts.idxmax()
                 dom_mot = mot_counts.idxmax()
-                c1.metric("Dominant Style ", f"{dom_comm} ({int(comm_counts.max())}%)")
-                c2.metric("Top Driver ", f"{dom_mot} ({int(mot_counts.max())}%)") 
+                c1.metric("Dominant Style (Weighted)", f"{dom_comm} ({int(comm_counts.max())}%)")
+                c2.metric("Top Driver (Weighted)", f"{dom_mot} ({int(mot_counts.max())}%)") 
                 c3.metric("Total Staff Analyzed", total_staff)
             
         st.divider()
@@ -2258,13 +2258,13 @@ elif st.session_state.current_view == "Org Pulse":
         c_a, c_b = st.columns(2)
         with c_a: 
             with st.container(border=True):
-                st.markdown("##### 🗣️ Communication Mix ")
+                st.markdown("##### 🗣️ Communication Mix (Weighted)")
                 # Use pre-calculated weighted counts for the chart
                 fig_comm = px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']])
                 st.plotly_chart(fig_comm, use_container_width=True)
         with c_b: 
             with st.container(border=True):
-                st.markdown("##### 🔋 Motivation Drivers ")
+                st.markdown("##### 🔋 Motivation Drivers (Weighted)")
                 fig_mot = px.bar(x=mot_counts.values, y=mot_counts.index, orientation='h', color_discrete_sequence=[BRAND_COLORS['blue']])
                 st.plotly_chart(fig_mot, use_container_width=True)
 
@@ -2387,7 +2387,7 @@ elif st.session_state.current_view == "Org Pulse":
                         # Use weighted counts for Leadership Analysis as well
                         l_counts = calculate_weighted_pct(leaders, 'p_comm', 's_comm').sort_values(ascending=False)
                         
-                        st.write("**Leadership Diversity Check :**")
+                        st.write("**Leadership Diversity Check (Weighted):**")
                         c1, c2 = st.columns(2)
                         with c1:
                             st.caption("Leadership Team Mix")
