@@ -1252,7 +1252,6 @@ SUPERVISOR_CLASH_MATRIX = {
 CAREER_PATHWAYS = {
     "Director": {
         "Shift Supervisor": {
-            # ... existing content ...
             "shift": "**From 'Individual Hero' to 'Orchestra Conductor':** This transition requires a fundamental rewiring of how you define value. As a YDP, you were the MVP—the fastest, strongest problem solver who could dive into any chaos and fix it. Your worth was tied to your personal output. As a Supervisor, your 'hero' instincts are now a liability. If you dive in, you leave the team without a leader. You must shift from being the player who scores the points to the coach who designs the plays. This means suppressing the urge to 'just do it myself' and instead investing energy into directing, observing, and correcting others. Your new win condition is not 'I fixed it,' but 'The team fixed it because I guided them.'",
             "why": "This is an identity crisis. As a YDP, the Director was valued for their speed, their ability to put out fires, and their 'do it myself' competence. They were the MVP player. Now, as a supervisor, their job is to stay on the sidelines and call the plays. They often feel useless when they aren't physically doing the work. They fear that if they don't step in, the team will fail or be too slow. This anxiety drives them to micromanage or 'rescue' the team, which stunts the team's growth and leads to supervisor burnout.",
             "conversation": "**The 'Hands in Pockets' Talk:**\n\n'Your value has changed. Yesterday, I paid you to be the fastest runner on the field. Today, I am paying you to make sure everyone else knows where to run. \n\nEvery time you jump in to fix a problem for a staff member, you are stealing a learning opportunity from them. You are teaching them that they don't need to be competent because you will save them. \n\nI need you to practice 'strategic patience.' Watch them struggle for 30 seconds before you intervene. Guide them with questions ('What do you think we should do?'), not commands. Your goal is to make yourself unnecessary.'",
@@ -1263,7 +1262,6 @@ CAREER_PATHWAYS = {
             "supervisor_focus": "Watch for their anxiety levels. Are they vibrating with the need to 'do'? Debrief that anxiety—it's the core of their development."
         },
         "Program Supervisor": {
-            # ... existing content ...
             "shift": "**From 'Operational General' to 'Strategic Architect':** You have mastered the art of the daily grind, but the Program Supervisor role demands a longer horizon. You can no longer just fight today's battles; you must design the war strategy for next year. This shift requires you to stop prioritizing immediate efficiency over long-term health. You must learn to value the 'soft' work—culture building, emotional mentoring, and slow policy implementation—as much as the 'hard' work of audits and schedules. If you run the program like a machine, you will burn out the parts (your people). You must learn to be a gardener: preparing the soil, planting seeds, and waiting patiently for growth, rather than pulling on plants to make them grow faster.",
             "why": "Directors excel at execution. They love checking boxes and hitting daily targets. However, the Program Supervisor role requires long-term thinking, culture building, and developing people over months, not minutes. They struggle to see the value in 'soft' work like mentoring or culture building because it doesn't have an immediate, visible result. They risk running a highly efficient program that burns out staff because they treat people like parts of a machine.",
             "conversation": "**The 'Gardener' Analogy:**\n\n'You are excellent at building machines, but a team is a garden. You can't force a plant to grow faster by pulling on it. You have to create the right environment—soil, sun, water—and wait.\n\nYour job is no longer just to hit the metrics today. Your job is to build a team that can hit the metrics a year from now. This means you have to prioritize mentoring over doing. You have to tolerate short-term inefficiency for long-term growth. If you burn out your people to hit a number, you have failed.'",
@@ -1273,7 +1271,6 @@ CAREER_PATHWAYS = {
             "red_flags": "1. The Director just did the task for them to 'save time'.\n2. The staff member feels steamrolled or criticized.\n3. The Director complains that the staff member is 'too slow' or 'doesn't get it'.\n4. The Director cannot explain *why* the staff member struggled, only *that* they struggled."
         },
         "Manager": {
-            # ... existing content ...
             "shift": "**From 'Battle Commander' to 'Diplomat & Strategist':** As a Program Supervisor, you led the troops. As a Manager, you lead the Generals. You can no longer rely on 'command and control' because your direct reports (Program Supervisors) are strong leaders who need autonomy. Your value shifts from 'solving the problem' to 'managing the politics and resources so *they* can solve the problem.' You must move from tactical execution to organizational strategy. You have to care about the agency's liability, public image, and budget as much as the kids. You must learn to lose small battles to win the war.",
             "why": "Directors want to fix the crisis *now*. At the Manager level, 'fixing it now' might cause a lawsuit or a budget crisis later. They struggle with the red tape and the indirect influence. They get frustrated that they can't just 'order' a Program Supervisor to change culture. They have to learn to influence through questions and vision, not just authority.",
             "conversation": "**The 'Chess Player' Talk:**\n\n'You are used to playing checkers—fast moves, jumping opponents, clear wins. Management is chess. You have to think five moves ahead.\n\nYour job is no longer to run the floor. Your job is to protect the agency so the floor can exist. This means you will spend less time with kids and more time with spreadsheets, lawyers, and angry parents. You have to be okay with not being the hero in the moment. You are the architect of the system.'",
@@ -1294,7 +1291,6 @@ CAREER_PATHWAYS = {
     },
     "Encourager": {
         "Shift Supervisor": {
-            # ... existing content ...
             "shift": "**From 'Best Friend' to 'Respected Leader':** This is the most emotionally taxing shift you will make. Your natural strength is connection, and you likely built your influence by being the person everyone feels safe with—the 'Best Friend.' Leadership requires you to trade some of that intimacy for respect. You must accept that you cannot be both their peer and their boss. The shift involves realizing that true kindness is not about keeping people happy in the moment; it is about holding them to a standard that keeps them employed and the youth safe. You must move from 'protecting feelings' to 'protecting the mission,' even if that means making your friends uncomfortable.",
             "why": "This is the hardest shift for an Encourager. Their primary motivation is Connection—they want to be liked and part of the tribe. Becoming a supervisor separates them from the peer group. They fear that if they give feedback or enforce rules, they will be rejected or seen as 'mean.' This leads to the 'Cool Parent' trap, where they let standards slide to buy affection, eventually losing the team's respect and safety.",
             "conversation": "**The 'Kindness vs. Niceness' Distinction:**\n\n'You are prioritizing being *nice* over being *kind*. \n\nBeing nice is about saving yourself from awkwardness. It's selfish. \nBeing kind is about telling someone the truth so they can be successful. It's selfless.\n\nWhen you let a peer break a rule because you don't want to upset them, you are setting them up to be fired by me later. That is not friendship. True care is holding them to a standard that keeps them employed and keeps kids safe. You have to be willing to be 'the bad guy' to be a good leader.'",
@@ -1305,7 +1301,6 @@ CAREER_PATHWAYS = {
             "supervisor_focus": "Watch for the 'apology tour' afterwards. Ensure they sit in the discomfort of the boundary they just set."
         },
         "Program Supervisor": {
-            # ... existing content ...
             "shift": "**From 'Team Cheerleader' to 'Culture Architect':** As a Program Supervisor, your 'niceness' can become a toxicity if not tempered with courage. You are no longer just boosting morale; you are the immune system of the program culture. This means you must be willing to identify and remove toxic elements, even if they are popular. The shift requires you to stop seeing conflict as a failure of leadership and start seeing it as a tool for clarity. You must transition from being the person who absorbs the team's stress to the person who sets the boundaries that prevent stress. You are not just there to hug the team; you are there to build a house where the team can thrive, which requires firm walls.",
             "why": "Encouragers are great at maintaining morale, but Program Supervisors need to *build* culture, which often involves pruning toxic elements. Encouragers struggle to fire people, put people on performance plans, or make unpopular decisions that are best for the program. They can become 'toxic protectors,' shielding bad staff from accountability to keep the peace, which rots the culture from the inside.",
             "conversation": "**The 'Protect the Hive' Talk:**\n\n'You love this team, and that is your superpower. But right now, by protecting the underperformers, you are hurting your high performers. \n\nYour high performers are tired of carrying the load for the people you won't hold accountable. They are waiting for you to lead. If you value the team, you have to protect the *standard* of the team, not just the feelings of the individual. Leadership is not about making everyone happy today; it's about making the team healthy forever.'",
@@ -1315,7 +1310,6 @@ CAREER_PATHWAYS = {
             "red_flags": "1. They framed it as 'a suggestion' or 'something we should try'.\n2. They apologized for the new rule.\n3. They let the team debate the rule until it lost all teeth.\n4. They ended the meeting by seeking reassurance ('Is everyone okay with me?')."
         },
         "Manager": {
-            # ... existing content ...
             "shift": "**From 'Nurturer' to 'Protector of the Agency':** The hardest truth for an Encourager at the Manager level is that you cannot save everyone. You are responsible for the survival of the entire residential program, not just the happiness of the staff. This means making cold, hard decisions—cutting budgets, firing popular but ineffective leaders, or closing programs—to ensure the agency survives. You must move from 'personal care' to 'systemic care.' You have to protect the agency from liability even if it means being the 'bad guy' to the staff.",
             "why": "Encouragers define success by how people feel. Managers often have to make decisions that make people feel bad (for a while) to ensure the agency is safe. They struggle with the 'distance' required at the Manager level. They can't be friends with the Program Supervisors in the same way. They risk burnout by absorbing the emotional weight of the entire agency.",
             "conversation": "**The 'Surgeon' Analogy:**\n\n'A surgeon cannot cry while they are cutting. It doesn't mean they don't care; it means they are focused on saving the life.\n\nAs a Manager, you are the surgeon. If you let a toxic Program Supervisor stay because you like them, the infection spreads to the whole campus. You have to love the mission more than you love being liked. Your compassion must be for the 100 kids we serve, not just the one staff member in your office crying.'",
@@ -1336,7 +1330,6 @@ CAREER_PATHWAYS = {
     },
     "Facilitator": {
         "Shift Supervisor": {
-            # ... existing content ...
             "shift": "**From 'Consensus Builder' to 'Decision Maker':** Your gift for listening and ensuring everyone feels heard is vital for culture, but it can be fatal in a crisis. The shift requires you to abandon the need for 100% agreement. In the Supervisor role, 'good enough and fast' is often better than 'perfect and slow.' You must learn to recognize the moment when discussion ends and command begins. This feels unnatural and perhaps even 'mean' to you, but you must reframe decisiveness as safety. The team feels unsafe when they don't know who is driving the bus. Your new goal is not to make everyone happy with the decision, but to make everyone safe with the direction.",
             "why": "Facilitators are excellent at hearing all sides and ensuring fairness. However, in a crisis or fast-paced shift, this strength becomes a weakness: 'Analysis Paralysis.' They delay making necessary decisions because they are waiting for everyone to agree, or they try to find a 'perfect' solution that upsets no one. On a shift, a good decision *now* is better than a perfect decision *later*. They need to get comfortable with the 51% decision.",
             "conversation": "**The 'Captain of the Ship' Analogy:**\n\n'When the seas are calm, we can vote on where to go for dinner. When the ship is hitting an iceberg, you don't call a meeting; you give an order.\n\nYour team feels unsafe when you hesitate. They aren't looking for a vote; they are looking for a leader. I need you to practice making calls when you only have 60% of the information and 0% of the consensus. If you are wrong, we will fix it together. But you cannot be frozen.'",
@@ -1347,7 +1340,6 @@ CAREER_PATHWAYS = {
             "supervisor_focus": "Validate their *decision-making capability*. They need to know you trust their gut so they can trust it too."
         },
         "Program Supervisor": {
-            # ... existing content ...
             "shift": "**From 'Mediator' to 'Driver of Change':** You naturally seek equilibrium and stability, acting as the bridge between conflicting parties. However, a Program Supervisor often needs to *disrupt* the equilibrium to force growth. You must shift from being the neutral peacekeeper to the active driver of unpopular but necessary changes. This means you cannot just validate the staff's resistance to new admin policies; you must champion the 'Why' behind the change. You must become comfortable with the team being temporarily unhappy with you for the sake of their long-term development. Leadership is not just about servicing the team's current desires; it is about leading them to a new reality.",
             "why": "Facilitators naturally want to balance the system and keep it stable. As a Program Supervisor, they often need to *disrupt* the system to improve it. They struggle to roll out unpopular changes or enforce new mandates from above because they empathize too deeply with the staff's resistance. They can become 'message carriers' ('Admin said we have to...') rather than leaders who own the mission.",
             "conversation": "**The 'Sales vs. Service' Shift:**\n\n'You are used to servicing the team's needs. Now, I need you to sell them on a new reality. \n\nWe are implementing [New Protocol]. The team is going to hate it at first. Your job is not just to validate their complaints until the protocol dies. Your job is to listen, acknowledge, and then *lead them through the change*. You cannot stay neutral. You have to own this change as if it were your idea. You are the driver, not the passenger.'",
@@ -1357,7 +1349,6 @@ CAREER_PATHWAYS = {
             "red_flags": "1. They said 'I know this sucks, but I have to tell you...'\n2. They promised to try to get the rule cancelled.\n3. They let the meeting devolve into a complaining session.\n4. They stayed neutral/silent when staff attacked the policy."
         },
         "Manager": {
-            # ... existing content ...
             "shift": "**From 'Voice of the People' to 'Voice of the Mission':** As a PS, you were the advocate for your team against the system. As a Manager, you *are* the system. This is an identity crisis for Facilitators. You have to arbitrate disputes between Program Supervisors without 'splitting the difference.' You have to make decisions that favor the agency's long-term health over a specific program's comfort. You must become comfortable with the fact that in every decision, someone will feel unheard or unhappy. You are no longer the mediator; you are the judge.",
             "why": "Facilitators want everyone to win. In management, resources are finite. Sometimes one program gets the budget and the other doesn't. They struggle to make 'Zero-Sum' decisions. They risk stalling the entire agency by trying to find a solution that pleases everyone.",
             "conversation": "**The 'Judge' Analogy:**\n\n'A mediator tries to get everyone to agree. A judge looks at the law (mission) and makes a ruling.\n\nYou are now the judge. When two Program Supervisors come to you with a conflict over resources, you can't just tell them to work it out. You have to decide who gets the resource based on the strategic needs of the agency. Someone will lose. That is okay. Your job is to make the decision fair, not to make it popular.'",
@@ -1378,7 +1369,6 @@ CAREER_PATHWAYS = {
     },
     "Tracker": {
         "Shift Supervisor": {
-            # ... existing content ...
             "shift": "**From 'Rule Enforcer' to 'Adaptive Leader':** You find safety in the black-and-white clarity of the rulebook. The shift to Supervisor thrusts you into the gray world of human emotion and crisis management. You must learn that the policy is a map, but the terrain (the actual situation) determines the path. The transition requires you to prioritize the *outcome* (safety/connection) over the *process* (strict compliance). You must learn to ask 'What does this kid need right now?' before asking 'What does page 42 say?' This doesn't mean abandoning rules; it means mastering them so well that you know exactly when to bend them to save a situation.",
             "why": "Trackers find safety in the black-and-white rulebook. As supervisors, they struggle with the 'gray'. They can become rigid 'policy robots' who quote the handbook while the building burns down. They risk losing the team's trust because they prioritize compliance over context. They need to learn that the rule is the map, but the territory (the reality of human behavior) is what matters.",
             "conversation": "**The 'Spirit of the Law' Talk:**\n\n'You know the rules better than anyone. That is your strength. But leadership is about knowing when the rule serves the mission and when it blocks it.\n\nIf you enforce a rule in a way that escalates a kid into a crisis, you have failed the mission of safety, even if you were 'right' on paper. I need you to develop your intuition. I need you to read the room, not just the manual. Compliance is the baseline; safety and connection are the goal.'",
@@ -1389,7 +1379,6 @@ CAREER_PATHWAYS = {
             "supervisor_focus": "Praise their flexibility. They need permission to color outside the lines when it serves the mission."
         },
         "Program Supervisor": {
-            # ... existing content ...
             "shift": "**From 'Guardian' to 'Architect':** You are excellent at maintaining the integrity of existing systems. The Program Supervisor role, however, requires you to *break* systems that no longer work and build better ones. You must shift from a mindset of 'preservation' to 'innovation.' This is difficult because change feels like risk to you. You must learn to see inefficiency as a bigger threat than change. Your job is not just to ensure the forms are filled out correctly; it is to ask if we even need that form at all. You must become the designer of the machine, not just its mechanic.",
             "why": "Trackers are excellent at maintaining existing systems. However, Program Supervisors need to *build* new systems and improve broken ones. Trackers often resist change because change feels like chaos/risk. They can become bottlenecks who stifle innovation because 'we've always done it this way.' They need to shift from protecting the status quo to designing better ways to work.",
             "conversation": "**The 'System Upgrade' Talk:**\n\n'You are great at keeping the train on the tracks. But now I need you to build a better track.\n\nI want you to look at our systems not as sacred laws, but as tools. Some of them are broken. Some are slow. Your job is not just to make people follow the process; it's to fix the process so it's easier to follow. I need you to stop saying 'no' to new ideas and start asking 'how can we make this work safely?''",
@@ -1399,7 +1388,6 @@ CAREER_PATHWAYS = {
             "red_flags": "1. They created a system that is just more paperwork/checklist boxes.\n2. They refused to change the old way because 'it's policy'.\n3. They did not consult the users (staff) about the friction points.\n4. The solution solves a compliance problem but creates an operational nightmare."
         },
         "Manager": {
-            # ... existing content ...
             "shift": "**From 'Compliance Officer' to 'Risk Manager':** Compliance is black and white—you either followed the rule or you didn't. Risk Management is gray—it is about calculating probabilities and making bets. As a Manager, you have to operate in the gray. You will face situations where every option carries risk (e.g., admitting a high-needs youth to balance the budget vs. denying them to protect staff). You cannot just quote the policy book because the policy book doesn't cover this. You must learn to tolerate the anxiety of not having a perfect answer.",
             "why": "Trackers want certainty. Management is inherently uncertain. They struggle with ambiguity and 'wicked problems' that have no clean solution. They can become paralyzed by the fear of making a mistake that leads to a lawsuit or audit failure.",
             "conversation": "**The 'Poker' Analogy:**\n\n'You are used to playing chess where all the pieces are visible. Management is poker. You have to bet on incomplete information.\n\nI need you to stop looking for the 'perfectly safe' option because it doesn't exist. I need you to tell me: 'Option A has 20% risk, Option B has 40% risk.' Then we choose Option A and live with the anxiety. Your job isn't to eliminate risk; it's to manage it.'",
@@ -1885,7 +1873,7 @@ elif st.session_state.current_view == "Team DNA":
                 with st.container(border=True):
                     # Weighted Communication
                     comm_counts = calculate_weighted_counts(tdf, 'p_comm', 's_comm')
-                    st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix (Weighted)", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
+                    st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
                 
                 # DOMINANT CULTURE ANALYSIS
                 if not comm_counts.empty:
@@ -1937,7 +1925,7 @@ elif st.session_state.current_view == "Team DNA":
                 with st.container(border=True):
                     # Weighted Motivation
                     mot_counts = calculate_weighted_counts(tdf, 'p_mot', 's_mot')
-                    st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers (Weighted)", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
+                    st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
                 
                 # MOTIVATION GAP ANALYSIS
                 if not mot_counts.empty:
@@ -2248,8 +2236,8 @@ elif st.session_state.current_view == "Org Pulse":
             if not comm_counts.empty:
                 dom_comm = comm_counts.idxmax()
                 dom_mot = mot_counts.idxmax()
-                c1.metric("Dominant Style (Weighted)", f"{dom_comm} ({int(comm_counts.max())}%)")
-                c2.metric("Top Driver (Weighted)", f"{dom_mot} ({int(mot_counts.max())}%)") 
+                c1.metric("Dominant Style", f"{dom_comm} ({int(comm_counts.max())}%)")
+                c2.metric("Top Driver", f"{dom_mot} ({int(mot_counts.max())}%)") 
                 c3.metric("Total Staff Analyzed", total_staff)
             
         st.divider()
@@ -2258,13 +2246,13 @@ elif st.session_state.current_view == "Org Pulse":
         c_a, c_b = st.columns(2)
         with c_a: 
             with st.container(border=True):
-                st.markdown("##### 🗣️ Communication Mix (Weighted)")
+                st.markdown("##### 🗣️ Communication Mix")
                 # Use pre-calculated weighted counts for the chart
                 fig_comm = px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']])
                 st.plotly_chart(fig_comm, use_container_width=True)
         with c_b: 
             with st.container(border=True):
-                st.markdown("##### 🔋 Motivation Drivers (Weighted)")
+                st.markdown("##### 🔋 Motivation Drivers")
                 fig_mot = px.bar(x=mot_counts.values, y=mot_counts.index, orientation='h', color_discrete_sequence=[BRAND_COLORS['blue']])
                 st.plotly_chart(fig_mot, use_container_width=True)
 
@@ -2377,8 +2365,8 @@ elif st.session_state.current_view == "Org Pulse":
                     """)
 
         # --- TAB 3: PIPELINE HEALTH ---
-        with tab3:
-            with st.container(border=True):
+            # --- TAB 3: PIPELINE HEALTH ---
+            with tab3:
                 st.markdown("### Leadership Pipeline Analysis")
                 if 'role' in df.columns:
                     # Compare Leadership Composition to General Staff
@@ -2387,7 +2375,7 @@ elif st.session_state.current_view == "Org Pulse":
                         # Use weighted counts for Leadership Analysis as well
                         l_counts = calculate_weighted_pct(leaders, 'p_comm', 's_comm').sort_values(ascending=False)
                         
-                        st.write("**Leadership Diversity Check (Weighted):**")
+                        st.write("**Leadership Diversity Check:**")
                         c1, c2 = st.columns(2)
                         with c1:
                             st.caption("Leadership Team Mix")
