@@ -430,7 +430,6 @@ COMM_TRAITS = ["Director", "Encourager", "Facilitator", "Tracker"]
 MOTIV_TRAITS = ["Achievement", "Growth", "Purpose", "Connection"]
 
 # --- MASTER DATA PROFILES ---
-# (Content dictionaries are retained exactly as requested)
 COMM_PROFILES = {
     "Director": {
         "bullets": [
@@ -1181,7 +1180,7 @@ SUPERVISOR_CLASH_MATRIX = {
         },
         "Tracker": {
             "tension": "Consensus vs. Compliance (People vs. Policy)",
-            "psychology": "You (Facilitator) want the team to agree. They (Tracker) want the team to follow the rule. You feel they are being rigid 'robots'. They feel you are treating safety rules as 'suggestions' to make people happy.",
+            "psychology": "You (Facilitator) want to talk it out. They (Tracker) want to get it done. You feel steamrolled and disrespected. They feel slowed down and frustrated by 'pointless' discussion.",
             "watch_fors": ["**The Policy War:** They quote the handbook; you quote the 'context'.", "**Ignoring:** You ignoring their emails because they feel like nagging.", "**Anxiety:** They get anxious when you say 'let's just see how it goes'."],
             "intervention_steps": ["**1. Validate the Rule:** Acknowledge the policy first.", "**2. Contextualize the Exception:** Explain *why* this specific situation requires a bend.", "**3. Define the New Boundary:** Create a temporary rule so they feel safe."],
             "scripts": {
@@ -1419,12 +1418,34 @@ def generate_profile_content(comm, motiv):
     m_data = MOTIV_PROFILES.get(motiv, {})
     i_data = INTEGRATED_PROFILES.get(combo_key, {})
 
+    avoid_map = {
+        "Director": [
+            "**Wasting time with small talk:** This signals disrespect for their time.",
+            "**Vague answers:** They interpret ambiguity as incompetence.",
+            "**Micromanaging:** This signals you don't trust their capability."
+        ],
+        "Encourager": [
+            "**Public criticism:** This feels like a rejection of their identity.",
+            "**Ignoring feelings:** They view emotion as data; ignoring it misses the point.",
+            "**Transactional talk:** Skipping the 'hello' makes them feel used."
+        ],
+        "Facilitator": [
+            "**Pushing for instant decisions:** This feels reckless and unsafe to them.",
+            "**Aggressive confrontation:** This shuts them down instantly.",
+            "**Dismissing group concerns:** This violates their core value of fairness."
+        ],
+        "Tracker": [
+            "**Vague instructions:** This triggers anxiety about 'doing it wrong'.",
+            "**Asking to break policy:** This feels unethical and unsafe to them.",
+            "**Chaos/Disorganization:** They cannot respect a leader who is messy."
+        ]
+    }
+
     return {
         "s1_b": c_data.get('bullets'),
         "s2_b": c_data.get('supervising_bullets'),
         "s3_b": m_data.get('bullets'),
         "s4_b": m_data.get('strategies_bullets'),
-        # S5 is Synergy
         "s5": f"**Profile:** {i_data.get('title')}\n\n{i_data.get('synergy')}",
         "s6": i_data.get('support', ''),
         "s7": i_data.get('thriving', ''), # Thriving paragraphs
@@ -1433,7 +1454,12 @@ def generate_profile_content(comm, motiv):
         "s9_b": i_data.get('interventions', []),
         "s10_b": m_data.get('celebrate_bullets'),
         "coaching": i_data.get('questions', []),
-        "advancement": i_data.get('advancement', '')
+        "advancement": i_data.get('advancement', ''),
+        
+        # New keys for cheat sheet consistency
+        "cheat_do": c_data.get('supervising_bullets'),
+        "cheat_avoid": avoid_map.get(comm, []),
+        "cheat_fuel": m_data.get('strategies_bullets')
     }
 
 def clean_text(text):
@@ -1470,15 +1496,47 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
-    blue = (1, 91, 173); black = (0, 0, 0)
+    
+    # Colors
+    blue = (26, 115, 232)
+    green = (52, 168, 83)
+    red = (234, 67, 53)
+    black = (0, 0, 0)
+    gray = (128, 128, 128)
     
     # Header
     pdf.set_font("Arial", 'B', 20); pdf.set_text_color(*blue); pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align='C')
     pdf.set_font("Arial", '', 12); pdf.set_text_color(*black); pdf.cell(0, 8, clean_text(f"For: {name} ({role})"), ln=True, align='C')
-    pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C'); pdf.ln(8)
+    pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C'); pdf.ln(5)
     
     # Generate Data
     data = generate_profile_content(p_comm, p_mot)
+
+    # --- CHEAT SHEET SECTION (NEW) ---
+    pdf.set_fill_color(240, 240, 240)
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(0, 10, "Rapid Interaction Cheat Sheet", ln=True, fill=True, align='C')
+    pdf.ln(2)
+
+    def print_cheat_column(title, items, color_rgb):
+        pdf.set_font("Arial", 'B', 12)
+        pdf.set_text_color(*color_rgb)
+        pdf.cell(0, 8, title, ln=True)
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_font("Arial", '', 10)
+        for item in items:
+            # Clean up bold markdown for PDF
+            clean_item = item.replace("**", "")
+            pdf.multi_cell(0, 5, clean_text(f"- {clean_item}"))
+        pdf.ln(2)
+
+    print_cheat_column("DO THIS (Communication):", data['cheat_do'], green)
+    print_cheat_column("AVOID THIS (Triggers):", data['cheat_avoid'], red)
+    print_cheat_column("FUEL (Motivation):", data['cheat_fuel'], blue)
+    
+    pdf.ln(5)
+    pdf.line(10, pdf.get_y(), 200, pdf.get_y()) # Horizontal line
+    pdf.ln(5)
 
     def add_section(title, body, bullets=None):
         pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
@@ -1531,93 +1589,49 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.markdown(f"### 📘 Supervisory Guide: {name}")
     st.caption(f"Role: {role} | Profile: {p_comm}/{s_comm} • {p_mot}/{s_mot}")
     
-    # --- VISUALIZATION SECTION (NEW) ---
+    # --- VISUALIZATION SECTION ---
     with st.container(border=True):
         st.subheader("📊 Profile At-A-Glance")
         vc1, vc2 = st.columns(2)
         
         with vc1:
             # 1. COMMUNICATION RADAR
-            # Assign weights for visualization
             comm_scores = {"Director": 2, "Encourager": 2, "Facilitator": 2, "Tracker": 2}
             if p_comm in comm_scores: comm_scores[p_comm] = 10
             if s_comm in comm_scores: comm_scores[s_comm] = 7
             
-            # Prepare Data for Plotly
-            radar_df = pd.DataFrame(dict(
-                r=list(comm_scores.values()),
-                theta=list(comm_scores.keys())
-            ))
-            fig_comm = px.line_polar(radar_df, r='r', theta='theta', line_close=True, 
-                                     title="Communication Footprint",
-                                     range_r=[0,10])
+            radar_df = pd.DataFrame(dict(r=list(comm_scores.values()), theta=list(comm_scores.keys())))
+            fig_comm = px.line_polar(radar_df, r='r', theta='theta', line_close=True, title="Communication Footprint", range_r=[0,10])
             fig_comm.update_traces(fill='toself', line_color=BRAND_COLORS['blue'])
             fig_comm.update_layout(height=300, margin=dict(t=30, b=30, l=30, r=30))
             st.plotly_chart(fig_comm, use_container_width=True)
             
         with vc2:
             # 2. MOTIVATION BATTERY
-            # Assign weights
             mot_scores = {"Achievement": 2, "Growth": 2, "Purpose": 2, "Connection": 2}
             if p_mot in mot_scores: mot_scores[p_mot] = 10
             if s_mot in mot_scores: mot_scores[s_mot] = 7
             
-            # Sort for visual hierarchy
             sorted_mot = dict(sorted(mot_scores.items(), key=lambda item: item[1], reverse=True))
+            mot_df = pd.DataFrame(dict(Driver=list(sorted_mot.keys()), Intensity=list(sorted_mot.values())))
             
-            mot_df = pd.DataFrame(dict(
-                Driver=list(sorted_mot.keys()),
-                Intensity=list(sorted_mot.values())
-            ))
-            
-            fig_mot = px.bar(mot_df, x="Intensity", y="Driver", orientation='h', 
-                             title="Motivation Drivers",
-                             color="Intensity",
-                             color_continuous_scale=[BRAND_COLORS['gray'], BRAND_COLORS['blue']])
+            fig_mot = px.bar(mot_df, x="Intensity", y="Driver", orientation='h', title="Motivation Drivers", color="Intensity", color_continuous_scale=[BRAND_COLORS['gray'], BRAND_COLORS['blue']])
             fig_mot.update_layout(height=300, showlegend=False, margin=dict(t=30, b=30, l=30, r=30))
             fig_mot.update_xaxes(visible=False)
             st.plotly_chart(fig_mot, use_container_width=True)
 
-    # --- CHEAT SHEET SECTION (NEW) ---
+    # --- CHEAT SHEET SECTION ---
     with st.expander("⚡ Rapid Interaction Cheat Sheet", expanded=True):
         cc1, cc2, cc3 = st.columns(3)
         with cc1:
             st.markdown("##### ✅ Do This")
-            for b in data['s2_b']:
-                # Now printing full bullet text to include rationale
-                st.success(b)
+            for b in data['cheat_do']: st.success(b)
         with cc2:
             st.markdown("##### ⛔ Avoid This")
-            # Updated map with specific rationales
-            avoid_map = {
-                "Director": [
-                    "**Wasting time with small talk:** This signals disrespect for their time.",
-                    "**Vague answers:** They interpret ambiguity as incompetence.",
-                    "**Micromanaging:** This signals you don't trust their capability."
-                ],
-                "Encourager": [
-                    "**Public criticism:** This feels like a rejection of their identity.",
-                    "**Ignoring feelings:** They view emotion as data; ignoring it misses the point.",
-                    "**Transactional talk:** Skipping the 'hello' makes them feel used."
-                ],
-                "Facilitator": [
-                    "**Pushing for instant decisions:** This feels reckless and unsafe to them.",
-                    "**Aggressive confrontation:** This shuts them down instantly.",
-                    "**Dismissing group concerns:** This violates their core value of fairness."
-                ],
-                "Tracker": [
-                    "**Vague instructions:** This triggers anxiety about 'doing it wrong'.",
-                    "**Asking to break policy:** This feels unethical and unsafe to them.",
-                    "**Chaos/Disorganization:** They cannot respect a leader who is messy."
-                ]
-            }
-            for avoid in avoid_map.get(p_comm, []):
-                st.error(avoid)
+            for avoid in data['cheat_avoid']: st.error(avoid)
         with cc3:
             st.markdown("##### 🔋 Fuel")
-            # Now printing full bullet text to include rationale
-            for b in data['s4_b']:
-                 st.info(b)
+            for b in data['cheat_fuel']: st.info(b)
 
     st.divider()
     
@@ -1639,10 +1653,10 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     c1, c2 = st.columns(2)
     with c1:
         st.subheader("7. Thriving")
-        st.success(data['s7']) # Green box
+        st.success(data['s7']) 
     with c2:
         st.subheader("8. Struggling")
-        st.error(data['s8'])   # Red box
+        st.error(data['s8'])   
     
     st.markdown("<br>", unsafe_allow_html=True)
     show_section("9. Supervisory Interventions", None, data['s9_b'])
@@ -2365,8 +2379,8 @@ elif st.session_state.current_view == "Org Pulse":
                     """)
 
         # --- TAB 3: PIPELINE HEALTH ---
-            # --- TAB 3: PIPELINE HEALTH ---
-            with tab3:
+        with tab3:
+            with st.container(border=True):
                 st.markdown("### Leadership Pipeline Analysis")
                 if 'role' in df.columns:
                     # Compare Leadership Composition to General Staff
