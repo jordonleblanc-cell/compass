@@ -1346,7 +1346,7 @@ if st.session_state.step == 'intro':
     scroll_to_top()
     
     show_brand_header("Communication & Motivation Snapshot")
-    st.markdown("#### Welcome")
+    st.markdown("#### Welcome!")
     # Tighter welcome message
     st.markdown("This assessment helps you understand your natural patterns at work. Your insights will shape a personalized profile built to support your growth.")
     
