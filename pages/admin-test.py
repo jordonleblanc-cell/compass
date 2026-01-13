@@ -2193,7 +2193,8 @@ elif st.session_state.current_view == "Career Pathfinder":
         with st.container(border=True):
             c1, c2 = st.columns(2)
             cand = c1.selectbox("Candidate", df['name'].unique(), index=None, key="career")
-            role = c2.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor", "Manager"], index=None, key="career_target")
+            # [CHANGE] Added "Director" to the list of target roles
+            role = c2.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor", "Manager", "Director"], index=None, key="career_target")
         
         if cand and role:
             d = df[df['name']==cand].iloc[0]
