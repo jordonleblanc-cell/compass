@@ -1163,14 +1163,12 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
         pdf.multi_cell(0, 6, clean_text(int_prof['summary']))
         pdf.ln(2)
         
-        # Strengths
         pdf.set_font("Arial", 'B', 11)
         pdf.cell(0, 8, "Strengths:", ln=True, fill=True)
         pdf.set_font("Arial", '', 11)
         for s in int_prof['strengths']: pdf.multi_cell(0, 6, clean_text(f"- {s.replace('**', '')}"))
         pdf.ln(2)
 
-        # Weaknesses
         pdf.set_font("Arial", 'B', 11)
         pdf.cell(0, 8, "Weaknesses:", ln=True, fill=True)
         pdf.set_font("Arial", '', 11)
@@ -1346,12 +1344,15 @@ if st.session_state.step == 'intro':
                             fetched_user = data.get("user_info")
                             fetched_results = data.get("scores")
                             
-                            st.session_state.user_info = fetched_user
-                            st.session_state.results = fetched_results
-                            st.session_state.step = 'results'
-                            st.success("Results loaded! Redirecting...")
-                            time.sleep(1)
-                            st.rerun()
+                            if not fetched_results:
+                                st.error("Found user but no scores recorded.")
+                            else:
+                                st.session_state.user_info = fetched_user
+                                st.session_state.results = fetched_results
+                                st.session_state.step = 'results'
+                                st.success("Results loaded! Redirecting...")
+                                time.sleep(1)
+                                st.rerun()
                         else:
                             st.error("No results found for this email, or database connection failed.")
                 else:
@@ -1520,6 +1521,15 @@ elif st.session_state.step == 'processing':
 elif st.session_state.step == 'results':
     scroll_to_top()
     st.progress(100)
+    
+    # [FIX] Guard clause for missing data
+    if "results" not in st.session_state or st.session_state.results is None:
+        st.error("No results found. Please restart the assessment.")
+        if st.button("Restart"):
+            st.session_state.clear()
+            st.rerun()
+        st.stop()
+
     res = st.session_state.results
     user = st.session_state.user_info
     role_key = normalize_role_key(user['role'])
