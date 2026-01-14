@@ -1505,20 +1505,80 @@ def generate_profile_content(comm, motiv):
 
     integrated_profile_text = "\n".join([p for p in integrated_profile_lines if p])
 
+    # --- Expanded but non-duplicative section intros (keeps bullets for readability + PDF formatting) ---
+    comm_quick = " ".join([kp for kp in comm_keypoints[:2] if kp]).strip()
+    motiv_quick = " ".join([kp for kp in motiv_keypoints[:2] if kp]).strip()
+
+    s1_text = f"**Quick read:** {comm_quick}" if comm_quick else ""
+    s2_text = (
+        "Use the moves below as your default operating system with them. "
+        "When you need to correct course, change *one variable at a time* (clarity, tone, timing, or channel) "
+        "so they can feel the difference and adapt quickly."
+    )
+
+    s3_text = f"**Quick read:** {motiv_quick}" if motiv_quick else ""
+    s4_text = (
+        "These strategies keep their internal engine running. "
+        "Pick 1–2 approaches and apply them consistently for 2–3 weeks before adding anything new."
+    )
+
+    support_base = (i_data.get('support', '') or '').strip()
+    support_overlay = [
+        "**Support cadence that usually works well:**",
+        "- **Weekly:** quick 5–10 minute alignment (priorities, obstacles, support needed).",
+        "- **Monthly:** deeper coaching (patterns, growth edge, skill-building plan).",
+        "- **As-needed:** reset after incidents—facts first, then impact, then next steps."
+    ]
+    s6_text = (support_base + ("\n\n" if support_base else "") + "\n".join(support_overlay)).strip()
+
+    s9_text = (
+        "Interventions work best when they follow a predictable ladder: **clarify → coach → document → escalate**. "
+        "Start with the *least intensive* step that protects residents, the team, and compliance—then move up quickly if "
+        "there’s no behavior change or if safety is at risk."
+    )
+
+    s10_text = (
+        "Celebrate the behaviors you want repeated. Keep recognition **specific** (what they did), **impact-based** "
+        "(who it helped / what improved), and **timely** (within the week when possible)."
+    )
+
+    coaching_intro = (
+        "Use these as a 10–15 minute coaching flow: pick **2–3 questions**, listen for patterns, then agree on "
+        "**one next action** and **one check-in date**."
+    )
+
+    advancement_base = (i_data.get('advancement', '') or '').strip()
+    advancement_overlay = [
+        "**Advancement levers to emphasize:**",
+        "- **Reliability at the next level:** predictable follow-through on priorities and documentation.",
+        "- **Influence without authority:** guiding peers through tone, clarity, and consistency.",
+        "- **Systems thinking:** spotting root causes and proposing small, testable improvements."
+    ]
+    advancement_expanded = (advancement_base + ("\n\n" if advancement_base else "") + "\n".join(advancement_overlay)).strip()
+
     return {
+        "s1": s1_text,
         "s1_b": c_data.get('bullets'),
+        "s2": s2_text,
         "s2_b": c_data.get('supervising_bullets'),
+        "s3": s3_text,
         "s3_b": m_data.get('bullets'),
+        "s4": s4_text,
         "s4_b": m_data.get('strategies_bullets'),
         "s5": integrated_profile_text,
-        "s6": i_data.get('support', ''),
+        "s6": s6_text,
+
+        "s6_raw": i_data.get('support', ''),
         "s7": i_data.get('thriving', ''), # Thriving paragraphs
         "s8": i_data.get('struggling', ''), # Struggling paragraphs
-        "s9": "Strategies for Course Correction:", # Intervention Header
+        "s9": s9_text,
         "s9_b": i_data.get('interventions', []),
+        "s10": s10_text,
         "s10_b": m_data.get('celebrate_bullets'),
+        "coaching_intro": coaching_intro,
         "coaching": i_data.get('questions', []),
         "advancement": i_data.get('advancement', ''),
+        "advancement_expanded": advancement_expanded,
         
         # New keys for cheat sheet consistency
         "cheat_do": c_data.get('supervising_bullets'),
@@ -1620,27 +1680,30 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         pdf.ln(4)
 
     # Sections 1-10
-    add_section(f"1. Communication Profile: {p_comm}", None, data['s1_b']) 
-    add_section("2. Supervising Their Communication", None, data['s2_b'])
-    add_section(f"3. Motivation Profile: {p_mot}", None, data['s3_b'])
-    add_section("4. Motivating This Staff Member", None, data['s4_b'])
+    add_section(f"1. Communication Profile: {p_comm}", data.get('s1'), data['s1_b']) 
+    add_section("2. Supervising Their Communication", data.get('s2'), data['s2_b'])
+    add_section(f"3. Motivation Profile: {p_mot}", data.get('s3'), data['s3_b'])
+    add_section("4. Motivating This Staff Member", data.get('s4'), data['s4_b'])
     add_section("5. Integrated Leadership Profile", data['s5']) 
-    add_section("6. How You Can Best Support Them", data['s6'])
+    add_section("6. How You Can Best Support Them", data.get('s6', ''))
     add_section("7. What They Look Like When Thriving", data['s7'])
     add_section("8. What They Look Like When Struggling", data['s8'])
-    add_section("9. Supervisory Interventions (Roadmap)", None, data['s9_b'])
-    add_section("10. What You Should Celebrate", None, data['s10_b'])
+    add_section("9. Supervisory Interventions (Roadmap)", data.get('s9'), data['s9_b'])
+    add_section("10. What You Should Celebrate", data.get('s10'), data['s10_b'])
 
     # 11. Coaching Questions (10 questions)
     pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
     pdf.cell(0, 8, "11. Coaching Questions", ln=True, fill=True); pdf.ln(2)
     pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
+    if data.get('coaching_intro'):
+        pdf.multi_cell(0, 5, clean_text(data['coaching_intro']))
+        pdf.ln(1)
     for i, q in enumerate(data['coaching']):
         pdf.multi_cell(0, 5, clean_text(f"{i+1}. {q}"))
     pdf.ln(4)
 
     # 12. Advancement
-    add_section("12. Helping Them Prepare for Advancement", data['advancement'])
+    add_section("12. Helping Them Prepare for Advancement", data.get('advancement_expanded', data['advancement']))
 
     return pdf.output(dest='S').encode('latin-1')
 
@@ -1701,7 +1764,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     
     def show_section(title, text, bullets=None):
         st.subheader(title)
-        if text: st.write(text)
+        if text: st.markdown(text)
         if bullets:
             for b in bullets:
                 st.markdown(f"- {b}")
@@ -1723,16 +1786,18 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         st.error(data['s8'])   
     
     st.markdown("<br>", unsafe_allow_html=True)
-    show_section("9. Supervisory Interventions", None, data['s9_b'])
-    show_section("10. What You Should Celebrate", None, data['s10_b'])
+    show_section("9. Supervisory Interventions", data.get('s9'), data['s9_b'])
+    show_section("10. What You Should Celebrate", data.get('s10'), data['s10_b'])
     
     st.subheader("11. Coaching Questions")
+    if data.get('coaching_intro'):
+        st.markdown(data['coaching_intro'])
     for i, q in enumerate(data['coaching']):
         st.write(f"{i+1}. {q}")
             
     st.markdown("<br>", unsafe_allow_html=True)
     
-    show_section("12. Helping Them Prepare for Advancement", data['advancement'])
+    show_section("12. Helping Them Prepare for Advancement", data.get('advancement_expanded', data['advancement']))
 
 # --- 6. MAIN APP LOGIC ---
 # Reset Helpers
