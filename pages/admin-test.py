@@ -403,7 +403,7 @@ def get_filtered_dataframe():
     
     if 'role' in current_df.columns:
         if "Program Supervisor" in user_role:
-            pass
+            pass # PS sees everyone in cottage
         elif "Shift Supervisor" in user_role:
             condition = (filtered_df['role'] == 'YDP') | (filtered_df['name'] == current_user)
             filtered_df = filtered_df[condition]
@@ -433,50 +433,50 @@ MOTIV_TRAITS = ["Achievement", "Growth", "Purpose", "Connection"]
 COMM_PROFILES = {
     "Director": {
         "bullets": [
-            "**Clarity:** They prioritize the 'bottom line' over the backstory, speaking in headlines to ensure immediate understanding. Supervisors should not mistake their brevity for rudeness.",
-            "**Speed:** They process information rapidly and expect others to keep up, preferring a quick 80% solution over a delayed 100% solution. They are likely to interrupt if they feel a conversation is dragging or becoming repetitive, signaling their desire to move on. Supervisors should be prepared to move quickly through agenda items to maintain their engagement. They view pause and hesitation as a lack of confidence or competence in others.",
-            "**Conflict:** They view conflict as a tool for problem-solving rather than a relationship breaker. They do not take disagreement personally and respect those who push back with logic. They are comfortable addressing issues head-on and may perceive hesitation in others as weakness or lack of preparation. For them, friction is necessary to sharpen ideas."
+            "**Clarity:** They prioritize the 'bottom line' over the backstory, speaking in headlines.",
+            "**Speed:** They process information rapidly and expect others to keep up.",
+            "**Conflict:** They view conflict as a tool for problem-solving rather than a relationship breaker."
         ],
         "supervising_bullets": [
-            "**Be Concise:** Get to the point immediately; avoid 'sandwiching' feedback with small talk. They value their time and yours, and they respect supervisors who treat time as a resource. If you have five minutes of content, do not stretch it to thirty. They will tune out if they feel you are 'padding' the conversation.",
-            "**Focus on Outcomes:** Tell them what needs to be achieved, but leave the how to them. Focusing on the end result empowers them to find the most efficient path. Over-explaining the process will make them feel micromanaged and stifled. They trust their own ability to navigate the map; they just need you to identify the destination.",
-            "**Respect Autonomy:** Give them space to operate independently; tight oversight feels like distrust to a Director. Check in at agreed-upon milestones rather than hovering constantly. Trust that they will come to you if they hit a roadblock they cannot remove themselves. Their silence usually means they are working, not that they are lost."
+            "**Be Concise:** Get to the point immediately; avoid 'sandwiching' feedback.",
+            "**Focus on Outcomes:** Tell them what needs to be achieved, but leave the how to them.",
+            "**Respect Autonomy:** Give them space to operate independently; tight oversight feels like distrust."
         ]
     },
     "Encourager": {
         "bullets": [
-            "**Verbal Processing:** They think out loud and prefer talking through problems rather than reading about them. They are articulate and inspiring. They need to hear their own voice to know what they think. They process information externally and socially.",
-            "**Optimism:** They naturally focus on the potential and the positive. They sell the vision effectively but may gloss over the gritty details. They see the glass as overflowing. They are the cheerleaders of the organization.",
-            "**Relationship-First:** They influence people through liking and charisma. They prioritize the 'vibe' of the interaction. They want you to like them before they want you to understand them. They build bridges before they cross them."
+            "**Verbal Processing:** They think out loud and prefer talking through problems.",
+            "**Optimism:** They naturally focus on the potential and the positive.",
+            "**Relationship-First:** They influence people through liking and charisma."
         ],
         "supervising_bullets": [
-            "**Allow Discussion:** Give them a few minutes to chat and connect; cutting them off too early kills their morale. They need the relational runway to take off. Small talk is big work for them.",
-            "**Ask for Specifics:** They speak in generalities ('It's going great!'). Ask 'What specifically is going great?' to get the data. You must drill down to find the reality beneath the enthusiasm. Force them to define their terms.",
-            "**Follow Up in Writing:** They may agree enthusiastically in the moment but forget the details. Always send a recap email. Their memory is often tied to the emotion of the moment, not the facts. Document the boring parts for them."
+            "**Allow Discussion:** Give them a few minutes to chat and connect.",
+            "**Ask for Specifics:** They speak in generalities; drill down to find the reality.",
+            "**Follow Up in Writing:** They may agree enthusiastically but forget details."
         ]
     },
     "Facilitator": {
         "bullets": [
-            "**Listening:** They gather all perspectives before speaking. They are the quiet ones in the meeting who are taking notes. They want the full picture before they commit to an opinion. They value input from every chair in the room to ensure nothing is missed.",
-            "**Consensus:** They prefer group agreement over unilateral action. They view a 5-4 vote as a failure to align the team properly. They want everyone on the bus before the bus moves forward. They work hard to bring dissenters along to create a unified front.",
-            "**Process:** They value how a decision is made as much as the decision itself. They hate chaos and shooting from the hip without a plan. They want a clear agenda, a timeline, and a protocol to follow. They find comfort in the structure of a well-organized meeting."
+            "**Listening:** They gather all perspectives before speaking.",
+            "**Consensus:** They prefer group agreement over unilateral action.",
+            "**Process:** They value how a decision is made as much as the decision itself."
         ],
         "supervising_bullets": [
-            "**Advance Notice:** Give them time to think before asking for a decision. Send the agenda 24 hours in advance so they can prepare. They hate being put on the spot and forced to react instantly. They need to process internally before they speak publicly to ensure they are accurate.",
-            "**Deadlines:** Set clear 'decision dates' to prevent endless deliberation. Without a deadline, they will process forever in search of the perfect consensus. You must close the window of discussion to ensure progress. Give them a specific time to stop thinking and start acting.",
-            "**Solicit Opinion:** Ask them explicitly what they think during meetings. They will not fight for airtime against louder voices. You have to hand them the microphone to get their valuable insight. Their silence does not mean they have nothing to say; it means they are waiting to be asked."
+            "**Advance Notice:** Give them time to think before asking for a decision.",
+            "**Deadlines:** Set clear 'decision dates' to prevent endless deliberation.",
+            "**Solicit Opinion:** Ask them explicitly what they think during meetings."
         ]
     },
     "Tracker": {
         "bullets": [
-            "**Detail-Oriented:** They communicate in spreadsheets, data, and precise details. They value accuracy above all else and will correct you if you are wrong. They want to be right, not just understood. They find safety in the specifics and mistrust vagueness.",
-            "**Risk-Averse:** They are cautious in their speech, avoiding definitive statements until they are 100% sure. They will often say 'let me check on that' rather than guessing. They view guessing as lying or irresponsibility. They speak carefully and deliberately.",
-            "**Process-Driven:** They talk about how we do things, not just what we do. They are the guardians of the handbook and the policy manual. They believe the rules exist to save us from chaos. They quote the manual to settle disputes."
+            "**Detail-Oriented:** They communicate in spreadsheets, data, and precise details.",
+            "**Risk-Averse:** They are cautious in their speech, avoiding definitive statements until sure.",
+            "**Process-Driven:** They talk about how we do things, not just what we do."
         ],
         "supervising_bullets": [
-            "**Be Specific:** Do not use vague language like 'do it better' or 'work harder.' Give them the metric: 'Increase accuracy by 10%.' They cannot hit a target they cannot see. Use numbers, not feelings, to drive behavior.",
-            "**Provide Data:** If you want to persuade them, bring the numbers and the facts. Emotional appeals will bounce off them. They respect logic, evidence, and precedent. Show them the proof that your idea works.",
-            "**Written Instructions:** Follow up every verbal conversation with an email. They trust the written word more than the spoken word. It provides a paper trail they crave for security. Document the ask to ensure alignment."
+            "**Be Specific:** Give the metric: 'Increase accuracy by 10%.'",
+            "**Provide Data:** If you want to persuade them, bring the numbers and facts.",
+            "**Written Instructions:** Follow up every verbal conversation with an email."
         ]
     }
 }
@@ -484,70 +484,70 @@ COMM_PROFILES = {
 MOTIV_PROFILES = {
     "Achievement": {
         "bullets": [
-            "**Scoreboard:** They need to know if they are winning or losing at any given moment. Ambiguity is their enemy; they need quantifiable metrics to judge their own performance. Without a clear definition of success, they may become anxious or disengaged. They are driven by the comparison of 'where we were' vs 'where we are.'",
-            "**Completion:** They derive energy from finishing tasks and closing loops. An endless list of open-ended projects drains them; they need the dopamine hit of marking a task 'done.' Ensure they have a mix of short-term wins alongside long-term goals. If a project has no end in sight, they will manufacture a conclusion or lose interest.",
-            "**Efficiency:** They hate wasted time and redundancy more than almost anything else. If a meeting has no clear purpose, they will resent attending. They are motivated by streamlining processes and removing bottlenecks. They will work harder to build a system that saves time than they will to just do the work."
+            "**Scoreboard:** They need to know if they are winning or losing.",
+            "**Completion:** They derive energy from finishing tasks and closing loops.",
+            "**Efficiency:** They hate wasted time and redundancy."
         ],
         "strategies_bullets": [
-            "**Visual Goals:** Use charts, dashboards, or checklists they can physically mark off. Seeing their progress visually reinforces their sense of forward momentum. Set up a system where they can self-monitor their data without needing to ask you. The visual representation of 'done' is a powerful psychological reward for them.",
-            "**Public Wins:** Acknowledge their success in front of peers, highlighting competence and results. They value respect for their capability more than praise for their personality. Be specific about what they achieved, using data whenever possible. General praise like 'good job' means less to them than 'you improved efficiency by 20%.'",
-            "**Autonomy:** Give them the goal and let them design the strategy. This appeals to their desire for control and efficiency. When they succeed using their own methods, their buy-in to the organization deepens significantly. It proves to them that you trust their competence."
+            "**Visual Goals:** Use charts, dashboards, or checklists.",
+            "**Public Wins:** Acknowledge success in front of peers.",
+            "**Autonomy:** Give them the goal and let them design the strategy."
         ],
         "celebrate_bullets": [
-            "**Efficiency:** Celebrate specific instances where they solved a complex logistical puzzle quickly. Quantify the time or money they saved.",
-            "**Clarity:** Celebrate their ability to draw a hard line or make a tough call.",
-            "**Resilience:** Celebrate their ability to bounce back immediately and focus on solutions."
+            "**Efficiency:** Celebrate specific instances where they solved a puzzle quickly.",
+            "**Clarity:** Celebrate their ability to draw a hard line.",
+            "**Resilience:** Celebrate their ability to bounce back immediately."
         ]
     },
     "Growth": {
         "bullets": [
-            "**Curiosity:** They are driven to understand the 'why' and 'how' behind every rule. They will not accept 'because we've always done it this way' as an answer. This curiosity is an asset for innovation but can feel like insubordination to insecure leaders. They need to take the machine apart to see how it works.",
-            "**Future-Focused:** They view their current role primarily as a stepping stone to the next challenge. They need to see a clear trajectory for their career or they will look elsewhere. They are constantly scanning the horizon for what is next, which keeps them ambitious but potentially dissatisfied with the present. They live in the future tense.",
-            "**Feedback:** They crave constructive correction over empty praise. Telling them 'good job' is less effective than telling them 'here is how you could do that 10% better.' They view criticism as free consulting for their personal brand and professional development. They want to be sharper, not just happier."
+            "**Curiosity:** Driven to understand the 'why' and 'how'.",
+            "**Future-Focused:** View current role as a stepping stone.",
+            "**Feedback:** Crave constructive correction over empty praise."
         ],
         "strategies_bullets": [
-            "**Stretch Assignments:** Assign tasks slightly above their current skill level. They are bored by mastery; they need to feel the tension of potential failure to stay engaged. Give them problems that no one else has solved yet.",
-            "**Career Pathing:** Discuss their professional future regularly, not just at annual reviews. Map out exactly how their current work contributes to their 5-year plan. Be honest about what skills they lack for the next level so they have a target to aim for.",
-            "**Mentorship:** Connect them with leaders they admire inside or outside the organization. They learn through observation and proximity to power/intellect. Facilitate introductions to senior leadership as a reward for performance."
+            "**Stretch Assignments:** Tasks slightly above current skill level.",
+            "**Career Pathing:** Discuss their professional future regularly.",
+            "**Mentorship:** Connect them with leaders they admire."
         ],
         "celebrate_bullets": [
-            "**Insight:** Celebrate specific moments where they identified a root cause others missed.",
-            "**Development:** Celebrate a staff member who visibly improved under their guidance.",
-            "**Courage:** Celebrate their willingness to try a new approach, even if it failed."
+            "**Insight:** Celebrate moments where they identified a root cause.",
+            "**Development:** Celebrate a staff member who improved under their guidance.",
+            "**Courage:** Celebrate their willingness to try a new approach."
         ]
     },
     "Purpose": {
         "bullets": [
-            "**Values-Driven:** They filter every decision through the lens of 'Is this right?' They are less concerned with 'Is this profitable?' or 'Is this efficient?' If a directive violates their internal code, they will resist it, often openly and fiercely. They act as the moral conscience of the room.",
-            "**Advocacy:** They are wired to fight for the underdog. They naturally align themselves with the most vulnerable person in the room (the client, the new staff member). They see themselves as the shield against a cold system. They will risk their own standing to protect someone else.",
-            "**Meaning:** They need the 'why' connected to client well-being. They cannot work for a paycheck alone; they must believe their work matters. If they lose connection to the mission, they burn out instantly. They need to feel they are part of a crusade, not just a company."
+            "**Values-Driven:** Filter every decision through 'Is this right?'",
+            "**Advocacy:** Wired to fight for the underdog.",
+            "**Meaning:** Need the 'why' connected to client well-being."
         ],
         "strategies_bullets": [
-            "**The Why:** Explain the mission behind every mandate. Never say 'because I said so' or 'because it's policy.' Connect the rule directly to how it keeps a child safe or helps a family heal. If they understand the noble purpose, they will endure any hardship.",
-            "**Storytelling:** Share narratives of redemption and impact. They are fueled by stories of success against the odds. Remind them of the specific lives they have touched. Use qualitative data to show them their impact.",
-            "**Ethics:** Allow space to voice moral concerns. Do not shut down their ethical questions; validate them. Even if you cannot change the decision, acknowledging their moral struggle builds trust. They need to know their leader has a soul."
+            "**The Why:** Explain the mission behind every mandate.",
+            "**Storytelling:** Share narratives of redemption and impact.",
+            "**Ethics:** Allow space to voice moral concerns."
         ],
         "celebrate_bullets": [
-            "**Integrity:** Celebrate moments where they made a hard choice because it was the right thing to do.",
+            "**Integrity:** Celebrate moments where they made a hard choice.",
             "**Advocacy:** Celebrate when they gave a voice to the voiceless.",
             "**Consistency:** Celebrate their unwavering commitment to care."
         ]
     },
     "Connection": {
         "bullets": [
-            "**Belonging:** They view the team as a family. Their primary goal is to ensure everyone feels they belong. They are the first to welcome new hires and the last to leave a party. They define success by the tightness of the circle.",
-            "**Harmony:** They are sensitive to tension and will absorb it to protect others. A fight on the unit ruins their entire day. They want everyone to get along, but unlike the Peacemaker, they will fight to impose peace if necessary.",
-            "**Support:** They are motivated by helping peers. They will stay late to help a coworker even if their own work is done. They see service to the team as their primary job description."
+            "**Belonging:** View the team as a family.",
+            "**Harmony:** Sensitive to tension and absorb it to protect others.",
+            "**Support:** Motivated by helping peers."
         ],
         "strategies_bullets": [
-            "**Face Time:** Prioritize in-person check-ins. They value the relationship with you more than the tasks you assign. A text message is okay, but a face-to-face conversation is gold. They need to see your eyes to trust you.",
-            "**Team Rituals:** Encourage meals, huddles, and traditions. Give them the space to create culture. They thrive when the team has a shared identity and shared experiences.",
-            "**Personal Care:** Ask about life outside work. They bring their whole self to work and expect you to care about it. Knowing their kids' names or their hobbies matters deeply to them."
+            "**Face Time:** Prioritize in-person check-ins.",
+            "**Team Rituals:** Encourage meals, huddles, and traditions.",
+            "**Personal Care:** Ask about life outside work."
         ],
         "celebrate_bullets": [
             "**Loyalty:** Celebrate their standing up for the team.",
             "**Stabilization:** Celebrate their physical presence calming a room.",
-            "**Culture:** Celebrate the strong identity of the unit. Praise the low turnover or the high morale."
+            "**Culture:** Celebrate the strong identity of the unit."
         ]
     }
 }
@@ -555,7 +555,7 @@ MOTIV_PROFILES = {
 INTEGRATED_PROFILES = {
     "Director-Achievement": {
         "title": "The Executive General",
-        "synergy": "Operational Velocity. They don't just want to lead; they want to win. They cut through noise to identify the most efficient path to success. They are excellent at turnarounds or crisis management where decisive action is required immediately.",
+        "synergy": "**Leadership Archetype:** The Wartime General.\n\n**The Operational Vibe:** High-octane, results-driven, and incredibly fast. This person enters a room and immediately scans for inefficiencies. They don't want to chat; they want to conquer. They treat every shift like a mission that must be won.\n\n**Decision-Making Style:** Rapid and unilateral. They trust their gut and will make a 70% accurate decision *now* rather than waiting for a 100% accurate decision later. They view hesitation as weakness.\n\n**The Value Proposition:** Operational Velocity. They are the best person to lead a turnaround or manage a crisis. They cut through bureaucracy and get the job done when others are stuck in meetings.\n\n**Strategic Blindspot:** They can confuse 'activity' with 'progress.' They might win the battle (the shift) but lose the war (staff retention) because they are running too hot and burning people out.",
         "support": "**Operational Risk:** Name the operational risk of moving fast. Say, 'We can do this quickly if we build in these guardrails.' This validates their speed while protecting the agency from errors. Help them see that slowing down slightly to check safety is actually an efficiency measure in the long run.\n\n**Burnout Watch:** They are the best person to identify when the 'ask' exceeds capacity, but they need permission to say it. They often view endurance as a badge of honor and will work until they collapse. Proactively ask them about their fuel tank before they run dry. They often do not realize they are exhausted until they are already sick.",
         "thriving": "**Rapid Decision Architecture:** They make calls with partial information, preventing the team from freezing in analysis paralysis. They create a sense of momentum that energizes the entire unit. Their confidence stabilizes the team during chaotic shifts.\n\n**Objective Focus:** They separate story from fact, focusing on behaviors and outcomes. This helps de-escalate emotional situations by grounding them in reality. They are excellent at conducting after-action reviews that are blameless but rigorous.\n\n**High-Bar Accountability:** They refuse to walk past a mistake, raising the standard of care. They hold peers accountable naturally, often elevating the performance of the whole group. They expect excellence and usually model it themselves.",
         "struggling": "**The Steamroller Effect:** They announce decisions without checking if the team is emotionally ready. This can alienate staff who feel unheard or bulldozed. They may view team building as 'fluff' and skip essential relationship steps.\n\n**Burnout by Intensity:** They assume everyone has their stamina and push until the team breaks. They struggle to understand why others can't just 'power through.' This can create a culture of exhaustion if left unchecked.\n\n**Dismissing 'Soft' Data:** They ignore 'bad feelings' or intuition because there is no proof. This leads to missing early warning signs of cultural toxicity or client unrest. They may view emotional concerns as irrelevant to the mission.",
@@ -580,7 +580,7 @@ INTEGRATED_PROFILES = {
     },
     "Director-Growth": {
         "title": "The Restless Improver",
-        "synergy": "Transformational Leadership. They don't just manage the shift; they want to upgrade it. They see potential in every staff member and are willing to push hard to unlock it. They are natural disruptors who prevent the agency from stagnating.",
+        "synergy": "**Leadership Archetype:** The Architect of Change.\n\n**The Operational Vibe:** Dynamic, challenging, and never satisfied. This person is constantly taking the machine apart to see if they can make it run faster. They are allergic to the phrase 'we've always done it this way.'\n\n**Decision-Making Style:** Experimental. They treat decisions as hypotheses to be tested. They are willing to break a system to build a better one, often moving faster than the team can follow.\n\n**The Value Proposition:** Transformational Leadership. They prevent the agency from stagnating. They are the engine of innovation that pushes the program into the future.\n\n**Strategic Blindspot:** They undervalue stability. They can create 'change fatigue' in the team by launching too many initiatives at once, making staff feel like they can never just 'do the job' without it changing.",
         "support": "**Connect Goals:** Link their personal growth goals to youth outcomes and the mission. Help them see that 'getting better' isn't just about their resume, but about serving the client better. This grounds their ambition in service.\n\n**Pacing:** Remind them that not everyone learns at their speed. They need help understanding that organizational change is a marathon, not a sprint. Coach them to wait for the team to catch up before introducing the next change.",
         "thriving": "**Diagnostic Speed:** They quickly identify the root causes of failures rather than treating symptoms. They are excellent at analyzing a crisis to prevent it from recurring. They turn every incident into a case study for improvement.\n\n**Fearless Innovation:** They are willing to break the status quo to find a better way. They are not afraid of administrative pushback if they believe their idea improves care. They constantly ask, 'Is there a better way to do this?'\n\n**High-Impact Coaching:** They give direct, developmental feedback that accelerates the growth of their peers. They are often the 'tough love' mentor on the unit. People grow faster under their leadership than anywhere else.",
         "struggling": "**The Pace Mismatch:** They get visibly frustrated with slow learners or bureaucracy. This impatience can leak out as arrogance or disdain. They may make others feel stupid or slow without realizing it.\n\n**'Fix-It' Fatigue:** They are constantly pointing out flaws and forgetting to validate what is working. The team may feel that nothing is ever good enough for them. They risk demoralizing the team by only focusing on the gap.\n\n**Leaving People Behind:** They focus on the idea of change rather than the adoption of change. They implement new systems without getting buy-in, leading to failure. They assume because an idea is logical, everyone will just do it.",
@@ -605,7 +605,7 @@ INTEGRATED_PROFILES = {
     },
     "Director-Purpose": {
         "title": "The Mission Defender",
-        "synergy": "Ethical Courage. They provide the moral backbone for the team, ensuring expediency never trumps integrity. They are the conscience of the unit and will speak truth to power without hesitation.",
+        "synergy": "**Leadership Archetype:** The Guardian.\n\n**The Operational Vibe:** Intense, principled, and fierce. They lead with a sword in one hand and a shield in the other. They are not climbing a career ladder; they are fighting a holy war for the kids.\n\n**Decision-Making Style:** Ethical Absolutism. They filter every choice through a black-and-white moral lens. If it hurts a kid, the answer is 'No,' regardless of the budget or politics.\n\n**The Value Proposition:** Ethical Courage. They are the conscience of the organization. They ensure that expediency never trumps integrity, even when it's inconvenient.\n\n**Strategic Blindspot:** They can become self-righteous and judgmental. They may alienate potential allies by demanding ideological purity, viewing compromise as a sin rather than a strategy.",
         "support": "**Share Values:** Share your own core values so they trust your leadership. They need to know you are 'one of the good guys.' If they trust your heart, they will follow your orders.\n\n**Operational Risk:** Frame slowing down as 'protecting the mission.' Help them see that rushing can lead to mistakes that hurt the client. This aligns their need for speed with their need for care.",
         "thriving": "**Unshakeable Advocacy:** They act immediately against injustice. They do not wait for permission to stop something unsafe or unethical. They are the first to report abuse or neglect.\n\n**Clarity of 'Why':** They contextualize the grind for the staff. When the team is tired, they remind everyone why the work matters. They turn mundane tasks into holy work.\n\n**Crisis Ethics:** They keep their moral compass even in chaos. When everyone else is panicking, they are asking 'What is the right thing to do?' They provide a steady hand based on principles.",
         "struggling": "**Righteous Rigidity:** They struggle to see the gray areas, viewing everything as black and white. This can make them inflexible and difficult to negotiate with. They may view compromise as a sin.\n\n**The Martyr Complex:** They overwork because they don't trust others to care enough. They believe that if they stop, the clients will suffer. This leads to rapid burnout and resentment.\n\n**Judgmental Tone:** They come across as 'preachy' or morally superior. They may unintentionally shame staff who are just trying to get through the day. They alienate allies by demanding ideological purity.",
@@ -630,7 +630,7 @@ INTEGRATED_PROFILES = {
     },
     "Director-Connection": {
         "title": "The Protective Captain",
-        "synergy": "Safe Enclosure. They create a perimeter of safety where staff and youth feel protected. They lead from the front, taking the hits so their team doesn't have to. They are the 'Mama Bear' or 'Papa Bear' of the unit.",
+        "synergy": "**Leadership Archetype:** The Papa/Mama Bear.\n\n**The Operational Vibe:** Warm but firm. They create a 'family' atmosphere but sit clearly at the head of the table. They are deeply loyal to their own people but can be hostile to outsiders who threaten the tribe.\n\n**Decision-Making Style:** Protective. They make calls based on what keeps their team safe and together. They will take a bullet for their staff, but they expect total loyalty in return.\n\n**The Value Proposition:** Safe Enclosure. They build units with incredibly high retention and morale because staff feel physically and emotionally safe under their command.\n\n**Strategic Blindspot:** They can become insular and overly protective. They might hide performance issues to 'save' a team member or create an 'Us vs. Them' dynamic with management.",
         "support": "**Touchpoints:** Short, genuine check-ins are crucial. You don't need a one-hour meeting; you need five minutes of real connection. Consistency matters more than duration.\n\n**Backing:** Be candid about where you can back them up (air cover). They need to know you are in their corner. If they feel exposed or unsupported, they will withdraw their loyalty.",
         "thriving": "**Decisive Care:** They fix problems for people immediately. They don't just sympathize; they solve. They use their Director power to remove obstacles for their people.\n\n**Crisis Stabilization:** They become the calm human shield during a crisis. Staff look to them for physical and emotional safety. Their presence alone can de-escalate a room.\n\n**Team Loyalty:** They build a strong 'Us.' The team has a distinct identity and high morale. People protect each other and cover for each other because the Captain has set the standard.",
         "struggling": "**Us vs. Them:** They become hostile toward outsiders (admin, other units). They circle the wagons and view any critique of their team as an attack. They can create a silo that is hard to penetrate.\n\n**Over-Functioning:** They do everyone's job to protect them. They burn themselves out trying to carry the load for 'weaker' team members. They enable underperformance in the name of loyalty.\n\n**Taking Conflict Personally:** They conflate professional disagreement with personal betrayal. If you correct them, they feel unloved. This makes supervision very tricky and emotional.",
@@ -655,7 +655,7 @@ INTEGRATED_PROFILES = {
     },
     "Encourager-Achievement": {
         "title": "The Coach",
-        "synergy": "Inspirational Performance. They make hard work feel like a game. They believe the team can win and their energy is contagious. They drive results not by demanding them, but by pumping the team up to chase them.",
+        "synergy": "**Leadership Archetype:** The Captain of the Team.\n\n**The Operational Vibe:** High energy, loud, and competitive. They make work feel like a game. They are constantly high-fiving, celebrating wins, and rallying the troops. They hate losing, but they hate low energy even more.\n\n**Decision-Making Style:** Optimistic. They bet on the best-case scenario. They assume the team can pull off the impossible, which is inspiring but sometimes unrealistic.\n\n**The Value Proposition:** Performance Positivity. They can turn a depressed, burnt-out unit into a high-performing team just through the force of their personality. They make hard work feel fun.\n\n**Strategic Blindspot:** They gloss over failure. They are so focused on 'winning' and staying positive that they may ignore serious red flags or operational deficits until it is too late.",
         "support": "**Reality Checks:** Be the ground to their sky. Validate their enthusiasm but ask 'What is the plan if this goes wrong?' You provide the tether that keeps them from floating away.\n\n**Focus:** Help them pick one lane. They want to achieve everything at once; force them to prioritize. You are the editor of their ambition.",
         "thriving": "**Team Morale:** The unit has high energy and believes they are the best unit in the building. There is a 'swag' to the team. They create a winning culture.\n\n**Rallying:** They can turn a bad shift around with a pep talk. They refuse to let the team wallow in defeat. They are resilient optimists.\n\n**Goal-Smashing:** When locked in, they hit metrics with flair and celebrate loudly. They make success look fun. They normalize high performance.",
         "struggling": "**Overselling:** They promise things they can't deliver to get buy-in. This leads to disappointment and loss of trust later. They write checks their reality can't cash.\n\n**Disorganization:** They are moving so fast and talking so much they lose paperwork or forget details. They leave a wake of administrative chaos. They miss the trees for the forest.\n\n**Impatience:** They get frustrated when the team doesn't share their burning desire to win immediately. They can't understand low energy. They judge the 'plodders.'",
@@ -680,7 +680,7 @@ INTEGRATED_PROFILES = {
     },
     "Encourager-Growth": {
         "title": "The Mentor",
-        "synergy": "Developmental Charisma. They see the gold in people and talk it out of them. They make people feel smarter and more capable just by being around them. They lead by selling the team on their own potential.",
+        "synergy": "**Leadership Archetype:** The Talent Scout.\n\n**The Operational Vibe:** Inspirational and developmental. They see the gold in people before they see it in themselves. They spend more time talking about 'potential' and 'future' than they do about today's tasks.\n\n**Decision-Making Style:** People-Centric. They make decisions based on how it will help someone grow, even if it's less efficient in the short term. They will let a staff member struggle with a task just to learn.\n\n**The Value Proposition:** Psychological Safety. They create an environment where it is safe to fail, which is the only environment where true learning happens. They build the bench for the future.\n\n**Strategic Blindspot:** They tolerate mediocrity too long. They fall in love with 'potential' and ignore 'performance,' keeping staff members who are nice but incompetent because they believe they can 'fix' them.",
         "support": "**Structure:** They have a million ideas; provide the structure to execute one at a time. You are the trellis for their vine. Help them focus their creative energy on the most impactful goals. Prevent them from drowning in their own possibilities.\n\n**Patience:** Remind them that growth is messy and non-linear. They can get discouraged when people slide back or don't grow fast enough. Be the steady hand that reminds them change takes time.",
         "thriving": "**Talent Magnet:** People want to work for them because they feel grown and seen. They attract high-potential staff who want to develop. They build a deep bench of future leaders.\n\n**Culture of Learning:** Mistakes are celebrated as learning opportunities, reducing fear in the unit. They create a safe laboratory for growth where experimentation is encouraged. They normalize failure as part of the process.\n\n**Innovation:** They are constantly bringing in new ideas from books, podcasts, or other units. They keep the agency fresh and relevant. They prevent stagnation by constantly injecting new thought.",
         "struggling": "**Shiny Object Syndrome:** They chase a new initiative every week, confusing the team. The staff gets whiplash from the constant pivots and lack of follow-through. They start many fires but tend few.\n\n**Avoidance of Hard Conversations:** They want to inspire, not correct. They struggle to give negative feedback that might 'hurt' the relationship. They sugarcoat the poison to avoid being the 'bad guy.'\n\n**All Talk:** They talk a great game about development but lack the follow-through to document it. Great visions, poor execution. They can be dreamers who don't do the hard work of implementation.",
@@ -705,7 +705,7 @@ INTEGRATED_PROFILES = {
     },
     "Encourager-Purpose": {
         "title": "The Heart of the Mission",
-        "synergy": "Passionate Advocacy. They are the soul of the unit. They keep the emotional flame alive. When everyone else is cynical, they are the ones reminding the team why this work matters. They lead with raw emotion and belief.",
+        "synergy": "**Leadership Archetype:** The True Believer.\n\n**The Operational Vibe:** Passionate, emotional, and deeply human. They wear their heart on their sleeve. They don't just work here; they *believe* in this place. They cry when the kids hurt and cheer when they win.\n\n**Decision-Making Style:** Intuitive and Emotional. They feel their way through problems. They rely on their gut instinct about what is 'right' and 'good,' often ignoring the data.\n\n**The Value Proposition:** Emotional Resonance. They keep the human element alive in a bureaucratic system. They remind everyone that we are in the business of love, not just logistics.\n\n**Strategic Blindspot:** They lack emotional skin. They absorb the trauma of the work and the team, leading to compassion fatigue. They can lose objectivity because they are too close to the pain.",
         "support": "**Emotional Boundaries:** Help them distinguish between caring and carrying. They will burn out by taking home the trauma of the clients. You must be the wall that keeps the flood out. Teach them the art of detached concern.\n\n**Validation:** Frequently affirm that their heart is a strength, not a weakness. They often feel 'too soft' for the work; remind them that softness is a tool. Validate their empathy as a professional asset.",
         "thriving": "**Cultural Carrier:** They set the emotional tone for the entire workspace. If they are up, the unit is up. They are the thermostat of the team, regulating the emotional temperature. They create warmth and acceptance.\n\n**Advocate:** They are fearless in speaking up for kids, using their persuasion to get resources. They can charm the resources out of administration by making them feel the need. They fight for their people with tenacity.\n\n**Inspiration:** They can make a tired team feel like heroes again. They bring the magic back to the work when it feels like a grind. They renew the spirit of the group.",
         "struggling": "**Emotional Flooding:** They get so wrapped up in the 'story' that they lose objectivity. They might cry in meetings or get irrationally angry at perceived slights. They lose perspective and cannot see the other side.\n\n**Us vs. The System:** They can whip the team into a frenzy against 'cold' administration. They become the ringleader of the rebellion, viewing policy as the enemy of care. They vilify leadership to protect the team.\n\n**Burnout:** They give everything and have nothing left. They crash hard and often abruptly because they have no reserves. They function on adrenaline and emotion until they break.",
@@ -730,7 +730,7 @@ INTEGRATED_PROFILES = {
     },
     "Encourager-Connection": {
         "title": "The Team Builder",
-        "synergy": "Social Cohesion. They are the social cruise director of the unit. They ensure everyone feels included, liked, and happy. They lead by making the workplace feel like a community.",
+        "synergy": "**Leadership Archetype:** The Social Glue.\n\n**The Operational Vibe:** Chatty, warm, and inclusive. They are the cruise director of the unit. They ensure everyone feels included, remembered, and liked. They prioritize the 'vibe' over the 'to-do list.'\n\n**Decision-Making Style:** Democratic. They want everyone to be happy with the decision. They struggle to make unpopular calls that might alienate someone.\n\n**The Value Proposition:** Social Capital. They build a web of relationships that holds the team together during stress. They prevent burnout by making work a place where people want to be.\n\n**Strategic Blindspot:** They confuse 'friendly' with 'effective.' They may tolerate low performance to keep the social peace, creating a 'country club' culture where standards are optional.",
         "support": "**Hard Decisions:** Step in to be the 'bad guy' so they don't have to burn social capital. They struggle to be the enforcer, so lend them your spine until they grow their own. eventually, you must train them to make the call themselves.\n\n**Focus:** Remind them that work is the goal, fun is the method. Don't let the party overtake the mission. Keep the main thing the main thing. Ensure that the social cohesiveness results in productivity, not just distraction.",
         "thriving": "**Zero Turnover:** People stay because they love the team. They create a sticky culture that is hard to leave. Staff feel at home and supported. They save the agency money by retaining talent.\n\n**Conflict Resolution:** They talk things out and smooth over rough edges. They keep the social machinery oiled. They heal rifts before they become canyons. They mediate disputes naturally.\n\n**Joy:** There is laughter on the unit, which is therapeutic. They make the heavy work lighter. They bring the fun to the grind. They prevent the atmosphere from becoming toxic.",
         "struggling": "**The Country Club:** Too much socializing, not enough work. The unit becomes a hangout spot where standards slip. Productivity drops because everyone is having too much fun.\n\n**Gossip:** Their need to be 'in the know' and close to everyone can spiral into drama. They trade secrets for connection. They become the center of the rumor mill.\n\n**Favoritism:** They struggle to lead people they don't personally like. They create an 'in-crowd' and an 'out-crowd.' They alienate the outliers who don't fit their vibe.",
@@ -755,7 +755,7 @@ INTEGRATED_PROFILES = {
     },
     "Facilitator-Achievement": {
         "title": "The Steady Mover",
-        "synergy": "Methodical Progress. They don't sprint; they march with purpose and precision. They get the team to the finish line by ensuring everyone knows their role and the process is solid. They are the engine that keeps the unit moving forward without chaos or drama.",
+        "synergy": "**Leadership Archetype:** The Silent Executer.\n\n**The Operational Vibe:** Calm, methodical, and relentless. They don't make a lot of noise, but they get a lot done. They are the tortoise who beats the hare. They lower the temperature in the room while raising the output.\n\n**Decision-Making Style:** Deliberate. They gather the facts, hear the voices, and then make a steady, low-risk decision that sticks. They don't pivot quickly, but they don't make mistakes.\n\n**The Value Proposition:** Sustainable Progress. They build systems that last. They don't burn out the team with frantic energy; they just keep moving the ball forward every single day.\n\n**Strategic Blindspot:** They are risk-averse to a fault. They can get stuck in 'Analysis Paralysis,' waiting for 100% data and 100% consensus before moving, causing them to miss windows of opportunity.",
         "support": "**Decision Speed:** Push them to decide even when they don't have 100% consensus. Appeal to their need to 'finish' the task to overcome their hesitation. Frame indecision as a failure to achieve the goal. Remind them that a good decision today is better than a perfect decision next week.\n\n**Validation:** Praise the quiet work of organization that often goes unseen. Notice the spreadsheets, the schedules, and the well-run meetings. Acknowledge that their structure allows the rest of the team to function. Validate their role as the stabilizer of the group.",
         "thriving": "**Consistent Wins:** They hit the metrics every month without drama or panic. They are boringly successful in the best way possible. They are the metronome of the department, keeping the beat steady. You can set your watch by their performance.\n\n**Efficient Meetings:** They run meetings where everyone feels heard, but action items are clearly assigned. They master the follow-up to ensure accountability. They respect everyone's time by keeping things on track. They balance voice with velocity.\n\n**Project Management:** They are excellent at long-term implementation of complex initiatives. They don't drop the ball on details or deadlines. They keep the trains running on time regardless of the weather. They turn strategy into reality through execution.",
         "struggling": "**Analysis Paralysis:** They want to achieve the goal (Achievement) but want everyone to agree on how (Facilitator), leading to stalls. They get stuck in the 'how' and lose sight of the 'what.' They freeze at the intersection of speed and agreement. They delay action to avoid friction.\n\n**Frustration with Chaos:** They hate last-minute changes that disrupt the plan they worked hard to create. They can be rigid when the plan changes unexpectedly. They struggle to pivot quickly without a new plan in place. They view spontaneity as a threat to efficiency.\n\n**Silent Resentment:** They work hard and resent those who don't, but won't say it aloud to avoid conflict. They steam internally while picking up the slack. They become passive-aggressive instead of direct. They let resentment build until it affects their morale.",
@@ -780,7 +780,7 @@ INTEGRATED_PROFILES = {
     },
     "Facilitator-Growth": {
         "title": "The Patient Gardener",
-        "synergy": "Organic Development. They don't force growth; they create the conditions for it. They are incredibly patient with difficult staff or youth, believing that everyone can change if given enough time and support. They nurture rather than drive.",
+        "synergy": "**Leadership Archetype:** The Cultivator.\n\n**The Operational Vibe:** Gentle, curious, and observant. They don't force change; they plant seeds. They are content to wait for results. They notice the small shifts in culture that others miss.\n\n**Decision-Making Style:** Reflective. They need time to process. They will not give you an answer in the meeting; they will come back tomorrow with a perfectly thought-out plan.\n\n**The Value Proposition:** Organic Development. They grow a healthy culture from the ground up. They fix the root causes of toxicity rather than just treating the symptoms.\n\n**Strategic Blindspot:** They lack urgency. They view everything as a process that cannot be rushed, which creates frustration in a crisis where immediate action is required.",
         "support": "**Urgency:** You must provide the urgency, or they will let things grow forever. Remind them that sometimes we need to prune (fire/discipline) for the health of the whole. Be the winter to their summer to create balance. Help them see that time is a limited resource.\n\n**Outcome Focus:** Remind them that growth must eventually result in performance. Potential is not enough; we need kinetic energy and results. Help them connect development to deliverables and metrics. Ensure that the learning leads to doing.",
         "thriving": "**Turnaround Specialist:** They can take a failing staff member and slowly rehabilitate them. They save people others would fire by finding their hidden strengths. They have the magic touch for restoration and second chances. They see gold where others see dirt.\n\n**Deep Listening:** They understand the nuance of the unit better than anyone. They know the root system of the culture and the hidden dynamics. They see what others miss because they are paying attention. They diagnose the disease, not just the symptom.\n\n**Sustainable Pace:** They model a healthy work-life balance that prevents burnout. They run a marathon pace, not a sprint, ensuring longevity. They are in it for the long haul and help others do the same. They create a calm in the storm.",
         "struggling": "**Tolerance of Mediocrity:** They give people too many chances in the name of 'growth.' They enable bad behavior by refusing to set hard limits. They can't let go of the hope that someone will change, even when evidence says otherwise. They confuse kindness with weakness.\n\n**Slow to Launch:** They study the problem forever without fixing it. They get stuck in diagnosis and analysis paralysis. They over-analyze and under-act, waiting for perfect conditions. They value the theory over the practice.\n\n**Fear of Judgment:** They struggle to evaluate people because they know how hard growth is. They don't want to play judge or executioner. They avoid the hard call to protect the relationship and the person's feelings. They struggle to give a failing grade.",
@@ -805,7 +805,7 @@ INTEGRATED_PROFILES = {
     },
     "Facilitator-Purpose": {
         "title": "The Moral Compass",
-        "synergy": "Principled Consensus. They are the quiet conscience of the team. They ensure that the team doesn't just get things done, but gets them done right. They build unity around shared values and mission, creating a deeply ethical culture.",
+        "synergy": "**Leadership Archetype:** The Conscience.\n\n**The Operational Vibe:** Quietly principled. They don't shout about values, they just live them. They act as a check and balance on the team, ensuring that speed never compromises integrity.\n\n**Decision-Making Style:** Inclusive. They ensure the marginalized voices are heard before a decision is made. They ask 'Who will this hurt?' before 'How much will this save?'\n\n**The Value Proposition:** Inclusive Justice. They ensure the agency walks its talk. They build trust because staff know they will never be sold out for a quick win.\n\n**Strategic Blindspot:** They can be morally rigid. They may block necessary business decisions because they view them as 'impure,' refusing to accept the 'least bad option' in a tough situation.",
         "support": "**Validation of Values:** Regularly affirm their role as the ethical standard-bearer. Tell them, 'I appreciate that you always keep the client's needs in focus.' Reinforce that their conscience is an asset, not a liability. Make them feel seen for their integrity.\n\n**Decision Frameworks:** Give them a framework for making 'imperfect' decisions (e.g., 'We are choosing the least bad option'). Help them navigate the gray areas where values conflict. Provide tools for ethical triage. Help them accept trade-offs.",
         "thriving": "**Ethical Anchor:** When the team is confused, they bring everyone back to the mission statement. They center the boat in the storm. They provide true north when the map is lost. They remind everyone who we serve.\n\n**Unified Team:** They create a team culture where everyone feels respected and heard. They build a moral community based on trust. They foster deep connections among staff. They create a safe harbor for the team.\n\n**Trust:** Staff trust them implicitly because they know they are not self-interested. They have high credibility because their motives are pure. They walk the talk and model the values. They are seen as the 'good' leader.",
         "struggling": "**Moral Paralysis:** They refuse to make a decision because no option is perfectly ethical. They freeze in the face of ambiguity. They get stuck in the dilemma and stall the team. They let the perfect be the enemy of the good.\n\n**Passive Resistance:** Instead of arguing openly, they simply don't do the things they disagree with. They silently rebel against policies they dislike. They become a bottleneck for implementation. They vote with their feet (or their inaction).\n\n**Judgment:** They may silently judge others who are more pragmatic or business-minded. They can become self-righteous and isolated. They separate themselves from the 'impure' parts of the organization. They create an 'us vs. them' dynamic based on morals.",
@@ -830,7 +830,7 @@ INTEGRATED_PROFILES = {
     },
     "Facilitator-Connection": {
         "title": "The Peacemaker",
-        "synergy": "Harmonious Inclusion. They create a psychological safety net for the team. They lead by relationship, ensuring that staff feel loved, supported, and heard so they can do the hard work of care.",
+        "synergy": "**Leadership Archetype:** The Diplomat.\n\n**The Operational Vibe:** Harmonious, safe, and low-conflict. They absorb the stress of the unit so others don't have to. They are the oil in the machine, reducing friction between strong personalities.\n\n**Decision-Making Style:** Compromise. They look for the middle ground where everyone can live with the outcome. They hate polarization.\n\n**The Value Proposition:** Relational Stability. They keep the team from fracturing under pressure. They are the master de-escalators of both youth and staff.\n\n**Strategic Blindspot:** They are conflict-avoidant. They will let a problem fester rather than address it head-on, hoping it will resolve itself. They prioritize current peace over future health.",
         "support": "**Conflict Coaching:** They are likely terrified of conflict and will avoid it. Role-play hard conversations with them to build muscle memory. Be their sparring partner in a safe space. Build their confidence to say hard things.\n\n**Permission to Disappoint:** Explicitly tell them, 'It is okay if they are mad at you.' Absolve them of the need to please everyone all the time. Free them from the guilt of making a tough call. Remind them that leadership requires making people unhappy sometimes.",
         "thriving": "**High Retention:** People rarely leave their team because it feels good to work there. They build deep loyalty and connection. Staff feel loved and seen. They stay for the leader, not the paycheck.\n\n**Psychological Safety:** Staff admit mistakes freely because they aren't afraid of shame. The environment is low-fear and high-trust. People feel safe to fail and grow. They create a learning organization.\n\n**De-escalation:** They can calm a room just by walking in. They are a sedative for chaos and stress. They bring the peace to high-stress situations. Their presence lowers the blood pressure of the unit.",
         "struggling": "**The Doormat:** They let staff walk all over them to avoid a fight. They lose respect and authority. They become a pushover who cannot enforce rules. They get used by stronger personalities.\n\n**Exhaustion:** They carry everyone's emotional baggage and trauma. They develop compassion fatigue from over-caring. They burn out because they have no boundaries. They deplete themselves to feed others.\n\n**Triangulation:** Instead of addressing an issue directly, they complain to others to vent. They create side conversations to avoid the main conflict. They avoid the source of the pain. They create drama by trying to avoid it.",
@@ -855,7 +855,7 @@ INTEGRATED_PROFILES = {
     },
     "Tracker-Achievement": {
         "title": "The Architect",
-        "synergy": "Systematic Perfection. They build the systems that allow the team to succeed. They are the engineers of the unit. They ensure that nothing falls through the cracks and that every procedure is followed to the letter.",
+        "synergy": "**Leadership Archetype:** The Engineer.\n\n**The Operational Vibe:** Structured, precise, and efficient. They love a checklist. They find comfort in order and anxiety in chaos. They believe that a clean spreadsheet is a thing of beauty.\n\n**Decision-Making Style:** Data-Driven. They trust the numbers, not the feelings. If you can't prove it on a graph, they won't do it.\n\n**The Value Proposition:** Scalable Efficiency. They build the infrastructure that allows the agency to grow. They turn chaotic good intentions into repeatable systems.\n\n**Strategic Blindspot:** They forget the human variable. They design perfect systems for robots, not people. They get frustrated when staff don't follow the 'perfect' process, blaming the person instead of the design.",
         "support": "**Clarity:** Be hyper-clear about expectations and deliverables. Ambiguity is torture for them and leads to anxiety. If the instructions are vague, they will freeze or ask a million questions. Provide the map and the compass.\n\n**Time:** Give them the time to do it right. If you rush them, they will panic because they cannot ensure quality. Respect their need for precision and thoroughness. Don't force speed over quality unless necessary.",
         "thriving": "**Flawless Execution:** Their paperwork is perfect and their data is clean. Their audits are 100% compliant. You never have to check their work twice because they already checked it three times. They are meticulous and reliable.\n\n**System Builder:** They create new trackers or logs that save everyone time. They solve problems permanently by fixing the system, not just the symptom. They build infrastructure that outlasts them.\n\n**Reliability:** If they say it is done, it is done right. They are the most dependable person on the staff for technical tasks. They keep their word and their deadlines. They are a safe pair of hands.",
         "struggling": "**Rigidity:** They refuse to bend the rules even when it makes sense for the client. They value the policy over the person. They become the 'bureaucrat' who blocks progress. They lack flexibility and empathy in the moment.\n\n**Micromanagement:** If they lead others, they hover to ensure it is done 'perfectly.' They drive their staff crazy with minor corrections. They can't let go of control because they don't trust others' standards.\n\n**Critique:** They constantly point out others' errors and flaws. They become the 'compliance police,' alienating their peers. They focus on the negative and the gap, rather than the progress.",
@@ -880,7 +880,7 @@ INTEGRATED_PROFILES = {
     },
     "Tracker-Growth": {
         "title": "The Technical Expert",
-        "synergy": "Knowledge Mastery. They are the walking encyclopedia of the agency. They know every rule, every regulation, and every loophole. They lead by being the authority that everyone turns to for the answer.",
+        "synergy": "**Leadership Archetype:** The Professor.\n\n**The Operational Vibe:** Knowledgeable, exacting, and scholarly. They know the policy manual better than the person who wrote it. They love to teach the 'right way' to do things.\n\n**Decision-Making Style:** Evidence-Based. They research the best practice before moving. They hate guessing.\n\n**The Value Proposition:** Expertise. They raise the technical standard of the entire unit. They ensure we are providing professional, clinical care, not just babysitting.\n\n**Strategic Blindspot:** They can be know-it-alls. They struggle to accept feedback because they believe they are factually correct, missing the emotional or relational reality of the situation.",
         "support": "**Resources:** Give them access to the information they crave. Do not gatekeep the data or the policy. Open the books and let them read. Feed their mind with the details they need to feel secure.\n\n**Challenge:** Give them a problem that no one else can solve. They love a puzzle that tests their limits. Test their skills with a high-level project. Let them prove their worth through intellectual combat.",
         "thriving": "**Problem Solver:** They fix the technical issues that stump everyone else. They are the 'IT support' for the program logic. They find the solution where others see a dead end. They are invaluable in a crisis.\n\n**Teacher:** They patiently explain complex systems to others. They raise the unit's IQ by sharing what they know. They share the knowledge freely. They empower the team through education.\n\n**Innovator:** They find new tools or methods to make the work better. They upgrade the operating system of the team. They modernize the work. They are constantly tweaking the machine for better performance.",
         "struggling": "**Arrogance:** They can make others feel stupid for not knowing the rules. They weaponize their knowledge to dominate. They talk down to people who are less technical. They value IQ over EQ.\n\n**Over-Complication:** They design systems that are too complex for anyone else to use. They engineer for experts, not users. They lose the audience with jargon. They create barriers to entry.\n\n**Disengagement:** If they stop learning, they check out completely. They cannot tolerate stagnation or boredom. They get bored easily if the work becomes routine. They need constant stimulation.",
@@ -905,7 +905,7 @@ INTEGRATED_PROFILES = {
     },
     "Tracker-Purpose": {
         "title": "The Guardian",
-        "synergy": "Protective Compliance. They believe that following the rules is the highest form of caring. They protect the mission by ensuring that the agency never gets in trouble. They are the shield that keeps the organization safe from external threat.",
+        "synergy": "**Leadership Archetype:** The Compliance Officer.\n\n**The Operational Vibe:** Vigilant, protective, and serious. They view rules as safety. They believe that following the protocol is the highest form of caring for the child.\n\n**Decision-Making Style:** Risk-Averse. They look for the danger in every plan. Their default answer is 'No' until you prove it is safe.\n\n**The Value Proposition:** Compliance as Care. They keep the agency open. They prevent the lawsuits, the licensing violations, and the safety failures that close programs.\n\n**Strategic Blindspot:** They are the 'Department of No.' They block innovation and agility because they over-value safety. They can suffocate the spirit of the program with rules.",
         "support": "**Explanation:** Explain the 'why' behind every change in policy. If they think a change endangers the mission, they will block it. Give them the rationale so they can get on board.\n\n**Validation:** Validate their fears and concerns. Don't dismiss their anxiety; thank them for spotting the risk, then explain how you will mitigate it. Honor their watchfulness as a skill.",
         "thriving": "**Safety Net:** They catch the errors that would cause a lawsuit or a licensing violation. They save the agency's life by finding the needle in the haystack. They are the backstop that prevents failure.\n\n**Moral Consistency:** They ensure that we do what we say we do. They close the gap between values and behavior. They keep us honest and aligned with our mission.\n\n**Reliability:** You can trust them with the most sensitive tasks. They are a vault for secrets and safety. They are dependable and consistent.",
         "struggling": "**Bureaucracy:** They use rules to block necessary action. They value the form over the child. They get stuck in red tape and slow everything down. They lose the spirit of the law.\n\n**Fear-Mongering:** They constantly predict disaster and doom. They are the 'Chicken Little' of the unit. They spread anxiety to the rest of the team. They see risk everywhere.\n\n**Judgment:** They view errors as moral failings. If you mess up the paperwork, you don't care about the kids. They judge harshly and lack grace. They alienate teammates with their rigidity.",
@@ -930,7 +930,7 @@ INTEGRATED_PROFILES = {
     },
     "Tracker-Connection": {
         "title": "The Reliable Rock",
-        "synergy": "Servant Consistency. They show their love for the team by doing the work perfectly. They are the backbone of the unit. They don't want the spotlight; they just want to be useful and safe within the group.",
+        "synergy": "**Leadership Archetype:** The Steward.\n\n**The Operational Vibe:** Consistent, loyal, and service-oriented. They show love by doing the dishes and filing the paperwork. They are the background operating system of the team.\n\n**Decision-Making Style:** Routine. They prefer the known to the unknown. They will choose the path of stability over the path of disruption.\n\n**The Value Proposition:** Operational Support. They are the backbone that allows the 'stars' to shine. They handle the logistics so others can handle the emotions.\n\n**Strategic Blindspot:** They are passive. They wait to be told what to do rather than taking initiative. They can become the 'doormat' of the team, resentfully doing everyone else's work.",
         "support": "**Notice the Details:** Notice when they refill the copier or clean the breakroom. Small praises mean the world to them. Validate the invisible labor that keeps the office running. Show them you see them.\n\n**Change Management:** Hold their hand through change. Explain how the new way will help the people they love. Ease their anxiety about the unknown. Be their anchor during transitions.",
         "thriving": "**Steady Presence:** They are always there, always on time, always prepared. They are the anchor in the storm for the team. They are consistent and dependable. They provide stability.\n\n**Helper:** They use their skills to help others succeed. They are the best assistant manager you could ask for. They support the lead without ego. They make everyone else look good.\n\n**Culture Keeper:** They maintain the traditions and the history of the unit. They remember the birthdays and the anniversaries. They keep the family together through ritual. They nurture the bond.",
         "struggling": "**Overwhelmed:** They say 'yes' to everything to please people and then drown in the details. They cannot set boundaries. They burn out quietly without complaining. They suffer in silence.\n\n**Passive Aggressive:** If they feel unappreciated, they will slow down or withdraw. They punish you with silence and minimum effort. They resent the lack of thanks. They become stubborn.\n\n**Resistance to Change:** They dig their heels in when you try to change a routine. They love the rut because it is safe. They fear the new and the unknown. They block innovation.",
@@ -1180,7 +1180,7 @@ SUPERVISOR_CLASH_MATRIX = {
         },
         "Tracker": {
             "tension": "Consensus vs. Compliance (People vs. Policy)",
-            "psychology": "You (Facilitator) want to talk it out. They (Tracker) want to get it done. You feel steamrolled and disrespected. They feel slowed down and frustrated by 'pointless' discussion.",
+            "psychology": "You (Facilitator) want the team to agree. They (Tracker) want the team to follow the rule. You feel they are being rigid 'robots'. They feel you are treating safety rules as 'suggestions' to make people happy.",
             "watch_fors": ["**The Policy War:** They quote the handbook; you quote the 'context'.", "**Ignoring:** You ignoring their emails because they feel like nagging.", "**Anxiety:** They get anxious when you say 'let's just see how it goes'."],
             "intervention_steps": ["**1. Validate the Rule:** Acknowledge the policy first.", "**2. Contextualize the Exception:** Explain *why* this specific situation requires a bend.", "**3. Define the New Boundary:** Create a temporary rule so they feel safe."],
             "scripts": {
@@ -1418,34 +1418,12 @@ def generate_profile_content(comm, motiv):
     m_data = MOTIV_PROFILES.get(motiv, {})
     i_data = INTEGRATED_PROFILES.get(combo_key, {})
 
-    avoid_map = {
-        "Director": [
-            "**Wasting time with small talk:** This signals disrespect for their time.",
-            "**Vague answers:** They interpret ambiguity as incompetence.",
-            "**Micromanaging:** This signals you don't trust their capability."
-        ],
-        "Encourager": [
-            "**Public criticism:** This feels like a rejection of their identity.",
-            "**Ignoring feelings:** They view emotion as data; ignoring it misses the point.",
-            "**Transactional talk:** Skipping the 'hello' makes them feel used."
-        ],
-        "Facilitator": [
-            "**Pushing for instant decisions:** This feels reckless and unsafe to them.",
-            "**Aggressive confrontation:** This shuts them down instantly.",
-            "**Dismissing group concerns:** This violates their core value of fairness."
-        ],
-        "Tracker": [
-            "**Vague instructions:** This triggers anxiety about 'doing it wrong'.",
-            "**Asking to break policy:** This feels unethical and unsafe to them.",
-            "**Chaos/Disorganization:** They cannot respect a leader who is messy."
-        ]
-    }
-
     return {
         "s1_b": c_data.get('bullets'),
         "s2_b": c_data.get('supervising_bullets'),
         "s3_b": m_data.get('bullets'),
         "s4_b": m_data.get('strategies_bullets'),
+        # S5 is Synergy
         "s5": f"**Profile:** {i_data.get('title')}\n\n{i_data.get('synergy')}",
         "s6": i_data.get('support', ''),
         "s7": i_data.get('thriving', ''), # Thriving paragraphs
@@ -1454,12 +1432,7 @@ def generate_profile_content(comm, motiv):
         "s9_b": i_data.get('interventions', []),
         "s10_b": m_data.get('celebrate_bullets'),
         "coaching": i_data.get('questions', []),
-        "advancement": i_data.get('advancement', ''),
-        
-        # New keys for cheat sheet consistency
-        "cheat_do": c_data.get('supervising_bullets'),
-        "cheat_avoid": avoid_map.get(comm, []),
-        "cheat_fuel": m_data.get('strategies_bullets')
+        "advancement": i_data.get('advancement', '')
     }
 
 def clean_text(text):
@@ -1496,47 +1469,15 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
-    
-    # Colors
-    blue = (26, 115, 232)
-    green = (52, 168, 83)
-    red = (234, 67, 53)
-    black = (0, 0, 0)
-    gray = (128, 128, 128)
+    blue = (1, 91, 173); black = (0, 0, 0)
     
     # Header
     pdf.set_font("Arial", 'B', 20); pdf.set_text_color(*blue); pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align='C')
     pdf.set_font("Arial", '', 12); pdf.set_text_color(*black); pdf.cell(0, 8, clean_text(f"For: {name} ({role})"), ln=True, align='C')
-    pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C'); pdf.ln(5)
+    pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C'); pdf.ln(8)
     
     # Generate Data
     data = generate_profile_content(p_comm, p_mot)
-
-    # --- CHEAT SHEET SECTION (NEW) ---
-    pdf.set_fill_color(240, 240, 240)
-    pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, "Rapid Interaction Cheat Sheet", ln=True, fill=True, align='C')
-    pdf.ln(2)
-
-    def print_cheat_column(title, items, color_rgb):
-        pdf.set_font("Arial", 'B', 12)
-        pdf.set_text_color(*color_rgb)
-        pdf.cell(0, 8, title, ln=True)
-        pdf.set_text_color(0, 0, 0)
-        pdf.set_font("Arial", '', 10)
-        for item in items:
-            # Clean up bold markdown for PDF
-            clean_item = item.replace("**", "")
-            pdf.multi_cell(0, 5, clean_text(f"- {clean_item}"))
-        pdf.ln(2)
-
-    print_cheat_column("DO THIS (Communication):", data['cheat_do'], green)
-    print_cheat_column("AVOID THIS (Triggers):", data['cheat_avoid'], red)
-    print_cheat_column("FUEL (Motivation):", data['cheat_fuel'], blue)
-    
-    pdf.ln(5)
-    pdf.line(10, pdf.get_y(), 200, pdf.get_y()) # Horizontal line
-    pdf.ln(5)
 
     def add_section(title, body, bullets=None):
         pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
@@ -1583,57 +1524,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     data = generate_profile_content(p_comm, p_mot)
 
-    st.markdown("---")
-    
-    # --- DASHBOARD HEADER ---
-    st.markdown(f"### 📘 Supervisory Guide: {name}")
-    st.caption(f"Role: {role} | Profile: {p_comm}/{s_comm} • {p_mot}/{s_mot}")
-    
-    # --- VISUALIZATION SECTION ---
-    with st.container(border=True):
-        st.subheader("📊 Profile At-A-Glance")
-        vc1, vc2 = st.columns(2)
-        
-        with vc1:
-            # 1. COMMUNICATION RADAR
-            comm_scores = {"Director": 2, "Encourager": 2, "Facilitator": 2, "Tracker": 2}
-            if p_comm in comm_scores: comm_scores[p_comm] = 10
-            if s_comm in comm_scores: comm_scores[s_comm] = 7
-            
-            radar_df = pd.DataFrame(dict(r=list(comm_scores.values()), theta=list(comm_scores.keys())))
-            fig_comm = px.line_polar(radar_df, r='r', theta='theta', line_close=True, title="Communication Footprint", range_r=[0,10])
-            fig_comm.update_traces(fill='toself', line_color=BRAND_COLORS['blue'])
-            fig_comm.update_layout(height=300, margin=dict(t=30, b=30, l=30, r=30))
-            st.plotly_chart(fig_comm, use_container_width=True)
-            
-        with vc2:
-            # 2. MOTIVATION BATTERY
-            mot_scores = {"Achievement": 2, "Growth": 2, "Purpose": 2, "Connection": 2}
-            if p_mot in mot_scores: mot_scores[p_mot] = 10
-            if s_mot in mot_scores: mot_scores[s_mot] = 7
-            
-            sorted_mot = dict(sorted(mot_scores.items(), key=lambda item: item[1], reverse=True))
-            mot_df = pd.DataFrame(dict(Driver=list(sorted_mot.keys()), Intensity=list(sorted_mot.values())))
-            
-            fig_mot = px.bar(mot_df, x="Intensity", y="Driver", orientation='h', title="Motivation Drivers", color="Intensity", color_continuous_scale=[BRAND_COLORS['gray'], BRAND_COLORS['blue']])
-            fig_mot.update_layout(height=300, showlegend=False, margin=dict(t=30, b=30, l=30, r=30))
-            fig_mot.update_xaxes(visible=False)
-            st.plotly_chart(fig_mot, use_container_width=True)
-
-    # --- CHEAT SHEET SECTION ---
-    with st.expander("⚡ Rapid Interaction Cheat Sheet", expanded=True):
-        cc1, cc2, cc3 = st.columns(3)
-        with cc1:
-            st.markdown("##### ✅ Do This")
-            for b in data['cheat_do']: st.success(b)
-        with cc2:
-            st.markdown("##### ⛔ Avoid This")
-            for avoid in data['cheat_avoid']: st.error(avoid)
-        with cc3:
-            st.markdown("##### 🔋 Fuel")
-            for b in data['cheat_fuel']: st.info(b)
-
-    st.divider()
+    st.markdown("---"); st.markdown(f"### 📘 Supervisory Guide: {name}"); st.divider()
     
     def show_section(title, text, bullets=None):
         st.subheader(title)
@@ -1653,10 +1544,10 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     c1, c2 = st.columns(2)
     with c1:
         st.subheader("7. Thriving")
-        st.success(data['s7']) 
+        st.success(data['s7']) # Green box
     with c2:
         st.subheader("8. Struggling")
-        st.error(data['s8'])   
+        st.error(data['s8'])   # Red box
     
     st.markdown("<br>", unsafe_allow_html=True)
     show_section("9. Supervisory Interventions", None, data['s9_b'])
@@ -1723,75 +1614,73 @@ if st.session_state.current_view == "Supervisor's Guide":
             if current_selection in staff_options_list:
                 default_index = staff_options_list.index(current_selection)
 
-            with st.container(border=True):
-                sel = st.selectbox(
-                    "Select Staff", 
-                    staff_options_list, 
-                    index=default_index, 
-                    key="t1_staff_select",
-                    placeholder="Choose a staff member..."
-                )
+            sel = st.selectbox(
+                "Select Staff", 
+                staff_options_list, 
+                index=default_index, 
+                key="t1_staff_select",
+                placeholder="Choose a staff member..."
+            )
+            # --------------------------------------------
+            
+            if sel:
+                d = options[sel]
+                c1,c2,c3 = st.columns(3)
+                c1.metric("Role", d['role']); c2.metric("Style", d['p_comm']); c3.metric("Drive", d['p_mot'])
                 
-                if sel:
-                    d = options[sel]
-                    c1,c2,c3 = st.columns(3)
-                    c1.metric("Role", d['role']); c2.metric("Style", d['p_comm']); c3.metric("Drive", d['p_mot'])
-                    
-                    if st.button("Generate Guide", type="primary", use_container_width=True):
-                        st.session_state.generated_pdf = create_supervisor_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
-                        st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
-                        st.session_state.generated_name = d['name']
-                        display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
+                if st.button("Generate Guide", type="primary"):
+                    st.session_state.generated_pdf = create_supervisor_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
+                    st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
+                    st.session_state.generated_name = d['name']
+                    display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
 
-            if "generated_pdf" in st.session_state and st.session_state.get("generated_name") == d['name']:
-                st.divider()
-                st.markdown("#### 📤 Actions")
-                ac1, ac2 = st.columns([1, 2])
-                
-                with ac1:
-                    st.download_button(
-                        label="📥 Download PDF", 
-                        data=st.session_state.generated_pdf, 
-                        file_name=st.session_state.generated_filename, 
-                        mime="application/pdf",
-                        use_container_width=True
-                    )
-                
-                with ac2:
-                    with st.popover("📧 Email to Me", use_container_width=True):
-                        email_input = st.text_input("Recipient Email", placeholder="name@elmcrest.org")
-                        if st.button("Send Email"):
-                            if email_input:
-                                with st.spinner("Sending..."):
-                                    success, msg = send_pdf_via_email(
-                                        to_email=email_input,
-                                        subject=f"Supervisor Guide: {d['name']}",
-                                        body=f"Attached is the Compass Supervisor Guide for {d['name']}.",
-                                        pdf_bytes=st.session_state.generated_pdf,
-                                        filename=st.session_state.generated_filename
-                                    )
-                                    if success: st.success(msg)
-                                    else: st.error(msg)
-                            else:
-                                st.warning("Please enter an email address.")
-                
-            st.button("Reset", on_click=reset_t1)
+                if "generated_pdf" in st.session_state and st.session_state.get("generated_name") == d['name']:
+                    st.divider()
+                    st.markdown("#### 📤 Actions")
+                    ac1, ac2 = st.columns([1, 2])
+                    
+                    with ac1:
+                        st.download_button(
+                            label="📥 Download PDF", 
+                            data=st.session_state.generated_pdf, 
+                            file_name=st.session_state.generated_filename, 
+                            mime="application/pdf",
+                            use_container_width=True
+                        )
+                    
+                    with ac2:
+                        with st.popover("📧 Email to Me", use_container_width=True):
+                            email_input = st.text_input("Recipient Email", placeholder="name@elmcrest.org")
+                            if st.button("Send Email"):
+                                if email_input:
+                                    with st.spinner("Sending..."):
+                                        success, msg = send_pdf_via_email(
+                                            to_email=email_input,
+                                            subject=f"Supervisor Guide: {d['name']}",
+                                            body=f"Attached is the Compass Supervisor Guide for {d['name']}.",
+                                            pdf_bytes=st.session_state.generated_pdf,
+                                            filename=st.session_state.generated_filename
+                                        )
+                                        if success: st.success(msg)
+                                        else: st.error(msg)
+                                else:
+                                    st.warning("Please enter an email address.")
+                    
+                st.button("Reset", on_click=reset_t1)
 
     # --- MANUAL TAB ---
     with sub2:
-        with st.container(border=True):
-            st.info("Use this tab to generate a PDF for someone who isn't in the database yet, without saving them.")
-            with st.form("manual"):
-                c1,c2 = st.columns(2)
-                mn = c1.text_input("Name"); mr = c2.selectbox("Role", ["YDP", "Shift Supervisor", "Program Supervisor"])
-                mpc = c1.selectbox("Comm", COMM_TRAITS); mpm = c2.selectbox("Motiv", MOTIV_TRAITS)
-                
-                if st.form_submit_button("Generate PDF Only") and mn:
-                    pdf_manual = create_supervisor_guide(mn, mr, mpc, None, mpm, None)
-                    fname_manual = f"Guide_{mn.replace(' ', '_')}.pdf"
-                    st.session_state.manual_pdf = pdf_manual
-                    st.session_state.manual_fname = fname_manual
-                    display_guide(mn, mr, mpc, None, mpm, None)
+        with st.form("manual"):
+            c1,c2 = st.columns(2)
+            mn = c1.text_input("Name"); mr = c2.selectbox("Role", ["YDP", "Shift Supervisor", "Program Supervisor"])
+            mpc = c1.selectbox("Comm", COMM_TRAITS); mpm = c2.selectbox("Motiv", MOTIV_TRAITS)
+            
+            if st.form_submit_button("Generate") and mn:
+                pdf_manual = create_supervisor_guide(mn, mr, mpc, None, mpm, None)
+                fname_manual = f"Guide_{mn.replace(' ', '_')}.pdf"
+                st.session_state.manual_pdf = pdf_manual
+                st.session_state.manual_fname = fname_manual
+                display_guide(mn, mr, mpc, None, mpm, None)
 
         if "manual_pdf" in st.session_state:
             st.divider()
@@ -1816,63 +1705,60 @@ if st.session_state.current_view == "Supervisor's Guide":
 
     # --- [NEW] INPUT OFFLINE DATA TAB ---
     with sub3:
-        with st.container(border=True):
-            st.markdown("### 📥 Input Offline Results")
-            st.info("Use this form to enter results from paper assessments. This will save the data to the Google Sheet and update the database.")
+        st.markdown("### 📥 Input Offline Results")
+        st.info("Use this form to enter results from paper assessments. This will save the data to the Google Sheet and update the database.")
+        
+        with st.form("offline_input_form"):
+            col_a, col_b = st.columns(2)
             
-            with st.form("offline_input_form"):
-                col_a, col_b = st.columns(2)
-                
-                with col_a:
-                    off_name = st.text_input("Staff Name (Required)")
-                    off_email = st.text_input("Email (Optional)")
-                    off_role = st.selectbox("Role", ["YDP", "Shift Supervisor", "Program Supervisor", "Clinician", "TSS Staff", "Other"])
-                    off_cottage = st.selectbox("Program/Cottage", ["Building 10", "Cottage 2", "Cottage 3", "Cottage 7", "Cottage 8", "Cottage 9", "Cottage 11", "Euclid", "Overnight", "Skeele Valley", "TSS Staff", "Other"])
-                
-                with col_b:
-                    st.markdown("**Assessment Results**")
-                    off_p_comm = st.selectbox("Primary Communication", COMM_TRAITS, key="off_pc")
-                    off_s_comm = st.selectbox("Secondary Communication", COMM_TRAITS, key="off_sc")
-                    off_p_mot = st.selectbox("Primary Motivation", MOTIV_TRAITS, key="off_pm")
-                    off_s_mot = st.selectbox("Secondary Motivation", MOTIV_TRAITS, key="off_sm")
-                
-                st.markdown("---")
-                if st.form_submit_button("💾 Save to Database", type="primary"):
-                    if off_name:
-                        with st.spinner("Saving to Google Sheets..."):
-                            payload = {
-                                "name": off_name,
-                                "email": off_email,
-                                "role": off_role,
-                                "cottage": off_cottage,
-                                "p_comm": off_p_comm,
-                                "s_comm": off_s_comm,
-                                "p_mot": off_p_mot,
-                                "s_mot": off_s_mot
-                            }
+            with col_a:
+                off_name = st.text_input("Staff Name (Required)")
+                off_email = st.text_input("Email (Optional)")
+                off_role = st.selectbox("Role", ["YDP", "Shift Supervisor", "Program Supervisor", "Clinician", "TSS Staff", "Other"])
+                off_cottage = st.selectbox("Program/Cottage", ["Building 10", "Cottage 2", "Cottage 3", "Cottage 7", "Cottage 8", "Cottage 9", "Cottage 11", "Euclid", "Overnight", "Skeele Valley", "TSS Staff", "Other"])
+            
+            with col_b:
+                st.markdown("**Assessment Results**")
+                off_p_comm = st.selectbox("Primary Communication", COMM_TRAITS, key="off_pc")
+                off_s_comm = st.selectbox("Secondary Communication", COMM_TRAITS, key="off_sc")
+                off_p_mot = st.selectbox("Primary Motivation", MOTIV_TRAITS, key="off_pm")
+                off_s_mot = st.selectbox("Secondary Motivation", MOTIV_TRAITS, key="off_sm")
+            
+            st.markdown("---")
+            if st.form_submit_button("💾 Save to Database", type="primary"):
+                if off_name:
+                    with st.spinner("Saving to Google Sheets..."):
+                        payload = {
+                            "name": off_name,
+                            "email": off_email,
+                            "role": off_role,
+                            "cottage": off_cottage,
+                            "p_comm": off_p_comm,
+                            "s_comm": off_s_comm,
+                            "p_mot": off_p_mot,
+                            "s_mot": off_s_mot
+                        }
+                        
+                        success = submit_data_to_google(payload)
+                        
+                        if success:
+                            st.success(f"Successfully saved {off_name}!")
                             
-                            success = submit_data_to_google(payload)
-                            
-                            if success:
-                                st.success(f"Successfully saved {off_name}!")
-                                
-                                # Manually update local session state so we don't have to reload to see them
-                                new_row = payload.copy()
-                                st.session_state.staff_df = pd.concat([st.session_state.staff_df, pd.DataFrame([new_row])], ignore_index=True)
-                                time.sleep(1)
-                                st.rerun()
-                            else:
-                                st.error("Failed to save. Please check your internet connection or the Google Script URL.")
-                    else:
-                        st.error("Name is required.")
+                            # Manually update local session state so we don't have to reload to see them
+                            new_row = payload.copy()
+                            st.session_state.staff_df = pd.concat([st.session_state.staff_df, pd.DataFrame([new_row])], ignore_index=True)
+                            time.sleep(1)
+                            st.rerun()
+                        else:
+                            st.error("Failed to save. Please check your internet connection or the Google Script URL.")
+                else:
+                    st.error("Name is required.")
 
 # 2. TEAM DNA
 elif st.session_state.current_view == "Team DNA":
     st.subheader("🧬 Team DNA")
     if not df.empty:
-        with st.container(border=True):
-            teams = st.multiselect("Select Team Members", df['name'].tolist(), key="t2_team_select")
-        
+        teams = st.multiselect("Select Team Members", df['name'].tolist(), key="t2_team_select")
         if teams:
             tdf = df[df['name'].isin(teams)]
             
@@ -1884,10 +1770,10 @@ elif st.session_state.current_view == "Team DNA":
 
             c1, c2 = st.columns(2)
             with c1:
-                with st.container(border=True):
-                    # Weighted Communication
-                    comm_counts = calculate_weighted_counts(tdf, 'p_comm', 's_comm')
-                    st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
+                # Weighted Communication
+                comm_counts = calculate_weighted_counts(tdf, 'p_comm', 's_comm')
+                
+                st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
                 
                 # DOMINANT CULTURE ANALYSIS
                 if not comm_counts.empty:
@@ -1897,24 +1783,22 @@ elif st.session_state.current_view == "Team DNA":
                     
                     if ratio > 0.4: # Slightly lower threshold for weighted dominance
                         guide = TEAM_CULTURE_GUIDE.get(dom_style, {})
-                        with st.container(border=True):
-                            st.warning(f"⚠️ **Dominant Culture:** This team is {int(ratio*100)}% **{dom_style}** (incl. secondary styles).")
-                            with st.expander(f"📖 Managing the {guide.get('title', dom_style)}", expanded=True):
-                                st.markdown(f"**The Vibe:**\n{guide.get('impact_analysis')}")
-                                st.markdown(guide.get('management_strategy'))
-                                st.markdown(f"**📋 Meeting Protocol:**\n{guide.get('meeting_protocol')}")
-                                st.info(f"**🎉 Team Building Idea:** {guide.get('team_building')}")
+                        st.warning(f"⚠️ **Dominant Culture:** This team is {int(ratio*100)}% **{dom_style}** (incl. secondary styles).")
+                        with st.expander(f"📖 Managing the {guide.get('title', dom_style)}", expanded=True):
+                            st.markdown(f"**The Vibe:**\n{guide.get('impact_analysis')}")
+                            st.markdown(guide.get('management_strategy'))
+                            st.markdown(f"**📋 Meeting Protocol:**\n{guide.get('meeting_protocol')}")
+                            st.info(f"**🎉 Team Building Idea:** {guide.get('team_building')}")
                     else:
                         # BALANCED CULTURE
                         guide = TEAM_CULTURE_GUIDE.get("Balanced", {})
-                        with st.container(border=True):
-                            st.info("**Balanced Culture:** No single style dominates significantly. This reduces blindspots but may increase friction.")
-                            with st.expander("📖 Managing a Balanced Team", expanded=True):
-                                st.markdown("""**The Balanced Friction:**
-                                A diverse team has no blind spots, but it speaks 4 different languages. Your role is **The Translator**.
-                                * **Translate Intent:** 'The Director isn't being mean; they are being efficient.' 'The Tracker isn't being difficult; they are being safe.'
-                                * **Rotate Leadership:** Let the Director lead the crisis; let the Encourager lead the debrief; let the Tracker lead the audit.
-                                * **Meeting Protocol:** Use structured turn-taking (Round Robin) so the loudest voice doesn't always win.""")
+                        st.info("**Balanced Culture:** No single style dominates significantly. This reduces blindspots but may increase friction.")
+                        with st.expander("📖 Managing a Balanced Team", expanded=True):
+                             st.markdown("""**The Balanced Friction:**
+                             A diverse team has no blind spots, but it speaks 4 different languages. Your role is **The Translator**.
+                             * **Translate Intent:** 'The Director isn't being mean; they are being efficient.' 'The Tracker isn't being difficult; they are being safe.'
+                             * **Rotate Leadership:** Let the Director lead the crisis; let the Encourager lead the debrief; let the Tracker lead the audit.
+                             * **Meeting Protocol:** Use structured turn-taking (Round Robin) so the loudest voice doesn't always win.""")
 
                 # MISSING VOICE ANALYSIS
                 # Check presence in Primary OR Secondary
@@ -1925,34 +1809,34 @@ elif st.session_state.current_view == "Team DNA":
                 missing_styles = set(COMM_TRAITS) - all_present
                 
                 if missing_styles:
-                    with st.container(border=True):
-                        st.error(f"🚫 **Missing Voices:** {', '.join(missing_styles)}")
-                        cols = st.columns(len(missing_styles))
-                        for idx, style in enumerate(missing_styles):
-                            with cols[idx]:
-                                data = MISSING_VOICE_GUIDE.get(style, {})
-                                st.markdown(f"**Without a {style}:**")
-                                st.write(data.get('risk'))
-                                st.success(f"**Supervisor Fix:** {data.get('fix')}")
+                    st.markdown("---")
+                    st.error(f"🚫 **Missing Voices:** {', '.join(missing_styles)}")
+                    cols = st.columns(len(missing_styles))
+                    for idx, style in enumerate(missing_styles):
+                        with cols[idx]:
+                             data = MISSING_VOICE_GUIDE.get(style, {})
+                             with st.container(border=True):
+                                 st.markdown(f"**Without a {style}:**")
+                                 st.write(data.get('risk'))
+                                 st.success(f"**Supervisor Fix:** {data.get('fix')}")
 
             with c2:
-                with st.container(border=True):
-                    # Weighted Motivation
-                    mot_counts = calculate_weighted_counts(tdf, 'p_mot', 's_mot')
-                    st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
+                # Weighted Motivation
+                mot_counts = calculate_weighted_counts(tdf, 'p_mot', 's_mot')
+                st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
                 
                 # MOTIVATION GAP ANALYSIS
                 if not mot_counts.empty:
                     dom_mot = mot_counts.idxmax()
-                    with st.container(border=True):
-                        st.subheader(f"⚠️ Motivation Gap: {dom_mot} Driven")
-                        
-                        # Fetch data from new dictionary
-                        mot_guide = MOTIVATION_GAP_GUIDE.get(dom_mot, {})
-                        if mot_guide:
-                            st.warning(mot_guide['warning'])
-                            with st.expander("💡 Coaching Strategy for this Driver", expanded=True):
-                                st.markdown(mot_guide['coaching'])
+                    st.markdown("---")
+                    st.subheader(f"⚠️ Motivation Gap: {dom_mot} Driven")
+                    
+                    # Fetch data from new dictionary
+                    mot_guide = MOTIVATION_GAP_GUIDE.get(dom_mot, {})
+                    if mot_guide:
+                        st.warning(mot_guide['warning'])
+                        with st.expander("💡 Coaching Strategy for this Driver", expanded=True):
+                            st.markdown(mot_guide['coaching'])
             
             st.button("Clear", on_click=reset_t2)
 
@@ -1980,15 +1864,14 @@ elif st.session_state.current_view == "Conflict Mediator":
             else:
                 st.error("❌ No API Key Found")
 
-        with st.container(border=True):
-            c1, c2 = st.columns(2)
-            p1 = c1.selectbox("Select Yourself (Supervisor)", df['name'].unique(), index=None, key="p1")
-            p2 = c2.selectbox("Select Staff Member", df['name'].unique(), index=None, key="p2")
+        c1, c2 = st.columns(2)
+        p1 = c1.selectbox("Select Yourself (Supervisor)", df['name'].unique(), index=None, key="p1")
+        p2 = c2.selectbox("Select Staff Member", df['name'].unique(), index=None, key="p2")
         
         if p1 and p2 and p1 != p2:
             d1 = df[df['name']==p1].iloc[0]; d2 = df[df['name']==p2].iloc[0]
             
-            # Extract Primary AND Secondary styles
+            # [CHANGE] Extract Primary AND Secondary styles
             s1_p, s1_s = d1['p_comm'], d1['s_comm']
             m1_p, m1_s = d1['p_mot'], d1['s_mot']
             
@@ -1996,10 +1879,10 @@ elif st.session_state.current_view == "Conflict Mediator":
             m2_p, m2_s = d2['p_mot'], d2['s_mot']
             
             st.divider()
-            # Display full profile in header
+            # [CHANGE] Display full profile in header
             st.subheader(f"{s1_p}/{s1_s} (Sup) vs. {s2_p}/{s2_s} (Staff)")
             
-            # Updated Logic to display BOTH Primary and Secondary clashes
+            # [CHANGE] Updated Logic to display BOTH Primary and Secondary clashes
             if s1_p in SUPERVISOR_CLASH_MATRIX and s2_p in SUPERVISOR_CLASH_MATRIX[s1_p]:
                 clash_p = SUPERVISOR_CLASH_MATRIX[s1_p][s2_p]
                 
@@ -2031,7 +1914,16 @@ elif st.session_state.current_view == "Conflict Mediator":
                             script_tabs = st.tabs(list(clash_p['scripts'].keys()))
                             for i, (cat, text) in enumerate(clash_p['scripts'].items()):
                                 with script_tabs[i]:
-                                    st.success(f"\"{text}\"")
+                                    # Split script and rationale for display if present
+                                    if "**Script:**" in text:
+                                        parts = text.split("**Rationale:**")
+                                        script_part = parts[0].replace("**Script:**", "").strip().strip('"')
+                                        rationale_part = parts[1].strip() if len(parts) > 1 else ""
+                                        st.success(f"\"{script_part}\"")
+                                        if rationale_part:
+                                            st.info(f"💡 **Why this works:** {rationale_part}")
+                                    else:
+                                        st.success(f"\"{text}\"")
 
                     # --- TAB 2: SECONDARY (ROUTINE) ---
                     with t_sec:
@@ -2081,7 +1973,7 @@ elif st.session_state.current_view == "Conflict Mediator":
                 # -------------------------------------------
                 # LOGIC ENGINE: HYBRID (Rule-Based + Gemini)
                 # -------------------------------------------
-                # Updated function to accept full profiles
+                # [CHANGE] Updated function to accept full profiles
                 def get_smart_response(query, p2_name, s2_p, s2_s, m2_p, m2_s, s1_p, s1_s, m1_p, m1_s, key):
                     # Prepare Context Data (Primary)
                     comm_data = COMM_PROFILES.get(s2_p, {})
@@ -2090,7 +1982,7 @@ elif st.session_state.current_view == "Conflict Mediator":
                     # If API Key exists, use Gemini
                     if key:
                         try:
-                            # Enhanced System Prompt with Secondary Styles
+                            # [CHANGE] Enhanced System Prompt with Secondary Styles
                             system_prompt = f"""
                             You are an expert Leadership Coach for a youth care agency.
                             You are advising a Supervisor on how to manage a staff member named {p2_name}.
@@ -2223,9 +2115,8 @@ elif st.session_state.current_view == "Career Pathfinder":
                         st.divider()
                         st.success(f"**Success:** {path['success_indicators']}")
                         st.error(f"**Red Flags:** {path['red_flags']}")
-                if 'debrief_questions' in path:
-                    with st.expander("🧠 Post-Assignment Debrief Questions"):
-                        for q in path['debrief_questions']: st.markdown(f"- {q}")
+            else:
+                 st.warning("Career path data not available for this combination.")
             st.button("Reset", key="reset_t4", on_click=reset_t4)
 
 # 5. ORG PULSE
