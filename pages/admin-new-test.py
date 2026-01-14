@@ -1509,7 +1509,70 @@ def generate_profile_content(comm, motiv):
     comm_quick = " ".join([kp for kp in comm_keypoints[:2] if kp]).strip()
     motiv_quick = " ".join([kp for kp in motiv_keypoints[:2] if kp]).strip()
 
-    s1_text = f"**Quick read:** {comm_quick}" if comm_quick else ""
+    # --- Section 1 (Expanded): Communication Profile ---
+    # Keep the original bullets for detail, but add a structured overview that matches the #5 style
+    comm_style_map = {
+        "Director": {
+            "optimize_for": "speed, clarity, and decisive movement.",
+            "receive": ["Lead with the conclusion first, then the rationale.", "Frame updates in outcomes, risks, and deadlines."],
+            "misreads": ["Brevity can sound harsh (it’s usually efficiency).", "Direct challenge is often problem-solving, not personal criticism."],
+            "listen_for": ["“What’s the point?” = tighten the message.", "“What’s the plan?” = show the path, not the drama."]
+        },
+        "Encourager": {
+            "optimize_for": "connection, momentum, and shared belief.",
+            "receive": ["Start with people-impact, then the task.", "Invite dialogue—they process by talking."],
+            "misreads": ["Warmth can be mistaken for lack of seriousness.", "Lots of words can be processing, not avoidance."],
+            "listen_for": ["“How are we doing?” = check the emotional temperature.", "“Are we aligned?” = reaffirm the shared goal."]
+        },
+        "Facilitator": {
+            "optimize_for": "harmony, fairness, and steady consensus.",
+            "receive": ["Give context and let them think before answering.", "Offer options and ask for input on impact to others."],
+            "misreads": ["Pauses can be mistaken for indecision (often it’s careful weighing).", "Conflict-avoidance can look like disengagement (often it’s conflict-management)."],
+            "listen_for": ["“What do others think?” = map stakeholder impact.", "“What’s the safest approach?” = reduce disruption."]
+        },
+        "Tracker": {
+            "optimize_for": "accuracy, predictability, and correctness.",
+            "receive": ["Be specific: who/what/when/how documented.", "Explain the ‘why’ behind changes to process."],
+            "misreads": ["Detail can be mistaken for rigidity (it’s risk-control).", "Questions can be mistaken for pushback (it’s due diligence)."],
+            "listen_for": ["“What’s the standard?” = anchor to policy/expectations.", "“What’s the exact process?” = reduce ambiguity."]
+        }
+    }
+
+    style = comm_style_map.get(comm, {})
+    s1_lines = []
+
+    if comm_quick:
+        s1_lines.append(f"**Quick read:** {comm_quick}")
+
+    if style.get("optimize_for"):
+        s1_lines.append(f"\n**What they’re optimizing for:** {style['optimize_for']}")
+
+    # Pull the bolded labels from the existing bullets (no duplication—just a clean summary)
+    labels = []
+    for b in (comm_bullets or [])[:3]:
+        m = re.match(r"\*\*(.+?)\:\*\*\s*(.+)", str(b).strip())
+        if m:
+            labels.append(m.group(1).strip())
+
+    if labels:
+        s1_lines.append("\n**Core levers in their style:** " + ", ".join(labels) + ".")
+
+    if style.get("receive"):
+        s1_lines.append("\n**Best way to deliver information to them:**")
+        for tip in style["receive"]:
+            s1_lines.append(f"- {tip}")
+
+    if style.get("listen_for"):
+        s1_lines.append("\n**Phrases to listen for (and what they usually signal):**")
+        for cue in style["listen_for"]:
+            s1_lines.append(f"- {cue}")
+
+    if style.get("misreads"):
+        s1_lines.append("\n**Common misreads (help your team interpret them accurately):**")
+        for r in style["misreads"]:
+            s1_lines.append(f"- {r}")
+
+    s1_text = "\n".join([x for x in s1_lines if x]).strip()
     s2_text = (
         "Use the moves below as your default operating system with them. "
         "When you need to correct course, change *one variable at a time* (clarity, tone, timing, or channel) "
