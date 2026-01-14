@@ -5,6 +5,7 @@ from fpdf import FPDF
 import plotly.express as px
 import time
 import json
+import re
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
