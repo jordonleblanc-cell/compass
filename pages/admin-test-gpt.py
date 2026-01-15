@@ -1680,77 +1680,205 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # --- VISUAL BREAK: QUICK COACHING MAP (between 1-6 and 7-8) ---
     with st.container(border=True):
         st.subheader("🧭 Quick Coaching Map")
-        st.caption("A fast visual to help you choose your tone, pace, and proof level before you start the conversation.")
+        st.caption("A fast setup guide: dial in Tone, Pace, and Proof for *this* person before you start the conversation.")
 
         m1, m2 = st.columns([1.2, 1])
 
-        # 1) Communication Map (directness x expressiveness)
-        with m1:
-            comm_map = {
-                "Director": {"x": 9, "y": 6, "label": "Direct + Fast"},
-                "Encourager": {"x": 7, "y": 9, "label": "Warm + Verbal"},
-                "Facilitator": {"x": 3, "y": 4, "label": "Quiet + Consensus"},
-                "Tracker": {"x": 4, "y": 2, "label": "Precise + Cautious"}
+        # --- Internal helper: compact lever guidance (kept distinct from Section 6 text) ---
+        COMM_LEVERS = {
+            "Director": {
+                "tone": [
+                    "Lead with respect and confidence—no over-softening or excessive reassurance.",
+                    "Use direct language, but keep it neutral (no sarcasm, no moralizing).",
+                    "Acknowledge competence first: “I trust you—here’s the target.”"
+                ],
+                "pace": [
+                    "Move quickly through the setup: goal → constraint → next step.",
+                    "Use short checkpoints (2–3 minutes) instead of long debriefs.",
+                    "If the conversation drifts, re-center with: “What’s the decision?”"
+                ],
+                "proof": [
+                    "Use outcomes and thresholds (“by end of shift,” “two examples,” “one change”).",
+                    "Bring the *one* most relevant policy/metric—avoid dumping context.",
+                    "Agree on what ‘done’ looks like before you discuss ‘how.’"
+                ]
+            },
+            "Encourager": {
+                "tone": [
+                    "Warm and personal up front—connection buys attention.",
+                    "Be upbeat, but don’t let optimism blur accountability.",
+                    "Name impact on people: “Here’s how this supports the team/youth.”"
+                ],
+                "pace": [
+                    "Give a brief runway for talk, then time-box the decision moment.",
+                    "Use a visible agenda: “2 minutes to process, then we pick a step.”",
+                    "End with a recap so momentum doesn’t evaporate."
+                ],
+                "proof": [
+                    "Use examples and stories, then translate into one concrete action.",
+                    "Write the follow-up in plain language (bullets, not paragraphs).",
+                    "Confirm specifics: who/what/when—don’t assume agreement = clarity."
+                ]
+            },
+            "Facilitator": {
+                "tone": [
+                    "Calm, collaborative, and invitational—lower the perceived threat.",
+                    "Validate input before directing: “That’s a fair point; here’s the decision.”",
+                    "Use ‘we’ language to preserve dignity while holding the line."
+                ],
+                "pace": [
+                    "Slow the start; speed up the finish (decision date + next step).",
+                    "Offer options: “We can do A or B—pick one by 3pm.”",
+                    "Avoid surprise pivots—signal transitions clearly."
+                ],
+                "proof": [
+                    "Use process clarity: steps, roles, and handoffs.",
+                    "Document agreements so they don’t re-open the loop later.",
+                    "Anchor in shared standards (“what we do every time”)."
+                ]
+            },
+            "Tracker": {
+                "tone": [
+                    "Steady and factual—avoid emotional heat or vague praise/critique.",
+                    "Assume good intent; focus on accuracy and risk reduction.",
+                    "Invite questions and acknowledge precision as a strength."
+                ],
+                "pace": [
+                    "Give a moment to think; don’t force instant answers on complex asks.",
+                    "Break the ask into steps with a checkpoint after each step.",
+                    "Avoid stacking multiple changes at once—sequence them."
+                ],
+                "proof": [
+                    "Use specifics: dates, counts, examples, and the exact expectation.",
+                    "Reference the policy/standard that matters most (one source).",
+                    "End with a written next step (what to document + by when)."
+                ]
+            }
+        }
+
+        MOT_LEVER_BONUS = {
+            "Achievement": {
+                "tone": ["Frame feedback as performance coaching (scoreboard, targets, wins)."],
+                "pace": ["Keep it crisp—define the win condition and the fastest safe path."],
+                "proof": ["Use metrics, deadlines, and visible progress checks."]
+            },
+            "Growth": {
+                "tone": ["Use developmental language: “Here’s the skill we’re building next.”"],
+                "pace": ["Add a short reflection beat: “What did you learn from that moment?”"],
+                "proof": ["Use feedback loops: one tweak → one rep → one review."]
+            },
+            "Purpose": {
+                "tone": ["Connect correction to values and youth wellbeing (the ‘why’ matters)."],
+                "pace": ["Pause before directives if emotions are high—regulate first, then act."],
+                "proof": ["Use real impact examples (safety, trust, dignity) plus a concrete step."]
+            },
+            "Connection": {
+                "tone": ["Prioritize belonging: “I’m with you—and we still need this change.”"],
+                "pace": ["Don’t rush the relationship moment; time-box it so it stays productive."],
+                "proof": ["Use relational proof: “Here’s how this affects the team dynamic.”"]
+            }
+        }
+
+        def _dedupe(items):
+            seen = set()
+            out = []
+            for x in items:
+                k = re.sub(r"\s+", " ", str(x).strip())
+                if k and k not in seen:
+                    out.append(k)
+                    seen.add(k)
+            return out
+
+        def build_lever_playbook(p_comm, s_comm, p_mot, s_mot):
+            # Start from primary comm
+            base = COMM_LEVERS.get(p_comm, COMM_LEVERS.get("Facilitator"))
+            play = {
+                "tone": list(base.get("tone", [])),
+                "pace": list(base.get("pace", [])),
+                "proof": list(base.get("proof", [])),
             }
 
-            points = []
-            for k, v in comm_map.items():
-                points.append({
-                    "Style": k,
-                    "Directness": v["x"],
-                    "Expressiveness": v["y"],
-                    "Role": "Reference",
-                    "Size": 14
-                })
+            # Light seasoning from secondary comm (1 item each max)
+            sec = COMM_LEVERS.get(s_comm)
+            if sec:
+                for k in ("tone", "pace", "proof"):
+                    if sec.get(k):
+                        play[k].append(sec[k][0])
 
-            # Primary/Secondary markers
-            if p_comm in comm_map:
-                points.append({
-                    "Style": f"Primary: {p_comm}",
-                    "Directness": comm_map[p_comm]["x"],
-                    "Expressiveness": comm_map[p_comm]["y"],
-                    "Role": "Primary",
-                    "Size": 26
-                })
-            if s_comm in comm_map:
-                points.append({
-                    "Style": f"Secondary: {s_comm}",
-                    "Directness": comm_map[s_comm]["x"],
-                    "Expressiveness": comm_map[s_comm]["y"],
-                    "Role": "Secondary",
-                    "Size": 20
-                })
+            # Motivation bonuses (primary + optional secondary)
+            for mot in [p_mot, s_mot]:
+                bonus = MOT_LEVER_BONUS.get(mot)
+                if bonus:
+                    play["tone"] += bonus.get("tone", [])
+                    play["pace"] += bonus.get("pace", [])
+                    play["proof"] += bonus.get("proof", [])
 
-            comm_plot_df = pd.DataFrame(points)
+            # Trim + dedupe to keep the cards tight and non-redundant
+            play["tone"] = _dedupe(play["tone"])[:4]
+            play["pace"] = _dedupe(play["pace"])[:4]
+            play["proof"] = _dedupe(play["proof"])[:4]
+            return play
 
-            fig_map = px.scatter(
-                comm_plot_df,
-                x="Directness",
-                y="Expressiveness",
-                color="Role",
-                size="Size",
-                text="Style",
-                title="Communication Map (Directness × Expressiveness)"
-            )
-            fig_map.update_traces(textposition="top center")
-            fig_map.update_layout(
-                height=340,
-                margin=dict(t=40, b=30, l=30, r=30),
-                xaxis=dict(range=[0, 10], title="More Direct →"),
-                yaxis=dict(range=[0, 10], title="More Expressive ↑"),
-                legend_title_text=""
-            )
-            fig_map.update_xaxes(showgrid=True, zeroline=False)
-            fig_map.update_yaxes(showgrid=True, zeroline=False)
-            st.plotly_chart(fig_map, use_container_width=True)
+        playbook = build_lever_playbook(p_comm, s_comm, p_mot, s_mot)
 
-        # 2) Coaching Levers (tone, pace, proof)
+        # 1) More useful visual: recommended dial settings (0–10)
+        with m1:
+            # Base positions by communication style
+            base_dials = {
+                "Director":  {"Tone": 4, "Pace": 9, "Proof": 6},
+                "Encourager": {"Tone": 9, "Pace": 7, "Proof": 5},
+                "Facilitator": {"Tone": 7, "Pace": 4, "Proof": 6},
+                "Tracker": {"Tone": 6, "Pace": 3, "Proof": 9},
+            }
+            d = base_dials.get(p_comm, {"Tone": 7, "Pace": 5, "Proof": 6}).copy()
+
+            # Motivation nudges
+            if p_mot == "Achievement":
+                d["Pace"] = min(10, d["Pace"] + 1); d["Proof"] = min(10, d["Proof"] + 1)
+            if p_mot == "Growth":
+                d["Proof"] = min(10, d["Proof"] + 1)
+            if p_mot == "Purpose":
+                d["Tone"] = min(10, d["Tone"] + 1)
+            if p_mot == "Connection":
+                d["Tone"] = min(10, d["Tone"] + 1); d["Pace"] = max(0, d["Pace"] - 1)
+
+            dial_df = pd.DataFrame({
+                "Lever": list(d.keys()),
+                "Recommended": list(d.values())
+            })
+
+            with st.container(border=True):
+                st.markdown("##### 📊 Conversation Dial Settings")
+                st.caption("Recommended starting point. Adjust live based on the moment (stress, urgency, safety).")
+
+                fig_dial = px.bar(
+                    dial_df,
+                    x="Recommended",
+                    y="Lever",
+                    orientation="h",
+                    range_x=[0, 10],
+                    text="Recommended",
+                    title=None
+                )
+                fig_dial.update_traces(textposition="outside")
+                fig_dial.update_layout(height=260, margin=dict(t=10, b=10, l=10, r=10), showlegend=False)
+                fig_dial.update_xaxes(title=None, showgrid=True, zeroline=False, dtick=1)
+                fig_dial.update_yaxes(title=None)
+                st.plotly_chart(fig_dial, use_container_width=True)
+
+                chips = []
+                chips.append(f"**Tone:** {'Warm' if d['Tone']>=8 else 'Balanced' if d['Tone']>=5 else 'Neutral/Direct'}")
+                chips.append(f"**Pace:** {'Fast' if d['Pace']>=8 else 'Steady' if d['Pace']>=5 else 'Slow/Deliberate'}")
+                chips.append(f"**Proof:** {'High Detail' if d['Proof']>=8 else 'Concrete Examples' if d['Proof']>=5 else 'Light Proof'}")
+                st.info(" • ".join(chips))
+
+        # 2) Coaching Levers (tone, pace, proof) — unique detail, not a repeat of Section 6
         with m2:
             st.markdown("##### 🎛️ Three Levers to Dial In")
             lever_cards = [
-                ("🗣️ Tone", "Aim for this first", take(data.get('cheat_do', []), 2)),
-                ("⏱️ Pace", "Keep the conversation moving", take(data.get('s2_b', []), 2)),
-                ("🧾 Proof", "Use specifics that stick", take(data.get('s4_b', []), 2)),
+                ("🗣️ Tone", "How you sound in the first 30 seconds", playbook.get("tone", [])),
+                ("⏱️ Pace", "How quickly you move from talk → decision → next step", playbook.get("pace", [])),
+                ("🧾 Proof", "What evidence makes the message ‘real’ for them", playbook.get("proof", [])),
             ]
 
             for title, subtitle, items in lever_cards:
@@ -1762,8 +1890,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                             st.markdown(f"- {it}")
                     else:
                         st.markdown("- Use a clear, concrete next step.")
-
-    # --- 7-8: THRIVING/STRUGGLING ---
+# --- 7-8: THRIVING/STRUGGLING ---
     c1, c2 = st.columns(2)
     with c1:
         st.subheader("7. Thriving")
