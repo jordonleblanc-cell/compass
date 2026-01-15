@@ -1677,208 +1677,93 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     show_section("5. Integrated Leadership Profile", data['s5'])
     show_section("6. How You Can Best Support Them", data['s6'])
 
-    
-    # --- VISUAL BREAK: SUPPORT LEVERS (between 1-6 and 7-8) ---
-    # Combines “How You Can Best Support Them” into adjustable levers + a quick, useful summary chart.
+    # --- VISUAL BREAK: QUICK COACHING MAP (between 1-6 and 7-8) ---
     with st.container(border=True):
-        st.subheader("🎚️ Support Levers")
-        st.caption(
-            "Use these levers to set your coaching approach for *this* conversation. "
-            "They’re pre-set based on the staff member’s profiles, but you can dial them up/down to match the moment."
-        )
+        st.subheader("🧭 Quick Coaching Map")
+        st.caption("A fast visual to help you choose your tone, pace, and proof level before you start the conversation.")
 
-        # Pull the existing “How You Can Best Support Them” bullets (already generated per profile)
-        support_bullets = data.get("s6_b", []) or []
+        m1, m2 = st.columns([1.2, 1])
 
-        def _assign_support_to_levers(items):
-            # Lightweight keyword bucketing so your existing support guidance is embedded into the levers.
-            buckets = {
-                "Clarity & Structure": [],
-                "Autonomy & Ownership": [],
-                "Recognition & Affirmation": [],
-                "Connection & Belonging": [],
-                "Growth & Challenge": [],
-                "Pace & Pressure": [],
+        # 1) Communication Map (directness x expressiveness)
+        with m1:
+            comm_map = {
+                "Director": {"x": 9, "y": 6, "label": "Direct + Fast"},
+                "Encourager": {"x": 7, "y": 9, "label": "Warm + Verbal"},
+                "Facilitator": {"x": 3, "y": 4, "label": "Quiet + Consensus"},
+                "Tracker": {"x": 4, "y": 2, "label": "Precise + Cautious"}
             }
 
-            # Keyword sets (intentionally broad; if a bullet matches multiple, it goes to the first best fit)
-            rules = [
-                ("Clarity & Structure", [
-                    "clear", "clar", "direct", "specific", "expect", "standard", "structure",
-                    "plan", "steps", "timeline", "deadline", "accountab", "follow through",
-                    "document", "policy", "procedure", "what success", "define"
-                ]),
-                ("Autonomy & Ownership", [
-                    "ownership", "autonomy", "independent", "trust", "empower", "choose",
-                    "lead", "decision", "decide", "initiative", "delegate", "space",
-                    "agency", "control"
-                ]),
-                ("Recognition & Affirmation", [
-                    "recogn", "praise", "affirm", "thank", "celebrat", "credit",
-                    "validate", "encourage", "appreciat", "seen", "noticed"
-                ]),
-                ("Connection & Belonging", [
-                    "connect", "relationship", "belong", "team", "together", "check-in",
-                    "listen", "hear", "supportive", "safe", "psychological", "rapport",
-                    "collabor", "community"
-                ]),
-                ("Growth & Challenge", [
-                    "grow", "develop", "learn", "improve", "coach", "feedback", "stretch",
-                    "challenge", "skill", "training", "practice", "reflect", "curious"
-                ]),
-                ("Pace & Pressure", [
-                    "pace", "slow", "rush", "pressure", "space", "time", "urgent",
-                    "overwhelm", "burnout", "calm", "de-escal", "regulate"
-                ]),
+            points = []
+            for k, v in comm_map.items():
+                points.append({
+                    "Style": k,
+                    "Directness": v["x"],
+                    "Expressiveness": v["y"],
+                    "Role": "Reference",
+                    "Size": 14
+                })
+
+            # Primary/Secondary markers
+            if p_comm in comm_map:
+                points.append({
+                    "Style": f"Primary: {p_comm}",
+                    "Directness": comm_map[p_comm]["x"],
+                    "Expressiveness": comm_map[p_comm]["y"],
+                    "Role": "Primary",
+                    "Size": 26
+                })
+            if s_comm in comm_map:
+                points.append({
+                    "Style": f"Secondary: {s_comm}",
+                    "Directness": comm_map[s_comm]["x"],
+                    "Expressiveness": comm_map[s_comm]["y"],
+                    "Role": "Secondary",
+                    "Size": 20
+                })
+
+            comm_plot_df = pd.DataFrame(points)
+
+            fig_map = px.scatter(
+                comm_plot_df,
+                x="Directness",
+                y="Expressiveness",
+                color="Role",
+                size="Size",
+                text="Style",
+                title="Communication Map (Directness × Expressiveness)"
+            )
+            fig_map.update_traces(textposition="top center")
+            fig_map.update_layout(
+                height=340,
+                margin=dict(t=40, b=30, l=30, r=30),
+                xaxis=dict(range=[0, 10], title="More Direct →"),
+                yaxis=dict(range=[0, 10], title="More Expressive ↑"),
+                legend_title_text=""
+            )
+            fig_map.update_xaxes(showgrid=True, zeroline=False)
+            fig_map.update_yaxes(showgrid=True, zeroline=False)
+            st.plotly_chart(fig_map, use_container_width=True)
+
+        # 2) Coaching Levers (tone, pace, proof)
+        with m2:
+            st.markdown("##### 🎛️ Three Levers to Dial In")
+            lever_cards = [
+                ("🗣️ Tone", "Aim for this first", take(data.get('cheat_do', []), 2)),
+                ("⏱️ Pace", "Keep the conversation moving", take(data.get('s2_b', []), 2)),
+                ("🧾 Proof", "Use specifics that stick", take(data.get('s4_b', []), 2)),
             ]
 
-            for raw in items:
-                t = str(raw).strip()
-                tl = t.lower()
+            for title, subtitle, items in lever_cards:
+                with st.container(border=True):
+                    st.markdown(f"**{title}**")
+                    st.caption(subtitle)
+                    if items:
+                        for it in items:
+                            st.markdown(f"- {it}")
+                    else:
+                        st.markdown("- Use a clear, concrete next step.")
 
-                placed = False
-                for lever, kws in rules:
-                    if any(k in tl for k in kws):
-                        buckets[lever].append(t)
-                        placed = True
-                        break
-                if not placed:
-                    # Default bucket: clarity is usually the most universally useful.
-                    buckets["Clarity & Structure"].append(t)
-
-            # Remove empties but keep consistent order
-            return buckets
-
-        lever_bullets = _assign_support_to_levers(support_bullets)
-
-        def _lever_defaults(p_comm, p_mot):
-            # Start neutral
-            vals = {
-                "Clarity & Structure": 55,
-                "Autonomy & Ownership": 55,
-                "Recognition & Affirmation": 55,
-                "Connection & Belonging": 55,
-                "Growth & Challenge": 55,
-                "Pace & Pressure": 50,  # higher = apply less pressure / slower pace
-            }
-
-            # Communication profile tuning
-            if p_comm == "Director":
-                vals["Clarity & Structure"] = 75
-                vals["Autonomy & Ownership"] = 70
-                vals["Pace & Pressure"] = 40
-                vals["Connection & Belonging"] = 45
-            elif p_comm == "Encourager":
-                vals["Recognition & Affirmation"] = 80
-                vals["Connection & Belonging"] = 75
-                vals["Pace & Pressure"] = 55
-            elif p_comm == "Facilitator":
-                vals["Connection & Belonging"] = 80
-                vals["Pace & Pressure"] = 70
-                vals["Autonomy & Ownership"] = 60
-                vals["Clarity & Structure"] = 50
-            elif p_comm == "Tracker":
-                vals["Clarity & Structure"] = 75
-                vals["Growth & Challenge"] = 60
-                vals["Pace & Pressure"] = 60
-                vals["Recognition & Affirmation"] = 45
-
-            # Motivation profile tuning
-            if p_mot == "Achievement":
-                vals["Clarity & Structure"] = max(vals["Clarity & Structure"], 70)
-                vals["Recognition & Affirmation"] = max(vals["Recognition & Affirmation"], 65)
-                vals["Pace & Pressure"] = min(vals["Pace & Pressure"], 55)
-            elif p_mot == "Growth":
-                vals["Growth & Challenge"] = 80
-                vals["Autonomy & Ownership"] = max(vals["Autonomy & Ownership"], 65)
-            elif p_mot == "Purpose":
-                vals["Clarity & Structure"] = max(vals["Clarity & Structure"], 65)
-                vals["Connection & Belonging"] = max(vals["Connection & Belonging"], 65)
-            elif p_mot == "Connection":
-                vals["Connection & Belonging"] = 85
-                vals["Recognition & Affirmation"] = max(vals["Recognition & Affirmation"], 70)
-                vals["Pace & Pressure"] = max(vals["Pace & Pressure"], 60)
-
-            return vals
-
-        defaults = _lever_defaults(p_comm, p_mot)
-
-        # Render levers
-        lcol, rcol = st.columns(2)
-        lever_order = [
-            "Clarity & Structure",
-            "Autonomy & Ownership",
-            "Recognition & Affirmation",
-            "Connection & Belonging",
-            "Growth & Challenge",
-            "Pace & Pressure",
-        ]
-
-        lever_values = {}
-
-        def _render_lever(col, lever_name, help_line):
-            key = f"lever_{name}_{lever_name}".replace(" ", "_")
-            with col:
-                v = st.slider(
-                    lever_name,
-                    min_value=0,
-                    max_value=100,
-                    value=int(defaults.get(lever_name, 55)),
-                    help=help_line,
-                    key=key
-                )
-                lever_values[lever_name] = v
-
-                # Embed “How You Can Best Support Them” guidance inside the lever block
-                tips = lever_bullets.get(lever_name, [])
-                if tips:
-                    st.markdown("**How to apply this lever:**")
-                    for t in tips[:4]:
-                        st.write(f"• {t}")
-                    if len(tips) > 4:
-                        with st.expander("More tips"):
-                            for t in tips[4:]:
-                                st.write(f"• {t}")
-                else:
-                    st.markdown(
-                        "<span style='color: var(--text-sub);'>"
-                        "No specific tips mapped for this lever—use your judgment for the situation."
-                        "</span>",
-                        unsafe_allow_html=True
-                    )
-                st.divider()
-
-        _render_lever(lcol, "Clarity & Structure", "Higher = more explicit expectations, steps, and definitions of success.")
-        _render_lever(rcol, "Autonomy & Ownership", "Higher = more choice, delegation, and shared decision-making.")
-        _render_lever(lcol, "Recognition & Affirmation", "Higher = more praise, appreciation, and confidence-building.")
-        _render_lever(rcol, "Connection & Belonging", "Higher = more relational check-ins and supportive tone.")
-        _render_lever(lcol, "Growth & Challenge", "Higher = more coaching, skill-building, and stretch goals.")
-        _render_lever(rcol, "Pace & Pressure", "Higher = slow the pace and reduce urgency/pressure.")
-
-        # New, more useful chart: a “priority snapshot” of lever settings
-        st.subheader("📊 Lever Priority Snapshot")
-        lever_df = pd.DataFrame({
-            "Lever": list(lever_values.keys()),
-            "Level": list(lever_values.values())
-        }).sort_values("Level", ascending=True)
-
-        fig_levers = px.bar(
-            lever_df,
-            x="Level",
-            y="Lever",
-            orientation="h",
-            title="Where to focus your coaching energy (higher = more emphasis)"
-        )
-        fig_levers.update_layout(height=340, margin=dict(l=20, r=20, t=60, b=20))
-        st.plotly_chart(fig_levers, use_container_width=True)
-
-        # Quick readout: top 2 levers
-        top2 = lever_df.sort_values("Level", ascending=False).head(2)["Lever"].tolist()
-        if top2:
-            st.caption(f"**Suggested emphasis right now:** {top2[0]} → {top2[1]}")
-
-    st.divider()
-
+    # --- 7-8: THRIVING/STRUGGLING ---
     c1, c2 = st.columns(2)
     with c1:
         st.subheader("7. Thriving")
