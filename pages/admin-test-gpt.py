@@ -1682,7 +1682,6 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         st.subheader("🧭 Quick Coaching Map")
         st.caption("A fast setup guide: dial in Tone, Pace, and Proof for *this* person before you start the conversation.")
 
-        m1, m2 = st.columns([1.2, 1])
 
         # --- Internal helper: compact lever guidance (kept distinct from Section 6 text) ---
         COMM_LEVERS = {
@@ -1822,74 +1821,73 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         playbook = build_lever_playbook(p_comm, s_comm, p_mot, s_mot)
 
         # 1) More useful visual: recommended dial settings (0–10)
-        with m1:
-            # Base positions by communication style
-            base_dials = {
-                "Director":  {"Tone": 4, "Pace": 9, "Proof": 6},
-                "Encourager": {"Tone": 9, "Pace": 7, "Proof": 5},
-                "Facilitator": {"Tone": 7, "Pace": 4, "Proof": 6},
-                "Tracker": {"Tone": 6, "Pace": 3, "Proof": 9},
-            }
-            d = base_dials.get(p_comm, {"Tone": 7, "Pace": 5, "Proof": 6}).copy()
+        # Base positions by communication style
+        base_dials = {
+            "Director":  {"Tone": 4, "Pace": 9, "Proof": 6},
+            "Encourager": {"Tone": 9, "Pace": 7, "Proof": 5},
+            "Facilitator": {"Tone": 7, "Pace": 4, "Proof": 6},
+            "Tracker": {"Tone": 6, "Pace": 3, "Proof": 9},
+        }
+        d = base_dials.get(p_comm, {"Tone": 7, "Pace": 5, "Proof": 6}).copy()
 
-            # Motivation nudges
-            if p_mot == "Achievement":
-                d["Pace"] = min(10, d["Pace"] + 1); d["Proof"] = min(10, d["Proof"] + 1)
-            if p_mot == "Growth":
-                d["Proof"] = min(10, d["Proof"] + 1)
-            if p_mot == "Purpose":
-                d["Tone"] = min(10, d["Tone"] + 1)
-            if p_mot == "Connection":
-                d["Tone"] = min(10, d["Tone"] + 1); d["Pace"] = max(0, d["Pace"] - 1)
+        # Motivation nudges
+        if p_mot == "Achievement":
+            d["Pace"] = min(10, d["Pace"] + 1); d["Proof"] = min(10, d["Proof"] + 1)
+        if p_mot == "Growth":
+            d["Proof"] = min(10, d["Proof"] + 1)
+        if p_mot == "Purpose":
+            d["Tone"] = min(10, d["Tone"] + 1)
+        if p_mot == "Connection":
+            d["Tone"] = min(10, d["Tone"] + 1); d["Pace"] = max(0, d["Pace"] - 1)
 
-            dial_df = pd.DataFrame({
-                "Lever": list(d.keys()),
-                "Recommended": list(d.values())
-            })
+        dial_df = pd.DataFrame({
+            "Lever": list(d.keys()),
+            "Recommended": list(d.values())
+        })
 
-            with st.container(border=True):
-                st.markdown("##### 📊 Conversation Dial Settings")
-                st.caption("Recommended starting point. Adjust live based on the moment (stress, urgency, safety).")
+        with st.container(border=True):
+            st.markdown("##### 📊 Conversation Dial Settings")
+            st.caption("Recommended starting point. Adjust live based on the moment (stress, urgency, safety).")
 
-                fig_dial = px.bar(
-                    dial_df,
-                    x="Recommended",
-                    y="Lever",
-                    orientation="h",
-                    range_x=[0, 10],
-                    text="Recommended",
-                    title=None
-                )
-                fig_dial.update_traces(textposition="outside")
-                fig_dial.update_layout(height=260, margin=dict(t=10, b=10, l=10, r=10), showlegend=False)
-                fig_dial.update_xaxes(title=None, showgrid=True, zeroline=False, dtick=1)
-                fig_dial.update_yaxes(title=None)
-                st.plotly_chart(fig_dial, use_container_width=True)
+            fig_dial = px.bar(
+                dial_df,
+                x="Recommended",
+                y="Lever",
+                orientation="h",
+                range_x=[0, 10],
+                text="Recommended",
+                title=None
+            )
+            fig_dial.update_traces(textposition="outside")
+            fig_dial.update_layout(height=260, margin=dict(t=10, b=10, l=10, r=10), showlegend=False)
+            fig_dial.update_xaxes(title=None, showgrid=True, zeroline=False, dtick=1)
+            fig_dial.update_yaxes(title=None)
+            st.plotly_chart(fig_dial, use_container_width=True)
 
-                chips = []
-                chips.append(f"**Tone:** {'Warm' if d['Tone']>=8 else 'Balanced' if d['Tone']>=5 else 'Neutral/Direct'}")
-                chips.append(f"**Pace:** {'Fast' if d['Pace']>=8 else 'Steady' if d['Pace']>=5 else 'Slow/Deliberate'}")
-                chips.append(f"**Proof:** {'High Detail' if d['Proof']>=8 else 'Concrete Examples' if d['Proof']>=5 else 'Light Proof'}")
-                st.info(" • ".join(chips))
+            chips = []
+            chips.append(f"**Tone:** {'Warm' if d['Tone']>=8 else 'Balanced' if d['Tone']>=5 else 'Neutral/Direct'}")
+            chips.append(f"**Pace:** {'Fast' if d['Pace']>=8 else 'Steady' if d['Pace']>=5 else 'Slow/Deliberate'}")
+            chips.append(f"**Proof:** {'High Detail' if d['Proof']>=8 else 'Concrete Examples' if d['Proof']>=5 else 'Light Proof'}")
+            st.info(" • ".join(chips))
 
         # 2) Coaching Levers (tone, pace, proof) — unique detail, not a repeat of Section 6
-        with m2:
-            st.markdown("##### 🎛️ Three Levers to Dial In")
-            lever_cards = [
-                ("🗣️ Tone", "How you sound in the first 30 seconds", playbook.get("tone", [])),
-                ("⏱️ Pace", "How quickly you move from talk → decision → next step", playbook.get("pace", [])),
-                ("🧾 Proof", "What evidence makes the message ‘real’ for them", playbook.get("proof", [])),
-            ]
+        st.markdown('---')
+        st.markdown("##### 🎛️ Three Levers to Dial In")
+        lever_cards = [
+            ("🗣️ Tone", "How you sound in the first 30 seconds", playbook.get("tone", [])),
+            ("⏱️ Pace", "How quickly you move from talk → decision → next step", playbook.get("pace", [])),
+            ("🧾 Proof", "What evidence makes the message ‘real’ for them", playbook.get("proof", [])),
+        ]
 
-            for title, subtitle, items in lever_cards:
-                with st.container(border=True):
-                    st.markdown(f"**{title}**")
-                    st.caption(subtitle)
-                    if items:
-                        for it in items:
-                            st.markdown(f"- {it}")
-                    else:
-                        st.markdown("- Use a clear, concrete next step.")
+        for title, subtitle, items in lever_cards:
+            with st.container(border=True):
+                st.markdown(f"**{title}**")
+                st.caption(subtitle)
+                if items:
+                    for it in items:
+                        st.markdown(f"- {it}")
+                else:
+                    st.markdown("- Use a clear, concrete next step.")
 # --- 7-8: THRIVING/STRUGGLING ---
     c1, c2 = st.columns(2)
     with c1:
