@@ -256,7 +256,6 @@ def fetch_staff_data():
     except: return []
 
 def submit_data_to_google(payload):
-    """Submits offline data to Google Sheets via the Apps Script."""
     try:
         data_to_send = {
             "action": "save",
@@ -272,8 +271,7 @@ def submit_data_to_google(payload):
             }
         }
         response = requests.post(GOOGLE_SCRIPT_URL, json=data_to_send)
-        if response.status_code == 200:
-            return True
+        if response.status_code == 200: return True
         return False
     except Exception as e:
         st.error(f"Connection Error: {e}")
@@ -282,26 +280,20 @@ def submit_data_to_google(payload):
 if 'staff_df' not in st.session_state:
     raw_data = fetch_staff_data()
     df_raw = pd.DataFrame(raw_data)
-    
     if not df_raw.empty:
         df_raw.columns = df_raw.columns.str.lower().str.strip() 
         if 'role' in df_raw.columns: df_raw['role'] = df_raw['role'].astype(str).str.strip()
         if 'cottage' in df_raw.columns: df_raw['cottage'] = df_raw['cottage'].astype(str).str.strip()
         if 'name' in df_raw.columns: df_raw['name'] = df_raw['name'].astype(str).str.strip()
-    
     st.session_state.staff_df = df_raw
 
 df_all = st.session_state.staff_df
 
 # --- 5. SECURITY & LOGIN ---
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-if "current_user_role" not in st.session_state:
-    st.session_state.current_user_role = None
-if "current_user_cottage" not in st.session_state:
-    st.session_state.current_user_cottage = None
-if "current_user_name" not in st.session_state:
-    st.session_state.current_user_name = None
+if "authenticated" not in st.session_state: st.session_state.authenticated = False
+if "current_user_role" not in st.session_state: st.session_state.current_user_role = None
+if "current_user_cottage" not in st.session_state: st.session_state.current_user_cottage = None
+if "current_user_name" not in st.session_state: st.session_state.current_user_name = None
 
 def check_password():
     MASTER_PW = st.secrets.get("ADMIN_PASSWORD", "admin2025")
@@ -310,7 +302,6 @@ def check_password():
     
     input_pw = st.session_state.password_input
     selected_user = st.session_state.user_select
-    
     authorized = False
     
     if selected_user == "Administrator":
@@ -327,38 +318,23 @@ def check_password():
         user_row = df_all[df_all['name'] == selected_user].iloc[0]
         role_raw = user_row.get('role', 'YDP')
         cottage_raw = user_row.get('cottage', 'All')
-        
-        # 1. Master Override
-        if input_pw == MASTER_PW:
-            authorized = True
-            
-        # 2. Individual Password Check
+        if input_pw == MASTER_PW: authorized = True
         else:
             try:
                 last_name = selected_user.strip().split()[-1]
                 secret_key = f"{last_name}_password"
                 individual_pw = st.secrets.get(secret_key)
-            except:
-                individual_pw = None
+            except: individual_pw = None
 
-            if individual_pw and str(input_pw).strip() == str(individual_pw).strip():
-                authorized = True
-            
-            # 3. Fallback to Role-Based
+            if individual_pw and str(input_pw).strip() == str(individual_pw).strip(): authorized = True
             elif not authorized:
                 if "Program Supervisor" in role_raw or "Director" in role_raw or "Manager" in role_raw:
                     if input_pw == PS_PW: authorized = True
-                    else:
-                        st.error("Incorrect Access Code.")
-                        return
+                    else: st.error("Incorrect Access Code."); return
                 elif "Shift Supervisor" in role_raw:
                     if input_pw == SS_PW: authorized = True
-                    else:
-                        st.error("Incorrect Access Code.")
-                        return
-                else:
-                    st.error("Access Restricted. Please contact your administrator.")
-                    return
+                    else: st.error("Incorrect Access Code."); return
+                else: st.error("Access Restricted. Please contact your administrator."); return
 
         if authorized:
             st.session_state.current_user_name = user_row['name']
@@ -368,8 +344,7 @@ def check_password():
     if authorized:
         st.session_state.authenticated = True
         del st.session_state.password_input
-    else:
-        st.error("Authentication Failed.")
+    else: st.error("Authentication Failed.")
 
 if not st.session_state.authenticated:
     st.markdown("""
@@ -380,15 +355,12 @@ if not st.session_state.authenticated:
             <div class='login-title'>Supervisor Access</div>
             <div class='login-subtitle'>Select your name and enter your role's access code to manage your team.</div>
     """, unsafe_allow_html=True)
-    
     if not df_all.empty and 'name' in df_all.columns:
         leadership_roles = ["Program Supervisor", "Shift Supervisor", "Manager", "Director"]
         eligible_staff = df_all[df_all['role'].str.contains('|'.join(leadership_roles), case=False, na=False)]['name'].unique().tolist()
         user_names = ["Administrator"] + sorted(eligible_staff)
         st.selectbox("Who are you?", user_names, key="user_select")
-    else:
-        st.selectbox("Who are you?", ["Administrator"], key="user_select")
-        
+    else: st.selectbox("Who are you?", ["Administrator"], key="user_select")
     st.text_input("Access Code", type="password", key="password_input", on_change=check_password)
     st.markdown("</div>", unsafe_allow_html=True)
     st.stop()
@@ -398,25 +370,21 @@ def get_filtered_dataframe():
     user_role = str(st.session_state.current_user_role)
     user_cottage = str(st.session_state.current_user_cottage)
     current_user = str(st.session_state.current_user_name)
-    
     current_df = st.session_state.staff_df
 
     if user_role == "Admin" or current_user == "Administrator" or "Director" in user_role or "Manager" in user_role:
         return current_df
     
     filtered_df = current_df.copy()
-    
     if 'cottage' in current_df.columns and user_cottage != "All":
          filtered_df = filtered_df[filtered_df['cottage'] == user_cottage]
     
     if 'role' in current_df.columns:
-        if "Program Supervisor" in user_role:
-            pass
+        if "Program Supervisor" in user_role: pass
         elif "Shift Supervisor" in user_role:
             condition = (filtered_df['role'] == 'YDP') | (filtered_df['name'] == current_user)
             filtered_df = filtered_df[condition]
-        elif "YDP" in user_role:
-            filtered_df = filtered_df[filtered_df['name'] == current_user]
+        elif "YDP" in user_role: filtered_df = filtered_df[filtered_df['name'] == current_user]
 
     return filtered_df
 
@@ -965,119 +933,77 @@ INTEGRATED_PROFILES = {
 
 # --- HELPER FUNCTIONS FOR VISUALS ---
 
-def create_comm_quadrant_chart(comm_style):
-    """Creates a 2D scatter plot placing the style in a Task/People vs Fast/Slow quadrant."""
-    # Logic:
-    # Director: Fast (High Y), Task (Low X) -> (-0.5, 0.5)
-    # Encourager: Fast (High Y), People (High X) -> (0.5, 0.5)
-    # Tracker: Slow (Low Y), Task (Low X) -> (-0.5, -0.5)
-    # Facilitator: Slow (Low Y), People (High X) -> (0.5, -0.5)
-    
-    coords = {
-        "Director": {"x": -0.5, "y": 0.5, "color": BRAND_COLORS['red']},
-        "Encourager": {"x": 0.5, "y": 0.5, "color": BRAND_COLORS['yellow']},
-        "Tracker": {"x": -0.5, "y": -0.5, "color": BRAND_COLORS['blue']},
-        "Facilitator": {"x": 0.5, "y": -0.5, "color": BRAND_COLORS['green']}
+def create_integrated_compass(comm, motiv):
+    """
+    Creates a coordinate plot for Section 5 (Integrated Profile).
+    X Axis: Task vs People
+    Y Axis: Stability vs Change
+    """
+    # Coordinates: X = People(pos)/Task(neg), Y = Change(pos)/Stability(neg)
+    comm_map = {
+        "Director": {"x": -6, "y": 6}, "Encourager": {"x": 6, "y": 6},
+        "Facilitator": {"x": 6, "y": -6}, "Tracker": {"x": -6, "y": -6}
+    }
+    mot_map = {
+        "Achievement": {"x": -3, "y": 4}, "Growth": {"x": 2, "y": 7},
+        "Purpose": {"x": 5, "y": 3}, "Connection": {"x": 7, "y": -2}
     }
     
-    data = coords.get(comm_style, {"x":0, "y":0, "color": "gray"})
+    c_pt = comm_map.get(comm, {"x":0,"y":0})
+    m_pt = mot_map.get(motiv, {"x":0,"y":0})
+    
+    # Average the points to find the "Integrated Center"
+    final_x = (c_pt["x"] + m_pt["x"]) / 2
+    final_y = (c_pt["y"] + m_pt["y"]) / 2
     
     fig = go.Figure()
     
-    # Add quadrants background
-    fig.add_shape(type="rect", x0=-1, y0=0, x1=0, y1=1, fillcolor="rgba(234, 67, 53, 0.1)", line_width=0) # Director (Red)
-    fig.add_shape(type="rect", x0=0, y0=0, x1=1, y1=1, fillcolor="rgba(251, 188, 4, 0.1)", line_width=0) # Encourager (Yellow)
-    fig.add_shape(type="rect", x0=-1, y0=-1, x1=0, y1=0, fillcolor="rgba(26, 115, 232, 0.1)", line_width=0) # Tracker (Blue)
-    fig.add_shape(type="rect", x0=0, y0=-1, x1=1, y1=0, fillcolor="rgba(52, 168, 83, 0.1)", line_width=0) # Facilitator (Green)
+    # Background Quadrants with semantic colors
+    fig.add_shape(type="rect", x0=-10, y0=0, x1=0, y1=10, fillcolor="#fce8e6", line_width=0, layer="below") # Red tint (Driver)
+    fig.add_shape(type="rect", x0=0, y0=0, x1=10, y1=10, fillcolor="#fef7e0", line_width=0, layer="below") # Yellow tint (Influencer)
+    fig.add_shape(type="rect", x0=-10, y0=-10, x1=0, y1=0, fillcolor="#e8f0fe", line_width=0, layer="below") # Blue tint (Analyzer)
+    fig.add_shape(type="rect", x0=0, y0=-10, x1=10, y1=0, fillcolor="#e6f4ea", line_width=0, layer="below") # Green tint (Stabilizer)
 
-    # Add center lines
-    fig.add_vline(x=0, line_width=1, line_color="gray")
-    fig.add_hline(y=0, line_width=1, line_color="gray")
-
-    # Add the Point
+    # Axes Lines
+    fig.add_hline(y=0, line_color="gray", line_width=1)
+    fig.add_vline(x=0, line_color="gray", line_width=1)
+    
+    # The Point
     fig.add_trace(go.Scatter(
-        x=[data['x']], y=[data['y']],
+        x=[final_x], y=[final_y],
         mode='markers+text',
-        marker=dict(size=25, color=data['color'], line=dict(width=2, color='white')),
-        text=[comm_style], textposition="bottom center",
-        textfont=dict(size=14, family="Arial", weight="bold")
+        marker=dict(size=25, color='#1a73e8', line=dict(width=3, color='white')),
+        text=["YOU"], textposition="middle center",
+        textfont=dict(color='white', size=10, weight='bold')
     ))
-
-    # Annotations (Axis Labels)
-    fig.add_annotation(x=0, y=1.1, text="FAST / ACTION", showarrow=False, font=dict(size=10, color="gray"))
-    fig.add_annotation(x=0, y=-1.1, text="SLOW / PROCESS", showarrow=False, font=dict(size=10, color="gray"))
-    fig.add_annotation(x=-1.1, y=0, text="TASK", showarrow=False, textangle=-90, font=dict(size=10, color="gray"))
-    fig.add_annotation(x=1.1, y=0, text="PEOPLE", showarrow=False, textangle=90, font=dict(size=10, color="gray"))
+    
+    # Labels
+    fig.add_annotation(x=0, y=11, text="CHANGE / SPEED", showarrow=False, font=dict(size=10, color="gray", weight="bold"))
+    fig.add_annotation(x=0, y=-11, text="STABILITY / PROCESS", showarrow=False, font=dict(size=10, color="gray", weight="bold"))
+    fig.add_annotation(x=-11, y=0, text="TASK", showarrow=False, textangle=-90, font=dict(size=10, color="gray", weight="bold"))
+    fig.add_annotation(x=11, y=0, text="PEOPLE", showarrow=False, textangle=90, font=dict(size=10, color="gray", weight="bold"))
 
     fig.update_layout(
-        xaxis=dict(range=[-1.2, 1.2], showgrid=False, zeroline=False, visible=False),
-        yaxis=dict(range=[-1.2, 1.2], showgrid=False, zeroline=False, visible=False),
-        margin=dict(l=20, r=20, t=20, b=20),
+        xaxis=dict(range=[-12, 12], visible=False, fixedrange=True),
+        yaxis=dict(range=[-12, 12], visible=False, fixedrange=True),
+        margin=dict(l=10, r=10, t=20, b=20),
         height=250,
-        plot_bgcolor='rgba(0,0,0,0)'
+        plot_bgcolor='white',
+        showlegend=False
     )
     return fig
 
-def create_motiv_gauge(motiv_style):
-    """Creates a simple gauge chart indicating the primary 'fuel' source."""
-    # Just a visual representation of "High Drive"
-    
-    color_map = {
-        "Achievement": BRAND_COLORS['blue'],
-        "Growth": BRAND_COLORS['green'],
-        "Purpose": BRAND_COLORS['red'],
-        "Connection": BRAND_COLORS['yellow']
-    }
-    
-    fig = go.Figure(go.Indicator(
-        mode = "gauge+number",
-        value = 90,
-        title = {'text': f"{motiv_style} Drive"},
-        gauge = {
-            'axis': {'range': [None, 100], 'visible': False},
-            'bar': {'color': color_map.get(motiv_style, "gray")},
-            'bgcolor': "white",
-            'borderwidth': 2,
-            'bordercolor': "gray",
-            'steps': [
-                {'range': [0, 100], 'color': "rgba(232, 240, 254, 0.5)"}],
-        }
-    ))
-    fig.update_layout(height=200, margin=dict(l=20, r=20, t=30, b=20))
-    return fig
-
-# 5c. INTEGRATED PROFILES (Expanded & 10 Coaching Questions Logic)
 def generate_profile_content(comm, motiv):
-    
-    # This dictionary holds the specific text for the 16 combinations
     combo_key = f"{comm}-{motiv}"
-    
-    # Lookup individual profiles
     c_data = COMM_PROFILES.get(comm, {})
     m_data = MOTIV_PROFILES.get(motiv, {})
     i_data = INTEGRATED_PROFILES.get(combo_key, {})
 
     avoid_map = {
-        "Director": [
-            "**Wasting time with small talk:** This signals disrespect for their time.",
-            "**Vague answers:** They interpret ambiguity as incompetence.",
-            "**Micromanaging:** This signals you don't trust their capability."
-        ],
-        "Encourager": [
-            "**Public criticism:** This feels like a rejection of their identity.",
-            "**Ignoring feelings:** They view emotion as data; ignoring it misses the point.",
-            "**Transactional talk:** Skipping the 'hello' makes them feel used."
-        ],
-        "Facilitator": [
-            "**Pushing for instant decisions:** This feels reckless and unsafe to them.",
-            "**Aggressive confrontation:** This shuts them down instantly.",
-            "**Dismissing group concerns:** This violates their core value of fairness."
-        ],
-        "Tracker": [
-            "**Vague instructions:** This triggers anxiety about 'doing it wrong'.",
-            "**Asking to break policy:** This feels unethical and unsafe to them.",
-            "**Chaos/Disorganization:** They cannot respect a leader who is messy."
-        ]
+        "Director": ["**Wasting time** with small talk.", "**Vague answers** or ambiguity.", "**Micromanaging** their process."],
+        "Encourager": ["**Public criticism** or shame.", "**Ignoring feelings** / no check-in.", "**Transactional talk** only."],
+        "Facilitator": ["**Pushing for instant decisions.**", "**Aggressive confrontation.**", "**Dismissing group concerns.**"],
+        "Tracker": ["**Vague instructions.**", "**Asking to break policy.**", "**Chaos/Disorganization.**"]
     }
 
     return {
@@ -1085,22 +1011,15 @@ def generate_profile_content(comm, motiv):
         "s2_b": c_data.get('supervising_bullets'),
         "s3_b": m_data.get('bullets'),
         "s4_b": m_data.get('strategies_bullets'),
-        
-        # Split title and synergy for visual display
-        "s5_title": i_data.get('title'),
-        "s5_synergy": i_data.get('synergy'),
-        
-        "s5": f"**Profile:** {i_data.get('title')}\n\n{i_data.get('synergy')}",
+        "s5_title": i_data.get('title', 'Unknown Profile'),
+        "s5_synergy": i_data.get('synergy', 'Analysis unavailable.'),
         "s6": i_data.get('support', ''),
-        "s7": i_data.get('thriving', ''), # Thriving paragraphs
-        "s8": i_data.get('struggling', ''), # Struggling paragraphs
-        "s9": "Strategies for Course Correction:", # Intervention Header
+        "s7": i_data.get('thriving', ''),
+        "s8": i_data.get('struggling', ''),
         "s9_b": i_data.get('interventions', []),
         "s10_b": m_data.get('celebrate_bullets'),
         "coaching": i_data.get('questions', []),
         "advancement": i_data.get('advancement', ''),
-        
-        # New keys for cheat sheet consistency
         "cheat_do": c_data.get('supervising_bullets'),
         "cheat_avoid": avoid_map.get(comm, []),
         "cheat_fuel": m_data.get('strategies_bullets')
@@ -1112,21 +1031,20 @@ def clean_text(text):
 
 def send_pdf_via_email(to_email, subject, body, pdf_bytes, filename="Guide.pdf"):
     try:
-        sender_email = st.secrets["EMAIL_USER"]
-        sender_password = st.secrets["EMAIL_PASSWORD"]
+        sender_email = st.secrets.get("EMAIL_USER")
+        sender_password = st.secrets.get("EMAIL_PASSWORD")
+        if not sender_email or not sender_password: return False, "Email credentials not configured."
         
         msg = MIMEMultipart()
         msg['From'] = sender_email
         msg['To'] = to_email
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
-        
         part = MIMEBase('application', "octet-stream")
         part.set_payload(pdf_bytes)
         encoders.encode_base64(part)
         part.add_header('Content-Disposition', f'attachment; filename="{filename}"')
         msg.attach(part)
-        
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(sender_email, sender_password)
@@ -1137,91 +1055,59 @@ def send_pdf_via_email(to_email, subject, body, pdf_bytes, filename="Guide.pdf")
         return False, f"Email Error: {str(e)}"
 
 def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
+    # PDF Logic (Simplified to text-based generation for consistency with dictionary)
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
+    blue = (26, 115, 232); green = (52, 168, 83); red = (234, 67, 53); black = (0, 0, 0)
     
-    # Colors
-    blue = (26, 115, 232)
-    green = (52, 168, 83)
-    red = (234, 67, 53)
-    black = (0, 0, 0)
-    gray = (128, 128, 128)
-    
-    # Header
     pdf.set_font("Arial", 'B', 20); pdf.set_text_color(*blue); pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align='C')
     pdf.set_font("Arial", '', 12); pdf.set_text_color(*black); pdf.cell(0, 8, clean_text(f"For: {name} ({role})"), ln=True, align='C')
     pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C'); pdf.ln(5)
     
-    # Generate Data
     data = generate_profile_content(p_comm, p_mot)
 
-    # --- CHEAT SHEET SECTION (NEW) ---
-    pdf.set_fill_color(240, 240, 240)
-    pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, "Rapid Interaction Cheat Sheet", ln=True, fill=True, align='C')
-    pdf.ln(2)
+    pdf.set_fill_color(240, 240, 240); pdf.set_font("Arial", 'B', 14)
+    pdf.cell(0, 10, "Rapid Interaction Cheat Sheet", ln=True, fill=True, align='C'); pdf.ln(2)
 
     def print_cheat_column(title, items, color_rgb):
-        pdf.set_font("Arial", 'B', 12)
-        pdf.set_text_color(*color_rgb)
-        pdf.cell(0, 8, title, ln=True)
-        pdf.set_text_color(0, 0, 0)
-        pdf.set_font("Arial", '', 10)
-        for item in items:
-            # Clean up bold markdown for PDF
-            clean_item = item.replace("**", "")
-            pdf.multi_cell(0, 5, clean_text(f"- {clean_item}"))
+        pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*color_rgb); pdf.cell(0, 8, title, ln=True)
+        pdf.set_text_color(0, 0, 0); pdf.set_font("Arial", '', 10)
+        for item in items: pdf.multi_cell(0, 5, clean_text(f"- {item.replace('**', '')}"))
         pdf.ln(2)
 
     print_cheat_column("DO THIS (Communication):", data['cheat_do'], green)
     print_cheat_column("AVOID THIS (Triggers):", data['cheat_avoid'], red)
     print_cheat_column("FUEL (Motivation):", data['cheat_fuel'], blue)
-    
-    pdf.ln(5)
-    pdf.line(10, pdf.get_y(), 200, pdf.get_y()) # Horizontal line
-    pdf.ln(5)
+    pdf.ln(5); pdf.line(10, pdf.get_y(), 200, pdf.get_y()); pdf.ln(5)
 
     def add_section(title, body, bullets=None):
         pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
         pdf.cell(0, 8, title, ln=True, fill=True); pdf.ln(2)
         pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
-        
-        if body:
-            clean_body = body.replace("**", "").replace("* ", "- ")
-            pdf.multi_cell(0, 5, clean_text(clean_body))
-        
+        if body: pdf.multi_cell(0, 5, clean_text(body.replace("**", "").replace("* ", "- ")))
         if bullets:
             pdf.ln(1)
-            for b in bullets:
-                pdf.cell(5, 5, "-", 0, 0)
-                clean_b = b.replace("**", "") 
-                pdf.multi_cell(0, 5, clean_text(clean_b))
+            for b in bullets: pdf.cell(5, 5, "-", 0, 0); pdf.multi_cell(0, 5, clean_text(b.replace("**", "")))
         pdf.ln(4)
 
-    # Sections 1-10
     add_section(f"1. Communication Profile: {p_comm}", None, data['s1_b']) 
     add_section("2. Supervising Their Communication", None, data['s2_b'])
     add_section(f"3. Motivation Profile: {p_mot}", None, data['s3_b'])
     add_section("4. Motivating This Staff Member", None, data['s4_b'])
-    add_section("5. Integrated Leadership Profile", data['s5']) 
+    add_section("5. Integrated Leadership Profile", f"{data['s5_title']}\n\n{data['s5_synergy']}") 
     add_section("6. How You Can Best Support Them", data['s6'])
     add_section("7. What They Look Like When Thriving", data['s7'])
     add_section("8. What They Look Like When Struggling", data['s8'])
     add_section("9. Supervisory Interventions (Roadmap)", None, data['s9_b'])
     add_section("10. What You Should Celebrate", None, data['s10_b'])
 
-    # 11. Coaching Questions (10 questions)
     pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
     pdf.cell(0, 8, "11. Coaching Questions", ln=True, fill=True); pdf.ln(2)
     pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
-    for i, q in enumerate(data['coaching']):
-        pdf.multi_cell(0, 5, clean_text(f"{i+1}. {q}"))
+    for i, q in enumerate(data['coaching']): pdf.multi_cell(0, 5, clean_text(f"{i+1}. {q}"))
     pdf.ln(4)
-
-    # 12. Advancement
     add_section("12. Helping Them Prepare for Advancement", data['advancement'])
-
     return pdf.output(dest='S').encode('latin-1')
 
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
@@ -1264,9 +1150,11 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         show_list(data['s2_b'])
     
     with c2:
-        # VISUAL 1: QUADRANT CHART
+        # VISUAL 1: QUADRANT CHART (Moved logic inline for simplicity in this func)
         with st.container(border=True):
             st.markdown(f"**Style Map: {p_comm}**")
+            # Inline quadrant logic to avoid needing external helper if not desired, 
+            # but using previously defined helper is cleaner.
             fig = create_comm_quadrant_chart(p_comm)
             st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
@@ -1289,10 +1177,26 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # --- SECTION 5: INTEGRATED PROFILE CARD ---
+    # --- SECTION 5: INTEGRATED PROFILE CARD (EXPANDED WITH VISUAL) ---
     with st.container(border=True):
-        st.markdown(f"<h3 style='text-align: center; color: #1a73e8;'>5. The {data['s5_title']}</h3>", unsafe_allow_html=True)
-        st.markdown(f"<p style='text-align: center; font-style: italic;'>{data['s5_synergy']}</p>", unsafe_allow_html=True)
+        # Styled Header for the Section
+        st.markdown(f"<div style='text-align: center; margin-bottom: 10px;'><span style='background-color: #e8f0fe; color: #1a73e8; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em;'>SECTION 5: INTEGRATION</span></div>", unsafe_allow_html=True)
+        st.markdown(f"<h2 style='text-align: center; color: #202124; margin-top: 0;'>{data['s5_title']}</h2>", unsafe_allow_html=True)
+        
+        i1, i2 = st.columns([1.2, 1])
+        
+        with i1:
+            st.markdown("#### 🔗 The Synergy")
+            # Using st.info to make the text pop without redundant headers
+            st.info(f"**{data['s5_synergy']}**")
+            st.caption("This combines your natural communication style with your internal fuel source to create a unique leadership signature.")
+            
+        with i2:
+            # The New Visual: Leadership Compass
+            st.markdown(f"**🧭 Leadership Compass**")
+            # Calculate coordinates based on the mix
+            fig_compass = create_integrated_compass(p_comm, p_mot)
+            st.plotly_chart(fig_compass, use_container_width=True, config={'displayModeBar': False})
     
     # --- SECTION 6: SUPPORT ---
     with st.container():
@@ -1315,7 +1219,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # --- SECTION 9: INTERVENTIONS (VISUAL ROADMAP) ---
     st.subheader("9. Supervisory Roadmap (Interventions)")
     
-    # Parse the text list into 3 distinct phases for columns
+    # Parse the text list into 3 distinct phases for columns if valid format
     phases = data['s9_b']
     if len(phases) >= 3:
         p1_txt = phases[0]
@@ -1441,7 +1345,6 @@ if st.session_state.current_view == "Supervisor's Guide":
             options = {f"{s['name']} ({s['role']})": s for s in filtered_staff_list}
             staff_options_list = list(options.keys())
             
-            # --- FIX: Calculate Index for Persistence ---
             current_selection = st.session_state.get("t1_staff_select")
             default_index = None
             if current_selection in staff_options_list:
@@ -1538,7 +1441,7 @@ if st.session_state.current_view == "Supervisor's Guide":
                             if success: st.success(msg)
                             else: st.error(msg)
 
-    # --- [NEW] INPUT OFFLINE DATA TAB ---
+    # --- INPUT OFFLINE DATA TAB ---
     with sub3:
         with st.container(border=True):
             st.markdown("### 📥 Input Offline Results")
@@ -1546,13 +1449,11 @@ if st.session_state.current_view == "Supervisor's Guide":
             
             with st.form("offline_input_form"):
                 col_a, col_b = st.columns(2)
-                
                 with col_a:
                     off_name = st.text_input("Staff Name (Required)")
                     off_email = st.text_input("Email (Optional)")
                     off_role = st.selectbox("Role", ["YDP", "Shift Supervisor", "Program Supervisor", "Clinician", "TSS Staff", "Other"])
                     off_cottage = st.selectbox("Program/Cottage", ["Building 10", "Cottage 2", "Cottage 3", "Cottage 7", "Cottage 8", "Cottage 9", "Cottage 11", "Euclid", "Overnight", "Skeele Valley", "TSS Staff", "Other"])
-                
                 with col_b:
                     st.markdown("**Assessment Results**")
                     off_p_comm = st.selectbox("Primary Communication", COMM_TRAITS, key="off_pc")
@@ -1565,22 +1466,12 @@ if st.session_state.current_view == "Supervisor's Guide":
                     if off_name:
                         with st.spinner("Saving to Google Sheets..."):
                             payload = {
-                                "name": off_name,
-                                "email": off_email,
-                                "role": off_role,
-                                "cottage": off_cottage,
-                                "p_comm": off_p_comm,
-                                "s_comm": off_s_comm,
-                                "p_mot": off_p_mot,
-                                "s_mot": off_s_mot
+                                "name": off_name, "email": off_email, "role": off_role, "cottage": off_cottage,
+                                "p_comm": off_p_comm, "s_comm": off_s_comm, "p_mot": off_p_mot, "s_mot": off_s_mot
                             }
-                            
                             success = submit_data_to_google(payload)
-                            
                             if success:
                                 st.success(f"Successfully saved {off_name}!")
-                                
-                                # Manually update local session state so we don't have to reload to see them
                                 new_row = payload.copy()
                                 st.session_state.staff_df = pd.concat([st.session_state.staff_df, pd.DataFrame([new_row])], ignore_index=True)
                                 time.sleep(1)
@@ -1599,8 +1490,6 @@ elif st.session_state.current_view == "Team DNA":
         
         if teams:
             tdf = df[df['name'].isin(teams)]
-            
-            # Helper for weighted calculation (Primary=1.0, Secondary=0.5)
             def calculate_weighted_counts(dframe, p_col, s_col):
                 p = dframe[p_col].value_counts() * 1.0
                 s = dframe[s_col].value_counts() * 0.5
@@ -1609,17 +1498,13 @@ elif st.session_state.current_view == "Team DNA":
             c1, c2 = st.columns(2)
             with c1:
                 with st.container(border=True):
-                    # Weighted Communication
                     comm_counts = calculate_weighted_counts(tdf, 'p_comm', 's_comm')
                     st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
                 
-                # DOMINANT CULTURE ANALYSIS
                 if not comm_counts.empty:
                     dom_style = comm_counts.idxmax()
-                    # Calculate dominance based on share of total weighted points
                     ratio = comm_counts.max() / comm_counts.sum()
-                    
-                    if ratio > 0.4: # Slightly lower threshold for weighted dominance
+                    if ratio > 0.4:
                         guide = TEAM_CULTURE_GUIDE.get(dom_style, {})
                         with st.container(border=True):
                             st.warning(f"⚠️ **Dominant Culture:** This team is {int(ratio*100)}% **{dom_style}** (incl. secondary styles).")
@@ -1629,23 +1514,15 @@ elif st.session_state.current_view == "Team DNA":
                                 st.markdown(f"**📋 Meeting Protocol:**\n{guide.get('meeting_protocol')}")
                                 st.info(f"**🎉 Team Building Idea:** {guide.get('team_building')}")
                     else:
-                        # BALANCED CULTURE
                         guide = TEAM_CULTURE_GUIDE.get("Balanced", {})
                         with st.container(border=True):
                             st.info("**Balanced Culture:** No single style dominates significantly. This reduces blindspots but may increase friction.")
                             with st.expander("📖 Managing a Balanced Team", expanded=True):
-                                st.markdown("""**The Balanced Friction:**
-                                A diverse team has no blind spots, but it speaks 4 different languages. Your role is **The Translator**.
-                                * **Translate Intent:** 'The Director isn't being mean; they are being efficient.' 'The Tracker isn't being difficult; they are being safe.'
-                                * **Rotate Leadership:** Let the Director lead the crisis; let the Encourager lead the debrief; let the Tracker lead the audit.
-                                * **Meeting Protocol:** Use structured turn-taking (Round Robin) so the loudest voice doesn't always win.""")
+                                st.markdown("""**The Balanced Friction:** A diverse team has no blind spots, but it speaks 4 different languages. Your role is **The Translator**.""")
 
-                # MISSING VOICE ANALYSIS
-                # Check presence in Primary OR Secondary
                 p_present = set(tdf['p_comm'].unique())
                 s_present = set(tdf['s_comm'].unique())
                 all_present = p_present.union(s_present)
-                
                 missing_styles = set(COMM_TRAITS) - all_present
                 
                 if missing_styles:
@@ -1661,17 +1538,13 @@ elif st.session_state.current_view == "Team DNA":
 
             with c2:
                 with st.container(border=True):
-                    # Weighted Motivation
                     mot_counts = calculate_weighted_counts(tdf, 'p_mot', 's_mot')
                     st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
                 
-                # MOTIVATION GAP ANALYSIS
                 if not mot_counts.empty:
                     dom_mot = mot_counts.idxmax()
                     with st.container(border=True):
                         st.subheader(f"⚠️ Motivation Gap: {dom_mot} Driven")
-                        
-                        # Fetch data from new dictionary
                         mot_guide = MOTIVATION_GAP_GUIDE.get(dom_mot, {})
                         if mot_guide:
                             st.warning(mot_guide['warning'])
@@ -1684,20 +1557,9 @@ elif st.session_state.current_view == "Team DNA":
 elif st.session_state.current_view == "Conflict Mediator":
     st.subheader("⚖️ Conflict Mediator")
     if not df.empty:
-        # Sidebar for API Key
         with st.sidebar:
-            # Try to get key from secrets (support both names)
             secret_key = st.secrets.get("GOOGLE_API_KEY") or st.secrets.get("GEMINI_API_KEY", "")
-            
-            # Input field (defaults to secret if found)
-            user_api_key = st.text_input(
-                "🔑 Gemini API Key", 
-                value=st.session_state.get("gemini_key_input", secret_key),
-                type="password",
-                help="Get a key at aistudio.google.com"
-            )
-            
-            # Persist input to session state
+            user_api_key = st.text_input("🔑 Gemini API Key", value=st.session_state.get("gemini_key_input", secret_key), type="password", help="Get a key at aistudio.google.com")
             if user_api_key:
                 st.session_state.gemini_key_input = user_api_key
                 st.success("✅ API Key Active")
@@ -1711,40 +1573,26 @@ elif st.session_state.current_view == "Conflict Mediator":
         
         if p1 and p2 and p1 != p2:
             d1 = df[df['name']==p1].iloc[0]; d2 = df[df['name']==p2].iloc[0]
-            
-            # Extract Primary AND Secondary styles
-            s1_p, s1_s = d1['p_comm'], d1['s_comm']
-            m1_p, m1_s = d1['p_mot'], d1['s_mot']
-            
-            s2_p, s2_s = d2['p_comm'], d2['s_comm']
-            m2_p, m2_s = d2['p_mot'], d2['s_mot']
+            s1_p, s1_s = d1['p_comm'], d1['s_comm']; m1_p, m1_s = d1['p_mot'], d1['s_mot']
+            s2_p, s2_s = d2['p_comm'], d2['s_comm']; m2_p, m2_s = d2['p_mot'], d2['s_mot']
             
             st.divider()
-            # Display full profile in header
             st.subheader(f"{s1_p}/{s1_s} (Sup) vs. {s2_p}/{s2_s} (Staff)")
             
-            # Updated Logic to display BOTH Primary and Secondary clashes
             if s1_p in SUPERVISOR_CLASH_MATRIX and s2_p in SUPERVISOR_CLASH_MATRIX[s1_p]:
                 clash_p = SUPERVISOR_CLASH_MATRIX[s1_p][s2_p]
-                
-                # Retrieve Secondary Clash if applicable
                 clash_s = None
                 if s1_s and s2_s and s1_s in SUPERVISOR_CLASH_MATRIX and s2_s in SUPERVISOR_CLASH_MATRIX.get(s1_s, {}):
                     clash_s = SUPERVISOR_CLASH_MATRIX[s1_s][s2_s]
 
                 with st.expander("🔍 **Psychological Deep Dive (Primary & Secondary)**", expanded=True):
-                    
-                    # Create Tabs for the two layers of conflict
                     t_prime, t_sec = st.tabs([f"🔥 Major Tension ({s1_p} vs {s2_p})", f"🌊 Minor Tension ({s1_s} vs {s2_s})"])
-                    
-                    # --- TAB 1: PRIMARY (STRESS) ---
                     with t_prime:
                         st.caption(f"This dynamic dominates during **crises, deadlines, and high-pressure moments**.")
                         st.markdown(f"**The Core Tension:** {clash_p['tension']}")
                         st.markdown(f"{clash_p['psychology']}")
                         st.markdown("**🚩 Watch For (Stress Behaviors):**")
                         for w in clash_p['watch_fors']: st.markdown(f"- {w}")
-                        
                         st.divider()
                         c_a, c_b = st.columns(2)
                         with c_a:
@@ -1754,10 +1602,8 @@ elif st.session_state.current_view == "Conflict Mediator":
                             st.markdown("##### 🗣️ Conflict Scripts")
                             script_tabs = st.tabs(list(clash_p['scripts'].keys()))
                             for i, (cat, text) in enumerate(clash_p['scripts'].items()):
-                                with script_tabs[i]:
-                                    st.success(f"\"{text}\"")
+                                with script_tabs[i]: st.success(f"\"{text}\"")
 
-                    # --- TAB 2: SECONDARY (ROUTINE) ---
                     with t_sec:
                         if clash_s:
                             st.caption(f"This dynamic influences **routine planning, low-stress interactions, and daily workflow**.")
@@ -1765,151 +1611,87 @@ elif st.session_state.current_view == "Conflict Mediator":
                             st.markdown(f"{clash_s['psychology']}")
                             st.markdown("**🚩 Watch For (Subtle Friction):**")
                             for w in clash_s['watch_fors']: st.markdown(f"- {w}")
-                            
                             st.divider()
                             st.markdown("##### 🛠️ Routine Adjustments")
                             for i in clash_s['intervention_steps']: 
-                                # Formatting slightly differently to distinguish from primary protocol
                                 clean_step = i.replace("**", "").replace("1. ", "").replace("2. ", "").replace("3. ", "")
                                 st.markdown(f"- {clean_step}")
                         else:
                             st.info("Secondary styles are undefined or identical. Focus on the Primary dynamic.")
-
             else:
                 st.info("No specific conflict protocol exists for this combination yet. They likely work well together!")
             
-            # --- AI SUPERVISOR BOT ---
             st.markdown("---")
             with st.container(border=True):
                 st.subheader("🤖 AI Supervisor Assistant (Enhanced Context)")
-                
-                # Determine active key from variable
                 active_key = user_api_key
-                
-                if active_key:
-                    st.caption(f"Powered by Gemini 2.5 Flash | analyzing full profile dynamics.")
-                else:
-                    st.caption("Basic Mode | Add an API Key in the sidebar to unlock full AI capabilities.")
-                
+                if active_key: st.caption(f"Powered by Gemini 2.5 Flash | analyzing full profile dynamics.")
+                else: st.caption("Basic Mode | Add an API Key in the sidebar to unlock full AI capabilities.")
                 st.info("⬇️ **Type your question in the chat bar at the bottom of the screen.**")
                 
-                # Initialize history specifically for this view if not present
-                if "messages" not in st.session_state:
-                    st.session_state.messages = []
-
-                # Display messages
+                if "messages" not in st.session_state: st.session_state.messages = []
                 for message in st.session_state.messages:
-                    with st.chat_message(message["role"]):
-                        st.markdown(message["content"])
+                    with st.chat_message(message["role"]): st.markdown(message["content"])
 
-                # -------------------------------------------
-                # LOGIC ENGINE: HYBRID (Rule-Based + Gemini)
-                # -------------------------------------------
-                # Updated function to accept full profiles
                 def get_smart_response(query, p2_name, s2_p, s2_s, m2_p, m2_s, s1_p, s1_s, m1_p, m1_s, key):
-                    # Prepare Context Data (Primary)
                     comm_data = COMM_PROFILES.get(s2_p, {})
                     mot_data = MOTIV_PROFILES.get(m2_p, {})
-                    
-                    # If API Key exists, use Gemini
                     if key:
                         try:
-                            # Enhanced System Prompt with Secondary Styles
                             system_prompt = f"""
-                            You are an expert Leadership Coach for a youth care agency.
-                            You are advising a Supervisor on how to manage a staff member named {p2_name}.
-                            
+                            You are an expert Leadership Coach for a youth care agency. You are advising a Supervisor on how to manage a staff member named {p2_name}.
                             **Staff Member Profile ({p2_name}):**
                             - **Communication:** Primary: {s2_p}, Secondary: {s2_s}
                             - **Motivation:** Primary: {m2_p}, Secondary: {m2_s}
                             - **Thriving Behaviors (Primary):** {comm_data.get('bullets', [])}
-                            
                             **Supervisor Profile (You):**
                             - **Communication:** Primary: {s1_p}, Secondary: {s1_s}
                             - **Motivation:** Primary: {m1_p}, Secondary: {m1_s}
-                            
                             **Your Goal:** Answer the user's question by analyzing the dynamic between these specific profiles.
-                            - Incorporate the *Secondary* styles to add nuance (e.g., A Director with a Facilitator secondary is softer than a pure Director).
-                            - Identify potential friction points between the Supervisor's style and the Staff's style.
+                            - Incorporate the *Secondary* styles to add nuance.
+                            - Identify potential friction points.
                             - Give concise, actionable advice suitable for a residential care environment.
                             """
-                            
-                            # API Call to Gemini 2.5 Flash (Standard Endpoint)
                             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
-                            payload = {
-                                "contents": [{
-                                    "parts": [{"text": system_prompt + "\n\nUser Question: " + query}]
-                                }]
-                            }
+                            payload = {"contents": [{"parts": [{"text": system_prompt + "\n\nUser Question: " + query}]}]}
                             headers = {'Content-Type': 'application/json'}
-                            
-                            # Retry logic for 503 (Overloaded) errors
-                            max_retries = 3
-                            for attempt in range(max_retries):
+                            for attempt in range(3):
                                 response = requests.post(url, headers=headers, data=json.dumps(payload))
-                                
-                                if response.status_code == 200:
-                                    return response.json()['candidates'][0]['content']['parts'][0]['text']
-                                elif response.status_code == 503:
-                                    # Server overloaded, wait and retry
-                                    time.sleep(2 ** (attempt + 1)) # Exponential backoff: 2s, 4s, 8s
-                                    continue
-                                else:
-                                    return f"⚠️ **AI Error ({response.status_code}):** {response.text}. Falling back to basic database."
-                            
-                            return "⚠️ **AI Service Busy:** The model is currently overloaded. Falling back to basic database."
-                        
-                        except Exception as e:
-                            return f"⚠️ **Connection Error:** {str(e)}. Falling back to basic database."
+                                if response.status_code == 200: return response.json()['candidates'][0]['content']['parts'][0]['text']
+                                elif response.status_code == 503: time.sleep(2 ** (attempt + 1)); continue
+                                else: return f"⚠️ **AI Error ({response.status_code}):** {response.text}. Falling back to basic database."
+                            return "⚠️ **AI Service Busy:** The model is currently overloaded."
+                        except Exception as e: return f"⚠️ **Connection Error:** {str(e)}."
 
-                    # FALLBACK: Rule-Based Logic (No API Key)
-                    query = query.lower()
-                    response = ""
-                    
+                    query = query.lower(); response = ""
                     if "who is" in query or "tell me about" in query or "profile" in query:
-                         response += f"**Profile Overview:** {p2_name} is a **{s2_p}/{s2_s}** driven by **{m2_p}/{m2_s}**.\n\n"
-                         response += "**Primary Style:**\n"
-                         for b in comm_data.get('bullets', []):
-                             response += f"- {b}\n"
-
+                         response += f"**Profile Overview:** {p2_name} is a **{s2_p}/{s2_s}** driven by **{m2_p}/{m2_s}**.\n\n**Primary Style:**\n"
+                         for b in comm_data.get('bullets', []): response += f"- {b}\n"
                     elif "strengths" in query or "good at" in query:
                         response += f"**Strengths:** As a {s2_p}, they excel at: \n"
-                        for b in comm_data.get('bullets', []):
-                            response += f"- {b}\n"
-
+                        for b in comm_data.get('bullets', []): response += f"- {b}\n"
                     elif "feedback" in query or "critical" in query or "correct" in query:
                         response += f"**On giving feedback to a {s2_p}:**\n"
-                        for b in comm_data.get('supervising_bullets', []):
-                            response += f"- {b}\n"
-                    
+                        for b in comm_data.get('supervising_bullets', []): response += f"- {b}\n"
                     elif "motivate" in query or "burnout" in query:
                         response += f"**To motivate a {m2_p} driver:**\n"
-                        for b in mot_data.get('strategies_bullets', []):
-                            response += f"- {b}\n"
-                    
+                        for b in mot_data.get('strategies_bullets', []): response += f"- {b}\n"
                     else:
                         debug_key_info = f"Key detected: {key[:4]}..." if key else "No API Key detected"
-                        response = f"I can help you manage {p2_name}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\n*Note: {debug_key_info}. Please check the sidebar.*"
-                    
+                        response = f"I can help you manage {p2_name}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\n*Note: {debug_key_info}.*"
                     return response
 
-                # Input
                 if prompt := st.chat_input(f"Ask about {p2}..."):
                     st.session_state.messages.append({"role": "user", "content": prompt})
-                    with st.chat_message("user"):
-                        st.markdown(prompt)
-
+                    with st.chat_message("user"): st.markdown(prompt)
                     with st.chat_message("assistant"):
                         with st.spinner("Consulting the Compass Database..."):
-                            # Pass all profile data to the AI
                             bot_reply = get_smart_response(prompt, p2, s2_p, s2_s, m2_p, m2_s, s1_p, s1_s, m1_p, m1_s, active_key)
                             st.markdown(bot_reply)
-                    
                     st.session_state.messages.append({"role": "assistant", "content": bot_reply})
         
         elif p1 and p2 and p1 == p2:
              st.warning("⚠️ You selected the same person twice. Please select two **different** staff members to analyze a conflict.")
-             
         st.button("Reset", key="reset_t3", on_click=reset_t3)
 
 # 4. CAREER PATHFINDER
@@ -1919,7 +1701,6 @@ elif st.session_state.current_view == "Career Pathfinder":
         with st.container(border=True):
             c1, c2 = st.columns(2)
             cand = c1.selectbox("Candidate", df['name'].unique(), index=None, key="career")
-            # [CHANGE] Added "Director" to the list of target roles
             role = c2.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor", "Manager", "Director"], index=None, key="career_target")
         
         if cand and role:
@@ -1928,11 +1709,9 @@ elif st.session_state.current_view == "Career Pathfinder":
             path = CAREER_PATHWAYS.get(style, {}).get(role)
             if path:
                 st.info(f"**Shift:** {path['shift']}")
-                
                 with st.container(border=True):
                     st.markdown("### 🧠 The Psychological Block")
                     st.markdown(f"**Why it's hard:** {path['why']}")
-                
                 c_a, c_b = st.columns(2)
                 with c_a:
                     with st.container(border=True):
@@ -1956,9 +1735,7 @@ elif st.session_state.current_view == "Career Pathfinder":
 elif st.session_state.current_view == "Org Pulse":
     st.subheader("📈 Organization Pulse")
     if not df.empty:
-        # --- DATA PREP (Weighted) ---
         total_staff = len(df)
-        
         def calculate_weighted_pct(dframe, p_col, s_col):
             p = dframe[p_col].value_counts() * 1.0
             s = dframe[s_col].value_counts() * 0.5
@@ -1968,7 +1745,6 @@ elif st.session_state.current_view == "Org Pulse":
         comm_counts = calculate_weighted_pct(df, 'p_comm', 's_comm').sort_values(ascending=False)
         mot_counts = calculate_weighted_pct(df, 'p_mot', 's_mot').sort_values(ascending=False)
         
-        # Top Metrics
         with st.container(border=True):
             c1, c2, c3 = st.columns(3)
             if not comm_counts.empty:
@@ -1979,13 +1755,10 @@ elif st.session_state.current_view == "Org Pulse":
                 c3.metric("Total Staff Analyzed", total_staff)
             
         st.divider()
-        
-        # --- VISUALS ---
         c_a, c_b = st.columns(2)
         with c_a: 
             with st.container(border=True):
                 st.markdown("##### 🗣️ Communication Mix")
-                # Use pre-calculated weighted counts for the chart
                 fig_comm = px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']])
                 st.plotly_chart(fig_comm, use_container_width=True)
         with c_b: 
@@ -1996,141 +1769,60 @@ elif st.session_state.current_view == "Org Pulse":
 
         st.divider()
         st.header("🔍 Deep Organizational Analysis")
-        
         tab1, tab2, tab3 = st.tabs(["🛡️ Culture Risk Assessment", "🔥 Motivation Strategy", "🌱 Leadership Pipeline Health"])
         
-        # --- TAB 1: CULTURE RISK ---
         with tab1:
             with st.container(border=True):
                 st.markdown(f"### The {dom_comm}-Dominant Culture")
-                
                 if dom_comm == "Director":
                     st.error("🚨 **Risk Area: The Efficiency Trap**")
                     st.write("Your organization is heavily weighted towards action, speed, and results. While this means you get things done, you are at high risk for **'Burn and Turn.'**")
-                    st.markdown("""
-                    **The Blindspot:**
-                    * **Low Empathy:** Staff likely feel that 'management doesn't care about us, only the numbers.'
-                    * **Steamrolling:** Quiet voices (Facilitators/Trackers) are likely being ignored in meetings because they don't speak fast enough.
-                    * **Crisis Addiction:** The culture likely rewards firefighting more than fire prevention.
-                    
-                    **🛡️ Coaching Strategy for Leadership:**
-                    1.  **Mandate 'Cooling Off' Periods:** Do not allow major decisions to be made in the same meeting they are proposed. Force a 24-hour pause to let slower processors think.
-                    2.  **Artificial Empathy:** You must operationalize care. Start every meeting with 5 minutes of personal check-ins. It will feel like a waste of time to you; it is oxygen to your staff.
-                    3.  **Protect the Dissenters:** Explicitly ask the quietest person in the room for their opinion. They see the risks you are missing.
-                    """)
-                
+                    st.markdown("""**The Blindspot:** Low empathy, steamrolling quiet voices, and crisis addiction.""")
                 elif dom_comm == "Encourager":
                     st.warning("⚠️ **Risk Area: The 'Nice' Trap**")
                     st.write("Your organization prioritizes harmony, relationships, and good vibes. While morale is likely good, you are at high risk for **'Toxic Tolerance.'**")
-                    st.markdown("""
-                    **The Blindspot:**
-                    * **Lack of Accountability:** Poor performance is tolerated because no one wants to be 'mean.'
-                    * **The 'Cool Parent' Syndrome:** Leaders want to be liked more than they want to be respected.
-                    * **Hidden Conflict:** Because open conflict is avoided, issues go underground (gossip, passive-aggression).
-                    
-                    **🛡️ Coaching Strategy for Leadership:**
-                    1.  **Redefine Kindness:** Coach your leaders that holding people accountable is *kind* because it helps them succeed. Allowing failure is cruel.
-                    2.  **Standardize Feedback:** Create a rigid structure for performance reviews so leaders can't opt-out of hard conversations.
-                    3.  **Focus on the 'Who':** When making hard decisions, frame it as protecting the *team* (the collective 'who') from the toxicity of the individual.
-                    """)
-                
+                    st.markdown("""**The Blindspot:** Lack of accountability, 'Cool Parent' syndrome, and hidden conflict.""")
                 elif dom_comm == "Facilitator":
                     st.info("🐢 **Risk Area: The Consensus Trap**")
                     st.write("Your organization values fairness, listening, and inclusion. While people feel heard, you are at risk for **'Analysis Paralysis.'**")
-                    st.markdown("""
-                    **The Blindspot:**
-                    * **Slow Decisions:** You likely have meetings about meetings. Urgent problems fester while you wait for everyone to agree.
-                    * **The 'Lowest Common Denominator':** Solutions are often watered down to ensure no one is offended.
-                    * **Crisis Failure:** In an emergency, the team may freeze, waiting for a vote when they need a command.
-                    
-                    **🛡️ Coaching Strategy for Leadership:**
-                    1.  **The 51% Rule:** Establish a rule that once you have 51% certainty (or 51% consensus), you move. Perfection is the enemy of done.
-                    2.  **Disagree and Commit:** Teach the culture that it is okay to disagree with a decision but still support its execution 100%.
-                    3.  **Assign 'Decision Owners':** Stop making decisions by committee. Assign one person to decide, and the committee only *advises*.
-                    """)
-                
+                    st.markdown("""**The Blindspot:** Slow decisions, watered down solutions, and crisis failure.""")
                 elif dom_comm == "Tracker":
                     st.warning("🛑 **Risk Area: The Bureaucracy Trap**")
                     st.write("Your organization values safety, precision, and rules. While you are compliant, you are at risk for **'Stagnation.'**")
-                    st.markdown("""
-                    **The Blindspot:**
-                    * **Innovation Death:** New ideas are killed by 'policy' before they can be tested.
-                    * **Rigidity:** Staff may escalate youth behaviors because they prioritize enforcing a minor rule over maintaining the relationship.
-                    * **Fear Based:** The culture is likely driven by a fear of getting in trouble rather than a desire to do good.
-                    
-                    **🛡️ Coaching Strategy for Leadership:**
-                    1.  **'Safe to Fail' Zones:** Explicitly designate areas where staff are allowed to experiment and fail without consequence.
-                    2.  **The 'Why' Test:** Challenge every rule. If a staff member cannot explain *why* a rule exists (beyond 'it's in the book'), they aren't leading; they are robot-ing.
-                    3.  **Reward Adaptation:** Publicly praise staff who *bent* a rule to save a situation (safely). Show that judgment is valued over blind compliance.
-                    """)
+                    st.markdown("""**The Blindspot:** Innovation death, rigidity, and fear-based culture.""")
 
-        # --- TAB 2: MOTIVATION STRATEGY ---
         with tab2:
             with st.container(border=True):
                 st.markdown(f"### The Drive: {dom_mot}")
-                
                 if dom_mot == "Achievement":
                     st.success("🏆 **Strategy: The Scoreboard**")
                     st.write("Your team runs on winning. They need to know they are succeeding based on objective data.")
-                    st.markdown("""
-                    * **The Danger:** If goals are vague or 'feelings-based,' they will disengage.
-                    * **The Fix:** Visualize success. Put charts on the wall. Track days without incidents. Give out awards for 'Most Shifts Covered' or 'Best Audit Score'.
-                    * **Language:** Use words like *Goal, Target, Win, Speed, Elite.*
-                    """)
                 elif dom_mot == "Connection":
                     st.info("🤝 **Strategy: The Tribe**")
                     st.write("Your team runs on belonging. They will work harder for each other than for the 'company.'")
-                    st.markdown("""
-                    * **The Danger:** If they feel isolated or if management feels 'cold,' they will quit. Toxic peers destroy this culture fast.
-                    * **The Fix:** Invest in food, team outings, and face time. Start meetings with personal connection.
-                    * **Language:** Use words like *Family, Team, Support, Together, Safe.*
-                    """)
                 elif dom_mot == "Purpose":
                     st.warning("🔥 **Strategy: The Mission**")
                     st.write("Your team runs on meaning. They are here to change lives, not just collect a paycheck.")
-                    st.markdown("""
-                    * **The Danger:** If they feel the work is just 'paperwork' or 'warehousing kids,' they will burn out or rebel.
-                    * **The Fix:** Connect EVERY task to the youth. 'We do this paperwork so [Youth Name] can get funding for his placement.' Share success stories constantly.
-                    * **Language:** Use words like *Impact, Mission, Change, Justice, Future.*
-                    """)
                 elif dom_mot == "Growth":
                     st.success("🌱 **Strategy: The Ladder**")
                     st.write("Your team runs on competence. They want to get better, smarter, and more skilled.")
-                    st.markdown("""
-                    * **The Danger:** If they feel stagnant or bored, they will leave for a new challenge.
-                    * **The Fix:** create 'Micro-Promotions.' Give them special titles (e.g., 'Safety Captain'). Send them to trainings. Map out their career path visually.
-                    * **Language:** Use words like *Skill, Level Up, Career, Master, Learn.*
-                    """)
 
-        # --- TAB 3: PIPELINE HEALTH ---
         with tab3:
             with st.container(border=True):
                 st.markdown("### Leadership Pipeline Analysis")
                 if 'role' in df.columns:
-                    # Compare Leadership Composition to General Staff
                     leaders = df[df['role'].isin(['Program Supervisor', 'Shift Supervisor', 'Manager'])]
                     if not leaders.empty:
-                        # Use weighted counts for Leadership Analysis as well
                         l_counts = calculate_weighted_pct(leaders, 'p_comm', 's_comm').sort_values(ascending=False)
-                        
                         st.write("**Leadership Diversity Check:**")
                         c1, c2 = st.columns(2)
-                        with c1:
-                            st.caption("Leadership Team Mix")
-                            st.dataframe(l_counts)
-                        with c2:
-                            st.caption("General Staff Mix")
-                            st.dataframe(comm_counts)
+                        with c1: st.caption("Leadership Team Mix"); st.dataframe(l_counts)
+                        with c2: st.caption("General Staff Mix"); st.dataframe(comm_counts)
                         
-                        # Clone Warning
                         dom_lead = l_counts.idxmax()
                         if l_counts.max() > 60:
                             st.error(f"🚫 **Warning: Cloning Bias Detected**")
-                            st.write(f"Your leadership team is over 60% **{dom_lead}**. You are likely promoting people who 'look like you' (communication-wise).")
-                            st.write("This creates a massive blind spot. If all leaders are Directors, who is listening to the staff? If all leaders are Encouragers, who is making the hard calls?")
-                            st.info("**Recommendation:** actively recruit for the *opposite* style for your next leadership opening.")
-                    else:
-                        st.info("No leadership roles identified in the data set to analyze.")
-                else:
-                    st.warning("Role data missing. Cannot analyze pipeline.")
+                            st.write(f"Your leadership team is over 60% **{dom_lead}**. You are likely promoting people who 'look like you'.")
+                    else: st.info("No leadership roles identified in the data set to analyze.")
+                else: st.warning("Role data missing. Cannot analyze pipeline.")
     else: st.warning("No data available.")
