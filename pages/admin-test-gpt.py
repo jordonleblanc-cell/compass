@@ -1674,7 +1674,176 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     show_section("2. Supervising Their Communication", None, data['s2_b'])
     show_section(f"3. Motivation Profile: {p_mot}", None, data['s3_b'])
     show_section("4. Motivating This Staff Member", None, data['s4_b'])
-    show_section("5. Integrated Leadership Profile", data['s5'])
+
+    # --- 5. INTEGRATED LEADERSHIP PROFILE (EXPANDED) ---
+    with st.container(border=True):
+        st.markdown(
+            "<div style='text-align: center; margin-bottom: 10px;'>"
+            "<span style='background-color: #e8f0fe; color: #1a73e8; padding: 5px 15px; "
+            "border-radius: 20px; font-weight: 700; font-size: 0.9em;'>SECTION 5: INTEGRATION</span></div>",
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            "<h2 style='text-align: center; color: #202124; margin-top: 0;'>Integrated Leadership Profile</h2>",
+            unsafe_allow_html=True,
+        )
+
+        # Leadership Balance Snapshot (full-width, readable)
+        st.markdown("#### 📍 Leadership Balance Snapshot")
+        st.caption(
+            "A fast way to anticipate how they’ll lead in real time. "
+            "Use it to choose how much structure, emotion, and evidence to bring into the conversation."
+        )
+
+        # X-axis: Task (-) ↔ People (+)  (primarily communication)
+        # Y-axis: Stability (-) ↔ Change (+) (primarily motivation)
+        x = {"Director": -0.70, "Tracker": -0.35, "Facilitator": 0.35, "Encourager": 0.70}.get(p_comm, 0.0)
+        y = {"Achievement": 0.55, "Growth": 0.30, "Purpose": -0.05, "Connection": -0.35}.get(p_mot, 0.0)
+
+        snap_df = pd.DataFrame([
+            {
+                "Profile": f"{p_comm} × {p_mot}",
+                "Task–People": x,
+                "Stability–Change": y,
+            }
+        ])
+
+        fig_snap = px.scatter(
+            snap_df,
+            x="Task–People",
+            y="Stability–Change",
+            text="Profile",
+            range_x=[-1, 1],
+            range_y=[-1, 1],
+        )
+        fig_snap.update_traces(textposition="top center", marker=dict(size=18, opacity=0.9))
+        fig_snap.add_hline(y=0, line_width=1, line_dash="dot", opacity=0.4)
+        fig_snap.add_vline(x=0, line_width=1, line_dash="dot", opacity=0.4)
+        fig_snap.update_layout(
+            height=420,
+            margin=dict(t=10, b=10, l=10, r=10),
+            xaxis_title="Task-focused  ◀──────────────▶  People-focused",
+            yaxis_title="Stability / consistency  ◀──────────────▶  Change / momentum",
+            showlegend=False,
+        )
+        fig_snap.update_xaxes(zeroline=False)
+        fig_snap.update_yaxes(zeroline=False)
+        st.plotly_chart(fig_snap, use_container_width=True, config={"displayModeBar": False})
+
+        # Teaching content (kept distinct from Section 6 and the Cheat Sheet)
+        left, right = st.columns([1.6, 1])
+
+        with left:
+            st.markdown("#### 🔗 The Synergy")
+            s5_text = str(data.get('s5', '')).strip()
+            st.info(s5_text or "Integrated profile details were not provided for this person.")
+
+            st.markdown("#### ⚙️ Leadership Mechanics")
+            st.caption(
+                "These three mechanics tell you *how* this person tends to operate. "
+                "Use them to coach one behavior at a time (not their personality)."
+            )
+
+            # Decision Style
+            if p_comm == "Director":
+                ds_label = "Decide fast, then calibrate"
+                ds_pattern = "They prefer clarity, speed, and a visible target; they commit early and refine in motion."
+                ds_seen = "Short questions, strong opinions, quick ownership moves, impatience with ambiguity."
+                ds_move = "Bring 2–3 options max. Ask: “Which option meets the standard fastest without increasing risk?”"
+                ds_watch = "Over-committing before hearing key input. Coach: one question first, then commit."
+            elif p_comm == "Tracker":
+                ds_label = "Verify, then decide"
+                ds_pattern = "They prefer accuracy and criteria; they decide once the facts and standards line up."
+                ds_seen = "Requests for detail, step-by-step clarity, and documentation."
+                ds_move = "Define decision criteria up front. Ask: “What evidence would convince you this is the right call?”"
+                ds_watch = "Stalling to reduce risk. Coach time-boxed decisions with ‘good enough’ proof."
+            elif p_comm == "Facilitator":
+                ds_label = "Align people, then decide"
+                ds_pattern = "They decide best once the room feels aligned; buy-in reduces friction for them."
+                ds_seen = "Clarifying questions, reflection, and consensus-seeking."
+                ds_move = "Name the boundary: “We’ll listen for 5 minutes, then choose a path.”"
+                ds_watch = "Avoiding conflict by delaying. Coach: empathy is not the same as agreement."
+            else:  # Encourager
+                ds_label = "Connect, then decide"
+                ds_pattern = "They decide best once relational safety is established; connection unlocks speed."
+                ds_seen = "Attention to morale, feelings, and human impact before action."
+                ds_move = "Start warm, then go concrete: “How do we support people *and* protect standards?”"
+                ds_watch = "Softening accountability. Coach: warmth + specificity (who/what/when)."
+
+            st.markdown(f"**1) Decision Style — {ds_label}**")
+            st.markdown(f"- **Pattern:** {ds_pattern}")
+            st.markdown(f"- **What you’ll see:** {ds_seen}")
+            st.markdown(f"- **Supervisor move:** {ds_move}")
+            st.markdown(f"- **Watch for:** {ds_watch}")
+
+            # Influence Tactic (motivation-driven)
+            if p_mot == "Achievement":
+                inf_label = "Challenge + scoreboard"
+                inf_use = "Set a clear win condition, define metrics, and track progress visibly."
+                inf_try = "Let’s define the win and measure it."
+            elif p_mot == "Growth":
+                inf_label = "Experiment + learning loop"
+                inf_use = "Frame change as practice: one small experiment, then debrief what worked."
+                inf_try = "Let’s run a small experiment and learn."
+            elif p_mot == "Purpose":
+                inf_label = "Values + meaning"
+                inf_use = "Connect tasks to impact on youth and team culture; meaning drives follow-through."
+                inf_try = "Let’s connect this to why it matters."
+            else:  # Connection
+                inf_label = "Belonging + trust"
+                inf_use = "Emphasize team cohesion, shared ownership, and psychological safety."
+                inf_try = "Let’s align as a team and move together."
+
+            st.markdown(f"**2) Influence Tactic — {inf_label}**")
+            st.markdown(f"- **How to use it:** {inf_use}")
+            st.markdown(f"- **Try this line:** “{inf_try}”")
+
+            # Trust Builder (communication-driven)
+            if p_comm in ("Director", "Tracker"):
+                tb_label = "Reliability + follow-through"
+                tb_use = "Trust grows when expectations are explicit, decisions are consistent, and loops are closed."
+                tb_reinforce = "Be specific, keep promises, and confirm completion."
+            else:
+                tb_label = "Dignity + voice"
+                tb_use = "Trust grows when people feel heard, feedback is respectful, and decisions are explained."
+                tb_reinforce = "Name perspectives, explain the ‘why’, and stay calm under stress."
+
+            st.markdown(f"**3) Trust Builder — {tb_label}**")
+            st.markdown(f"- **What builds trust here:** {tb_use}")
+            st.markdown(f"- **Reinforce by:** {tb_reinforce}")
+
+        with right:
+            st.markdown("#### 🧠 How to teach this profile")
+            st.caption("Use this as a mini-lesson in supervision: name the pattern, coach one behavior, then observe it on shift.")
+
+            st.markdown("**Coaching focus for the next 2 weeks**")
+            focus_map = {
+                "Director": "Slow the start (ask one question), speed the finish (commit + close loops).",
+                "Tracker": "Time-box proof: decide with ~80% info, then document and move.",
+                "Facilitator": "Validate input, then set the boundary. Practice conflict with respect.",
+                "Encourager": "Affirm effort, then name the standard + next step in concrete terms.",
+            }
+            st.write(focus_map.get(p_comm, "Coach one behavior change at a time."))
+
+            st.markdown("**Under pressure, they may drift to…**")
+            drift_map = {
+                "Director": "Bluntness or impatience to regain speed.",
+                "Tracker": "Rigidity or stalling to reduce risk.",
+                "Facilitator": "Avoiding conflict by stretching consensus.",
+                "Encourager": "Over-accommodating to protect feelings.",
+            }
+            st.write(drift_map.get(p_comm, "Their strongest habit."))
+
+            st.markdown("**One question that deepens growth**")
+            q_map = {
+                "Achievement": "What would excellent look like here—and how will we measure it?",
+                "Growth": "What’s one skill you want to strengthen in this situation?",
+                "Purpose": "How does this choice protect what matters most for the youth/team?",
+                "Connection": "Who needs to feel safe and clear for this to work?",
+            }
+            st.write(q_map.get(p_mot, "What outcome matters most here?"))
+
+    st.markdown("<br>", unsafe_allow_html=True)
     show_section("6. How You Can Best Support Them", data['s6'])
 
     # --- VISUAL BREAK: QUICK COACHING MAP (between 1-6 and 7-8) ---
@@ -2139,8 +2308,9 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 ),
             }
             w1, w2, w3 = why_map.get(phase_num, ("", "", ""))
-            # Build a single info box with readable paragraph spacing.
-            expanded_body = "\n\n".join([p for p in [base_body, w1, w2, w3] if p])
+            expanded_body = "
+
+".join([p for p in [base_body, w1, w2, w3] if p])
             st.info(expanded_body)
 
             # Snapshot chart for this phase
