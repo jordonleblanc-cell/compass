@@ -1451,7 +1451,7 @@ def generate_profile_content(comm, motiv):
         "s6": i_data.get('support', ''),
         "s7": i_data.get('thriving', ''), # Thriving paragraphs
         "s8": i_data.get('struggling', ''), # Struggling paragraphs
-        "s9": "Strategies for Course Correction:", # Intervention Header
+        "s9": "Professional Development Plan:", # Intervention Header
         "s9_b": i_data.get('interventions', []),
         "s10_b": m_data.get('celebrate_bullets'),
         "coaching": i_data.get('questions', []),
@@ -1464,24 +1464,8 @@ def generate_profile_content(comm, motiv):
     }
 
 def clean_text(text):
-    """Make text safe for classic FPDF (latin-1 only). Removes/normalizes common Unicode."""
-    if text is None:
-        return ""
-    s = str(text)
-
-    # Normalize common punctuation
-    s = (s.replace("‘", "'").replace("’", "'")
-           .replace("“", '"').replace("”", '"')
-           .replace("–", "-").replace("—", "-")
-           .replace("…", "...")
-           .replace("\xa0", " ")
-           .replace("•", "* "))
-
-    # Drop any remaining characters outside latin-1 (e.g., emojis)
-    s = "".join(ch for ch in s if ord(ch) < 256)
-
-    # Final encode/decode to guarantee latin-1
-    return s.encode("latin-1", "replace").decode("latin-1")
+    if not text: return ""
+    return str(text).replace('\u2018', "'").replace('\u2019', "'").encode('latin-1', 'replace').decode('latin-1')
 
 def send_pdf_via_email(to_email, subject, body, pdf_bytes, filename="Guide.pdf"):
     try:
@@ -1538,7 +1522,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     def print_cheat_column(title, items, color_rgb):
         pdf.set_font("Arial", 'B', 12)
         pdf.set_text_color(*color_rgb)
-        pdf.cell(0, 8, clean_text(title), ln=True)
+        pdf.cell(0, 8, title, ln=True)
         pdf.set_text_color(0, 0, 0)
         pdf.set_font("Arial", '', 10)
         for item in items:
@@ -1557,7 +1541,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
     def add_section(title, body, bullets=None):
         pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
-        pdf.cell(0, 8, clean_text(title), ln=True, fill=True); pdf.ln(2)
+        pdf.cell(0, 8, title, ln=True, fill=True); pdf.ln(2)
         pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
         
         if body:
@@ -1581,7 +1565,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     add_section("6. How You Can Best Support Them", data['s6'])
     add_section("7. What They Look Like When Thriving", data['s7'])
     add_section("8. What They Look Like When Struggling", data['s8'])
-    add_section("9. Supervisory Interventions (Roadmap)", None, data['s9_b'])
+    add_section("9. Individual Professional Development Plan (IPDP)", None, data['s9_b'])
     add_section("10. What You Should Celebrate", None, data['s10_b'])
 
     # 11. Coaching Questions (10 questions)
@@ -1696,77 +1680,205 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # --- VISUAL BREAK: QUICK COACHING MAP (between 1-6 and 7-8) ---
     with st.container(border=True):
         st.subheader("🧭 Quick Coaching Map")
-        st.caption("A fast visual to help you choose your tone, pace, and proof level before you start the conversation.")
+        st.caption("A fast setup guide: dial in Tone, Pace, and Proof for *this* person before you start the conversation.")
 
         m1, m2 = st.columns([1.2, 1])
 
-        # 1) Communication Map (directness x expressiveness)
-        with m1:
-            comm_map = {
-                "Director": {"x": 9, "y": 6, "label": "Direct + Fast"},
-                "Encourager": {"x": 7, "y": 9, "label": "Warm + Verbal"},
-                "Facilitator": {"x": 3, "y": 4, "label": "Quiet + Consensus"},
-                "Tracker": {"x": 4, "y": 2, "label": "Precise + Cautious"}
+        # --- Internal helper: compact lever guidance (kept distinct from Section 6 text) ---
+        COMM_LEVERS = {
+            "Director": {
+                "tone": [
+                    "Lead with respect and confidence—no over-softening or excessive reassurance.",
+                    "Use direct language, but keep it neutral (no sarcasm, no moralizing).",
+                    "Acknowledge competence first: “I trust you—here’s the target.”"
+                ],
+                "pace": [
+                    "Move quickly through the setup: goal → constraint → next step.",
+                    "Use short checkpoints (2–3 minutes) instead of long debriefs.",
+                    "If the conversation drifts, re-center with: “What’s the decision?”"
+                ],
+                "proof": [
+                    "Use outcomes and thresholds (“by end of shift,” “two examples,” “one change”).",
+                    "Bring the *one* most relevant policy/metric—avoid dumping context.",
+                    "Agree on what ‘done’ looks like before you discuss ‘how.’"
+                ]
+            },
+            "Encourager": {
+                "tone": [
+                    "Warm and personal up front—connection buys attention.",
+                    "Be upbeat, but don’t let optimism blur accountability.",
+                    "Name impact on people: “Here’s how this supports the team/youth.”"
+                ],
+                "pace": [
+                    "Give a brief runway for talk, then time-box the decision moment.",
+                    "Use a visible agenda: “2 minutes to process, then we pick a step.”",
+                    "End with a recap so momentum doesn’t evaporate."
+                ],
+                "proof": [
+                    "Use examples and stories, then translate into one concrete action.",
+                    "Write the follow-up in plain language (bullets, not paragraphs).",
+                    "Confirm specifics: who/what/when—don’t assume agreement = clarity."
+                ]
+            },
+            "Facilitator": {
+                "tone": [
+                    "Calm, collaborative, and invitational—lower the perceived threat.",
+                    "Validate input before directing: “That’s a fair point; here’s the decision.”",
+                    "Use ‘we’ language to preserve dignity while holding the line."
+                ],
+                "pace": [
+                    "Slow the start; speed up the finish (decision date + next step).",
+                    "Offer options: “We can do A or B—pick one by 3pm.”",
+                    "Avoid surprise pivots—signal transitions clearly."
+                ],
+                "proof": [
+                    "Use process clarity: steps, roles, and handoffs.",
+                    "Document agreements so they don’t re-open the loop later.",
+                    "Anchor in shared standards (“what we do every time”)."
+                ]
+            },
+            "Tracker": {
+                "tone": [
+                    "Steady and factual—avoid emotional heat or vague praise/critique.",
+                    "Assume good intent; focus on accuracy and risk reduction.",
+                    "Invite questions and acknowledge precision as a strength."
+                ],
+                "pace": [
+                    "Give a moment to think; don’t force instant answers on complex asks.",
+                    "Break the ask into steps with a checkpoint after each step.",
+                    "Avoid stacking multiple changes at once—sequence them."
+                ],
+                "proof": [
+                    "Use specifics: dates, counts, examples, and the exact expectation.",
+                    "Reference the policy/standard that matters most (one source).",
+                    "End with a written next step (what to document + by when)."
+                ]
+            }
+        }
+
+        MOT_LEVER_BONUS = {
+            "Achievement": {
+                "tone": ["Frame feedback as performance coaching (scoreboard, targets, wins)."],
+                "pace": ["Keep it crisp—define the win condition and the fastest safe path."],
+                "proof": ["Use metrics, deadlines, and visible progress checks."]
+            },
+            "Growth": {
+                "tone": ["Use developmental language: “Here’s the skill we’re building next.”"],
+                "pace": ["Add a short reflection beat: “What did you learn from that moment?”"],
+                "proof": ["Use feedback loops: one tweak → one rep → one review."]
+            },
+            "Purpose": {
+                "tone": ["Connect correction to values and youth wellbeing (the ‘why’ matters)."],
+                "pace": ["Pause before directives if emotions are high—regulate first, then act."],
+                "proof": ["Use real impact examples (safety, trust, dignity) plus a concrete step."]
+            },
+            "Connection": {
+                "tone": ["Prioritize belonging: “I’m with you—and we still need this change.”"],
+                "pace": ["Don’t rush the relationship moment; time-box it so it stays productive."],
+                "proof": ["Use relational proof: “Here’s how this affects the team dynamic.”"]
+            }
+        }
+
+        def _dedupe(items):
+            seen = set()
+            out = []
+            for x in items:
+                k = re.sub(r"\s+", " ", str(x).strip())
+                if k and k not in seen:
+                    out.append(k)
+                    seen.add(k)
+            return out
+
+        def build_lever_playbook(p_comm, s_comm, p_mot, s_mot):
+            # Start from primary comm
+            base = COMM_LEVERS.get(p_comm, COMM_LEVERS.get("Facilitator"))
+            play = {
+                "tone": list(base.get("tone", [])),
+                "pace": list(base.get("pace", [])),
+                "proof": list(base.get("proof", [])),
             }
 
-            points = []
-            for k, v in comm_map.items():
-                points.append({
-                    "Style": k,
-                    "Directness": v["x"],
-                    "Expressiveness": v["y"],
-                    "Role": "Reference",
-                    "Size": 14
-                })
+            # Light seasoning from secondary comm (1 item each max)
+            sec = COMM_LEVERS.get(s_comm)
+            if sec:
+                for k in ("tone", "pace", "proof"):
+                    if sec.get(k):
+                        play[k].append(sec[k][0])
 
-            # Primary/Secondary markers
-            if p_comm in comm_map:
-                points.append({
-                    "Style": f"Primary: {p_comm}",
-                    "Directness": comm_map[p_comm]["x"],
-                    "Expressiveness": comm_map[p_comm]["y"],
-                    "Role": "Primary",
-                    "Size": 26
-                })
-            if s_comm in comm_map:
-                points.append({
-                    "Style": f"Secondary: {s_comm}",
-                    "Directness": comm_map[s_comm]["x"],
-                    "Expressiveness": comm_map[s_comm]["y"],
-                    "Role": "Secondary",
-                    "Size": 20
-                })
+            # Motivation bonuses (primary + optional secondary)
+            for mot in [p_mot, s_mot]:
+                bonus = MOT_LEVER_BONUS.get(mot)
+                if bonus:
+                    play["tone"] += bonus.get("tone", [])
+                    play["pace"] += bonus.get("pace", [])
+                    play["proof"] += bonus.get("proof", [])
 
-            comm_plot_df = pd.DataFrame(points)
+            # Trim + dedupe to keep the cards tight and non-redundant
+            play["tone"] = _dedupe(play["tone"])[:4]
+            play["pace"] = _dedupe(play["pace"])[:4]
+            play["proof"] = _dedupe(play["proof"])[:4]
+            return play
 
-            fig_map = px.scatter(
-                comm_plot_df,
-                x="Directness",
-                y="Expressiveness",
-                color="Role",
-                size="Size",
-                text="Style",
-                title="Communication Map (Directness × Expressiveness)"
-            )
-            fig_map.update_traces(textposition="top center")
-            fig_map.update_layout(
-                height=340,
-                margin=dict(t=40, b=30, l=30, r=30),
-                xaxis=dict(range=[0, 10], title="More Direct →"),
-                yaxis=dict(range=[0, 10], title="More Expressive ↑"),
-                legend_title_text=""
-            )
-            fig_map.update_xaxes(showgrid=True, zeroline=False)
-            fig_map.update_yaxes(showgrid=True, zeroline=False)
-            st.plotly_chart(fig_map, use_container_width=True)
+        playbook = build_lever_playbook(p_comm, s_comm, p_mot, s_mot)
 
-        # 2) Coaching Levers (tone, pace, proof)
+        # 1) More useful visual: recommended dial settings (0–10)
+        with m1:
+            # Base positions by communication style
+            base_dials = {
+                "Director":  {"Tone": 4, "Pace": 9, "Proof": 6},
+                "Encourager": {"Tone": 9, "Pace": 7, "Proof": 5},
+                "Facilitator": {"Tone": 7, "Pace": 4, "Proof": 6},
+                "Tracker": {"Tone": 6, "Pace": 3, "Proof": 9},
+            }
+            d = base_dials.get(p_comm, {"Tone": 7, "Pace": 5, "Proof": 6}).copy()
+
+            # Motivation nudges
+            if p_mot == "Achievement":
+                d["Pace"] = min(10, d["Pace"] + 1); d["Proof"] = min(10, d["Proof"] + 1)
+            if p_mot == "Growth":
+                d["Proof"] = min(10, d["Proof"] + 1)
+            if p_mot == "Purpose":
+                d["Tone"] = min(10, d["Tone"] + 1)
+            if p_mot == "Connection":
+                d["Tone"] = min(10, d["Tone"] + 1); d["Pace"] = max(0, d["Pace"] - 1)
+
+            dial_df = pd.DataFrame({
+                "Lever": list(d.keys()),
+                "Recommended": list(d.values())
+            })
+
+            with st.container(border=True):
+                st.markdown("##### 📊 Conversation Dial Settings")
+                st.caption("Recommended starting point. Adjust live based on the moment (stress, urgency, safety).")
+
+                fig_dial = px.bar(
+                    dial_df,
+                    x="Recommended",
+                    y="Lever",
+                    orientation="h",
+                    range_x=[0, 10],
+                    text="Recommended",
+                    title=None
+                )
+                fig_dial.update_traces(textposition="outside")
+                fig_dial.update_layout(height=260, margin=dict(t=10, b=10, l=10, r=10), showlegend=False)
+                fig_dial.update_xaxes(title=None, showgrid=True, zeroline=False, dtick=1)
+                fig_dial.update_yaxes(title=None)
+                st.plotly_chart(fig_dial, use_container_width=True)
+
+                chips = []
+                chips.append(f"**Tone:** {'Warm' if d['Tone']>=8 else 'Balanced' if d['Tone']>=5 else 'Neutral/Direct'}")
+                chips.append(f"**Pace:** {'Fast' if d['Pace']>=8 else 'Steady' if d['Pace']>=5 else 'Slow/Deliberate'}")
+                chips.append(f"**Proof:** {'High Detail' if d['Proof']>=8 else 'Concrete Examples' if d['Proof']>=5 else 'Light Proof'}")
+                st.info(" • ".join(chips))
+
+        # 2) Coaching Levers (tone, pace, proof) — unique detail, not a repeat of Section 6
         with m2:
             st.markdown("##### 🎛️ Three Levers to Dial In")
             lever_cards = [
-                ("🗣️ Tone", "Aim for this first", take(data.get('cheat_do', []), 2)),
-                ("⏱️ Pace", "Keep the conversation moving", take(data.get('s2_b', []), 2)),
-                ("🧾 Proof", "Use specifics that stick", take(data.get('s4_b', []), 2)),
+                ("🗣️ Tone", "How you sound in the first 30 seconds", playbook.get("tone", [])),
+                ("⏱️ Pace", "How quickly you move from talk → decision → next step", playbook.get("pace", [])),
+                ("🧾 Proof", "What evidence makes the message ‘real’ for them", playbook.get("proof", [])),
             ]
 
             for title, subtitle, items in lever_cards:
@@ -1778,8 +1890,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                             st.markdown(f"- {it}")
                     else:
                         st.markdown("- Use a clear, concrete next step.")
-
-    # --- 7-8: THRIVING/STRUGGLING ---
+# --- 7-8: THRIVING/STRUGGLING ---
     c1, c2 = st.columns(2)
     with c1:
         st.subheader("7. Thriving")
@@ -1791,93 +1902,258 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.markdown("<br>", unsafe_allow_html=True)
 
     # --- 9-12: COACHING PLAN ---
-    show_section("9. Supervisory Interventions", None, data['s9_b'])
+    
+    # --- 9: INDIVIDUAL PROFESSIONAL DEVELOPMENT PLAN (IPDP) ---
+    st.subheader("9. Individual Professional Development Plan (IPDP)")
+    st.caption("A development-first framework for coaching growth, alignment, and performance over time. Select the current phase to get role-aware supervisor moves and a print-ready summary for check-ins.")
 
-    # --- VISUAL BREAK: INTERVENTION ROADMAP (between 9 and 10/11/12) ---
-    with st.container(border=True):
-        st.subheader("🗺️ Intervention Roadmap (Visual)")
-        st.caption("If the interventions include phases, this turns them into a quick timeline. Otherwise, it clusters the interventions into a simple visual list.")
+    interventions_raw = data.get('s9_b', []) or []
 
-        interventions = data.get('s9_b', []) or []
-        phase_rows = []
-        phase_pattern = re.compile(r"Phase\s*(\d+)\s*:\s*(.*?)\s*\((\d+)\s*[-–]\s*(\d+)\s*Months\)", re.IGNORECASE)
+    def _parse_phase(item: str):
+        """Parse a phase entry like '**Phase 1: Title (0-6 Months):** body...' into structured parts."""
+        if not isinstance(item, str):
+            return None
+        s = item.strip()
+        # Common formats in the profile library:
+        # **Phase 1: The Pause Button (0-6 Months):** You must...
+        m = re.match(r"^\*\*Phase\s*(\d+)\s*:\s*(.*?)\s*\((.*?)\)\s*:\*\*\s*(.*)$", s, flags=re.S)
+        if not m:
+            # Fallback: try without parentheses timing
+            m2 = re.match(r"^\*\*Phase\s*(\d+)\s*:\s*(.*?)\s*:\*\*\s*(.*)$", s, flags=re.S)
+            if not m2:
+                return None
+            num = int(m2.group(1))
+            title = m2.group(2).strip()
+            timing = ""
+            body = m2.group(3).strip()
+            return {"num": num, "title": title, "timing": timing, "body": body}
+        num = int(m.group(1))
+        title = m.group(2).strip()
+        timing = m.group(3).strip()
+        body = m.group(4).strip()
+        return {"num": num, "title": title, "timing": timing, "body": body}
 
-        for item in interventions:
-            m = phase_pattern.search(item)
-            if m:
-                phase_num = int(m.group(1))
-                title = m.group(2).strip()
-                start_m = int(m.group(3))
-                end_m = int(m.group(4))
-                phase_rows.append({
-                    "Phase": f"Phase {phase_num}",
-                    "Focus": title,
-                    "StartMonth": start_m,
-                    "EndMonth": end_m
-                })
+    phases = {}
+    for item in interventions_raw:
+        p = _parse_phase(item)
+        if p and p.get("num") in (1, 2, 3):
+            phases[p["num"]] = p
 
-        if phase_rows:
-            # Use a fixed baseline date so this renders consistently without relying on system locale/timezone.
-            base = pd.Timestamp("2026-01-01")
-            timeline_df = pd.DataFrame(phase_rows)
-            timeline_df["Start"] = timeline_df["StartMonth"].apply(lambda m: base + pd.DateOffset(months=m))
-            timeline_df["End"] = timeline_df["EndMonth"].apply(lambda m: base + pd.DateOffset(months=m))
+    # Sensible defaults if anything is missing
+    default_phase_meta = {
+        1: {"num": 1, "title": "Foundation", "timing": "0–6 months", "body": "Establish clarity, consistency, and psychological safety. Reduce overwhelm, define expectations, and build repeatable habits."},
+        2: {"num": 2, "title": "Skill Integration", "timing": "6–12 months", "body": "Practice skill application under real conditions. Increase reliability, sharpen judgment, and strengthen routines across scenarios."},
+        3: {"num": 3, "title": "Leadership Readiness", "timing": "12+ months", "body": "Build autonomy and leadership behaviors. Expand ownership, coach others, and strengthen decision-making in complex situations."},
+    }
+    for n in (1, 2, 3):
+        if n not in phases:
+            phases[n] = default_phase_meta[n]
 
-            fig_tl = px.timeline(
-                timeline_df.sort_values("StartMonth"),
-                x_start="Start",
-                x_end="End",
-                y="Phase",
-                color="Phase",
-                hover_data={"Focus": True, "StartMonth": True, "EndMonth": True},
-                title="Intervention Phases"
-            )
-            fig_tl.update_layout(
-                height=280,
-                margin=dict(t=40, b=20, l=20, r=20),
-                showlegend=False
-            )
-            fig_tl.update_yaxes(autorange="reversed")
-            st.plotly_chart(fig_tl, use_container_width=True)
+    # Role-specific supervisor moves by phase (kept concise and actionable)
+    role_additions = {
+        "YDP": {
+            1: [
+                "Use a 1-sentence expectation + 1 example ('Do X, like this...') to reduce ambiguity.",
+                "Focus on one micro-skill per shift (tone, proximity, or follow-through) rather than 'everything.'",
+                "End shifts with a 2-minute debrief: what worked / what to try next time."
+            ],
+            2: [
+                "Assign one repeatable routine to own (e.g., meds prep support, shift handoff notes, activity setup).",
+                "Practice 'IF/THEN' coaching: 'If youth escalates, then we...' to build judgment.",
+                "Increase independence gradually: fewer prompts, more reflection after."
+            ],
+            3: [
+                "Have them model for a newer staff member for one shift/week (calm tone + clear directions).",
+                "Give a small improvement project (checklist, routine, or engagement activity) to lead.",
+                "Coach regulated leadership: steady first, then problem-solve."
+            ]
+        },
+        "Shift Supervisor": {
+            1: [
+                "Coach at point-of-performance: brief, calm corrections in the moment.",
+                "Run 3-minute huddles: the 2 priorities + what 'good' looks like on this shift.",
+                "Track patterns and document specific examples (facts, not impressions)."
+            ],
+            2: [
+                "Standardize shift operations: checklists, handoffs, and consistent follow-through.",
+                "Use a weekly scenario drill (5 minutes) to build real-time judgment.",
+                "Delegate one routine oversight item (supplies, schedule checks, or chart review) and review weekly."
+            ],
+            3: [
+                "Coach other staff using the same framework (tone/pace/proof) to build consistency.",
+                "Lead a mini-after-action review after incidents (what happened / what we learned / next time).",
+                "Own a small quality improvement loop (spot check → feedback → follow-up)."
+            ]
+        },
+        "Program Supervisor": {
+            1: [
+                "Clarify the 'why' and the standard: align team expectations across shifts and cottages.",
+                "Set a predictable supervision cadence (weekly micro-check-in + monthly deeper review).",
+                "Remove friction: fix one systemic barrier (process, staffing pattern, documentation clarity)."
+            ],
+            2: [
+                "Audit routines and strengthen consistency across supervisors (handoff, documentation, escalation).",
+                "Coach decision-making: What data did you use? What did you assume?",
+                "Develop one cross-team skill focus per month (e.g., de-escalation, proactive engagement)."
+            ],
+            3: [
+                "Build leadership pipeline: identify stretch assignments and coaching plans for emerging leaders.",
+                "Improve systems: simplify a workflow, strengthen accountability loops, and celebrate wins publicly.",
+                "Shift from 'check' to 'coach': ask reflective questions that build ownership."
+            ]
+        }
+    }
 
-            # Also show the focus text in a clean set of cards
-            cols = st.columns(len(phase_rows))
-            for idx, row in enumerate(sorted(phase_rows, key=lambda r: r["StartMonth"])):
-                with cols[idx]:
-                    with st.container(border=True):
-                        st.markdown(f"**{row['Phase']}**")
-                        st.caption(f"Months {row['StartMonth']}-{row['EndMonth']}")
-                        st.write(row["Focus"])
+    # Normalize role key (we want to match the staff member being coached)
+    role_key = "YDP"
+    if isinstance(role, str):
+        if "Program Supervisor" in role:
+            role_key = "Program Supervisor"
+        elif "Shift Supervisor" in role:
+            role_key = "Shift Supervisor"
         else:
-            # Fallback visual: compact bar list to break text monotony
-            if interventions:
-                iv_df = pd.DataFrame({
-                    "Intervention": [f"{i+1}" for i in range(len(interventions))],
-                    "Weight": [1 for _ in interventions],
-                    "Detail": interventions
-                })
-                fig_iv = px.bar(
-                    iv_df,
-                    x="Weight",
-                    y="Intervention",
-                    orientation="h",
-                    title="Intervention List (Compact View)",
-                    hover_data={"Detail": True, "Weight": False}
-                )
-                fig_iv.update_layout(
-                    height=280,
-                    margin=dict(t=40, b=20, l=20, r=20),
-                    showlegend=False
-                )
-                fig_iv.update_xaxes(visible=False)
-                st.plotly_chart(fig_iv, use_container_width=True)
+            role_key = "YDP"
 
-                with st.expander("Show Intervention Text", expanded=False):
-                    for it in interventions:
-                        st.markdown(f"- {it}")
-            else:
-                st.info("No interventions found for this profile.")
+    phase_labels = [
+        f"Phase 1 — {phases[1]['title']} ({phases[1]['timing']})",
+        f"Phase 2 — {phases[2]['title']} ({phases[2]['timing']})",
+        f"Phase 3 — {phases[3]['title']} ({phases[3]['timing']})",
+    ]
 
+    phase_state_key = f"ipdp_phase__{name}".replace(" ", "_")
+    if phase_state_key not in st.session_state:
+        st.session_state[phase_state_key] = phase_labels[0]
+
+    sel_label = st.selectbox(
+        "Current development phase (used for coaching + summary export)",
+        options=phase_labels,
+        index=phase_labels.index(st.session_state[phase_state_key]) if st.session_state[phase_state_key] in phase_labels else 0,
+        key=phase_state_key
+    )
+
+    sel_num = 1 if sel_label.startswith("Phase 1") else 2 if sel_label.startswith("Phase 2") else 3
+
+    # --- Visual: Development Focus Snapshot (useful at-a-glance emphasis) ---
+    focus_weights = {
+        1: {"Structure & Clarity": 10, "Skill Application": 4, "Autonomy & Judgment": 2},
+        2: {"Structure & Clarity": 6, "Skill Application": 10, "Autonomy & Judgment": 6},
+        3: {"Structure & Clarity": 3, "Skill Application": 7, "Autonomy & Judgment": 10},
+    }
+    snap_df = pd.DataFrame({
+        "Focus": list(focus_weights[sel_num].keys()),
+        "Emphasis": list(focus_weights[sel_num].values())
+    }).sort_values("Emphasis", ascending=True)
+
+    with st.container(border=True):
+        st.subheader("📈 Development Focus Snapshot")
+        st.caption("This shows where to put your attention *right now* for this phase (not a performance score).")
+        fig_focus = px.bar(snap_df, x="Emphasis", y="Focus", orientation="h")
+        fig_focus.update_layout(height=240, margin=dict(l=10, r=10, t=10, b=10))
+        st.plotly_chart(fig_focus, use_container_width=True)
+
+    # --- Visual: Phase × Focus Matrix (actionable, role-aware) ---
+    with st.container(border=True):
+        st.subheader("🧭 Phase Coaching Matrix")
+        st.caption("Use this like a checklist when planning check-ins: coach the focus areas that match the current phase. Role-aware moves are included for the staff member’s role.")
+
+        phase = phases[sel_num]
+        colA, colB, colC = st.columns(3)
+
+        # Focus Area 1
+        with colA:
+            st.markdown("### Structure & Clarity")
+            st.markdown("""- Tighten expectations
+- Reduce ambiguity
+- Make "good" visible""")
+            st.markdown("**Supervisor moves:**")
+            moves = role_additions.get(role_key, {}).get(sel_num, [])[:2]
+            for mtxt in moves:
+                st.write(f"• {mtxt}")
+
+        # Focus Area 2
+        with colB:
+            st.markdown("### Skill Application")
+            st.markdown("""- Practice in real situations
+- Build repeatable routines
+- Coach judgment with scenarios""")
+            st.markdown("**Supervisor moves:**")
+            moves = role_additions.get(role_key, {}).get(sel_num, [])[1:3]
+            for mtxt in moves:
+                st.write(f"• {mtxt}")
+
+        # Focus Area 3
+        with colC:
+            st.markdown("### Autonomy & Judgment")
+            st.markdown("""- Increase ownership
+- Expand decision scope
+- Build leadership behaviors""")
+            st.markdown("**Supervisor moves:**")
+            moves = role_additions.get(role_key, {}).get(sel_num, [])[-2:]
+            for mtxt in moves:
+                st.write(f"• {mtxt}")
+
+        st.divider()
+        st.markdown(f"### Current Phase Detail — Phase {phase['num']}: {phase['title']}")
+        if phase.get("timing"):
+            st.caption(f"Typical timeframe: {phase['timing']}")
+        st.info(phase.get("body", ""))
+
+        with st.expander("See role-specific moves for other roles (helpful for succession / promotion coaching)"):
+            for rk in ["YDP", "Shift Supervisor", "Program Supervisor"]:
+                st.markdown(f"**{rk} — Phase {sel_num} moves**")
+                for bullet in role_additions.get(rk, {}).get(sel_num, []):
+                    st.write(f"• {bullet}")
+                st.markdown("---")
+
+    # --- Print-friendly summary export (PDF) ---
+    def _build_ipdp_summary_pdf(staff_name: str, staff_role: str, phase_num: int) -> bytes:
+        phase = phases[phase_num]
+        pdf = FPDF()
+        pdf.set_auto_page_break(auto=True, margin=12)
+        pdf.add_page()
+        pdf.set_font("Arial", "B", 16)
+        pdf.cell(0, 10, "Individual Professional Development Plan (IPDP)", ln=True)
+        pdf.ln(2)
+
+        pdf.set_font("Arial", "", 11)
+        pdf.multi_cell(0, 6, f"Staff: {staff_name}\nRole: {staff_role}\nCurrent Phase: Phase {phase_num} — {phase['title']} ({phase.get('timing','')})")
+        pdf.ln(2)
+
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, "Phase Summary", ln=True)
+        pdf.set_font("Arial", "", 11)
+        pdf.multi_cell(0, 6, phase.get("body", ""))
+        pdf.ln(1)
+
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, "Supervisor Focus (This Phase)", ln=True)
+        pdf.set_font("Arial", "", 11)
+        for focus, val in focus_weights[phase_num].items():
+            pdf.multi_cell(0, 6, f"- {focus}: Emphasis {val}/10")
+        pdf.ln(1)
+
+        rk = role_key
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, f"Role-Aware Supervisor Moves ({rk})", ln=True)
+        pdf.set_font("Arial", "", 11)
+        for bullet in role_additions.get(rk, {}).get(phase_num, []):
+            pdf.multi_cell(0, 6, f"- {bullet}")
+        pdf.ln(1)
+
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, "Recommended Check-In Notes Template", ln=True)
+        pdf.set_font("Arial", "", 11)
+        pdf.multi_cell(0, 6, "Wins since last check-in:\n-\n\nOne skill focus for next period:\n-\n\nSupport needed from supervisor:\n-\n\nNext check-in date:")
+        return pdf.output(dest="S").encode("latin1", errors="ignore")
+
+    pdf_bytes = _build_ipdp_summary_pdf(name, role, sel_num)
+    st.download_button(
+        "🖨️ Download IPDP Summary (PDF)",
+        data=pdf_bytes,
+        file_name=f"{name.replace(' ', '_')}_IPDP_Summary.pdf",
+        mime="application/pdf",
+        use_container_width=True
+    )
     show_section("10. What You Should Celebrate", None, data['s10_b'])
 
     # --- VISUAL BREAK: CELEBRATION SIGNALS ---
@@ -1907,12 +2183,10 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             first = re.sub(r"[^a-z]+", "", re.split(r"\s+", q_clean)[0].lower()) or "other"
             starters.append(first)
 
-        starter_df = (
-            pd.Series(starters)
-            .value_counts()
-            .reset_index()
-            .rename(columns={"index": "Starter", 0: "Count"})
-        )
+        starter_df = pd.Series(starters).value_counts().reset_index()
+        starter_df.columns = ['Starter', 'Count']
+        # Keep only top items so the chart stays readable
+        starter_df = starter_df.head(10)
 
         with st.container(border=True):
             st.subheader("🧠 Coaching Question Mix")
