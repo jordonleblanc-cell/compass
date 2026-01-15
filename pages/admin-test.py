@@ -1378,9 +1378,9 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
     st.divider()
 
-    # --- SECTION 9: INDIVIDUAL PROFESSIONAL DEVELOPMENT PLAN (IPDP) - FIXED ---
+    # --- SECTION 9: INDIVIDUAL PROFESSIONAL DEVELOPMENT PLAN (IPDP) - COLLAPSIBLE ---
     st.subheader("9. Individual Professional Development Plan (IPDP)")
-    st.caption("A development-first framework for coaching growth, alignment, and performance over time. Select the current phase to get role-aware supervisor moves and a print-ready summary for check-ins.")
+    st.caption("A development-first framework for coaching growth, alignment, and performance over time. Expand a phase below to view details and role-specific coaching moves.")
 
     # 1. Parse Data First (Preload Everything)
     interventions_raw = data.get('s9_b', []) or []
@@ -1447,94 +1447,13 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         elif "Shift Supervisor" in role: role_key = "Shift Supervisor"
         else: role_key = "YDP"
 
-    # 2. State Management for Phase Selection
-    # Initialize state if not present
-    ipdp_key = f"ipdp_phase_{name}"
-    if ipdp_key not in st.session_state:
-        st.session_state[ipdp_key] = 1
-
-    # 3. Create Labels for Display
-    phase_options = {
-        1: f"Phase 1 — {phases_content[1]['title']} ({phases_content[1]['timing']})",
-        2: f"Phase 2 — {phases_content[2]['title']} ({phases_content[2]['timing']})",
-        3: f"Phase 3 — {phases_content[3]['title']} ({phases_content[3]['timing']})"
-    }
-
-    # 4. The Selector Widget
-    # We use a radio or selectbox that updates the state integer directly
-    
-    col_sel, col_empty = st.columns([2, 1])
-    with col_sel:
-        selected_phase_num = st.selectbox(
-            "Select Development Phase:",
-            options=[1, 2, 3],
-            format_func=lambda x: phase_options[x],
-            key=ipdp_key
-        )
-
-    # 5. Render Content Based on Selection
-    # Just read directly from the widget value which is stored in session state automatically
-    sel_num = st.session_state[ipdp_key]
-    current_phase_data = phases_content[sel_num]
-
     focus_weights = {
         1: {"Structure & Clarity": 10, "Skill Application": 4, "Autonomy & Judgment": 2},
         2: {"Structure & Clarity": 6, "Skill Application": 10, "Autonomy & Judgment": 6},
         3: {"Structure & Clarity": 3, "Skill Application": 7, "Autonomy & Judgment": 10},
     }
-    
-    snap_df = pd.DataFrame({
-        "Focus": list(focus_weights[sel_num].keys()), 
-        "Emphasis": list(focus_weights[sel_num].values())
-    }).sort_values("Emphasis", ascending=True)
 
-    with st.container(border=True):
-        st.subheader("📈 Development Focus Snapshot")
-        st.caption("This shows where to put your attention *right now* for this phase (not a performance score).")
-        fig_focus = px.bar(snap_df, x="Emphasis", y="Focus", orientation="h")
-        fig_focus.update_layout(height=240, margin=dict(l=10, r=10, t=10, b=10))
-        st.plotly_chart(fig_focus, use_container_width=True)
-
-    with st.container(border=True):
-        st.subheader("🧭 Phase Coaching Matrix")
-        st.caption("Use this like a checklist when planning check-ins: coach the focus areas that match the current phase. Role-aware moves are included for the staff member’s role.")
-        
-        colA, colB, colC = st.columns(3)
-        
-        # Pre-calc moves for current phase
-        current_moves = role_additions.get(role_key, {}).get(sel_num, [])
-        
-        with colA:
-            st.markdown("### Structure & Clarity")
-            st.markdown("- Tighten expectations\n- Reduce ambiguity\n- Make \"good\" visible")
-            st.markdown("**Supervisor moves:**")
-            if len(current_moves) > 0: st.write(f"• {current_moves[0]}")
-            
-        with colB:
-            st.markdown("### Skill Application")
-            st.markdown("- Practice in real situations\n- Build repeatable routines\n- Coach judgment with scenarios")
-            st.markdown("**Supervisor moves:**")
-            if len(current_moves) > 1: st.write(f"• {current_moves[1]}")
-            
-        with colC:
-            st.markdown("### Autonomy & Judgment")
-            st.markdown("- Increase ownership\n- Expand decision scope\n- Build leadership behaviors")
-            st.markdown("**Supervisor moves:**")
-            if len(current_moves) > 2: st.write(f"• {current_moves[2]}")
-
-        st.divider()
-        st.markdown(f"### Current Phase Detail — Phase {current_phase_data['num']}: {current_phase_data['title']}")
-        if current_phase_data.get("timing"): st.caption(f"Typical timeframe: {current_phase_data['timing']}")
-        st.info(current_phase_data.get("body", ""))
-
-        with st.expander("See role-specific moves for other roles (helpful for succession / promotion coaching)"):
-            for rk in ["YDP", "Shift Supervisor", "Program Supervisor"]:
-                st.markdown(f"**{rk} — Phase {sel_num} moves**")
-                moves = role_additions.get(rk, {}).get(sel_num, [])
-                for bullet in moves: st.write(f"• {bullet}")
-                st.markdown("---")
-
-    # 6. PDF Generation Helper
+    # 6. PDF Generation Helper (Defined outside loop)
     def _build_ipdp_summary_pdf(staff_name, staff_role, phase_num):
         phase = phases_content[phase_num]
         moves = role_additions.get(role_key, {}).get(phase_num, [])
@@ -1577,8 +1496,79 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         pdf.multi_cell(0, 6, _safe_pdf_text(template))
         return pdf.output(dest="S").encode("latin1", errors="ignore")
 
-    pdf_bytes = _build_ipdp_summary_pdf(name, role, sel_num)
-    st.download_button("🖨️ Download IPDP Summary (PDF)", data=pdf_bytes, file_name=f"{name.replace(' ', '_')}_IPDP_Summary.pdf", mime="application/pdf", use_container_width=True)
+    # Render iterative expanders for each phase
+    for phase_idx in [1, 2, 3]:
+        p_data = phases_content[phase_idx]
+        # Construct header
+        header_text = f"Phase {phase_idx}: {p_data['title']} ({p_data.get('timing', 'Timing varies')})"
+        
+        with st.expander(header_text, expanded=False):
+            sel_num = phase_idx 
+            
+            # --- 1. Focus Snapshot (Chart) ---
+            snap_df = pd.DataFrame({
+                "Focus": list(focus_weights[sel_num].keys()), 
+                "Emphasis": list(focus_weights[sel_num].values())
+            }).sort_values("Emphasis", ascending=True)
+            
+            c_chart, c_desc = st.columns([1, 1])
+            with c_desc:
+                st.markdown(f"**Objective:** {p_data.get('body', '')}")
+                st.caption("Focus distribution shown in chart.")
+            with c_chart:
+                fig_focus = px.bar(snap_df, x="Emphasis", y="Focus", orientation="h")
+                fig_focus.update_layout(height=150, margin=dict(l=10, r=10, t=10, b=10), xaxis_title=None, yaxis_title=None)
+                st.plotly_chart(fig_focus, use_container_width=True, config={'displayModeBar': False})
+
+            st.divider()
+
+            # --- 2. Coaching Matrix ---
+            st.markdown("#### 🧭 Coaching Matrix")
+            colA, colB, colC = st.columns(3)
+            current_moves = role_additions.get(role_key, {}).get(sel_num, [])
+            
+            with colA:
+                st.markdown("**Structure & Clarity**")
+                st.caption("Tighten expectations, reduce ambiguity.")
+                if len(current_moves) > 0: st.info(f"{current_moves[0]}")
+                else: st.info("Establish clear routines.")
+            with colB:
+                st.markdown("**Skill Application**")
+                st.caption("Practice in real situations.")
+                if len(current_moves) > 1: st.info(f"{current_moves[1]}")
+                else: st.info("Coach in the moment.")
+            with colC:
+                st.markdown("**Autonomy & Judgment**")
+                st.caption("Increase ownership.")
+                if len(current_moves) > 2: st.info(f"{current_moves[2]}")
+                else: st.info("Reflect on decisions.")
+
+            st.divider()
+
+            # --- 3. Downloads & Extras ---
+            b_col, e_col = st.columns([1, 1])
+            with b_col:
+                pdf_bytes = _build_ipdp_summary_pdf(name, role, sel_num)
+                st.download_button(
+                    f"📥 Download Phase {sel_num} Plan (PDF)", 
+                    data=pdf_bytes, 
+                    file_name=f"{name.replace(' ', '_')}_IPDP_Phase_{sel_num}.pdf", 
+                    mime="application/pdf", 
+                    use_container_width=True,
+                    key=f"dl_btn_{sel_num}"
+                )
+            
+            # --- 4. Other Roles (No nested expander) ---
+            st.markdown("---")
+            st.caption(f"**Cross-Training / Future Role Moves for Phase {sel_num}:**")
+            r_tabs = st.tabs(["YDP Moves", "Shift Sup Moves", "Prog Sup Moves"])
+            
+            with r_tabs[0]:
+                for b in role_additions.get("YDP", {}).get(sel_num, []): st.write(f"- {b}")
+            with r_tabs[1]:
+                for b in role_additions.get("Shift Supervisor", {}).get(sel_num, []): st.write(f"- {b}")
+            with r_tabs[2]:
+                for b in role_additions.get("Program Supervisor", {}).get(sel_num, []): st.write(f"- {b}")
 
     st.markdown("<br>", unsafe_allow_html=True)
 
