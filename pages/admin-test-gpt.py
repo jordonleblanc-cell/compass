@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import requests
 import pandas as pd
 import re
@@ -2020,17 +2021,45 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         f"Phase 3 — {phases[3]['title']} ({phases[3]['timing']})",
     ]
 
+    # --- Phase selection (stable + non-disruptive) ---
+    # Streamlit will rerun the script on any widget interaction. To prevent the UI from "jumping" away
+    # (which feels like losing progress), we:
+    #   1) store the selection per staff member in session_state, and
+    #   2) auto-scroll back to this section after a phase change.
+    st.markdown('<div id="ipdp_phase_anchor"></div>', unsafe_allow_html=True)
+
     phase_state_key = f"ipdp_phase__{name}".replace(" ", "_")
+    scroll_flag_key = f"ipdp_scroll__{name}".replace(" ", "_")
+
     if phase_state_key not in st.session_state:
         st.session_state[phase_state_key] = phase_labels[0]
 
-    sel_label = st.selectbox(
+    def _on_ipdp_phase_change():
+        # Mark that we should scroll back to this section after rerun.
+        st.session_state[scroll_flag_key] = True
+
+    st.selectbox(
         "Current development phase (used for coaching + summary export)",
         options=phase_labels,
         index=phase_labels.index(st.session_state[phase_state_key]) if st.session_state[phase_state_key] in phase_labels else 0,
-        key=phase_state_key
+        key=phase_state_key,
+        on_change=_on_ipdp_phase_change
     )
 
+    # Auto-scroll back to the phase section after selection changes.
+    if st.session_state.get(scroll_flag_key):
+        components.html(
+            """
+            <script>
+              const el = window.parent.document.getElementById('ipdp_phase_anchor');
+              if (el) { el.scrollIntoView({behavior: 'instant', block: 'start'}); }
+            </script>
+            """,
+            height=0,
+        )
+        st.session_state[scroll_flag_key] = False
+
+    sel_label = st.session_state[phase_state_key]
     sel_num = 1 if sel_label.startswith("Phase 1") else 2 if sel_label.startswith("Phase 2") else 3
 
     # --- Visual: Development Focus Snapshot (useful at-a-glance emphasis) ---
