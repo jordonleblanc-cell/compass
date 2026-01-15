@@ -2139,9 +2139,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 ),
             }
             w1, w2, w3 = why_map.get(phase_num, ("", "", ""))
-            expanded_body = "
-
-".join([p for p in [base_body, w1, w2, w3] if p])
+            # Build a single info box with readable paragraph spacing.
+            expanded_body = "\n\n".join([p for p in [base_body, w1, w2, w3] if p])
             st.info(expanded_body)
 
             # Snapshot chart for this phase
@@ -3102,4 +3101,3 @@ elif st.session_state.current_view == "Org Pulse":
                 else:
                     st.warning("Role data missing. Cannot analyze pipeline.")
     else: st.warning("No data available.")
-        
