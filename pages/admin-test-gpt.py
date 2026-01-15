@@ -1674,8 +1674,140 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     show_section("2. Supervising Their Communication", None, data['s2_b'])
     show_section(f"3. Motivation Profile: {p_mot}", None, data['s3_b'])
     show_section("4. Motivating This Staff Member", None, data['s4_b'])
-    show_section("5. Integrated Leadership Profile", data['s5'])
+
+    # --- SECTION 5: INTEGRATED PROFILE CARD (EXPANDED) ---
+    # (Self-contained: no external helper functions required.)
+    with st.container(border=True):
+        st.markdown(
+            "<div style='text-align: center; margin-bottom: 10px;'><span style='background-color: #e8f0fe; color: #1a73e8; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em;'>SECTION 5: INTEGRATION</span></div>",
+            unsafe_allow_html=True,
+        )
+
+        # Pull the integrated title/synergy from the intersection map when available
+        key = f"{p_comm}-{p_mot}"
+        integrated = INTEGRATED_PROFILES.get(key, {})
+        title = integrated.get('title') or f"{p_comm} + {p_mot} Leadership Profile"
+        synergy = integrated.get('synergy') or data.get('s5') or ""
+
+        st.markdown(
+            f"<h2 style='text-align: center; color: #202124; margin-top: 0;'>{title}</h2>",
+            unsafe_allow_html=True,
+        )
+
+        i1, i2 = st.columns([1.5, 1])
+
+        with i1:
+            st.markdown("#### 🔗 The Synergy")
+            if synergy:
+                st.info(f"**{synergy}**")
+
+            st.markdown("#### ⚙️ Leadership Mechanics")
+
+            # Decision style is primarily driven by how they communicate
+            decision_by_comm = {
+                "Director": "Fast, decisive, and outcome-first. They prefer clear options and a recommendation.",
+                "Tracker": "Evidence-first and risk-aware. They prefer definitions, steps, and clear standards.",
+                "Facilitator": "Consensus-seeking and alignment-driven. They prefer hearing perspectives before committing.",
+                "Encourager": "People-first and relationally tuned. They prefer considering impact on morale and trust.",
+            }
+
+            # Influence tactic is primarily driven by what motivates them
+            influence_by_mot = {
+                "Achievement": "Frame the goal, define the win, and set measurable targets.",
+                "Growth": "Offer challenge + learning, and highlight skill-building opportunities.",
+                "Purpose": "Connect the work to mission, values, and the 'why' behind the task.",
+                "Connection": "Emphasize teamwork, shared ownership, and belonging in the process.",
+            }
+
+            # Trust builders vary by intersection (keep this concise and actionable)
+            trust_builder = {
+                "Director": {
+                    "Achievement": "Be prepared, be direct, and deliver outcomes on time.",
+                    "Growth": "Bring solutions and ask for stretch assignments with clarity.",
+                    "Purpose": "Tie decisions to mission and remove blockers quickly.",
+                    "Connection": "Be decisive while explicitly affirming people.",
+                },
+                "Tracker": {
+                    "Achievement": "Use data and clear standards; follow through consistently.",
+                    "Growth": "Show learning plans, document progress, and refine the process.",
+                    "Purpose": "Translate values into clear expectations and accountability.",
+                    "Connection": "Be consistent, predictable, and transparent in decisions.",
+                },
+                "Facilitator": {
+                    "Achievement": "Align people quickly around a plan and clarify roles.",
+                    "Growth": "Invite input, then convert it into a concrete development step.",
+                    "Purpose": "Keep the group aligned to mission during conflict or change.",
+                    "Connection": "Create psychological safety and shared buy-in.",
+                },
+                "Encourager": {
+                    "Achievement": "Celebrate wins publicly and coach privately toward the goal.",
+                    "Growth": "Encourage experimentation and normalize learning mistakes.",
+                    "Purpose": "Honor values and recognize meaningful impact.",
+                    "Connection": "Build trust through presence, empathy, and follow-through.",
+                },
+            }
+
+            mech_decision = decision_by_comm.get(p_comm, "")
+            mech_influence = influence_by_mot.get(p_mot, "")
+            mech_trust = trust_builder.get(p_comm, {}).get(p_mot, "")
+
+            if mech_decision:
+                st.markdown(f"**1. Decision Style:** {mech_decision}")
+            if mech_influence:
+                st.markdown(f"**2. Influence Tactic:** {mech_influence}")
+            if mech_trust:
+                st.markdown(f"**3. Trust Builder:** {mech_trust}")
+
+        with i2:
+            st.markdown("**🧭 Leadership Compass**")
+
+            # Inline compass visual (Task vs People on X; Change vs Stability on Y)
+            import plotly.graph_objects as go
+
+            comm_vec = {
+                "Director": (2, 1),
+                "Tracker": (2, -1),
+                "Encourager": (-2, -1),
+                "Facilitator": (-2, 1),
+            }.get(p_comm, (0, 0))
+
+            mot_vec = {
+                "Achievement": (1, 1),
+                "Growth": (0, 2),
+                "Purpose": (-1, 1),
+                "Connection": (-2, -1),
+            }.get(p_mot, (0, 0))
+
+            x = max(-3, min(3, comm_vec[0] + mot_vec[0]))
+            y = max(-3, min(3, comm_vec[1] + mot_vec[1]))
+
+            fig_compass = go.Figure()
+            fig_compass.add_trace(go.Scatter(x=[x], y=[y], mode='markers+text', text=["You"], textposition="top center"))
+            fig_compass.add_shape(type="line", x0=-3.2, x1=3.2, y0=0, y1=0)
+            fig_compass.add_shape(type="line", x0=0, x1=0, y0=-3.2, y1=3.2)
+
+            fig_compass.update_xaxes(range=[-3.2, 3.2], showgrid=False, zeroline=False, showticklabels=False)
+            fig_compass.update_yaxes(range=[-3.2, 3.2], showgrid=False, zeroline=False, showticklabels=False)
+
+            fig_compass.update_layout(
+                height=280,
+                margin=dict(t=30, b=20, l=20, r=20),
+                showlegend=False,
+                title=None,
+                annotations=[
+                    dict(x=3.1, y=0.15, text="Task", showarrow=False),
+                    dict(x=-3.1, y=0.15, text="People", showarrow=False),
+                    dict(x=0.15, y=3.1, text="Change", showarrow=False),
+                    dict(x=0.15, y=-3.1, text="Stability", showarrow=False),
+                ],
+            )
+
+            st.plotly_chart(fig_compass, use_container_width=True, config={'displayModeBar': False})
+            st.caption("The compass plots bias: Task vs. People (X-Axis) and Change vs. Stability (Y-Axis).")
+
+
     show_section("6. How You Can Best Support Them", data['s6'])
+
 
     # --- VISUAL BREAK: QUICK COACHING MAP (between 1-6 and 7-8) ---
     with st.container(border=True):
