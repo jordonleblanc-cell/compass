@@ -1984,12 +1984,10 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             first = re.sub(r"[^a-z]+", "", re.split(r"\s+", q_clean)[0].lower()) or "other"
             starters.append(first)
 
-        starter_df = (
-            pd.Series(starters)
-            .value_counts()
-            .reset_index()
-            .rename(columns={"index": "Starter", 0: "Count"})
-        )
+        starter_df = pd.Series(starters).value_counts().reset_index()
+        starter_df.columns = ['Starter', 'Count']
+        # Keep only top items so the chart stays readable
+        starter_df = starter_df.head(10)
 
         with st.container(border=True):
             st.subheader("🧠 Coaching Question Mix")
