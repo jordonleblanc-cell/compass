@@ -3102,3 +3102,4 @@ elif st.session_state.current_view == "Org Pulse":
                 else:
                     st.warning("Role data missing. Cannot analyze pipeline.")
     else: st.warning("No data available.")
+        
