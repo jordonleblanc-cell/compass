@@ -1,6 +1,8 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import requests
 import pandas as pd
+import re
 from fpdf import FPDF
 import plotly.express as px
 import plotly.graph_objects as go
@@ -1169,8 +1171,10 @@ def clean_text(text):
 
 def send_pdf_via_email(to_email, subject, body, pdf_bytes, filename="Guide.pdf"):
     try:
-        sender_email = st.secrets["EMAIL_USER"]
-        sender_password = st.secrets["EMAIL_PASSWORD"]
+        sender_email = st.secrets.get("EMAIL_USER")
+        sender_password = st.secrets.get("EMAIL_PASSWORD")
+        if not sender_email or not sender_password: return False, "Email credentials not configured."
+        
         msg = MIMEMultipart()
         msg['From'] = sender_email
         msg['To'] = to_email
@@ -1252,7 +1256,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     add_section("6. How You Can Best Support Them", data['s6'])
     add_section("7. What They Look Like When Thriving", data['s7'])
     add_section("8. What They Look Like When Struggling", data['s8'])
-    add_section("9. Supervisory Interventions (Roadmap)", None, data['s9_b'])
+    add_section("9. Individual Professional Development Plan (IPDP)", None, data['s9_b'])
     add_section("10. What You Should Celebrate", None, data['s10_b'])
 
     # 11. Coaching Questions
@@ -1370,33 +1374,181 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
     st.divider()
 
-    # --- SECTION 9: INTERVENTIONS (VISUAL ROADMAP) ---
-    st.subheader("9. Supervisory Roadmap (Interventions)")
-    phases = data['s9_b']
-    if len(phases) >= 3:
-        p1_txt = phases[0]
-        p2_txt = phases[1]
-        p3_txt = phases[2]
-        
-        def clean_phase(txt):
-            parts = txt.split(":", 2)
-            title = parts[0].replace("**", "") + ": " + parts[1].replace("**", "") if len(parts) > 1 else txt
-            body = parts[2] if len(parts) > 2 else ""
-            return title, body
+    # --- SECTION 9: INDIVIDUAL PROFESSIONAL DEVELOPMENT PLAN (IPDP) ---
+    st.subheader("9. Individual Professional Development Plan (IPDP)")
+    st.caption("A development-first framework for coaching growth, alignment, and performance over time. Select the current phase to get role-aware supervisor moves and a print-ready summary for check-ins.")
 
-        t1, b1 = clean_phase(p1_txt)
-        t2, b2 = clean_phase(p2_txt)
-        t3, b3 = clean_phase(p3_txt)
+    interventions_raw = data.get('s9_b', []) or []
 
-        rc1, rc2, rc3 = st.columns(3)
-        with rc1:
-            st.markdown(f"<div class='phase-card'><h5>{t1}</h5><p style='font-size:0.9em'>{b1}</p></div>", unsafe_allow_html=True)
-        with rc2:
-            st.markdown(f"<div class='phase-card'><h5>{t2}</h5><p style='font-size:0.9em'>{b2}</p></div>", unsafe_allow_html=True)
-        with rc3:
-            st.markdown(f"<div class='phase-card'><h5>{t3}</h5><p style='font-size:0.9em'>{b3}</p></div>", unsafe_allow_html=True)
-    else:
-        show_list(phases)
+    def _parse_phase(item: str):
+        if not isinstance(item, str): return None
+        s = item.strip()
+        m = re.match(r"^\*\*Phase\s*(\d+)\s*:\s*(.*?)\s*\((.*?)\)\s*:\*\*\s*(.*)$", s, flags=re.S)
+        if not m:
+            m2 = re.match(r"^\*\*Phase\s*(\d+)\s*:\s*(.*?)\s*:\*\*\s*(.*)$", s, flags=re.S)
+            if not m2: return None
+            num = int(m2.group(1))
+            title = m2.group(2).strip()
+            timing = ""
+            body = m2.group(3).strip()
+            return {"num": num, "title": title, "timing": timing, "body": body}
+        num = int(m.group(1))
+        title = m.group(2).strip()
+        timing = m.group(3).strip()
+        body = m.group(4).strip()
+        return {"num": num, "title": title, "timing": timing, "body": body}
+
+    phases = {}
+    for item in interventions_raw:
+        p = _parse_phase(item)
+        if p and p.get("num") in (1, 2, 3):
+            phases[p["num"]] = p
+
+    default_phase_meta = {
+        1: {"num": 1, "title": "Foundation", "timing": "0–6 months", "body": "Establish clarity, consistency, and psychological safety. Reduce overwhelm, define expectations, and build repeatable habits."},
+        2: {"num": 2, "title": "Skill Integration", "timing": "6–12 months", "body": "Practice skill application under real conditions. Increase reliability, sharpen judgment, and strengthen routines across scenarios."},
+        3: {"num": 3, "title": "Leadership Readiness", "timing": "12+ months", "body": "Build autonomy and leadership behaviors. Expand ownership, coach others, and strengthen decision-making in complex situations."},
+    }
+    for n in (1, 2, 3):
+        if n not in phases: phases[n] = default_phase_meta[n]
+
+    role_additions = {
+        "YDP": {
+            1: ["Use a 1-sentence expectation + 1 example ('Do X, like this...') to reduce ambiguity.", "Focus on one micro-skill per shift (tone, proximity, or follow-through) rather than 'everything.'", "End shifts with a 2-minute debrief: what worked / what to try next time."],
+            2: ["Assign one repeatable routine to own (e.g., meds prep support, shift handoff notes, activity setup).", "Practice 'IF/THEN' coaching: 'If youth escalates, then we...' to build judgment.", "Increase independence gradually: fewer prompts, more reflection after."],
+            3: ["Have them model for a newer staff member for one shift/week (calm tone + clear directions).", "Give a small improvement project (checklist, routine, or engagement activity) to lead.", "Coach regulated leadership: steady first, then problem-solve."]
+        },
+        "Shift Supervisor": {
+            1: ["Coach at point-of-performance: brief, calm corrections in the moment.", "Run 3-minute huddles: the 2 priorities + what 'good' looks like on this shift.", "Track patterns and document specific examples (facts, not impressions)."],
+            2: ["Standardize shift operations: checklists, handoffs, and consistent follow-through.", "Use a weekly scenario drill (5 minutes) to build real-time judgment.", "Delegate one routine oversight item (supplies, schedule checks, or chart review) and review weekly."],
+            3: ["Coach other staff using the same framework (tone/pace/proof) to build consistency.", "Lead a mini-after-action review after incidents (what happened / what we learned / next time).", "Own a small quality improvement loop (spot check → feedback → follow-up)."]
+        },
+        "Program Supervisor": {
+            1: ["Clarify the 'why' and the standard: align team expectations across shifts and cottages.", "Set a predictable supervision cadence (weekly micro-check-in + monthly deeper review).", "Remove friction: fix one systemic barrier (process, staffing pattern, documentation clarity)."],
+            2: ["Audit routines and strengthen consistency across supervisors (handoff, documentation, escalation).", "Coach decision-making: What data did you use? What did you assume?", "Develop one cross-team skill focus per month (e.g., de-escalation, proactive engagement)."],
+            3: ["Build leadership pipeline: identify stretch assignments and coaching plans for emerging leaders.", "Improve systems: simplify a workflow, strengthen accountability loops, and celebrate wins publicly.", "Shift from 'check' to 'coach': ask reflective questions that build ownership."]
+        }
+    }
+
+    role_key = "YDP"
+    if isinstance(role, str):
+        if "Program Supervisor" in role: role_key = "Program Supervisor"
+        elif "Shift Supervisor" in role: role_key = "Shift Supervisor"
+        else: role_key = "YDP"
+
+    phase_labels = [
+        f"Phase 1 — {phases[1]['title']} ({phases[1]['timing']})",
+        f"Phase 2 — {phases[2]['title']} ({phases[2]['timing']})",
+        f"Phase 3 — {phases[3]['title']} ({phases[3]['timing']})",
+    ]
+
+    st.markdown('<div id="ipdp_phase_anchor"></div>', unsafe_allow_html=True)
+    phase_state_key = f"ipdp_phase__{name}".replace(" ", "_")
+    scroll_flag_key = f"ipdp_scroll__{name}".replace(" ", "_")
+
+    if phase_state_key not in st.session_state:
+        st.session_state[phase_state_key] = phase_labels[0]
+
+    def _on_ipdp_phase_change():
+        st.session_state[scroll_flag_key] = True
+
+    st.selectbox("Current development phase (used for coaching + summary export)", options=phase_labels, index=phase_labels.index(st.session_state[phase_state_key]) if st.session_state[phase_state_key] in phase_labels else 0, key=phase_state_key, on_change=_on_ipdp_phase_change)
+
+    if st.session_state.get(scroll_flag_key):
+        components.html("""<script>const el = window.parent.document.getElementById('ipdp_phase_anchor'); if (el) { el.scrollIntoView({behavior: 'instant', block: 'start'}); }</script>""", height=0)
+        st.session_state[scroll_flag_key] = False
+
+    sel_label = st.session_state[phase_state_key]
+    sel_num = 1 if sel_label.startswith("Phase 1") else 2 if sel_label.startswith("Phase 2") else 3
+
+    focus_weights = {
+        1: {"Structure & Clarity": 10, "Skill Application": 4, "Autonomy & Judgment": 2},
+        2: {"Structure & Clarity": 6, "Skill Application": 10, "Autonomy & Judgment": 6},
+        3: {"Structure & Clarity": 3, "Skill Application": 7, "Autonomy & Judgment": 10},
+    }
+    snap_df = pd.DataFrame({"Focus": list(focus_weights[sel_num].keys()), "Emphasis": list(focus_weights[sel_num].values())}).sort_values("Emphasis", ascending=True)
+
+    with st.container(border=True):
+        st.subheader("📈 Development Focus Snapshot")
+        st.caption("This shows where to put your attention *right now* for this phase (not a performance score).")
+        fig_focus = px.bar(snap_df, x="Emphasis", y="Focus", orientation="h")
+        fig_focus.update_layout(height=240, margin=dict(l=10, r=10, t=10, b=10))
+        st.plotly_chart(fig_focus, use_container_width=True)
+
+    with st.container(border=True):
+        st.subheader("🧭 Phase Coaching Matrix")
+        st.caption("Use this like a checklist when planning check-ins: coach the focus areas that match the current phase. Role-aware moves are included for the staff member’s role.")
+        phase = phases[sel_num]
+        colA, colB, colC = st.columns(3)
+        with colA:
+            st.markdown("### Structure & Clarity")
+            st.markdown("- Tighten expectations\n- Reduce ambiguity\n- Make \"good\" visible")
+            st.markdown("**Supervisor moves:**")
+            for mtxt in role_additions.get(role_key, {}).get(sel_num, [])[:2]: st.write(f"• {mtxt}")
+        with colB:
+            st.markdown("### Skill Application")
+            st.markdown("- Practice in real situations\n- Build repeatable routines\n- Coach judgment with scenarios")
+            st.markdown("**Supervisor moves:**")
+            for mtxt in role_additions.get(role_key, {}).get(sel_num, [])[1:3]: st.write(f"• {mtxt}")
+        with colC:
+            st.markdown("### Autonomy & Judgment")
+            st.markdown("- Increase ownership\n- Expand decision scope\n- Build leadership behaviors")
+            st.markdown("**Supervisor moves:**")
+            for mtxt in role_additions.get(role_key, {}).get(sel_num, [])[-2:]: st.write(f"• {mtxt}")
+
+        st.divider()
+        st.markdown(f"### Current Phase Detail — Phase {phase['num']}: {phase['title']}")
+        if phase.get("timing"): st.caption(f"Typical timeframe: {phase['timing']}")
+        st.info(phase.get("body", ""))
+
+        with st.expander("See role-specific moves for other roles (helpful for succession / promotion coaching)"):
+            for rk in ["YDP", "Shift Supervisor", "Program Supervisor"]:
+                st.markdown(f"**{rk} — Phase {sel_num} moves**")
+                for bullet in role_additions.get(rk, {}).get(sel_num, []): st.write(f"• {bullet}")
+                st.markdown("---")
+
+    def _build_ipdp_summary_pdf(staff_name: str, staff_role: str, phase_num: int) -> bytes:
+        phase = phases[phase_num]
+        def _safe_pdf_text(val) -> str:
+            s = "" if val is None else str(val)
+            s = (s.replace("—", "-").replace("–", "-").replace("“", '"').replace("”", '"').replace("‘", "'").replace("’", "'").replace("•", "* ").replace("…", "..."))
+            s = s.encode("latin-1", errors="ignore").decode("latin-1")
+            return s
+        pdf = FPDF()
+        pdf.set_auto_page_break(auto=True, margin=12)
+        pdf.add_page()
+        pdf.set_font("Arial", "B", 16)
+        pdf.cell(0, 10, _safe_pdf_text("Individual Professional Development Plan (IPDP)"), ln=True)
+        pdf.ln(2)
+        pdf.set_font("Arial", "", 11)
+        header = (f"Staff: {staff_name}\nRole: {staff_role}\nCurrent Phase: Phase {phase_num} - {phase.get('title','')} ({phase.get('timing','')})")
+        pdf.multi_cell(0, 6, _safe_pdf_text(header))
+        pdf.ln(2)
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, _safe_pdf_text("Phase Summary"), ln=True)
+        pdf.set_font("Arial", "", 11)
+        pdf.multi_cell(0, 6, _safe_pdf_text(phase.get("body", "")))
+        pdf.ln(1)
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, _safe_pdf_text("Supervisor Focus (This Phase)"), ln=True)
+        pdf.set_font("Arial", "", 11)
+        for focus, val in focus_weights[phase_num].items(): pdf.multi_cell(0, 6, _safe_pdf_text(f"- {focus}: Emphasis {val}/10"))
+        pdf.ln(1)
+        rk = role_key
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, _safe_pdf_text(f"Role-Aware Supervisor Moves ({rk})"), ln=True)
+        pdf.set_font("Arial", "", 11)
+        for bullet in role_additions.get(rk, {}).get(phase_num, []): pdf.multi_cell(0, 6, _safe_pdf_text(f"- {bullet}"))
+        pdf.ln(1)
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, _safe_pdf_text("Recommended Check-In Notes Template"), ln=True)
+        pdf.set_font("Arial", "", 11)
+        template = ("Wins since last check-in:\n-\n\nOne skill focus for next period:\n-\n\nSupport needed from supervisor:\n-\n\nNext check-in date:")
+        pdf.multi_cell(0, 6, _safe_pdf_text(template))
+        return pdf.output(dest="S").encode("latin1", errors="ignore")
+
+    pdf_bytes = _build_ipdp_summary_pdf(name, role, sel_num)
+    st.download_button("🖨️ Download IPDP Summary (PDF)", data=pdf_bytes, file_name=f"{name.replace(' ', '_')}_IPDP_Summary.pdf", mime="application/pdf", use_container_width=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -1836,6 +1988,43 @@ elif st.session_state.current_view == "Conflict Mediator":
         elif p1 and p2 and p1 == p2:
              st.warning("⚠️ You selected the same person twice. Please select two **different** staff members to analyze a conflict.")
         st.button("Reset", key="reset_t3", on_click=reset_t3)
+
+# 4. CAREER PATHFINDER
+elif st.session_state.current_view == "Career Pathfinder":
+    st.subheader("🚀 Career Pathfinder")
+    if not df.empty:
+        with st.container(border=True):
+            c1, c2 = st.columns(2)
+            cand = c1.selectbox("Candidate", df['name'].unique(), index=None, key="career")
+            role = c2.selectbox("Target Role", ["Shift Supervisor", "Program Supervisor", "Manager", "Director"], index=None, key="career_target")
+        
+        if cand and role:
+            d = df[df['name']==cand].iloc[0]
+            style = d['p_comm']
+            path = CAREER_PATHWAYS.get(style, {}).get(role)
+            if path:
+                st.info(f"**Shift:** {path['shift']}")
+                with st.container(border=True):
+                    st.markdown("### 🧠 The Psychological Block")
+                    st.markdown(f"**Why it's hard:** {path['why']}")
+                c_a, c_b = st.columns(2)
+                with c_a:
+                    with st.container(border=True):
+                        st.markdown("##### 🗣️ The Conversation")
+                        st.write(path['conversation'])
+                        if 'supervisor_focus' in path: st.warning(f"**Watch For:** {path['supervisor_focus']}")
+                with c_b:
+                    with st.container(border=True):
+                        st.markdown("##### ✅ Assignment")
+                        st.write(f"**Setup:** {path['assignment_setup']}")
+                        st.write(f"**Task:** {path['assignment_task']}")
+                        st.divider()
+                        st.success(f"**Success:** {path['success_indicators']}")
+                        st.error(f"**Red Flags:** {path['red_flags']}")
+                if 'debrief_questions' in path:
+                    with st.expander("🧠 Post-Assignment Debrief Questions"):
+                        for q in path['debrief_questions']: st.markdown(f"- {q}")
+            st.button("Reset", key="reset_t4", on_click=reset_t4)
 
 # 5. ORG PULSE
 elif st.session_state.current_view == "Org Pulse":
