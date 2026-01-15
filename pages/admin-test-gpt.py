@@ -1674,140 +1674,180 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     show_section("2. Supervising Their Communication", None, data['s2_b'])
     show_section(f"3. Motivation Profile: {p_mot}", None, data['s3_b'])
     show_section("4. Motivating This Staff Member", None, data['s4_b'])
+    
+# --- 5. INTEGRATED LEADERSHIP PROFILE (EXPANDED) ---
+def _integrated_mechanics(comm_style: str, motiv_style: str):
+    """Return supervisor-facing training guidance without duplicating other sections."""
+    # Decision Style (primarily communication-driven)
+    if comm_style == "Director":
+        decision_core = "Decisive and fast—prefers a workable answer now over a perfect answer later."
+        decision_see = "You’ll see quick calls, clear targets, and a bias toward action during ambiguity."
+        decision_move = "Ask one clarifying question before closing: “What’s the risk if we’re wrong?”"
+        decision_watch = "Rushing past context can create preventable rework or missed youth/staff signals."
+    elif comm_style == "Encourager":
+        decision_core = "Verbal and relational—thinks out loud and often lands decisions through dialogue."
+        decision_see = "You’ll see brainstorming, idea-bundling, and a tendency to ‘talk it into clarity’."
+        decision_move = "Time-box the conversation, then lock the next step: “What are we doing by end of shift?”"
+        decision_watch = "Momentum can drift if the decision isn’t translated into a single concrete action."
+    elif comm_style == "Facilitator":
+        decision_core = "Consensus-leaning and process-aware—wants people on board and the plan to be fair."
+        decision_see = "You’ll see careful listening, inclusion, and steadier pacing under stress."
+        decision_move = "Set a decision deadline and name the decider: “I’m deciding at 3pm with your input.”"
+        decision_watch = "Alignment work can become delay if ‘hearing everyone’ replaces choosing a direction."
+    else:  # Tracker
+        decision_core = "Analytical and cautious—prefers data, policy, and precedent before committing."
+        decision_see = "You’ll see note-taking, rule-checking, and strong follow-through once decided."
+        decision_move = "Separate ‘one-way door’ vs ‘two-way door’ decisions; speed up on reversible calls."
+        decision_watch = "Over-checking can slow urgent moments where safety/connection requires timely action."
 
-    # --- SECTION 5: INTEGRATED PROFILE CARD (EXPANDED) ---
-    # (Self-contained: no external helper functions required.)
-    with st.container(border=True):
-        st.markdown(
-            "<div style='text-align: center; margin-bottom: 10px;'><span style='background-color: #e8f0fe; color: #1a73e8; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em;'>SECTION 5: INTEGRATION</span></div>",
-            unsafe_allow_html=True,
-        )
+    # Influence Tactic (primarily communication-driven, tuned by motivation)
+    if comm_style == "Director":
+        influence_core = "Leads with authority and clarity—people follow because the direction is unmistakable."
+        influence_see = "You’ll see direct assignments, crisp expectations, and firm boundary-setting."
+        influence_move = "Add a 10-second ‘why’ so it doesn’t feel like command-and-control."
+        influence_watch = "If the team doesn’t understand purpose, compliance rises while ownership drops."
+    elif comm_style == "Encourager":
+        influence_core = "Leads with energy and vision—people follow because they feel invited into something."
+        influence_see = "You’ll see morale-building, relationship leverage, and optimism that lifts the room."
+        influence_move = "Pair vision with specifics: one metric, one behavior, one follow-up time."
+        influence_watch = "Too much ‘good vibes’ can soften accountability unless expectations are explicit."
+    elif comm_style == "Facilitator":
+        influence_core = "Leads with listening and empowerment—people follow because they feel respected."
+        influence_see = "You’ll see collaborative planning and a strong instinct to preserve dignity."
+        influence_move = "When needed, practice a clean close: “I’ve heard you—this is the decision.”"
+        influence_watch = "If everything stays optional, the strongest personalities (not the best plan) win."
+    else:  # Tracker
+        influence_core = "Leads with expertise and accuracy—people follow because the reasoning is defensible."
+        influence_see = "You’ll see careful explanations, policy alignment, and a focus on ‘doing it right.’"
+        influence_move = "Translate the rule into impact: “This protects safety/consistency for the youth.”"
+        influence_watch = "If influence stays purely technical, staff may comply but not emotionally commit."
 
-        # Pull the integrated title/synergy from the intersection map when available
-        key = f"{p_comm}-{p_mot}"
-        integrated = INTEGRATED_PROFILES.get(key, {})
-        title = integrated.get('title') or f"{p_comm} + {p_mot} Leadership Profile"
-        synergy = integrated.get('synergy') or data.get('s5') or ""
+    # Trust Builder (primarily motivation-driven, expressed through communication)
+    if motiv_style == "Achievement":
+        trust_core = "Trust is earned through competence and reliability—delivering results builds credibility."
+        trust_see = "They respect peers who follow through, hit targets, and stay steady under pressure."
+        trust_move = "Praise precision + outcome: “That follow-through prevented escalation—do that again.”"
+        trust_watch = "If recognition is vague, they may assume performance isn’t being tracked or valued."
+    elif motiv_style == "Growth":
+        trust_core = "Trust is earned through curiosity and development—learning together builds loyalty."
+        trust_see = "They respect leaders who coach, invite reflection, and treat mistakes as improvable."
+        trust_move = "Use ‘next rep’ language: “What’s one tweak you’ll try next time?”"
+        trust_watch = "If feedback feels fixed or shaming, they may disengage or hide learning needs."
+    elif motiv_style == "Purpose":
+        trust_core = "Trust is earned through values and meaning—integrity and mission-alignment build buy-in."
+        trust_see = "They respect leaders who connect decisions to youth wellbeing and ethical standards."
+        trust_move = "Anchor hard calls in mission: “We do this because it keeps kids safe and connected.”"
+        trust_watch = "If actions feel arbitrary or convenience-driven, trust erodes quickly."
+    else:  # Connection
+        trust_core = "Trust is earned through relationship and belonging—consistency and care build commitment."
+        trust_see = "They respect leaders who are present, loyal, and protective of team cohesion."
+        trust_move = "Follow up personally: “How did that land with you after the shift?”"
+        trust_watch = "If they feel unseen, motivation drops even when the technical plan is strong."
 
-        st.markdown(
-            f"<h2 style='text-align: center; color: #202124; margin-top: 0;'>{title}</h2>",
-            unsafe_allow_html=True,
-        )
+    # Light tuning to avoid redundancy and keep it ‘integrated’
+    if comm_style in ("Director", "Tracker") and motiv_style in ("Connection", "Purpose"):
+        integration_tip = "Integration note: their head may move faster than their heart (or vice versa). Coach them to ‘name the human impact’ while keeping the plan tight."
+    elif comm_style in ("Encourager", "Facilitator") and motiv_style == "Achievement":
+        integration_tip = "Integration note: they care about people *and* results. Coach them to keep warmth while making the target non-negotiable."
+    else:
+        integration_tip = "Integration note: their communication style is the delivery system; their motivation is the fuel. Coach the delivery *and* the fuel source."
 
-        i1, i2 = st.columns([1.5, 1])
+    return {
+        "decision": {"core": decision_core, "see": decision_see, "move": decision_move, "watch": decision_watch},
+        "influence": {"core": influence_core, "see": influence_see, "move": influence_move, "watch": influence_watch},
+        "trust": {"core": trust_core, "see": trust_see, "move": trust_move, "watch": trust_watch},
+        "integration_tip": integration_tip
+    }
 
-        with i1:
-            st.markdown("#### 🔗 The Synergy")
-            if synergy:
-                st.info(f"**{synergy}**")
+def _integrated_balance_chart(comm_style: str, motiv_style: str):
+    """More practical than a compass: shows starting bias on two dimensions."""
+    # Negative = Task / Process, Positive = People / Speed
+    comm_map = {
+        "Director": {"x": -8, "y": 8},
+        "Encourager": {"x": 7, "y": 7},
+        "Facilitator": {"x": 5, "y": -6},
+        "Tracker": {"x": -7, "y": -7},
+    }
+    mot_map = {
+        "Achievement": {"x": -3, "y": 4},
+        "Growth": {"x": 2, "y": 7},
+        "Purpose": {"x": 5, "y": 3},
+        "Connection": {"x": 7, "y": -2},
+    }
 
-            st.markdown("#### ⚙️ Leadership Mechanics")
+    c = comm_map.get(comm_style, {"x": 0, "y": 0})
+    m = mot_map.get(motiv_style, {"x": 0, "y": 0})
 
-            # Decision style is primarily driven by how they communicate
-            decision_by_comm = {
-                "Director": "Fast, decisive, and outcome-first. They prefer clear options and a recommendation.",
-                "Tracker": "Evidence-first and risk-aware. They prefer definitions, steps, and clear standards.",
-                "Facilitator": "Consensus-seeking and alignment-driven. They prefer hearing perspectives before committing.",
-                "Encourager": "People-first and relationally tuned. They prefer considering impact on morale and trust.",
-            }
+    task_people = (c["x"] + m["x"]) / 2
+    speed_process = (c["y"] + m["y"]) / 2
 
-            # Influence tactic is primarily driven by what motivates them
-            influence_by_mot = {
-                "Achievement": "Frame the goal, define the win, and set measurable targets.",
-                "Growth": "Offer challenge + learning, and highlight skill-building opportunities.",
-                "Purpose": "Connect the work to mission, values, and the 'why' behind the task.",
-                "Connection": "Emphasize teamwork, shared ownership, and belonging in the process.",
-            }
+    df_bal = pd.DataFrame([
+        {"Dimension": "Task  ←→  People", "Score": task_people},
+        {"Dimension": "Process  ←→  Speed", "Score": speed_process},
+    ])
 
-            # Trust builders vary by intersection (keep this concise and actionable)
-            trust_builder = {
-                "Director": {
-                    "Achievement": "Be prepared, be direct, and deliver outcomes on time.",
-                    "Growth": "Bring solutions and ask for stretch assignments with clarity.",
-                    "Purpose": "Tie decisions to mission and remove blockers quickly.",
-                    "Connection": "Be decisive while explicitly affirming people.",
-                },
-                "Tracker": {
-                    "Achievement": "Use data and clear standards; follow through consistently.",
-                    "Growth": "Show learning plans, document progress, and refine the process.",
-                    "Purpose": "Translate values into clear expectations and accountability.",
-                    "Connection": "Be consistent, predictable, and transparent in decisions.",
-                },
-                "Facilitator": {
-                    "Achievement": "Align people quickly around a plan and clarify roles.",
-                    "Growth": "Invite input, then convert it into a concrete development step.",
-                    "Purpose": "Keep the group aligned to mission during conflict or change.",
-                    "Connection": "Create psychological safety and shared buy-in.",
-                },
-                "Encourager": {
-                    "Achievement": "Celebrate wins publicly and coach privately toward the goal.",
-                    "Growth": "Encourage experimentation and normalize learning mistakes.",
-                    "Purpose": "Honor values and recognize meaningful impact.",
-                    "Connection": "Build trust through presence, empathy, and follow-through.",
-                },
-            }
+    fig = px.bar(
+        df_bal,
+        x="Score",
+        y="Dimension",
+        orientation="h",
+        range_x=[-10, 10],
+        text="Score",
+        title="Leadership Balance Snapshot"
+    )
+    fig.update_traces(texttemplate="%{text:.1f}", textposition="outside")
+    fig.add_vline(x=0, line_width=2, line_color="gray")
+    fig.update_layout(height=220, margin=dict(t=50, b=20, l=20, r=20), showlegend=False)
+    fig.update_xaxes(showgrid=False, zeroline=False)
+    return fig
 
-            mech_decision = decision_by_comm.get(p_comm, "")
-            mech_influence = influence_by_mot.get(p_mot, "")
-            mech_trust = trust_builder.get(p_comm, {}).get(p_mot, "")
+with st.container(border=True):
+    st.subheader("5. Integrated Leadership Profile")
+    st.caption("This section explains how their communication style and motivation driver combine into a predictable leadership pattern—and how to coach it.")
 
-            if mech_decision:
-                st.markdown(f"**1. Decision Style:** {mech_decision}")
-            if mech_influence:
-                st.markdown(f"**2. Influence Tactic:** {mech_influence}")
-            if mech_trust:
-                st.markdown(f"**3. Trust Builder:** {mech_trust}")
+    left, right = st.columns([1.8, 1])
 
-        with i2:
-            st.markdown("**🧭 Leadership Compass**")
+    with left:
+        st.markdown("#### 🔗 The Synergy")
+        st.info(str(data.get('s5', '')).strip() or "Integrated profile details were not provided for this person.")
 
-            # Inline compass visual (Task vs People on X; Change vs Stability on Y)
-            import plotly.graph_objects as go
+        mech = _integrated_mechanics(p_comm, p_mot)
+        st.markdown("#### ⚙️ Leadership Mechanics")
+        st.caption("Use these as teaching points—what to expect, what to reinforce, and what to watch for.")
 
-            comm_vec = {
-                "Director": (2, 1),
-                "Tracker": (2, -1),
-                "Encourager": (-2, -1),
-                "Facilitator": (-2, 1),
-            }.get(p_comm, (0, 0))
+        # 1) Decision Style
+        st.markdown("**1) Decision Style**")
+        st.markdown(f"- **Pattern:** {mech['decision']['core']}")
+        st.markdown(f"- **What you’ll see:** {mech['decision']['see']}")
+        st.markdown(f"- **Supervisor move:** {mech['decision']['move']}")
+        st.markdown(f"- **Watch for:** {mech['decision']['watch']}")
 
-            mot_vec = {
-                "Achievement": (1, 1),
-                "Growth": (0, 2),
-                "Purpose": (-1, 1),
-                "Connection": (-2, -1),
-            }.get(p_mot, (0, 0))
+        st.markdown("")
 
-            x = max(-3, min(3, comm_vec[0] + mot_vec[0]))
-            y = max(-3, min(3, comm_vec[1] + mot_vec[1]))
+        # 2) Influence Tactic
+        st.markdown("**2) Influence Tactic**")
+        st.markdown(f"- **Pattern:** {mech['influence']['core']}")
+        st.markdown(f"- **What you’ll see:** {mech['influence']['see']}")
+        st.markdown(f"- **Supervisor move:** {mech['influence']['move']}")
+        st.markdown(f"- **Watch for:** {mech['influence']['watch']}")
 
-            fig_compass = go.Figure()
-            fig_compass.add_trace(go.Scatter(x=[x], y=[y], mode='markers+text', text=["You"], textposition="top center"))
-            fig_compass.add_shape(type="line", x0=-3.2, x1=3.2, y0=0, y1=0)
-            fig_compass.add_shape(type="line", x0=0, x1=0, y0=-3.2, y1=3.2)
+        st.markdown("")
 
-            fig_compass.update_xaxes(range=[-3.2, 3.2], showgrid=False, zeroline=False, showticklabels=False)
-            fig_compass.update_yaxes(range=[-3.2, 3.2], showgrid=False, zeroline=False, showticklabels=False)
+        # 3) Trust Builder
+        st.markdown("**3) Trust Builder**")
+        st.markdown(f"- **Pattern:** {mech['trust']['core']}")
+        st.markdown(f"- **What you’ll see:** {mech['trust']['see']}")
+        st.markdown(f"- **Supervisor move:** {mech['trust']['move']}")
+        st.markdown(f"- **Watch for:** {mech['trust']['watch']}")
 
-            fig_compass.update_layout(
-                height=280,
-                margin=dict(t=30, b=20, l=20, r=20),
-                showlegend=False,
-                title=None,
-                annotations=[
-                    dict(x=3.1, y=0.15, text="Task", showarrow=False),
-                    dict(x=-3.1, y=0.15, text="People", showarrow=False),
-                    dict(x=0.15, y=3.1, text="Change", showarrow=False),
-                    dict(x=0.15, y=-3.1, text="Stability", showarrow=False),
-                ],
-            )
+        st.info(mech["integration_tip"])
 
-            st.plotly_chart(fig_compass, use_container_width=True, config={'displayModeBar': False})
-            st.caption("The compass plots bias: Task vs. People (X-Axis) and Change vs. Stability (Y-Axis).")
-
-
+    with right:
+        st.markdown("#### 📊 Leadership Balance Snapshot")
+        fig_bal = _integrated_balance_chart(p_comm, p_mot)
+        st.plotly_chart(fig_bal, use_container_width=True, config={'displayModeBar': False})
+        st.caption("Scores show a *starting bias* (not a fixed identity). Coach them to borrow the opposite gear when the situation demands it.")
     show_section("6. How You Can Best Support Them", data['s6'])
-
 
     # --- VISUAL BREAK: QUICK COACHING MAP (between 1-6 and 7-8) ---
     with st.container(border=True):
