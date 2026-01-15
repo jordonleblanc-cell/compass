@@ -1477,6 +1477,23 @@ def generate_profile_content(comm, motiv):
     if synergy_snippet:
         integrated_profile_text.append(f"\n**Core blend (what’s distinctive about this combo):**\n{synergy_snippet}")
 
+    # Pull optional signature metadata if present (kept fully optional to avoid redundancy)
+    c_sig = {}
+    _cs = c_data.get("signature")
+    if isinstance(_cs, dict):
+        c_sig.update(_cs)
+    for _k in ("default_pace", "decision_mode", "blindspot"):
+        if c_data.get(_k) and _k not in c_sig:
+            c_sig[_k] = c_data.get(_k)
+
+    m_sig = {}
+    _ms = m_data.get("signature")
+    if isinstance(_ms, dict):
+        m_sig.update(_ms)
+    for _k in ("north_star", "risk"):
+        if m_data.get(_k) and _k not in m_sig:
+            m_sig[_k] = m_data.get(_k)
+
     # What their leadership ‘defaults’ look like (unique framing)
     defaults = []
     if c_sig.get("default_pace"):
