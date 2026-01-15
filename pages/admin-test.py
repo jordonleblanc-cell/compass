@@ -1072,29 +1072,45 @@ def create_integrated_compass(comm, motiv):
 def get_leadership_mechanics(comm, motiv):
     """
     Returns specific 'Training' insights for Section 5 based on profile intersection.
+    Contains detailed, actionable coaching data.
     """
     mech = {}
     
     # 1. Decision Style (Communication Based)
-    if comm == "Director": mech['decision'] = "Decisive & Direct (Fast)"
-    elif comm == "Encourager": mech['decision'] = "Intuitive & Collaborative (Social)"
-    elif comm == "Facilitator": mech['decision'] = "Methodical & Inclusive (Deliberate)"
-    elif comm == "Tracker": mech['decision'] = "Analytical & Cautious (Data-Driven)"
-    else: mech['decision'] = "Balanced"
+    if comm == "Director": 
+        mech['decision'] = "**Decisive & Direct (The Accelerator).** You prefer the '80% solution now' over the '100% solution later.' You view hesitation as weakness. **Training Tip:** Force yourself to ask 'What am I missing?' before pulling the trigger to prevent blind spots."
+    elif comm == "Encourager": 
+        mech['decision'] = "**Intuitive & Collaborative (The Processor).** You process decisions verbally and socially. You need to talk it out to know what you think. **Training Tip:** Write down the pros/cons *before* discussing them to separate objective fact from emotional enthusiasm."
+    elif comm == "Facilitator": 
+        mech['decision'] = "**Methodical & Inclusive (The Stabilizer).** You seek consensus and process. You want everyone on the bus before driving. **Training Tip:** Set a strict deadline for the decision (e.g., 'By 3 PM') to prevent analysis paralysis. A good decision today is better than a perfect one next week."
+    elif comm == "Tracker": 
+        mech['decision'] = "**Analytical & Cautious (The Auditor).** You rely on data, precedent, and policy. You fear being wrong more than being slow. **Training Tip:** Identify 'one-way door' decisions (irreversible) vs 'two-way door' decisions (reversible). Practice moving faster on the reversible ones."
+    else: 
+        mech['decision'] = "Balanced decision style."
 
     # 2. Influence Tactic (Communication Based)
-    if comm == "Director": mech['influence'] = "Authority & Logic"
-    elif comm == "Encourager": mech['influence'] = "Charisma & Vision"
-    elif comm == "Facilitator": mech['influence'] = "Empowerment & Listening"
-    elif comm == "Tracker": mech['influence'] = "Expertise & Policy"
-    else: mech['influence'] = "Diplomacy"
+    if comm == "Director": 
+        mech['influence'] = "**Authority & Logic.** You influence by stating the destination clearly and moving with confidence. **Training Tip:** Explain the 'Why' behind the 'What.' Your team needs the backstory to buy in; otherwise, your direction feels like a dictatorship."
+    elif comm == "Encourager": 
+        mech['influence'] = "**Charisma & Vision.** You influence by selling the emotional upside and building relationships. **Training Tip:** Back up your vision with specific data points. Skeptics need proof, not just passion, to follow you."
+    elif comm == "Facilitator": 
+        mech['influence'] = "**Empowerment & Listening.** You influence by making others feel heard and valued. **Training Tip:** Don't confuse 'agreement' with 'alignment.' Sometimes you must direct, not just suggest. Practice saying, 'I have heard you, and this is the decision.'"
+    elif comm == "Tracker": 
+        mech['influence'] = "**Expertise & Accuracy.** You influence by citing the rules, the history, and the facts. **Training Tip:** Connect the rule to the human impact (safety/care). People follow rules better when they understand how the rule protects the child."
+    else: 
+        mech['influence'] = "Diplomatic influence."
 
     # 3. Trust Builder (Motivation Based)
-    if motiv == "Achievement": mech['trust'] = "Competence (Getting it done)"
-    elif motiv == "Growth": mech['trust'] = "Evolution (Making it better)"
-    elif motiv == "Purpose": mech['trust'] = "Integrity (Doing it right)"
-    elif motiv == "Connection": mech['trust'] = "Safety (Being there)"
-    else: mech['trust'] = "Consistency"
+    if motiv == "Achievement": 
+        mech['trust'] = "**Competence.** People trust you because you get results and solve problems. **Training Tip:** Admit when you are struggling. Vulnerability builds trust where competence only builds respect. Let them see you sweat occasionally."
+    elif motiv == "Growth": 
+        mech['trust'] = "**Evolution.** People trust you because you help them improve and see their potential. **Training Tip:** Ensure your feedback ratio is 3:1 (positive to constructive). If you only coach them to be better, they may feel they are never 'good enough' for you."
+    elif motiv == "Purpose": 
+        mech['trust'] = "**Integrity.** People trust you because you stand for values and the mission. **Training Tip:** Be careful not to judge those who are more pragmatic. Acknowledge the messy reality of operations without compromising your core ethics."
+    elif motiv == "Connection": 
+        mech['trust'] = "**Safety.** People trust you because you have their back and care about them as humans. **Training Tip:** Demonstrate that you can handle bad news without crumbling. Your stability is their safety. If you panic, they panic."
+    else: 
+        mech['trust'] = "Consistent behavior."
     
     return mech
 
@@ -1315,7 +1331,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         st.markdown(f"<div style='text-align: center; margin-bottom: 10px;'><span style='background-color: #e8f0fe; color: #1a73e8; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em;'>SECTION 5: INTEGRATION</span></div>", unsafe_allow_html=True)
         st.markdown(f"<h2 style='text-align: center; color: #202124; margin-top: 0;'>{data['s5_title']}</h2>", unsafe_allow_html=True)
         
-        i1, i2 = st.columns([1.3, 1])
+        i1, i2 = st.columns([1.5, 1])
         
         with i1:
             st.markdown("#### 🔗 The Synergy")
@@ -1327,18 +1343,14 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             mech = get_leadership_mechanics(p_comm, p_mot) 
             
             st.markdown(f"**1. Decision Style:** {mech['decision']}")
-            st.caption(f"How they make calls under pressure (Based on {p_comm} preference).")
-            
             st.markdown(f"**2. Influence Tactic:** {mech['influence']}")
-            st.caption(f"How they get others to follow (Based on {p_comm} style).")
-            
             st.markdown(f"**3. Trust Builder:** {mech['trust']}")
-            st.caption(f"How they earn respect from the team (Based on {p_mot} drive).")
 
         with i2:
             st.markdown(f"**🧭 Leadership Compass**")
             fig_compass = create_integrated_compass(p_comm, p_mot)
             st.plotly_chart(fig_compass, use_container_width=True, config={'displayModeBar': False})
+            st.caption("The compass plots your bias: Task vs. People (X-Axis) and Change vs. Stability (Y-Axis).")
     
     # --- SECTION 6: SUPPORT ---
     with st.container():
