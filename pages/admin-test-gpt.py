@@ -1451,7 +1451,7 @@ def generate_profile_content(comm, motiv):
         "s6": i_data.get('support', ''),
         "s7": i_data.get('thriving', ''), # Thriving paragraphs
         "s8": i_data.get('struggling', ''), # Struggling paragraphs
-        "s9": "Strategies for Course Correction:", # Intervention Header
+        "s9": "Professional Development Plan:", # Intervention Header
         "s9_b": i_data.get('interventions', []),
         "s10_b": m_data.get('celebrate_bullets'),
         "coaching": i_data.get('questions', []),
@@ -1565,7 +1565,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     add_section("6. How You Can Best Support Them", data['s6'])
     add_section("7. What They Look Like When Thriving", data['s7'])
     add_section("8. What They Look Like When Struggling", data['s8'])
-    add_section("9. Supervisory Interventions (Roadmap)", None, data['s9_b'])
+    add_section("9. Individual Professional Development Plan (IPDP)", None, data['s9_b'])
     add_section("10. What You Should Celebrate", None, data['s10_b'])
 
     # 11. Coaching Questions (10 questions)
@@ -1902,186 +1902,258 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.markdown("<br>", unsafe_allow_html=True)
 
     # --- 9-12: COACHING PLAN ---
-    show_section("9. Supervisory Interventions", None, data['s9_b'])
+    
+    # --- 9: INDIVIDUAL PROFESSIONAL DEVELOPMENT PLAN (IPDP) ---
+    st.subheader("9. Individual Professional Development Plan (IPDP)")
+    st.caption("A development-first framework for coaching growth, alignment, and performance over time. Select the current phase to get role-aware supervisor moves and a print-ready summary for check-ins.")
 
-    # --- VISUAL BREAK: INTERVENTION ROADMAP (between 9 and 10/11/12) ---
-    with st.container(border=True):
-        st.subheader("🗺️ Intervention Roadmap (Visual)")
-        st.caption("A phase-based view of the intervention plan. Each phase includes the original guidance plus role-specific supervisor moves.")
+    interventions_raw = data.get('s9_b', []) or []
 
-        interventions = data.get('s9_b', []) or []
+    def _parse_phase(item: str):
+        """Parse a phase entry like '**Phase 1: Title (0-6 Months):** body...' into structured parts."""
+        if not isinstance(item, str):
+            return None
+        s = item.strip()
+        # Common formats in the profile library:
+        # **Phase 1: The Pause Button (0-6 Months):** You must...
+        m = re.match(r"^\*\*Phase\s*(\d+)\s*:\s*(.*?)\s*\((.*?)\)\s*:\*\*\s*(.*)$", s, flags=re.S)
+        if not m:
+            # Fallback: try without parentheses timing
+            m2 = re.match(r"^\*\*Phase\s*(\d+)\s*:\s*(.*?)\s*:\*\*\s*(.*)$", s, flags=re.S)
+            if not m2:
+                return None
+            num = int(m2.group(1))
+            title = m2.group(2).strip()
+            timing = ""
+            body = m2.group(3).strip()
+            return {"num": num, "title": title, "timing": timing, "body": body}
+        num = int(m.group(1))
+        title = m.group(2).strip()
+        timing = m.group(3).strip()
+        body = m.group(4).strip()
+        return {"num": num, "title": title, "timing": timing, "body": body}
 
-        # Normalize the staff role being supervised (not the viewer)
-        role_raw = str(role or "").lower()
-        if "program supervisor" in role_raw:
-            role_cat = "Program Supervisor"
-        elif "shift supervisor" in role_raw:
-            role_cat = "Shift Supervisor"
-        else:
-            role_cat = "YDP"
+    phases = {}
+    for item in interventions_raw:
+        p = _parse_phase(item)
+        if p and p.get("num") in (1, 2, 3):
+            phases[p["num"]] = p
 
-        ROLE_PHASE_MOVES = {
-            "YDP": {
-                1: [
-                    "Lock in the basics: attendance, punctuality, routines, and required documentation.",
-                    "Ask for micro-feedback after tough moments: “What’s one thing I should do differently next time?”",
-                    "Pick one skill to practice daily (tone, pacing, boundaries, de-escalation)."
-                ],
-                2: [
-                    "Own the next step without being chased—send proactive updates before being asked.",
-                    "Anticipate common needs on the unit (supplies, prep, transitions) and move early.",
-                    "Shadow a strong peer and copy one habit that creates safety and consistency."
-                ],
-                3: [
-                    "Mentor a newer staff member for one shift a week (modeling calm, clarity, and follow-through).",
-                    "Lead a small improvement (a routine, a checklist, or a youth engagement activity).",
-                    "Practice regulated leadership: stay steady first, then problem-solve."
-                ]
-            },
-            "Shift Supervisor": {
-                1: [
-                    "Coach in the moment—clear, calm feedback at point-of-performance.",
-                    "Run short huddles to set expectations (what ‘good’ looks like on this shift).",
-                    "Track patterns and document examples (specifics, not vibes)."
-                ],
-                2: [
-                    "Standardize the shift: checklists, handoffs, and consistent follow-through.",
-                    "Coordinate with other supervisors to prevent mixed messages across shifts.",
-                    "Escalate early and cleanly when risk or patterns emerge (bring receipts + a proposed plan)."
-                ],
-                3: [
-                    "Develop other leaders (House Managers/Assistants)—delegate ownership of routines and follow-up.",
-                    "Run brief after-action reviews after incidents: what happened, what worked, what changes next time.",
-                    "Lead one change initiative that improves safety or consistency (and measure it)."
-                ]
-            },
-            "Program Supervisor": {
-                1: [
-                    "Clarify standards and reduce ambiguity: write the ‘definition of done’ for key tasks.",
-                    "Close training gaps quickly (refreshers, shadowing plans, and competency checks).",
-                    "Monitor leading indicators (incidents, documentation quality, call-offs) and intervene early."
-                ],
-                2: [
-                    "Build systems: supervision cadence, documentation expectations, and cross-team coordination.",
-                    "Use formal tools when needed (coaching plans/PIPs) with clear metrics and timelines.",
-                    "Strengthen culture—recognize wins publicly and correct privately with consistency."
-                ],
-                3: [
-                    "Institutionalize what worked: update SOPs, onboarding, and quality checks.",
-                    "Succession plan: build a bench of leaders and create stretch opportunities.",
-                    "Evaluate outcomes and recalibrate—keep what moves metrics and morale."
-                ]
-            }
+    # Sensible defaults if anything is missing
+    default_phase_meta = {
+        1: {"num": 1, "title": "Foundation", "timing": "0–6 months", "body": "Establish clarity, consistency, and psychological safety. Reduce overwhelm, define expectations, and build repeatable habits."},
+        2: {"num": 2, "title": "Skill Integration", "timing": "6–12 months", "body": "Practice skill application under real conditions. Increase reliability, sharpen judgment, and strengthen routines across scenarios."},
+        3: {"num": 3, "title": "Leadership Readiness", "timing": "12+ months", "body": "Build autonomy and leadership behaviors. Expand ownership, coach others, and strengthen decision-making in complex situations."},
+    }
+    for n in (1, 2, 3):
+        if n not in phases:
+            phases[n] = default_phase_meta[n]
+
+    # Role-specific supervisor moves by phase (kept concise and actionable)
+    role_additions = {
+        "YDP": {
+            1: [
+                "Use a 1-sentence expectation + 1 example ('Do X, like this...') to reduce ambiguity.",
+                "Focus on one micro-skill per shift (tone, proximity, or follow-through) rather than 'everything.'",
+                "End shifts with a 2-minute debrief: what worked / what to try next time."
+            ],
+            2: [
+                "Assign one repeatable routine to own (e.g., meds prep support, shift handoff notes, activity setup).",
+                "Practice 'IF/THEN' coaching: 'If youth escalates, then we...' to build judgment.",
+                "Increase independence gradually: fewer prompts, more reflection after."
+            ],
+            3: [
+                "Have them model for a newer staff member for one shift/week (calm tone + clear directions).",
+                "Give a small improvement project (checklist, routine, or engagement activity) to lead.",
+                "Coach regulated leadership: steady first, then problem-solve."
+            ]
+        },
+        "Shift Supervisor": {
+            1: [
+                "Coach at point-of-performance: brief, calm corrections in the moment.",
+                "Run 3-minute huddles: the 2 priorities + what 'good' looks like on this shift.",
+                "Track patterns and document specific examples (facts, not impressions)."
+            ],
+            2: [
+                "Standardize shift operations: checklists, handoffs, and consistent follow-through.",
+                "Use a weekly scenario drill (5 minutes) to build real-time judgment.",
+                "Delegate one routine oversight item (supplies, schedule checks, or chart review) and review weekly."
+            ],
+            3: [
+                "Coach other staff using the same framework (tone/pace/proof) to build consistency.",
+                "Lead a mini-after-action review after incidents (what happened / what we learned / next time).",
+                "Own a small quality improvement loop (spot check → feedback → follow-up)."
+            ]
+        },
+        "Program Supervisor": {
+            1: [
+                "Clarify the 'why' and the standard: align team expectations across shifts and cottages.",
+                "Set a predictable supervision cadence (weekly micro-check-in + monthly deeper review).",
+                "Remove friction: fix one systemic barrier (process, staffing pattern, documentation clarity)."
+            ],
+            2: [
+                "Audit routines and strengthen consistency across supervisors (handoff, documentation, escalation).",
+                "Coach decision-making: What data did you use? What did you assume?",
+                "Develop one cross-team skill focus per month (e.g., de-escalation, proactive engagement)."
+            ],
+            3: [
+                "Build leadership pipeline: identify stretch assignments and coaching plans for emerging leaders.",
+                "Improve systems: simplify a workflow, strengthen accountability loops, and celebrate wins publicly.",
+                "Shift from 'check' to 'coach': ask reflective questions that build ownership."
+            ]
         }
+    }
 
-        phase_rows = []
-        # Matches strings like: **Phase 1: Title (0-6 Months):** Description...
-        phase_pattern = re.compile(
-            r"\*\*\s*Phase\s*(\d+)\s*:\s*(.*?)\s*\((\d+)\s*[-–]\s*(\d+)\s*Months\)\s*:\s*\*\*\s*(.*)",
-            re.IGNORECASE
-        )
-
-        def strip_md(s: str) -> str:
-            s = re.sub(r"\*\*", "", str(s))
-            s = re.sub(r"\s+", " ", s).strip()
-            return s
-
-        for item in interventions:
-            m = phase_pattern.search(str(item))
-            if m:
-                phase_num = int(m.group(1))
-                title = strip_md(m.group(2))
-                start_m = int(m.group(3))
-                end_m = int(m.group(4))
-                desc = strip_md(m.group(5))
-                phase_rows.append({
-                    "PhaseNum": phase_num,
-                    "Phase": f"Phase {phase_num}",
-                    "Focus": title,
-                    "StartMonth": start_m,
-                    "EndMonth": end_m,
-                    "Detail": desc
-                })
-
-        if phase_rows:
-            # Timeline bar visual
-            base = pd.Timestamp("2026-01-01")
-            timeline_df = pd.DataFrame(phase_rows).sort_values("StartMonth")
-            timeline_df["Start"] = timeline_df["StartMonth"].apply(lambda m: base + pd.DateOffset(months=m))
-            timeline_df["End"] = timeline_df["EndMonth"].apply(lambda m: base + pd.DateOffset(months=m))
-
-            fig_tl = px.timeline(
-                timeline_df,
-                x_start="Start",
-                x_end="End",
-                y="Phase",
-                color="Phase",
-                hover_data={"Focus": True, "Detail": True, "StartMonth": True, "EndMonth": True},
-                title="Intervention Phases"
-            )
-            fig_tl.update_layout(
-                height=280,
-                margin=dict(t=40, b=20, l=20, r=20),
-                showlegend=False
-            )
-            fig_tl.update_yaxes(autorange="reversed")
-            st.plotly_chart(fig_tl, use_container_width=True)
-
-            # Phase cards + role-specific moves
-            st.markdown("##### 🧩 Phase-by-Phase Playbook")
-            st.caption(f"Role lens applied: **{role_cat}** (based on the staff member’s current role).")
-
-            cards = sorted(phase_rows, key=lambda r: r["StartMonth"])
-            cols = st.columns(min(3, len(cards)))
-            for idx, row in enumerate(cards):
-                with cols[idx % len(cols)]:
-                    with st.container(border=True):
-                        st.markdown(f"**{row['Phase']}: {row['Focus']}**")
-                        st.caption(f"Timeline: Months {row['StartMonth']}-{row['EndMonth']}")
-                        if row.get("Detail"):
-                            st.write(row["Detail"])
-
-                        st.markdown("---")
-                        st.markdown(f"**What *you* do in {row['Phase']} ({role_cat})**")
-                        for mv in ROLE_PHASE_MOVES.get(role_cat, {}).get(row["PhaseNum"], []):
-                            st.markdown(f"- {mv}")
-
-                        with st.expander("See other role perspectives", expanded=False):
-                            tabs = st.tabs(["YDP", "Shift Supervisor", "Program Supervisor"])
-                            for t_idx, t_role in enumerate(["YDP", "Shift Supervisor", "Program Supervisor"]):
-                                with tabs[t_idx]:
-                                    for mv in ROLE_PHASE_MOVES.get(t_role, {}).get(row["PhaseNum"], []):
-                                        st.markdown(f"- {mv}")
+    # Normalize role key (we want to match the staff member being coached)
+    role_key = "YDP"
+    if isinstance(role, str):
+        if "Program Supervisor" in role:
+            role_key = "Program Supervisor"
+        elif "Shift Supervisor" in role:
+            role_key = "Shift Supervisor"
         else:
-            # Fallback visual: compact bar list to break text monotony
-            if interventions:
-                iv_df = pd.DataFrame({
-                    "Intervention": [f"{i+1}" for i in range(len(interventions))],
-                    "Weight": [1 for _ in interventions],
-                    "Detail": interventions
-                })
-                fig_iv = px.bar(
-                    iv_df,
-                    x="Weight",
-                    y="Intervention",
-                    orientation="h",
-                    title="Intervention List (Compact View)",
-                    hover_data={"Detail": True, "Weight": False}
-                )
-                fig_iv.update_layout(
-                    height=280,
-                    margin=dict(t=40, b=20, l=20, r=20),
-                    showlegend=False
-                )
-                fig_iv.update_xaxes(visible=False)
-                st.plotly_chart(fig_iv, use_container_width=True)
+            role_key = "YDP"
 
-                with st.expander("Show Intervention Text", expanded=False):
-                    for it in interventions:
-                        st.markdown(f"- {it}")
-            else:
-                st.info("No interventions found for this profile.")
+    phase_labels = [
+        f"Phase 1 — {phases[1]['title']} ({phases[1]['timing']})",
+        f"Phase 2 — {phases[2]['title']} ({phases[2]['timing']})",
+        f"Phase 3 — {phases[3]['title']} ({phases[3]['timing']})",
+    ]
 
+    phase_state_key = f"ipdp_phase__{name}".replace(" ", "_")
+    if phase_state_key not in st.session_state:
+        st.session_state[phase_state_key] = phase_labels[0]
+
+    sel_label = st.selectbox(
+        "Current development phase (used for coaching + summary export)",
+        options=phase_labels,
+        index=phase_labels.index(st.session_state[phase_state_key]) if st.session_state[phase_state_key] in phase_labels else 0,
+        key=phase_state_key
+    )
+
+    sel_num = 1 if sel_label.startswith("Phase 1") else 2 if sel_label.startswith("Phase 2") else 3
+
+    # --- Visual: Development Focus Snapshot (useful at-a-glance emphasis) ---
+    focus_weights = {
+        1: {"Structure & Clarity": 10, "Skill Application": 4, "Autonomy & Judgment": 2},
+        2: {"Structure & Clarity": 6, "Skill Application": 10, "Autonomy & Judgment": 6},
+        3: {"Structure & Clarity": 3, "Skill Application": 7, "Autonomy & Judgment": 10},
+    }
+    snap_df = pd.DataFrame({
+        "Focus": list(focus_weights[sel_num].keys()),
+        "Emphasis": list(focus_weights[sel_num].values())
+    }).sort_values("Emphasis", ascending=True)
+
+    with st.container(border=True):
+        st.subheader("📈 Development Focus Snapshot")
+        st.caption("This shows where to put your attention *right now* for this phase (not a performance score).")
+        fig_focus = px.bar(snap_df, x="Emphasis", y="Focus", orientation="h")
+        fig_focus.update_layout(height=240, margin=dict(l=10, r=10, t=10, b=10))
+        st.plotly_chart(fig_focus, use_container_width=True)
+
+    # --- Visual: Phase × Focus Matrix (actionable, role-aware) ---
+    with st.container(border=True):
+        st.subheader("🧭 Phase Coaching Matrix")
+        st.caption("Use this like a checklist when planning check-ins: coach the focus areas that match the current phase. Role-aware moves are included for the staff member’s role.")
+
+        phase = phases[sel_num]
+        colA, colB, colC = st.columns(3)
+
+        # Focus Area 1
+        with colA:
+            st.markdown("### Structure & Clarity")
+            st.markdown("""- Tighten expectations
+- Reduce ambiguity
+- Make "good" visible""")
+            st.markdown("**Supervisor moves:**")
+            moves = role_additions.get(role_key, {}).get(sel_num, [])[:2]
+            for mtxt in moves:
+                st.write(f"• {mtxt}")
+
+        # Focus Area 2
+        with colB:
+            st.markdown("### Skill Application")
+            st.markdown("""- Practice in real situations
+- Build repeatable routines
+- Coach judgment with scenarios""")
+            st.markdown("**Supervisor moves:**")
+            moves = role_additions.get(role_key, {}).get(sel_num, [])[1:3]
+            for mtxt in moves:
+                st.write(f"• {mtxt}")
+
+        # Focus Area 3
+        with colC:
+            st.markdown("### Autonomy & Judgment")
+            st.markdown("""- Increase ownership
+- Expand decision scope
+- Build leadership behaviors""")
+            st.markdown("**Supervisor moves:**")
+            moves = role_additions.get(role_key, {}).get(sel_num, [])[-2:]
+            for mtxt in moves:
+                st.write(f"• {mtxt}")
+
+        st.divider()
+        st.markdown(f"### Current Phase Detail — Phase {phase['num']}: {phase['title']}")
+        if phase.get("timing"):
+            st.caption(f"Typical timeframe: {phase['timing']}")
+        st.info(phase.get("body", ""))
+
+        with st.expander("See role-specific moves for other roles (helpful for succession / promotion coaching)"):
+            for rk in ["YDP", "Shift Supervisor", "Program Supervisor"]:
+                st.markdown(f"**{rk} — Phase {sel_num} moves**")
+                for bullet in role_additions.get(rk, {}).get(sel_num, []):
+                    st.write(f"• {bullet}")
+                st.markdown("---")
+
+    # --- Print-friendly summary export (PDF) ---
+    def _build_ipdp_summary_pdf(staff_name: str, staff_role: str, phase_num: int) -> bytes:
+        phase = phases[phase_num]
+        pdf = FPDF()
+        pdf.set_auto_page_break(auto=True, margin=12)
+        pdf.add_page()
+        pdf.set_font("Arial", "B", 16)
+        pdf.cell(0, 10, "Individual Professional Development Plan (IPDP)", ln=True)
+        pdf.ln(2)
+
+        pdf.set_font("Arial", "", 11)
+        pdf.multi_cell(0, 6, f"Staff: {staff_name}\nRole: {staff_role}\nCurrent Phase: Phase {phase_num} — {phase['title']} ({phase.get('timing','')})")
+        pdf.ln(2)
+
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, "Phase Summary", ln=True)
+        pdf.set_font("Arial", "", 11)
+        pdf.multi_cell(0, 6, phase.get("body", ""))
+        pdf.ln(1)
+
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, "Supervisor Focus (This Phase)", ln=True)
+        pdf.set_font("Arial", "", 11)
+        for focus, val in focus_weights[phase_num].items():
+            pdf.multi_cell(0, 6, f"- {focus}: Emphasis {val}/10")
+        pdf.ln(1)
+
+        rk = role_key
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, f"Role-Aware Supervisor Moves ({rk})", ln=True)
+        pdf.set_font("Arial", "", 11)
+        for bullet in role_additions.get(rk, {}).get(phase_num, []):
+            pdf.multi_cell(0, 6, f"- {bullet}")
+        pdf.ln(1)
+
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, "Recommended Check-In Notes Template", ln=True)
+        pdf.set_font("Arial", "", 11)
+        pdf.multi_cell(0, 6, "Wins since last check-in:\n-\n\nOne skill focus for next period:\n-\n\nSupport needed from supervisor:\n-\n\nNext check-in date:")
+        return pdf.output(dest="S").encode("latin1", errors="ignore")
+
+    pdf_bytes = _build_ipdp_summary_pdf(name, role, sel_num)
+    st.download_button(
+        "🖨️ Download IPDP Summary (PDF)",
+        data=pdf_bytes,
+        file_name=f"{name.replace(' ', '_')}_IPDP_Summary.pdf",
+        mime="application/pdf",
+        use_container_width=True
+    )
     show_section("10. What You Should Celebrate", None, data['s10_b'])
 
     # --- VISUAL BREAK: CELEBRATION SIGNALS ---
