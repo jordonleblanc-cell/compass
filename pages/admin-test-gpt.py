@@ -1780,40 +1780,116 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # --- VISUAL BREAK: INTERVENTION ROADMAP (between 9 and 10/11/12) ---
     with st.container(border=True):
         st.subheader("🗺️ Intervention Roadmap (Visual)")
-        st.caption("If the interventions include phases, this turns them into a quick timeline. Otherwise, it clusters the interventions into a simple visual list.")
+        st.caption("A phase-based view of the intervention plan. Each phase includes the original guidance plus role-specific supervisor moves.")
 
         interventions = data.get('s9_b', []) or []
+
+        # Normalize the staff role being supervised (not the viewer)
+        role_raw = str(role or "").lower()
+        if "program supervisor" in role_raw:
+            role_cat = "Program Supervisor"
+        elif "shift supervisor" in role_raw:
+            role_cat = "Shift Supervisor"
+        else:
+            role_cat = "YDP"
+
+        ROLE_PHASE_MOVES = {
+            "YDP": {
+                1: [
+                    "Lock in the basics: attendance, punctuality, routines, and required documentation.",
+                    "Ask for micro-feedback after tough moments: “What’s one thing I should do differently next time?”",
+                    "Pick one skill to practice daily (tone, pacing, boundaries, de-escalation)."
+                ],
+                2: [
+                    "Own the next step without being chased—send proactive updates before being asked.",
+                    "Anticipate common needs on the unit (supplies, prep, transitions) and move early.",
+                    "Shadow a strong peer and copy one habit that creates safety and consistency."
+                ],
+                3: [
+                    "Mentor a newer staff member for one shift a week (modeling calm, clarity, and follow-through).",
+                    "Lead a small improvement (a routine, a checklist, or a youth engagement activity).",
+                    "Practice regulated leadership: stay steady first, then problem-solve."
+                ]
+            },
+            "Shift Supervisor": {
+                1: [
+                    "Coach in the moment—clear, calm feedback at point-of-performance.",
+                    "Run short huddles to set expectations (what ‘good’ looks like on this shift).",
+                    "Track patterns and document examples (specifics, not vibes)."
+                ],
+                2: [
+                    "Standardize the shift: checklists, handoffs, and consistent follow-through.",
+                    "Coordinate with other supervisors to prevent mixed messages across shifts.",
+                    "Escalate early and cleanly when risk or patterns emerge (bring receipts + a proposed plan)."
+                ],
+                3: [
+                    "Develop other leaders (House Managers/Assistants)—delegate ownership of routines and follow-up.",
+                    "Run brief after-action reviews after incidents: what happened, what worked, what changes next time.",
+                    "Lead one change initiative that improves safety or consistency (and measure it)."
+                ]
+            },
+            "Program Supervisor": {
+                1: [
+                    "Clarify standards and reduce ambiguity: write the ‘definition of done’ for key tasks.",
+                    "Close training gaps quickly (refreshers, shadowing plans, and competency checks).",
+                    "Monitor leading indicators (incidents, documentation quality, call-offs) and intervene early."
+                ],
+                2: [
+                    "Build systems: supervision cadence, documentation expectations, and cross-team coordination.",
+                    "Use formal tools when needed (coaching plans/PIPs) with clear metrics and timelines.",
+                    "Strengthen culture—recognize wins publicly and correct privately with consistency."
+                ],
+                3: [
+                    "Institutionalize what worked: update SOPs, onboarding, and quality checks.",
+                    "Succession plan: build a bench of leaders and create stretch opportunities.",
+                    "Evaluate outcomes and recalibrate—keep what moves metrics and morale."
+                ]
+            }
+        }
+
         phase_rows = []
-        phase_pattern = re.compile(r"Phase\s*(\d+)\s*:\s*(.*?)\s*\((\d+)\s*[-–]\s*(\d+)\s*Months\)", re.IGNORECASE)
+        # Matches strings like: **Phase 1: Title (0-6 Months):** Description...
+        phase_pattern = re.compile(
+            r"\*\*\s*Phase\s*(\d+)\s*:\s*(.*?)\s*\((\d+)\s*[-–]\s*(\d+)\s*Months\)\s*:\s*\*\*\s*(.*)",
+            re.IGNORECASE
+        )
+
+        def strip_md(s: str) -> str:
+            s = re.sub(r"\*\*", "", str(s))
+            s = re.sub(r"\s+", " ", s).strip()
+            return s
 
         for item in interventions:
-            m = phase_pattern.search(item)
+            m = phase_pattern.search(str(item))
             if m:
                 phase_num = int(m.group(1))
-                title = m.group(2).strip()
+                title = strip_md(m.group(2))
                 start_m = int(m.group(3))
                 end_m = int(m.group(4))
+                desc = strip_md(m.group(5))
                 phase_rows.append({
+                    "PhaseNum": phase_num,
                     "Phase": f"Phase {phase_num}",
                     "Focus": title,
                     "StartMonth": start_m,
-                    "EndMonth": end_m
+                    "EndMonth": end_m,
+                    "Detail": desc
                 })
 
         if phase_rows:
-            # Use a fixed baseline date so this renders consistently without relying on system locale/timezone.
+            # Timeline bar visual
             base = pd.Timestamp("2026-01-01")
-            timeline_df = pd.DataFrame(phase_rows)
+            timeline_df = pd.DataFrame(phase_rows).sort_values("StartMonth")
             timeline_df["Start"] = timeline_df["StartMonth"].apply(lambda m: base + pd.DateOffset(months=m))
             timeline_df["End"] = timeline_df["EndMonth"].apply(lambda m: base + pd.DateOffset(months=m))
 
             fig_tl = px.timeline(
-                timeline_df.sort_values("StartMonth"),
+                timeline_df,
                 x_start="Start",
                 x_end="End",
                 y="Phase",
                 color="Phase",
-                hover_data={"Focus": True, "StartMonth": True, "EndMonth": True},
+                hover_data={"Focus": True, "Detail": True, "StartMonth": True, "EndMonth": True},
                 title="Intervention Phases"
             )
             fig_tl.update_layout(
@@ -1824,14 +1900,31 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             fig_tl.update_yaxes(autorange="reversed")
             st.plotly_chart(fig_tl, use_container_width=True)
 
-            # Also show the focus text in a clean set of cards
-            cols = st.columns(len(phase_rows))
-            for idx, row in enumerate(sorted(phase_rows, key=lambda r: r["StartMonth"])):
-                with cols[idx]:
+            # Phase cards + role-specific moves
+            st.markdown("##### 🧩 Phase-by-Phase Playbook")
+            st.caption(f"Role lens applied: **{role_cat}** (based on the staff member’s current role).")
+
+            cards = sorted(phase_rows, key=lambda r: r["StartMonth"])
+            cols = st.columns(min(3, len(cards)))
+            for idx, row in enumerate(cards):
+                with cols[idx % len(cols)]:
                     with st.container(border=True):
-                        st.markdown(f"**{row['Phase']}**")
-                        st.caption(f"Months {row['StartMonth']}-{row['EndMonth']}")
-                        st.write(row["Focus"])
+                        st.markdown(f"**{row['Phase']}: {row['Focus']}**")
+                        st.caption(f"Timeline: Months {row['StartMonth']}-{row['EndMonth']}")
+                        if row.get("Detail"):
+                            st.write(row["Detail"])
+
+                        st.markdown("---")
+                        st.markdown(f"**What *you* do in {row['Phase']} ({role_cat})**")
+                        for mv in ROLE_PHASE_MOVES.get(role_cat, {}).get(row["PhaseNum"], []):
+                            st.markdown(f"- {mv}")
+
+                        with st.expander("See other role perspectives", expanded=False):
+                            tabs = st.tabs(["YDP", "Shift Supervisor", "Program Supervisor"])
+                            for t_idx, t_role in enumerate(["YDP", "Shift Supervisor", "Program Supervisor"]):
+                                with tabs[t_idx]:
+                                    for mv in ROLE_PHASE_MOVES.get(t_role, {}).get(row["PhaseNum"], []):
+                                        st.markdown(f"- {mv}")
         else:
             # Fallback visual: compact bar list to break text monotony
             if interventions:
