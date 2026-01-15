@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import requests
 import pandas as pd
 import re
@@ -1682,7 +1683,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         st.subheader("🧭 Quick Coaching Map")
         st.caption("A fast setup guide: dial in Tone, Pace, and Proof for *this* person before you start the conversation.")
 
-        m1, m2 = st.columns([1.2, 1])
+        m1 = st.container()
+        m2 = st.container()
 
         # --- Internal helper: compact lever guidance (kept distinct from Section 6 text) ---
         COMM_LEVERS = {
@@ -2014,42 +2016,142 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         else:
             role_key = "YDP"
 
-    # --- IPDP: phase content is PRE-RENDERED for all phases to avoid "losing progress" on selection.
-    # Streamlit reruns the script on widget interaction; instead of conditionally rendering one phase,
-    # we render all phases in expanders and only *highlight* the saved phase.
+    phase_labels = [
+        f"Phase 1 — {phases[1]['title']} ({phases[1]['timing']})",
+        f"Phase 2 — {phases[2]['title']} ({phases[2]['timing']})",
+        f"Phase 3 — {phases[3]['title']} ({phases[3]['timing']})",
+    ]
+
+    # --- Phase selection (stable + non-disruptive) ---
+    # Streamlit will rerun the script on any widget interaction. To prevent the UI from "jumping" away
+    # (which feels like losing progress), we:
+    #   1) store the selection per staff member in session_state, and
+    #   2) auto-scroll back to this section after a phase change.
+    st.markdown('<div id="ipdp_phase_anchor"></div>', unsafe_allow_html=True)
+
     phase_state_key = f"ipdp_phase__{name}".replace(" ", "_")
+    scroll_flag_key = f"ipdp_scroll__{name}".replace(" ", "_")
 
     if phase_state_key not in st.session_state:
-        st.session_state[phase_state_key] = 1  # 1..3
+        st.session_state[phase_state_key] = phase_labels[0]
 
-    current_phase_num = int(st.session_state[phase_state_key]) if str(st.session_state[phase_state_key]).isdigit() else 1
-    current_phase_num = 1 if current_phase_num not in (1, 2, 3) else current_phase_num
+    def _on_ipdp_phase_change():
+        # Mark that we should scroll back to this section after rerun.
+        st.session_state[scroll_flag_key] = True
 
-    st.markdown(f"**Saved current phase:** Phase {current_phase_num}")
-    st.caption("Open any phase below. Setting a phase is optional and won’t change what’s displayed.")
+    st.selectbox(
+        "Current development phase (used for coaching + summary export)",
+        options=phase_labels,
+        index=phase_labels.index(st.session_state[phase_state_key]) if st.session_state[phase_state_key] in phase_labels else 0,
+        key=phase_state_key,
+        on_change=_on_ipdp_phase_change
+    )
+
+    # Auto-scroll back to the phase section after selection changes.
+    if st.session_state.get(scroll_flag_key):
+        components.html(
+            """
+            <script>
+              const el = window.parent.document.getElementById('ipdp_phase_anchor');
+              if (el) { el.scrollIntoView({behavior: 'instant', block: 'start'}); }
+            </script>
+            """,
+            height=0,
+        )
+        st.session_state[scroll_flag_key] = False
+
+    sel_label = st.session_state[phase_state_key]
+    sel_num = 1 if sel_label.startswith("Phase 1") else 2 if sel_label.startswith("Phase 2") else 3
+
+    # --- Visual: Development Focus Snapshot (useful at-a-glance emphasis) ---
+    focus_weights = {
+        1: {"Structure & Clarity": 10, "Skill Application": 4, "Autonomy & Judgment": 2},
+        2: {"Structure & Clarity": 6, "Skill Application": 10, "Autonomy & Judgment": 6},
+        3: {"Structure & Clarity": 3, "Skill Application": 7, "Autonomy & Judgment": 10},
+    }
+    snap_df = pd.DataFrame({
+        "Focus": list(focus_weights[sel_num].keys()),
+        "Emphasis": list(focus_weights[sel_num].values())
+    }).sort_values("Emphasis", ascending=True)
+
+    with st.container(border=True):
+        st.subheader("📈 Development Focus Snapshot")
+        st.caption("This shows where to put your attention *right now* for this phase (not a performance score).")
+        fig_focus = px.bar(snap_df, x="Emphasis", y="Focus", orientation="h")
+        fig_focus.update_layout(height=240, margin=dict(l=10, r=10, t=10, b=10))
+        st.plotly_chart(fig_focus, use_container_width=True)
+
+    # --- Visual: Phase × Focus Matrix (actionable, role-aware) ---
+    with st.container(border=True):
+        st.subheader("🧭 Phase Coaching Matrix")
+        st.caption("Use this like a checklist when planning check-ins: coach the focus areas that match the current phase. Role-aware moves are included for the staff member’s role.")
+
+        phase = phases[sel_num]
+        colA, colB, colC = st.columns(3)
+
+        # Focus Area 1
+        with colA:
+            st.markdown("### Structure & Clarity")
+            st.markdown("""- Tighten expectations
+- Reduce ambiguity
+- Make "good" visible""")
+            st.markdown("**Supervisor moves:**")
+            moves = role_additions.get(role_key, {}).get(sel_num, [])[:2]
+            for mtxt in moves:
+                st.write(f"• {mtxt}")
+
+        # Focus Area 2
+        with colB:
+            st.markdown("### Skill Application")
+            st.markdown("""- Practice in real situations
+- Build repeatable routines
+- Coach judgment with scenarios""")
+            st.markdown("**Supervisor moves:**")
+            moves = role_additions.get(role_key, {}).get(sel_num, [])[1:3]
+            for mtxt in moves:
+                st.write(f"• {mtxt}")
+
+        # Focus Area 3
+        with colC:
+            st.markdown("### Autonomy & Judgment")
+            st.markdown("""- Increase ownership
+- Expand decision scope
+- Build leadership behaviors""")
+            st.markdown("**Supervisor moves:**")
+            moves = role_additions.get(role_key, {}).get(sel_num, [])[-2:]
+            for mtxt in moves:
+                st.write(f"• {mtxt}")
+
+        st.divider()
+        st.markdown(f"### Current Phase Detail — Phase {phase['num']}: {phase['title']}")
+        if phase.get("timing"):
+            st.caption(f"Typical timeframe: {phase['timing']}")
+        st.info(phase.get("body", ""))
+
+        with st.expander("See role-specific moves for other roles (helpful for succession / promotion coaching)"):
+            for rk in ["YDP", "Shift Supervisor", "Program Supervisor"]:
+                st.markdown(f"**{rk} — Phase {sel_num} moves**")
+                for bullet in role_additions.get(rk, {}).get(sel_num, []):
+                    st.write(f"• {bullet}")
+                st.markdown("---")
 
     # --- Print-friendly summary export (PDF) ---
     def _build_ipdp_summary_pdf(staff_name: str, staff_role: str, phase_num: int) -> bytes:
         phase = phases[phase_num]
 
-        # FPDF (pyfpdf) requires latin-1 compatible text. Sanitize all strings written to the PDF.
-        def _safe_pdf_text(s):
-            if s is None:
-                return ""
-            s = str(s)
-
-            # Common “smart” punctuation / bullets that break latin-1 in FPDF:
-            replacements = {
-                "“": """, "”": """, "’": "'", "‘": "'",
-                "—": "-", "–": "-", "…": "...",
-                "•": "*", "·": "*",
-                "\u00a0": " ",
-            }
-            for a, b in replacements.items():
-                s = s.replace(a, b)
-
-            # Remove anything still outside latin-1 range
-            s = s.encode("latin1", "ignore").decode("latin1")
+        # FPDF (pyfpdf) encodes page content as latin-1 internally.
+        # Any unicode (smart quotes, em dashes, bullets, emojis) will crash output().
+        def _safe_pdf_text(val) -> str:
+            s = "" if val is None else str(val)
+            # Normalize common unicode punctuation to ascii
+            s = (s.replace("—", "-")
+                   .replace("–", "-")
+                   .replace("“", '"').replace("”", '"')
+                   .replace("‘", "'").replace("’", "'")
+                   .replace("•", "* ")
+                   .replace("…", "..."))
+            # Strip any remaining non-latin1 characters
+            s = s.encode("latin-1", errors="ignore").decode("latin-1")
             return s
 
         pdf = FPDF()
@@ -2058,33 +2160,38 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
         pdf.set_font("Arial", "B", 16)
         pdf.cell(0, 10, _safe_pdf_text("Individual Professional Development Plan (IPDP)"), ln=True)
+        pdf.ln(2)
 
-        pdf.set_font("Arial", "", 12)
-        pdf.cell(0, 8, _safe_pdf_text(f"Staff: {staff_name}"), ln=True)
-        pdf.cell(0, 8, _safe_pdf_text(f"Role: {staff_role}"), ln=True)
-        pdf.cell(0, 8, _safe_pdf_text(f"Current Phase: Phase {phase_num} — {phase['title']}"), ln=True)
-        pdf.ln(3)
+        pdf.set_font("Arial", "", 11)
+        header = (
+            f"Staff: {staff_name}\n"
+            f"Role: {staff_role}\n"
+            f"Current Phase: Phase {phase_num} - {phase.get('title','')} ({phase.get('timing','')})"
+        )
+        pdf.multi_cell(0, 6, _safe_pdf_text(header))
+        pdf.ln(2)
 
         pdf.set_font("Arial", "B", 12)
         pdf.cell(0, 8, _safe_pdf_text("Phase Summary"), ln=True)
         pdf.set_font("Arial", "", 11)
         pdf.multi_cell(0, 6, _safe_pdf_text(phase.get("body", "")))
-        pdf.ln(2)
-
-        # Role-aware moves (for the staff member’s role)
-        role_key_pdf = "Program Supervisor" if "Program Supervisor" in str(staff_role) else "Shift Supervisor" if "Shift Supervisor" in str(staff_role) else "YDP"
-        bullets = role_additions.get(role_key_pdf, {}).get(phase_num, [])
+        pdf.ln(1)
 
         pdf.set_font("Arial", "B", 12)
-        pdf.cell(0, 8, _safe_pdf_text("Role-Aware Supervisor Moves"), ln=True)
+        pdf.cell(0, 8, _safe_pdf_text("Supervisor Focus (This Phase)"), ln=True)
         pdf.set_font("Arial", "", 11)
-        if bullets:
-            for bullet in bullets:
-                pdf.multi_cell(0, 6, _safe_pdf_text(f"- {bullet}"))
-        else:
-            pdf.multi_cell(0, 6, _safe_pdf_text("- Use clear expectations, specific feedback, and consistent follow-through."))
+        for focus, val in focus_weights[phase_num].items():
+            pdf.multi_cell(0, 6, _safe_pdf_text(f"- {focus}: Emphasis {val}/10"))
+        pdf.ln(1)
 
-        pdf.ln(2)
+        rk = role_key
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, _safe_pdf_text(f"Role-Aware Supervisor Moves ({rk})"), ln=True)
+        pdf.set_font("Arial", "", 11)
+        for bullet in role_additions.get(rk, {}).get(phase_num, []):
+            pdf.multi_cell(0, 6, _safe_pdf_text(f"- {bullet}"))
+        pdf.ln(1)
+
         pdf.set_font("Arial", "B", 12)
         pdf.cell(0, 8, _safe_pdf_text("Recommended Check-In Notes Template"), ln=True)
         pdf.set_font("Arial", "", 11)
@@ -2099,101 +2206,17 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         )
         pdf.multi_cell(0, 6, _safe_pdf_text(template))
 
+        # output() will now be safe because all written content is latin-1 compatible
         return pdf.output(dest="S").encode("latin1", errors="ignore")
 
-    # --- Visual: emphasis per phase (simple + useful) ---
-    focus_weights = {
-        1: {"Structure & Clarity": 10, "Skill Application": 4, "Autonomy & Judgment": 2},
-        2: {"Structure & Clarity": 6, "Skill Application": 10, "Autonomy & Judgment": 6},
-        3: {"Structure & Clarity": 3, "Skill Application": 7, "Autonomy & Judgment": 10},
-    }
-
-    # Pre-render all phases so changing phase doesn't "reset" the experience.
-    for phase_num in (1, 2, 3):
-        phase = phases[phase_num]
-        exp_label = f"Phase {phase_num} — {phase['title']} ({phase['timing']})"
-
-        with st.expander(exp_label, expanded=(phase_num == current_phase_num)):
-            # Phase header
-            st.markdown(f"#### Phase {phase_num}: {phase['title']}")
-            st.caption(f"Typical timeframe: {phase['timing']}")
-            st.info(phase.get("body", ""))
-
-            # Snapshot chart for this phase
-            snap_df = pd.DataFrame({
-                "Focus": list(focus_weights[phase_num].keys()),
-                "Emphasis": list(focus_weights[phase_num].values())
-            }).sort_values("Emphasis", ascending=True)
-
-            with st.container(border=True):
-                st.subheader("📈 Development Focus Snapshot")
-                st.caption("Higher bars = what to emphasize most during this phase.")
-                fig_focus = px.bar(
-                    snap_df,
-                    x="Emphasis",
-                    y="Focus",
-                    orientation="h",
-                    title=None
-                )
-                fig_focus.update_layout(
-                    margin=dict(l=10, r=10, t=10, b=10),
-                    height=220
-                )
-                st.plotly_chart(fig_focus, use_container_width=True)
-
-            # Phase Coaching Matrix (role-aware)
-            with st.container(border=True):
-                st.subheader("🧭 Phase Coaching Matrix")
-                st.caption("Use this like a checklist when planning check-ins. Role-aware moves are included for the staff member’s role.")
-
-                colA, colB, colC = st.columns(3)
-
-                with colA:
-                    st.markdown("### Structure & Clarity")
-                    st.markdown("""- Tighten expectations
-- Reduce ambiguity
-- Make "good" visible""")
-                with colB:
-                    st.markdown("### Skill Application")
-                    st.markdown("""- Practice the skill in real situations
-- Use brief coaching loops
-- Reinforce patterns""")
-                with colC:
-                    st.markdown("### Autonomy & Judgment")
-                    st.markdown("""- Increase decision reps
-- Coach judgment (not just rules)
-- Build self-correction""")
-
-                # Role-aware moves for THIS staff member role
-                st.markdown("#### Role-aware supervisor moves")
-                for bullet in role_additions.get(role_key, {}).get(phase_num, []):
-                    st.write(f"• {bullet}")
-
-                with st.expander("See role-specific moves for other roles (helpful for succession / promotion coaching)"):
-                    for rk in ["YDP", "Shift Supervisor", "Program Supervisor"]:
-                        st.markdown(f"**{rk} — Phase {phase_num} moves**")
-                        for bullet in role_additions.get(rk, {}).get(phase_num, []):
-                            st.write(f"• {bullet}")
-                        st.markdown("---")
-
-            # Save current phase (optional)
-            cols_save = st.columns([1, 1, 2])
-            with cols_save[0]:
-                if st.button(f"Set Phase {phase_num} as saved current phase", key=f"set_ipdp_phase__{name}__{phase_num}"):
-                    st.session_state[phase_state_key] = phase_num
-                    st.success(f"Saved current phase: Phase {phase_num}")
-
-            # PDF download for this phase
-            pdf_bytes = _build_ipdp_summary_pdf(name, role, phase_num)
-            st.download_button(
-                f"🖨️ Download Phase {phase_num} IPDP Summary (PDF)",
-                data=pdf_bytes,
-                file_name=f"{name.replace(' ', '_')}_IPDP_Phase_{phase_num}_Summary.pdf",
-                mime="application/pdf",
-                use_container_width=True,
-                key=f"ipdp_pdf_dl__{name}__{phase_num}"
-            )
-
+    pdf_bytes = _build_ipdp_summary_pdf(name, role, sel_num)
+    st.download_button(
+        "🖨️ Download IPDP Summary (PDF)",
+        data=pdf_bytes,
+        file_name=f"{name.replace(' ', '_')}_IPDP_Summary.pdf",
+        mime="application/pdf",
+        use_container_width=True
+    )
     st.subheader("10. What You Should Celebrate")
     st.caption("Use this section to reinforce the behaviors you want repeated. Keep recognition timely, specific, and tied to impact.")
     st.markdown("<br>", unsafe_allow_html=True)
