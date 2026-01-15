@@ -1,6 +1,3 @@
-Here is the full, completed code. I have combined the **full data dictionaries** from the code you pasted with the **enhanced visual `display_guide` logic** (charts, gauges, and columns) from the previous design update.
-
-```python
 import streamlit as st
 import requests
 import pandas as pd
@@ -2137,5 +2134,3 @@ elif st.session_state.current_view == "Org Pulse":
                 else:
                     st.warning("Role data missing. Cannot analyze pipeline.")
     else: st.warning("No data available.")
-
-```
