@@ -2108,42 +2108,75 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # --- Print-friendly summary export (PDF) ---
     def _build_ipdp_summary_pdf(staff_name: str, staff_role: str, phase_num: int) -> bytes:
         phase = phases[phase_num]
+
+        # FPDF (pyfpdf) encodes page content as latin-1 internally.
+        # Any unicode (smart quotes, em dashes, bullets, emojis) will crash output().
+        def _safe_pdf_text(val) -> str:
+            s = "" if val is None else str(val)
+            # Normalize common unicode punctuation to ascii
+            s = (s.replace("—", "-")
+                   .replace("–", "-")
+                   .replace("“", '"').replace("”", '"')
+                   .replace("‘", "'").replace("’", "'")
+                   .replace("•", "* ")
+                   .replace("…", "..."))
+            # Strip any remaining non-latin1 characters
+            s = s.encode("latin-1", errors="ignore").decode("latin-1")
+            return s
+
         pdf = FPDF()
         pdf.set_auto_page_break(auto=True, margin=12)
         pdf.add_page()
+
         pdf.set_font("Arial", "B", 16)
-        pdf.cell(0, 10, "Individual Professional Development Plan (IPDP)", ln=True)
+        pdf.cell(0, 10, _safe_pdf_text("Individual Professional Development Plan (IPDP)"), ln=True)
         pdf.ln(2)
 
         pdf.set_font("Arial", "", 11)
-        pdf.multi_cell(0, 6, f"Staff: {staff_name}\nRole: {staff_role}\nCurrent Phase: Phase {phase_num} — {phase['title']} ({phase.get('timing','')})")
+        header = (
+            f"Staff: {staff_name}\n"
+            f"Role: {staff_role}\n"
+            f"Current Phase: Phase {phase_num} - {phase.get('title','')} ({phase.get('timing','')})"
+        )
+        pdf.multi_cell(0, 6, _safe_pdf_text(header))
         pdf.ln(2)
 
         pdf.set_font("Arial", "B", 12)
-        pdf.cell(0, 8, "Phase Summary", ln=True)
+        pdf.cell(0, 8, _safe_pdf_text("Phase Summary"), ln=True)
         pdf.set_font("Arial", "", 11)
-        pdf.multi_cell(0, 6, phase.get("body", ""))
+        pdf.multi_cell(0, 6, _safe_pdf_text(phase.get("body", "")))
         pdf.ln(1)
 
         pdf.set_font("Arial", "B", 12)
-        pdf.cell(0, 8, "Supervisor Focus (This Phase)", ln=True)
+        pdf.cell(0, 8, _safe_pdf_text("Supervisor Focus (This Phase)"), ln=True)
         pdf.set_font("Arial", "", 11)
         for focus, val in focus_weights[phase_num].items():
-            pdf.multi_cell(0, 6, f"- {focus}: Emphasis {val}/10")
+            pdf.multi_cell(0, 6, _safe_pdf_text(f"- {focus}: Emphasis {val}/10"))
         pdf.ln(1)
 
         rk = role_key
         pdf.set_font("Arial", "B", 12)
-        pdf.cell(0, 8, f"Role-Aware Supervisor Moves ({rk})", ln=True)
+        pdf.cell(0, 8, _safe_pdf_text(f"Role-Aware Supervisor Moves ({rk})"), ln=True)
         pdf.set_font("Arial", "", 11)
         for bullet in role_additions.get(rk, {}).get(phase_num, []):
-            pdf.multi_cell(0, 6, f"- {bullet}")
+            pdf.multi_cell(0, 6, _safe_pdf_text(f"- {bullet}"))
         pdf.ln(1)
 
         pdf.set_font("Arial", "B", 12)
-        pdf.cell(0, 8, "Recommended Check-In Notes Template", ln=True)
+        pdf.cell(0, 8, _safe_pdf_text("Recommended Check-In Notes Template"), ln=True)
         pdf.set_font("Arial", "", 11)
-        pdf.multi_cell(0, 6, "Wins since last check-in:\n-\n\nOne skill focus for next period:\n-\n\nSupport needed from supervisor:\n-\n\nNext check-in date:")
+        template = (
+            "Wins since last check-in:\n"
+            "-\n\n"
+            "One skill focus for next period:\n"
+            "-\n\n"
+            "Support needed from supervisor:\n"
+            "-\n\n"
+            "Next check-in date:"
+        )
+        pdf.multi_cell(0, 6, _safe_pdf_text(template))
+
+        # output() will now be safe because all written content is latin-1 compatible
         return pdf.output(dest="S").encode("latin1", errors="ignore")
 
     pdf_bytes = _build_ipdp_summary_pdf(name, role, sel_num)
