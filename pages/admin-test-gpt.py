@@ -1679,48 +1679,46 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         st.subheader("5. Integrated Leadership Profile")
         st.caption("This section explains how their communication style and motivation driver combine into a predictable leadership pattern—and how to coach it.")
 
-        left, right = st.columns([1.8, 1])
+        # Leadership Balance Snapshot on its own full-width line
+        st.markdown("#### 📊 Leadership Balance Snapshot")
+        fig_bal = _integrated_balance_chart(p_comm, p_mot)
+        st.plotly_chart(fig_bal, use_container_width=True, config={'displayModeBar': False})
+        st.caption("Scores show a *starting bias* (not a fixed identity). Coach them to borrow the opposite gear when the situation demands it.")
+        st.markdown("---")
 
-        with left:
-            st.markdown("#### 🔗 The Synergy")
-            st.info(str(data.get('s5', '')).strip() or "Integrated profile details were not provided for this person.")
+        st.markdown("#### 🔗 The Synergy")
+        st.info(str(data.get('s5', '')).strip() or "Integrated profile details were not provided for this person.")
 
-            mech = _integrated_mechanics(p_comm, p_mot)
-            st.markdown("#### ⚙️ Leadership Mechanics")
-            st.caption("Use these as teaching points—what to expect, what to reinforce, and what to watch for.")
+        mech = _integrated_mechanics(p_comm, p_mot)
+        st.markdown("#### ⚙️ Leadership Mechanics")
+        st.caption("Use these as teaching points—what to expect, what to reinforce, and what to watch for.")
 
-            # 1) Decision Style
-            st.markdown("**1) Decision Style**")
-            st.markdown(f"- **Pattern:** {mech['decision']['core']}")
-            st.markdown(f"- **What you’ll see:** {mech['decision']['see']}")
-            st.markdown(f"- **Supervisor move:** {mech['decision']['move']}")
-            st.markdown(f"- **Watch for:** {mech['decision']['watch']}")
+        # 1) Decision Style
+        st.markdown("**1) Decision Style**")
+        st.markdown(f"- **Pattern:** {mech['decision']['core']}")
+        st.markdown(f"- **What you’ll see:** {mech['decision']['see']}")
+        st.markdown(f"- **Supervisor move:** {mech['decision']['move']}")
+        st.markdown(f"- **Watch for:** {mech['decision']['watch']}")
 
-            st.markdown("")
+        st.markdown("")
 
-            # 2) Influence Tactic
-            st.markdown("**2) Influence Tactic**")
-            st.markdown(f"- **Pattern:** {mech['influence']['core']}")
-            st.markdown(f"- **What you’ll see:** {mech['influence']['see']}")
-            st.markdown(f"- **Supervisor move:** {mech['influence']['move']}")
-            st.markdown(f"- **Watch for:** {mech['influence']['watch']}")
+        # 2) Influence Tactic
+        st.markdown("**2) Influence Tactic**")
+        st.markdown(f"- **Pattern:** {mech['influence']['core']}")
+        st.markdown(f"- **What you’ll see:** {mech['influence']['see']}")
+        st.markdown(f"- **Supervisor move:** {mech['influence']['move']}")
+        st.markdown(f"- **Watch for:** {mech['influence']['watch']}")
 
-            st.markdown("")
+        st.markdown("")
 
-            # 3) Trust Builder
-            st.markdown("**3) Trust Builder**")
-            st.markdown(f"- **Pattern:** {mech['trust']['core']}")
-            st.markdown(f"- **What you’ll see:** {mech['trust']['see']}")
-            st.markdown(f"- **Supervisor move:** {mech['trust']['move']}")
-            st.markdown(f"- **Watch for:** {mech['trust']['watch']}")
+        # 3) Trust Builder
+        st.markdown("**3) Trust Builder**")
+        st.markdown(f"- **Pattern:** {mech['trust']['core']}")
+        st.markdown(f"- **What you’ll see:** {mech['trust']['see']}")
+        st.markdown(f"- **Supervisor move:** {mech['trust']['move']}")
+        st.markdown(f"- **Watch for:** {mech['trust']['watch']}")
 
-            st.info(mech["integration_tip"])
-
-        with right:
-            st.markdown("#### 📊 Leadership Balance Snapshot")
-            fig_bal = _integrated_balance_chart(p_comm, p_mot)
-            st.plotly_chart(fig_bal, use_container_width=True, config={'displayModeBar': False})
-            st.caption("Scores show a *starting bias* (not a fixed identity). Coach them to borrow the opposite gear when the situation demands it.")
+        st.info(mech["integration_tip"])
         show_section("6. How You Can Best Support Them", data['s6'])
 
         # --- VISUAL BREAK: QUICK COACHING MAP (between 1-6 and 7-8) ---
