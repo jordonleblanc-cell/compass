@@ -1443,7 +1443,7 @@ def generate_profile_content(comm, motiv):
     }
 
     # -------------------------------
-    # EXPANDED SECTION #5 (INTEGRATED PROFILE — unique content)
+    # EXPANDED SECTION #5 (Integrated Leadership Profile)
     # -------------------------------
     def _truncate_sentences(text, max_sentences=2):
         if not text:
@@ -1454,97 +1454,20 @@ def generate_profile_content(comm, motiv):
             return t
         return ". ".join(parts[:max_sentences]) + "."
 
+    comm_bullets = c_data.get("bullets", []) or []
+    motiv_bullets = m_data.get("bullets", []) or []
+
+    comm_keypoints = [_truncate_sentences(b.replace("\n", " "), 1) for b in comm_bullets[:3]]
+    motiv_keypoints = [_truncate_sentences(b.replace("\n", " "), 1) for b in motiv_bullets[:3]]
+
+    thriving_snippet = _truncate_sentences(i_data.get("thriving", ""), 2)
+    struggling_snippet = _truncate_sentences(i_data.get("struggling", ""), 2)
+
+    supervisor_moves_comm = (c_data.get("supervising_bullets", []) or [])[:2]
+    supervisor_moves_motiv = (m_data.get("strategies_bullets", []) or [])[:2]
+
     title = i_data.get("title", "Integrated Profile")
     synergy = i_data.get("synergy", "")
-
-    # Unique “integration” lens: how communication + motivation interact (without repeating other sections)
-    comm_signature = {
-        "Director": {
-            "default_pace": "fast pace, outcome-first",
-            "decision_mode": "decides quickly and expects momentum",
-            "blindspot": "may under-signal warmth or context when moving quickly",
-        },
-        "Encourager": {
-            "default_pace": "people-first, relational pace",
-            "decision_mode": "aligns the room first, then commits",
-            "blindspot": "may soften hard messages or delay tough calls",
-        },
-        "Facilitator": {
-            "default_pace": "steady, consensus-aware",
-            "decision_mode": "integrates perspectives before landing decisions",
-            "blindspot": "may hesitate when conflict is sharp or stakes feel high",
-        },
-        "Tracker": {
-            "default_pace": "methodical, precision-first",
-            "decision_mode": "prefers clarity, rules, and a correct path",
-            "blindspot": "may get stuck refining details when speed is needed",
-        },
-    }
-
-    motiv_signature = {
-        "Achievement": {
-            "north_star": "winning and measurable progress",
-            "risk": "can over-commit or take on too much to ‘make it happen’",
-            "needs": "clear targets and visible progress markers",
-        },
-        "Growth": {
-            "north_star": "learning, mastery, and improvement",
-            "risk": "may prioritize experimentation over short-term throughput",
-            "needs": "developmental feedback and space to iterate",
-        },
-        "Purpose": {
-            "north_star": "meaning, values, and mission-aligned impact",
-            "risk": "can disengage if tasks feel misaligned or purely procedural",
-            "needs": "a clear ‘why’ and a sense of contribution",
-        },
-        "Connection": {
-            "north_star": "belonging, trust, and relational safety",
-            "risk": "may avoid conflict or carry too much emotional load",
-            "needs": "predictable check-ins and affirmation of relationship",
-        },
-    }
-
-    c_sig = comm_signature.get(comm, {})
-    m_sig = motiv_signature.get(motiv, {})
-
-    # Tension + leverage are intentionally NOT the same as Section 2/4 bullets.
-    tension_templates = {
-        ("Director", "Connection"): "Speed vs. belonging: they move fast, but will stall if relationship trust feels shaky.",
-        ("Director", "Purpose"): "Outcomes vs. meaning: they’ll execute hard, but need the mission tie-in to stay fully engaged.",
-        ("Director", "Growth"): "Execution vs. refinement: they want forward motion, but can get frustrated when learning loops slow the pace.",
-        ("Director", "Achievement"): "Acceleration risk: they’ll sprint for results—watch sustainability and ‘too much, too fast’.",
-        ("Encourager", "Achievement"): "Harmony vs. hard targets: they want people okay AND the goal met—can avoid necessary pressure.",
-        ("Encourager", "Purpose"): "Values alignment load: they’ll carry the emotional/moral weight—protect them from burnout-by-caretaking.",
-        ("Encourager", "Growth"): "Support vs. standards: they coach well, but may hesitate to correct firmly.",
-        ("Encourager", "Connection"): "Relational gravity: connection is fuel—guard against conflict-avoidance and over-accommodating.",
-        ("Facilitator", "Achievement"): "Consensus vs. speed: they’ll build buy-in, but may lose time when urgency is required.",
-        ("Facilitator", "Purpose"): "Fairness vs. decisiveness: they weigh impact carefully—help them commit when tradeoffs are real.",
-        ("Facilitator", "Growth"): "Learning loops: strong at improvement work—prevent ‘infinite iteration’ when action is needed.",
-        ("Facilitator", "Connection"): "Safety-first: excellent stabilizer—ensure hard feedback still lands with clarity.",
-        ("Tracker", "Achievement"): "Precision vs. pace: high output is possible—if the ‘definition of done’ is clear.",
-        ("Tracker", "Purpose"): "Rules vs. meaning: they’ll follow process, but thrive when the purpose behind rules is explicit.",
-        ("Tracker", "Growth"): "Mastery drive: great for quality improvement—avoid nitpicking spirals under stress.",
-        ("Tracker", "Connection"): "Care through structure: they show care by reliability—help them express warmth explicitly when needed.",
-    }
-
-    leverage_templates = {
-        "Achievement": [
-            "Use short performance sprints (7–14 days) with a single measurable target.",
-            "Name the finish line early: what ‘success’ looks like and how it will be recognized.",
-        ],
-        "Growth": [
-            "Turn mistakes into a learning loop: ‘What did we learn, what changes next time?’",
-            "Offer stretch assignments with guardrails (scope + timebox).",
-        ],
-        "Purpose": [
-            "Connect routine tasks to resident outcomes and mission impact in one sentence.",
-            "Let them own a ‘why’ moment (story, data point, or resident win) in meetings.",
-        ],
-        "Connection": [
-            "Use predictable micro-check-ins (2 minutes) to keep trust topped up.",
-            "Frame feedback as partnership: ‘I’m with you; we’re solving this together.’",
-        ],
-    }
 
     integrated_profile_text = []
     integrated_profile_text.append(f"**Profile:** {title}")
@@ -1603,7 +1526,122 @@ def generate_profile_content(comm, motiv):
     if stance:
         integrated_profile_text.append("\n**Supervisor stance (one line):**\n" + " ".join(stance))
 
-    integrated_profile_text = "\n".join([p for p in integrated_profile_text if p])
+    integrated_profile_text = "\n".join([p for p in integrated_profile_lines if p])
+
+    # --- Expanded but non-duplicative section intros (keeps bullets for readability + PDF formatting) ---
+    comm_quick = " ".join([kp for kp in comm_keypoints[:2] if kp]).strip()
+    motiv_quick = " ".join([kp for kp in motiv_keypoints[:2] if kp]).strip()
+
+    # --- Section 1 (Expanded): Communication Profile ---
+    # Keep the original bullets for detail, but add a structured overview that matches the #5 style
+    comm_style_map = {
+        "Director": {
+            "optimize_for": "speed, clarity, and decisive movement.",
+            "receive": ["Lead with the conclusion first, then the rationale.", "Frame updates in outcomes, risks, and deadlines."],
+            "misreads": ["Brevity can sound harsh (it’s usually efficiency).", "Direct challenge is often problem-solving, not personal criticism."],
+            "listen_for": ["“What’s the point?” = tighten the message.", "“What’s the plan?” = show the path, not the drama."]
+        },
+        "Encourager": {
+            "optimize_for": "connection, momentum, and shared belief.",
+            "receive": ["Start with people-impact, then the task.", "Invite dialogue—they process by talking."],
+            "misreads": ["Warmth can be mistaken for lack of seriousness.", "Lots of words can be processing, not avoidance."],
+            "listen_for": ["“How are we doing?” = check the emotional temperature.", "“Are we aligned?” = reaffirm the shared goal."]
+        },
+        "Facilitator": {
+            "optimize_for": "harmony, fairness, and steady consensus.",
+            "receive": ["Give context and let them think before answering.", "Offer options and ask for input on impact to others."],
+            "misreads": ["Pauses can be mistaken for indecision (often it’s careful weighing).", "Conflict-avoidance can look like disengagement (often it’s conflict-management)."],
+            "listen_for": ["“What do others think?” = map stakeholder impact.", "“What’s the safest approach?” = reduce disruption."]
+        },
+        "Tracker": {
+            "optimize_for": "accuracy, predictability, and correctness.",
+            "receive": ["Be specific: who/what/when/how documented.", "Explain the ‘why’ behind changes to process."],
+            "misreads": ["Detail can be mistaken for rigidity (it’s risk-control).", "Questions can be mistaken for pushback (it’s due diligence)."],
+            "listen_for": ["“What’s the standard?” = anchor to policy/expectations.", "“What’s the exact process?” = reduce ambiguity."]
+        }
+    }
+
+    style = comm_style_map.get(comm, {})
+    s1_lines = []
+
+    if comm_quick:
+        s1_lines.append(f"**Quick read:** {comm_quick}")
+
+    if style.get("optimize_for"):
+        s1_lines.append(f"\n**What they’re optimizing for:** {style['optimize_for']}")
+
+    # Pull the bolded labels from the existing bullets (no duplication—just a clean summary)
+    labels = []
+    for b in (comm_bullets or [])[:3]:
+        m = re.match(r"\*\*(.+?)\:\*\*\s*(.+)", str(b).strip())
+        if m:
+            labels.append(m.group(1).strip())
+
+    if labels:
+        s1_lines.append("\n**Core levers in their style:** " + ", ".join(labels) + ".")
+
+    if style.get("receive"):
+        s1_lines.append("\n**Best way to deliver information to them:**")
+        for tip in style["receive"]:
+            s1_lines.append(f"- {tip}")
+
+    if style.get("listen_for"):
+        s1_lines.append("\n**Phrases to listen for (and what they usually signal):**")
+        for cue in style["listen_for"]:
+            s1_lines.append(f"- {cue}")
+
+    if style.get("misreads"):
+        s1_lines.append("\n**Common misreads (help your team interpret them accurately):**")
+        for r in style["misreads"]:
+            s1_lines.append(f"- {r}")
+
+    s1_text = "\n".join([x for x in s1_lines if x]).strip()
+    s2_text = (
+        "Use the moves below as your default operating system with them. "
+        "When you need to correct course, change *one variable at a time* (clarity, tone, timing, or channel) "
+        "so they can feel the difference and adapt quickly."
+    )
+
+    s3_text = f"**Quick read:** {motiv_quick}" if motiv_quick else ""
+    s4_text = (
+        "These strategies keep their internal engine running. "
+        "Pick 1–2 approaches and apply them consistently for 2–3 weeks before adding anything new."
+    )
+
+    support_base = (i_data.get('support', '') or '').strip()
+    support_overlay = [
+        "**Support cadence that usually works well:**",
+        "- **Weekly:** quick 5–10 minute alignment (priorities, obstacles, support needed).",
+        "- **Monthly:** deeper coaching (patterns, growth edge, skill-building plan).",
+        "- **As-needed:** reset after incidents—facts first, then impact, then next steps."
+    ]
+    s6_text = (support_base + ("\n\n" if support_base else "") + "\n".join(support_overlay)).strip()
+
+    s9_text = (
+        "Interventions work best when they follow a predictable ladder: **clarify → coach → document → escalate**. "
+        "Start with the *least intensive* step that protects residents, the team, and compliance—then move up quickly if "
+        "there’s no behavior change or if safety is at risk."
+    )
+
+    s10_text = (
+        "Celebrate the behaviors you want repeated. Keep recognition **specific** (what they did), **impact-based** "
+        "(who it helped / what improved), and **timely** (within the week when possible)."
+    )
+
+    coaching_intro = (
+        "Use these as a 10–15 minute coaching flow: pick **2–3 questions**, listen for patterns, then agree on "
+        "**one next action** and **one check-in date**."
+    )
+
+    advancement_base = (i_data.get('advancement', '') or '').strip()
+    advancement_overlay = [
+        "**Advancement levers to emphasize:**",
+        "- **Reliability at the next level:** predictable follow-through on priorities and documentation.",
+        "- **Influence without authority:** guiding peers through tone, clarity, and consistency.",
+        "- **Systems thinking:** spotting root causes and proposing small, testable improvements."
+    ]
+    advancement_expanded = (advancement_base + ("\n\n" if advancement_base else "") + "\n".join(advancement_overlay)).strip()
+
     return {
         "s1": s1_text,
         "s1_b": c_data.get('bullets'),
