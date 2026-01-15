@@ -2020,31 +2020,17 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         f"Phase 3 — {phases[3]['title']} ({phases[3]['timing']})",
     ]
 
-    # Persist the selected phase per staff member WITHOUT triggering a full rerun on every dropdown click.
-    # Streamlit reruns the script on widget interaction; placing the dropdown inside a form prevents
-    # re-running until the user explicitly clicks "Apply".
     phase_state_key = f"ipdp_phase__{name}".replace(" ", "_")
-    pending_key = f"{phase_state_key}__pending"
-    form_key = f"ipdp_phase_form__{name}".replace(" ", "_")
-
     if phase_state_key not in st.session_state:
         st.session_state[phase_state_key] = phase_labels[0]
-    if pending_key not in st.session_state:
-        st.session_state[pending_key] = st.session_state[phase_state_key]
 
-    with st.form(key=form_key, clear_on_submit=False):
-        st.selectbox(
-            "Current development phase (used for coaching + summary export)",
-            options=phase_labels,
-            index=phase_labels.index(st.session_state[phase_state_key]) if st.session_state[phase_state_key] in phase_labels else 0,
-            key=pending_key
-        )
-        apply_phase = st.form_submit_button("Apply phase")
+    sel_label = st.selectbox(
+        "Current development phase (used for coaching + summary export)",
+        options=phase_labels,
+        index=phase_labels.index(st.session_state[phase_state_key]) if st.session_state[phase_state_key] in phase_labels else 0,
+        key=phase_state_key
+    )
 
-    if apply_phase:
-        st.session_state[phase_state_key] = st.session_state[pending_key]
-
-    sel_label = st.session_state[phase_state_key]
     sel_num = 1 if sel_label.startswith("Phase 1") else 2 if sel_label.startswith("Phase 2") else 3
 
     # --- Visual: Development Focus Snapshot (useful at-a-glance emphasis) ---
