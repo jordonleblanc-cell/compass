@@ -2187,21 +2187,92 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         mime="application/pdf",
         use_container_width=True
     )
-    show_section("10. What You Should Celebrate", None, data['s10_b'])
+    st.subheader("10. What You Should Celebrate")
+    st.caption("Use this section to reinforce the behaviors you want repeated. Keep recognition timely, specific, and tied to impact.")
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # --- VISUAL BREAK: CELEBRATION SIGNALS ---
     with st.container(border=True):
         st.subheader("🎉 Celebration Signals")
         st.caption("Use these as quick 'spotlight' moments to reinforce what you want repeated.")
 
+        # Pull the celebration cues for this profile (typically 3). We intentionally display only the top three
+        # to keep this section fast to scan during real-time supervision.
         celebs = data.get('s10_b', []) or []
-        if celebs:
+        celebs_top = celebs[:3] if isinstance(celebs, (list, tuple)) else []
+
+        def _celebration_style(comm_style, mot_style, staff_role):
+            # Communication-flavored recognition style
+            comm_map = {
+                "Director": ("Keep it concise and outcome-focused.", "Name the result and the next expectation."),
+                "Encourager": ("Make it warm and relational.", "Name the effort and how it helped others."),
+                "Facilitator": ("Make it collaborative and inclusive.", "Name the teamwork and invite reflection."),
+                "Tracker": ("Make it specific and observable.", "Name the concrete behavior and evidence.")
+            }
+            mot_map = {
+                "Achievement": ("Tie it to results and standards.", "Highlight measurable impact or completion."),
+                "Growth": ("Tie it to learning and improvement.", "Highlight what they tried and what they learned."),
+                "Purpose": ("Tie it to mission and values.", "Highlight who benefited and why it matters."),
+                "Connection": ("Tie it to relationships and belonging.", "Highlight how it strengthened the team.")
+            }
+            role_map = {
+                "YDP": ("Reinforce the 'repeatable' habit.", "Ask for one small repeatable next step."),
+                "Shift Supervisor": ("Reinforce judgment and coordination.", "Ask how they can repeat it across a shift."),
+                "Program Supervisor": ("Reinforce systems-thinking and delegation.", "Ask how they can scale it across the program.")
+            }
+
+            comm_tip = comm_map.get(comm_style, ("Keep it specific and timely.", "Name the behavior and impact."))
+            mot_tip = mot_map.get(mot_style, ("Tie it to what they care about.", "Connect it to meaning or results."))
+            # staff_role may include other words; do a contains match
+            role_key = "YDP"
+            if isinstance(staff_role, str):
+                if "Shift Supervisor" in staff_role:
+                    role_key = "Shift Supervisor"
+                elif "Program Supervisor" in staff_role:
+                    role_key = "Program Supervisor"
+                elif "YDP" in staff_role:
+                    role_key = "YDP"
+            role_tip = role_map.get(role_key, ("Reinforce the next level of ownership.", "Ask for a repeatable next step."))
+
+            return {
+                "recognition_tone": comm_tip[0],
+                "recognition_move": comm_tip[1],
+                "motivation_hook": mot_tip[0],
+                "motivation_move": mot_tip[1],
+                "role_focus": role_tip[0],
+                "role_move": role_tip[1],
+            }
+
+        style = _celebration_style(p_comm, p_mot, role)
+
+        if celebs_top:
             cols = st.columns(3)
-            for i, c in enumerate(celebs):
-                with cols[i % 3]:
+            for i, c in enumerate(celebs_top):
+                with cols[i]:
                     with st.container(border=True):
                         st.markdown("**✅ Celebrate**")
                         st.write(c)
+
+                        st.markdown("---")
+                        st.markdown("**Make it stick (say this):**")
+                        # Short “script” that adapts to comm + motivation
+                        st.write(
+                            f"“I noticed **{c.lower()}**. {style['recognition_tone']} "
+                            f"{style['motivation_hook']}”"
+                        )
+
+                        st.markdown("**Reinforce with:**")
+                        st.markdown(f"- {style['recognition_move']}")
+                        st.markdown(f"- {style['motivation_move']}")
+                        st.markdown(f"- {style['role_move']}")
+
+                        st.markdown("**One stretch prompt:**")
+                        if i == 0:
+                            st.write("What would it look like to do this *once per shift*?")
+                        elif i == 1:
+                            st.write("What’s the *smallest repeatable step* that makes this easier next time?")
+                        else:
+                            st.write("How could you *teach or model* this for someone else this week?")
         else:
             st.info("No celebration cues found for this profile.")
 
