@@ -1538,9 +1538,9 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 - If you treat stress as data, you intervene earlier and keep performance intact.
 
 **How to use it (Supervisor moves):**
-- **Name the pattern early** (low-stakes, non-accusatory): *"I'm noticing you're quieter and moving fast—are you overloaded?"*
-- **Ask for the first signal**: *"What usually changes first when you're nearing burnout—tone, sleep, patience, or focus?"*
-- **Separate person from behavior**: you are not judging character; you're reading a dashboard.
+- **Name the pattern early** (low-stakes, non-accusatory): *"I'm noticing you are quieter and moving fast—are you overloaded?"*
+- **Ask for the first signal**: *"What usually changes first when you are nearing burnout—tone, sleep, patience, or focus?"*
+- **Separate person from behavior**: you are not judging character; you are reading a dashboard.
 
 **Red flag rule:** If the stress signature is showing up **for 2+ shifts**, assume the environment and workload need adjustment—not just coaching.
 """)
@@ -1565,11 +1565,63 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         with sc1:
             st.markdown("#### 🚨 Stress Signature")
             st.error(f"**When they are unsupported, they will:**\n\n{stress_sig.get(p_comm)}")
+            # --- PEDAGOGY EXPANDED: why this stress signature shows up + what happens if missed
+            stress_why = {
+                'Director': 'When overloaded, Directors experience blocked control (too many barriers, too much talk, unclear authority). Their nervous system shifts into command-and-control to force progress.',
+                'Encourager': 'When overloaded, Encouragers read strain as relational risk (not being valued, not being supported). They may withdraw or become overly agreeable to keep peace.',
+                'Facilitator': 'When overloaded, Facilitators experience threat from conflict and ambiguity. The safest move becomes no move, so they freeze and keep asking for more input.',
+                'Tracker': 'When overloaded, Trackers experience threat from unpredictability. They narrow to rules and details to restore certainty and safety.'
+            }.get(p_comm, '')
+
+            stress_cost = {
+                'Director': ['Escalation into conflict with peers', 'Micromanaging that lowers morale', 'Burnout from carrying the unit alone'],
+                'Encourager': ['Disengagement masked as "fine"', 'Resentment and emotional exhaustion', 'Team culture drift (unspoken tension)'],
+                'Facilitator': ['Decision delays that create safety risk', 'Quiet resentment and avoidance', 'Team confusion about who decides'],
+                'Tracker': ['Rigid rule-enforcement that feels punitive', 'Fixation on minor errors while big risks grow', 'Anxiety-driven overload and shutdown']
+            }.get(p_comm, [])
+
+            with st.expander('Why this matters (and what happens if it is missed)', expanded=False):
+                st.info(f"Why this pattern shows up for {first_name}: {stress_why}")
+                st.markdown('If the stress signature is not addressed, you often see:')
+                for c in stress_cost:
+                    st.write(f"- {c}")
+                st.markdown('Supervisor move: Treat this as a dashboard, not a character flaw. Intervene earlier with small environmental adjustments.')
         with sc2:
             st.markdown("#### 💊 The Prescription")
             st.success("**Daily/Weekly Dosage:**")
             for r in rx.get(p_comm, []):
                 st.write(f"• {r}")
+            # --- PEDAGOGY EXPANDED: explain each prescription item
+            rx_details = {
+                'Director': {
+                    "Remove a barrier they can't move.": 'Why it works: it restores agency. How: ask what is blocking them, then remove/route it (approval, resource, decision).',
+                    "Give them a 'win' to chase.": 'Why it works: progress regulates them. How: define a short goal for this shift/week and let them own the path.',
+                    'Stop talking, start doing.': 'Why it works: long explanations feel like delay. How: give 1-2 clear next steps and move into action.'
+                },
+                'Encourager': {
+                    'Schedule face time (no agenda).': 'Why it works: connection restores safety. How: 5 minutes of real check-in before problem solving.',
+                    'Validate their emotional load.': 'Why it works: naming reduces shame. How: reflect what you see without fixing it immediately.',
+                    'Publicly praise a specific contribution.': 'Why it works: belonging + meaning. How: name the exact behavior and its impact on youth/team.'
+                },
+                'Facilitator': {
+                    'Give a clear deadline.': 'Why it works: it ends endless deliberation. How: set a decision date/time and define what input is needed.',
+                    'Take the blame for a hard decision.': 'Why it works: it removes relational fear. How: say you are deciding and they can reference you.',
+                    "Ask: 'What is the risk of doing nothing?'": 'Why it works: it moves from comfort to consequence. How: use it to unlock action in a stalemate.'
+                },
+                'Tracker': {
+                    "Give them the 'why' behind the chaos.": 'Why it works: meaning organizes uncertainty. How: explain the rationale behind last-minute changes in one paragraph.',
+                    'Protect them from last-minute changes.': 'Why it works: predictability reduces anxiety. How: bundle changes, give warning, and minimize surprise tasks.',
+                    "Explicitly define 'good enough.'": 'Why it works: prevents perfection loops. How: define the minimum safe standard for this shift.'
+                }
+            }.get(p_comm, {})
+
+            with st.expander('Why each prescription helps (and how to implement it)', expanded=False):
+                st.markdown('Use these as small, repeatable interventions. Consistency matters more than intensity.')
+                for item in rx.get(p_comm, []):
+                    detail = rx_details.get(item, '')
+                    if detail:
+                        st.markdown(f"**{item}**")
+                        st.write(detail)
 
     # 2. Environment Audit
     fuel_map = {"Achievement": "Clear Goals", "Growth": "New Challenges", "Purpose": "Mission Connection", "Connection": "Team Time"}
@@ -1604,10 +1656,82 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             st.metric("Top Fuel (Add This)", fuel_map.get(p_mot))
             st.caption("This is the #1 engagement fuel for them. Add small doses consistently.")
 
-        st.markdown("#### Quick actions you can take this week")
-        st.write("• Remove or reduce one friction source (a barrier, an ambiguity, a last-minute change).")
-        st.write("• Add one fuel source (clear goal, stretch task, mission story, or team touchpoint).")
-        st.write("• Confirm what 'good enough' looks like for the next 7 days.")
+        # --- PEDAGOGY EXPANDED: why friction/fuel are specific + what to do
+        friction_why = {
+            'Director': 'Red tape blocks forward motion and control. When they cannot move the system, they tighten on people.',
+            'Encourager': 'Isolation reads as rejection. Without belonging, they lose energy and may go quiet or appease.',
+            'Facilitator': 'Conflict creates threat. They freeze because any choice may damage relationships.',
+            'Tracker': 'Chaos removes predictability. They narrow to rules and details to feel safe.'
+        }.get(p_comm, '')
+
+        fuel_why = {
+            'Achievement': 'Visible progress calms and energizes them. Wins restore motivation and prevent the feeling of endless work.',
+            'Growth': 'Learning and stretch regulate them. Challenge plus feedback keeps them engaged and resilient.',
+            'Purpose': 'Meaning regulates them. Mission-connection prevents burnout when tasks feel heavy or bureaucratic.',
+            'Connection': 'Belonging regulates them. Team warmth and repair keep their nervous system steady.'
+        }.get(p_mot, '')
+
+        with st.expander('More on Top Friction (why it is this - and how to reduce it)', expanded=False):
+            st.info(f"Why this is the top friction for {first_name}: {friction_why}")
+            st.markdown('Supervisor levers you can actually use this week:')
+            if p_comm == 'Director':
+                for g in ['Pre-decide approvals where possible', 'Give clear lanes of ownership', 'Bundle changes instead of drip-feeding them']:
+                    st.write(f"- {g}")
+            elif p_comm == 'Encourager':
+                for g in ['Short face-time check-ins', 'Name appreciation with specificity', 'Address tension quickly; do not let it simmer']:
+                    st.write(f"- {g}")
+            elif p_comm == 'Facilitator':
+                for g in ['Set decision dates', 'State who decides in the moment', 'Promise a debrief window after the shift']:
+                    st.write(f"- {g}")
+            else:
+                for g in ['Write the plan in 3 bullets', 'Define what is good enough', 'Give advance warning on changes when possible']:
+                    st.write(f"- {g}")
+
+        with st.expander('More on Top Fuel (why it is this - and how to add it)', expanded=False):
+            st.info(f"Why this is the top fuel for {first_name}: {fuel_why}")
+            st.markdown('Supervisor micro-doses that work:')
+            if p_mot == 'Achievement':
+                for g in ['Define a short-term metric', 'Show progress visually', 'Celebrate completion (not just effort)']:
+                    st.write(f"- {g}")
+            elif p_mot == 'Growth':
+                for g in ['Assign one stretch task with guardrails', 'Debrief: what did you learn', 'Connect tasks to skill-building']:
+                    st.write(f"- {g}")
+            elif p_mot == 'Purpose':
+                for g in ['Explain the why behind policy', 'Share one impact story weekly', 'Invite ethical concerns briefly then decide']:
+                    st.write(f"- {g}")
+            else:
+                for g in ['Create micro-rituals (huddles)', 'Pair them with a peer', 'Repair conflict quickly']:
+                    st.write(f"- {g}")
+
+        st.markdown(f"#### Quick actions you can take this week for {first_name}")
+
+        # Profile-specific quick actions (teach the why/how)
+        ip_key = f"{p_comm}-{p_mot}"
+        qa = {
+            'Director-Achievement': [
+                ('Set a 7-day scoreboard', 'Why: progress regulates them. How: define 1 measurable goal and review it midweek.', 'Watch for: increased focus and fewer arguments.'),
+                ('Remove one approval bottleneck', 'Why: blocked agency creates stress. How: pre-clear a decision lane for this week.', 'Watch for: less micromanaging.'),
+                ('Define good-enough boundaries', 'Why: prevents perfection loops. How: name the minimum safe standard for the week.', 'Watch for: less over-control.')
+            ],
+            'Encourager-Connection': [
+                ('Do two 5-minute check-ins', 'Why: belonging restores regulation. How: no agenda, just presence + one appreciation.', 'Watch for: more initiative and less withdrawal.'),
+                ('Name one specific contribution publicly', 'Why: visibility fuels them. How: praise the exact behavior and impact.', 'Watch for: better mood and follow-through.'),
+                ('Repair one small tension quickly', 'Why: simmering conflict drains them. How: short script + closure.', 'Watch for: less gossip and more collaboration.')
+            ]
+        }.get(ip_key)
+
+        # Fallback if not explicitly listed
+        if not qa:
+            qa = [
+                ('Reduce one friction source', 'Why: environment drives burnout. How: remove one barrier or ambiguity this week.', 'Watch for: fewer stress signals.'),
+                ('Add one dose of fuel', 'Why: engagement is replenished, not demanded. How: add the top fuel in a small weekly rhythm.', 'Watch for: better energy and initiative.'),
+                ('Confirm what good looks like', 'Why: clarity reduces anxiety. How: define good-enough standards for the next 7 days.', 'Watch for: fewer errors and less overwhelm.')
+            ]
+
+        for title, whyhow, watch in qa:
+            st.markdown(f"**- {title}**")
+            st.write(whyhow)
+            st.caption(watch)
 
     # 3. Crisis Protocol
     crisis_script = {
@@ -1641,6 +1765,60 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 """)
 
         st.info(f"**When they are melting down, say this:**\n\n\"{crisis_script.get(p_comm)}\"")
+        # --- PEDAGOGY EXPANDED: why the script works + example crisis conversations
+        meltdown_teach = {
+            'Director': {
+                'strategy': 'Short, confident containment language that restores control and forward motion without debate.',
+                'why': 'In overload, they interpret long talk as delay and threat. A concise script reduces power struggle and gives a clear next step.',
+                'how': ['Lower your voice and slow your pace', 'Use 1-2 sentences only', 'Repeat once, do not argue', 'Debrief after regulation returns'],
+                'dialogues': [
+                    ('Supervisor', 'I am taking the pressure off. You do X. I will handle Y. We debrief after the shift.'),
+                    ('Staff', 'Fine.'),
+                    ('Supervisor', 'Good. One step: X now. I have the rest.')
+                ]
+            },
+            'Encourager': {
+                'strategy': 'Co-regulation language (togetherness + safety) paired with one simple next task.',
+                'why': 'They dysregulate when connection feels threatened. Belonging language reduces shame and restores engagement.',
+                'how': ['Face them, soften tone', 'Name safety: you are not alone', 'Give one simple task, then pause', 'Praise one regulated step afterward'],
+                'dialogues': [
+                    ('Supervisor', 'I am here with you. One step: grab the log, then we pause.'),
+                    ('Staff', 'I cannot do this.'),
+                    ('Supervisor', 'You do not have to do it alone. One step, then reset.')
+                ]
+            },
+            'Facilitator': {
+                'strategy': 'Containment through clear decision plus a promise to debrief later.',
+                'why': 'Conflict and ambiguity trigger freeze. When you decide, you remove relational risk and allow action.',
+                'how': ['Name the call: I am deciding this now', 'Remove discussion in the moment', 'Give the next 1-2 steps', 'Debrief later'],
+                'dialogues': [
+                    ('Supervisor', 'I am making the call. Do X now. We will talk it through after the shift.'),
+                    ('Staff', 'But they are upset...'),
+                    ('Supervisor', 'I hear you. Right now: X. Later: repair and debrief.')
+                ]
+            },
+            'Tracker': {
+                'strategy': 'Safety-through-structure language: protocol + minimum safe standard.',
+                'why': 'They stabilize when rules are clear. Protocol language reduces ambiguity and anxiety-driven control.',
+                'how': ['Point to protocol in 1 sentence', 'Define safe not perfect', 'Assign roles clearly', 'Review changes afterward'],
+                'dialogues': [
+                    ('Supervisor', 'We are following protocol. Step 1 now. I am responsible for the outcome.'),
+                    ('Staff', 'But it is not perfect.'),
+                    ('Supervisor', 'Tonight we need safe, not perfect. Step 1 now, then reassess.')
+                ]
+            }
+        }.get(p_comm, None)
+
+        if meltdown_teach:
+            with st.expander('Why this works + how to use it (training)', expanded=False):
+                st.markdown(f"**What this strategy is:** {meltdown_teach['strategy']}")
+                st.markdown(f"**Why it works:** {meltdown_teach['why']}")
+                st.markdown('**How to apply it:**')
+                for h in meltdown_teach['how']:
+                    st.write(f"- {h}")
+                st.markdown('**Example crisis conversations:**')
+                for speaker, line in meltdown_teach['dialogues']:
+                    st.write(f"**{speaker}:** {line}")
 
 
     # --- SECTION 7 & 8: THRIVING VS STRUGGLING ---
