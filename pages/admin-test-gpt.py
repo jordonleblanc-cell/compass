@@ -939,7 +939,392 @@ INTEGRATED_PROFILES = {
 }
 
 # --- PLACEHOLDERS FOR MISSING DATA ---
-SUPERVISOR_CLASH_MATRIX = {}
+SUPERVISOR_CLASH_MATRIX = {
+    "Director": {
+        "Director": {
+            "tension": "Power Struggle (Control vs. Control)",
+            "psychology": "When two Directors clash, it's a battle for dominance. Both value speed, autonomy, and being 'right.' The conflict usually isn't personal; it's structural.",
+            "watch_fors": ["**The Public Showdown:** Arguing in front of the team to establish who is 'Alpha'.", "**Malicious Compliance:** 'Fine, I'll do it your way, but I'll watch it fail.'", "**Siloing:** Dividing the team into 'My Crew' vs. 'Your Crew'."],
+            "intervention_steps": ["**1. Define Swim Lanes:** Explicitly divide the turf.", "**2. The 'Disagree and Commit' Pact:** Agree to back each other in public.", "**3. Scheduled Friction:** Set a weekly meeting to debate strategy behind closed doors."],
+            "scripts": {
+                "Opening": "**Script:** \"We are both strong leaders, but right now we are canceling each other out. We need to align forces instead of colliding.\"
+
+**Rationale:** Acknowledges their power immediately to prevent a status battle. Framing it as 'canceling out' highlights the inefficiency, which Directors hate.",
+                "Validation": "**Script:** \"I respect your drive and your need for autonomy. I know you want the best for this program and you want it done fast.\"
+
+**Rationale:** Validates their core intent (speed and impact) so they don't feel the need to defend their motives.",
+                "The Pivot": "**Script:** \"When we battle for control, we create confusion for the team. We need to stop competing for authority and start coordinating our attacks on the problem.\"
+
+**Rationale:** Shifts the opponent from 'You' to 'The Problem.' Directors will unite against a common enemy (confusion).",
+                "Crisis": "**Script:** \"We don't have time for a power struggle. In this specific instance, I need you to execute my play. We can debrief the strategy later.\"
+
+**Rationale:** Appeals to urgency. Uses command language ('execute my play') which Directors respect in emergencies.",
+                "Feedback": "**Script:** \"I need you to trust me to handle my lane. When you step in without asking, it undermines my authority, not just the task.\"
+
+**Rationale:** Defines the boundary in terms of authority and trust, which are the currencies Directors trade in."
+            }
+        },
+        "Encourager": {
+            "tension": "Efficiency vs. Empathy (Safety as Control vs. Safety as Connection)",
+            "psychology": "You (Director) find safety in speed and checking boxes. They (Encourager) find safety in connection and harmony. You view 'feelings' as distractions; they view them as the work. They feel steamrolled by your brevity; you feel slowed down by their need to chat.",
+            "watch_fors": ["**The 'Shut Down':** They go silent to protect themselves from your intensity.", "**The 'Smile & Nod':** They agree to a deadline they can't meet just to end the interaction.", "**Venting:** They process their hurt feelings with peers."],
+            "intervention_steps": ["**1. Disarm the Threat:** Lower your volume. Start with the person, not the task.", "**2. Translate Intent:** State that your intensity is about the *problem*, not them.", "**3. The 'Sandwich' Reframe:** They need the relational affirmation to hear the feedback."],
+            "scripts": {
+                "Opening": "**Script:** \"I want to talk about the task, but I sense some hesitation. How are you doing with this assignment?\"
+
+**Rationale:** Forces the Director to pause and check the 'human gauge.' Encouragers need to feel seen before they can work.",
+                "Validation": "**Script:** \"I know my style can feel intense or abrupt. I value your connection with the team and how much you care about the vibe.\"
+
+**Rationale:** The Supervisor owns their own intensity (disarming the threat) and validates the Encourager's superpower (connection).",
+                "The Pivot": "**Script:** \"However, we need to solve this problem efficiently. My directness is about fixing the issue quickly, not about being upset with you.\"
+
+**Rationale:** Clarifies intent. Encouragers often mistake speed for anger. This separates the task from the relationship.",
+                "Crisis": "**Script:** \"I need to be very direct right now because of the safety risk. It isn't personal, it's operational. Please trust my intent.\"
+
+**Rationale:** Pre-frames the intensity as safety-driven, protecting the relationship from the upcoming command.",
+                "Feedback": "**Script:** \"I value you. To grow, I need you to hear hard news without feeling attacked. Can we separate the 'what' from the 'who' for a moment?\"
+
+**Rationale:** Encouragers conflate performance with identity. This script explicitly asks them to separate the two."
+            }
+        },
+        "Facilitator": {
+            "tension": "Speed vs. Process (Urgency vs. Fairness)",
+            "psychology": "You (Director) value 'Done'. They (Facilitator) value 'Fair'. You see their desire for consensus as 'Analysis Paralysis'. They see your quick decisions as reckless. You fight for results; they fight for legitimacy.",
+            "watch_fors": ["**The 'We Need to Talk':** They schedule meetings to delay decisions.", "**Passive Resistance:** They won't argue, but they won't execute the plan.", "**Moral High Ground:** They frame your speed as 'uncaring'."],
+            "intervention_steps": ["**1. Define the Sandbox:** Give them a clear deadline (e.g., 'Decide by 3 PM').", "**2. Assign the 'Who':** Limit who they need to consult.", "**3. The 'Good Enough' Agreement:** Remind them a good decision today is better than a perfect one next week."],
+            "scripts": {
+                "Opening": "**Script:** \"I know this feels rushed and you want more time to process. I want to respect that need.\"
+
+**Rationale:** Validates the Facilitator's need for process, preventing them from digging in their heels.",
+                "Validation": "**Script:** \"I value that you want everyone to be heard and that you are thinking about the long-term impact.\"
+
+**Rationale:** Acknowledges that their hesitation comes from wisdom/care, not laziness.",
+                "The Pivot": "**Script:** \"The risk is that if we don't decide by noon, we lose the option entirely. We have to prioritize speed over consensus right now.\"
+
+**Rationale:** Reframes 'speed' as a necessity to save the option. Appeals to the risk of doing nothing.",
+                "Crisis": "**Script:** \"In this moment, the time for debate has passed. I have to make the call to keep us safe. Please follow my lead.\"
+
+**Rationale:** Sets a hard boundary. Facilitators respect safety; framing the command as a safety necessity overrides their need for consensus.",
+                "Feedback": "**Script:** \"Your desire for consensus is a strength, but sometimes it becomes a bottleneck. I need you to be willing to make a call even if people aren't 100% happy.\"
+
+**Rationale:** Identifies the specific behavior (bottlenecking) while affirming the intent (consensus)."
+            }
+        },
+        "Tracker": {
+            "tension": "Innovation vs. Compliance (Change vs. Safety)",
+            "psychology": "You (Director) want to break the status quo to get results. They (Tracker) want to protect the status quo to ensure safety. You see them as the 'Department of No.' They see you as a liability.",
+            "watch_fors": ["**The Rulebook Defense:** Quoting policy to stop new ideas.", "**The 'Yes, But':** Finding 10 reasons why it will fail.", "**Anxiety:** Your speed makes them visibly nervous."],
+            "intervention_steps": ["**1. The Pre-Mortem:** Ask them to list the risks, then solve them together.", "**2. Honor the Detail:** Do not dismiss their accuracy.", "**3. Trial Runs:** Frame changes as temporary experiments."],
+            "scripts": {
+                "Opening": "**Script:** \"I have a new idea, and I need your eyes on it to make sure it's safe before we launch.\"
+
+**Rationale:** Invites the Tracker in as an expert rather than an obstacle. Gives them a specific role (safety check).",
+                "Validation": "**Script:** \"I appreciate your attention to detail. You keep us compliant and prevent me from making reckless mistakes.\"
+
+**Rationale:** Validates their anxiety (fear of mistakes) and frames it as a value-add.",
+                "The Pivot": "**Script:** \"We need to find a way to make this work, not just reasons why it won't. How can we do this safely, rather than just saying 'no'?\"
+
+**Rationale:** Shifts them from 'Blocker' mode to 'Problem Solver' mode.",
+                "Crisis": "**Script:** \"I am taking full responsibility for this decision. I need you to trust me on the risk assessment right now.\"
+
+**Rationale:** Trackers fear getting in trouble. Taking full responsibility alleviates their anxiety.",
+                "Feedback": "**Script:** \"I need you to help me find the 'Yes.' Don't just tell me why we can't do it; tell me what it would take to make it possible.\"
+
+**Rationale:** Coaches them to use their knowledge to enable the mission, not just protect the policy."
+            }
+        }
+    },
+    "Encourager": {
+        "Encourager": {
+            "tension": "Artificial Harmony (Nice vs. Nice)",
+            "psychology": "The vibe is amazing, but accountability is low. You both value harmony so much that you avoid hard conversations. Issues fester underground. You become 'Toxic Protectors,' shielding the team from reality.",
+            "watch_fors": ["**The Vent Session:** Complaining without action.", "**The 'Reply All' Apology:** Apologizing for enforcing rules.", "**Ghosting:** Avoiding staff rather than correcting them."],
+            "intervention_steps": ["**1. The 'Safety' Contract:** Agree that giving feedback is safe.", "**2. Assign the 'Bad Guy':** Rotate who delivers bad news.", "**3. Focus on the Victim:** Remind each other of the youth suffering due to lack of structure."],
+            "scripts": {
+                "Opening": "**Script:** \"I hate having this conversation because I value our friendship, but we need to talk about the work.\"
+
+**Rationale:** Acknowledges the awkwardness (which is the elephant in the room) to clear the air.",
+                "Validation": "**Script:** \"I know we both want the team to be happy and for the vibe to be good.\"
+
+**Rationale:** Reaffirms shared values so the feedback doesn't feel like a betrayal.",
+                "The Pivot": "**Script:** \"But by not addressing this performance issue, we are actually hurting the team. We are letting the standards slip, which isn't fair to the hard workers.\"
+
+**Rationale:** Reframes 'accountability' as an act of care for the *rest* of the team.",
+                "Crisis": "**Script:** \"We can't hug our way out of this. We have to be firm or safety will be compromised.\"
+
+**Rationale:** A stark reality check that 'nice' is not the right tool for 'safe'.",
+                "Feedback": "**Script:** \"I feel like we are dancing around the issue to be nice. Let's just say it directly so we can fix it and move on.\"
+
+**Rationale:** Calls out the 'nice trap' explicitly and invites directness."
+            }
+        },
+        "Director": {
+            "tension": "Warmth vs. Competence (Being Liked vs. Being Effective)",
+            "psychology": "You (Encourager) interpret their brevity as anger. They (Director) interpret your need for chat as incompetence or padding. You feel unsafe; they feel slowed down.",
+            "watch_fors": ["**Apologizing:** You apologizing for giving them work.", "**Taking it Personally:** Feeling hurt by their directness.", "**Avoidance:** Emailing instead of talking to avoid the friction."],
+            "intervention_steps": ["**1. Cut the Fluff:** Start with the headline.", "**2. Stand Your Ground:** If they push back, state your reasoning calmly.", "**3. Ask for Input:** Frame the relationship issue as a problem to be solved."],
+            "scripts": {
+                "Opening": "**Script:** \"I'm going to get straight to the point because I know you value efficiency.\"
+
+**Rationale:** Signals that you respect their time, which gains their attention immediately.",
+                "Validation": "**Script:** \"I know you are focused on getting this done and you want results.\"
+
+**Rationale:** Validates their driver (Achievement) so they don't dismiss you as 'soft'.",
+                "The Pivot": "**Script:** \"However, the way you spoke to the team caused a shutdown. You got the task done, but you damaged the relationship we need for next time.\"
+
+**Rationale:** Frames the 'feelings' issue as a pragmatic 'effectiveness' issue. Directors listen to effectiveness.",
+                "Crisis": "**Script:** \"Stop. Listen to me. This is a safety issue and I need you to hear me.\"
+
+**Rationale:** Uses short, command-style sentences. Matches their energy intensity.",
+                "Feedback": "**Script:** \"You are right on the facts, but wrong on the approach. If they don't trust you, they won't follow you next time.\"
+
+**Rationale:** Shows them that their 'winning' style is actually 'losing' the team."
+            }
+        },
+        "Facilitator": {
+            "tension": "Energy Mismatch (Vibes vs. Process)",
+            "psychology": "You (Encourager) want enthusiasm and connection. They (Facilitator) want calm and structure. You feel they are disengaged or low-energy. They feel you are chaotic and exhausting.",
+            "watch_fors": ["**Withdrawal:** They stop talking to escape your high energy.", "**Over-Talking:** You talk to fill the silence, making them withdraw further.", "**Misinterpretation:** You think their quietness means they are mad."],
+            "intervention_steps": ["**1. Slow Down:** Match their energy level. Lower your volume.", "**2. Ask Specifics:** Don't ask 'How are you feeling?' Ask 'What do you think about X?'", "**3. Respect the Pause:** Wait 5 seconds after asking a question."],
+            "scripts": {
+                "Opening": "**Script:** \"I want to slow down and hear your thoughts. I feel like I've been doing all the talking.\"
+
+**Rationale:** Signals a shift in energy. Gives them permission to enter the conversation.",
+                "Validation": "**Script:** \"I know I bring a lot of energy to the room and that can be overwhelming.\"
+
+**Rationale:** Owns the dynamic so the Facilitator doesn't feel responsible for the disconnect.",
+                "The Pivot": "**Script:** \"I need you to tell me if I'm moving too fast or missing a detail. Your silence makes me nervous—I need to know what you are really thinking.\"
+
+**Rationale:** Vulnerability. Admitting their silence makes you nervous invites them to help you by speaking.",
+                "Crisis": "**Script:** \"I need you to speak up right now, even if you aren't 100% sure. I need your gut check.\"
+
+**Rationale:** Lowers the bar for entry. They don't need a perfect answer, just a gut check.",
+                "Feedback": "**Script:** \"When you go silent, I feel like you are checking out. I need your voice in the room, not just your presence.\"
+
+**Rationale:** Frames their silence as a lack of connection, which motivates the Facilitator to re-engage."
+            }
+        },
+        "Tracker": {
+            "tension": "Order vs. Chaos (Flexibility vs. Rules)",
+            "psychology": "You (Encourager) prioritize morale and exceptions. They (Tracker) prioritize the rulebook. You feel nitpicked and controlled. They feel unsafe because you are 'loose' with the rules.",
+            "watch_fors": ["**The Email Audit:** They send you long lists of errors.", "**Ignoring Details:** You stop reading their emails because they are 'negative'.", "**Passive-Aggression:** They follow your 'bad' instructions maliciously."],
+            "intervention_steps": ["**1. Honor the Rule:** Start by agreeing the rule is important.", "**2. Frame the Exception:** Explain that you are bending the rule for a *person*, not because you are lazy.", "**3. Ask for Help:** Ask them to help you organize the chaos."],
+            "scripts": {
+                "Opening": "**Script:** \"I know this looks messy to you and you're worried about the procedure.\"
+
+**Rationale:** Validates their anxiety about disorder immediately.",
+                "Validation": "**Script:** \"I value that you keep us compliant and safe. I know the rules matter.\"
+
+**Rationale:** Affirms their role as protector, reducing their need to fight you.",
+                "The Pivot": "**Script:** \"In this moment, I need to prioritize the relationship over the paperwork. We will fix the form, but first we have to fix the trust.\"
+
+**Rationale:** Explains the hierarchy of needs. Relationship > Paperwork (in this moment).",
+                "Crisis": "**Script:** \"We will fix the form later. Right now, handle the kid. The relationship is the intervention.\"
+
+**Rationale:** Gives them permission to let go of the rule by defining the new priority.",
+                "Feedback": "**Script:** \"I need you to be flexible without feeling like we are breaking the law. Sometimes the right thing to do isn't in the handbook.\"
+
+**Rationale:** Challenges their rigid thinking by appealing to a higher moral purpose."
+            }
+        }
+    },
+    "Facilitator": {
+        "Facilitator": {
+            "tension": "Process Paralysis (Talk vs. Talk)",
+            "psychology": "The infinite loop. You both want to make sure everyone is heard. You both dislike polarization. The result is meetings that never end and decisions that never happen.",
+            "watch_fors": ["**The 'Let's Circle Back':** Delaying decisions.", "**The Meeting About the Meeting:** Planning to plan.", "**Consensus Addiction:** Refusing to move without 100% agreement."],
+            "intervention_steps": ["**1. The 'Shot Clock':** Set a timer for the decision.", "**2. Limit Input:** Agree to only consult 2 people, not everyone.", "**3. The 'Good Enough' Pact:** Agree that 80% certainty is enough."],
+            "scripts": {
+                "Opening": "**Script:** \"We are over-thinking this and spinning in circles.\"
+
+**Rationale:** Naming the dynamic breaks the loop. Someone has to call it out.",
+                "Validation": "**Script:** \"I value that we are being thorough and want everyone on board.\"
+
+**Rationale:** Validates the intent so they don't feel guilty about moving fast.",
+                "The Pivot": "**Script:** \"But we are stuck. We need to pick a direction even if it isn't perfect. Doing nothing is becoming a decision itself.\"
+
+**Rationale:** Reframes inaction as a risky decision. Facilitators dislike risk.",
+                "Crisis": "**Script:** \"Process is over. I am making the call. We can debrief the feelings later.\"
+
+**Rationale:** Takes the burden of the decision off the peer. 'I am making the call' frees them.",
+                "Feedback": "**Script:** \"We need to stop asking for permission and start giving direction. The team is waiting for us to lead.\"
+
+**Rationale:** Reminds them of their responsibility to the team, which motivates them."
+            }
+        },
+        "Director": {
+            "tension": "Pace Mismatch (Consensus vs. Action)",
+            "psychology": "You (Facilitator) want to talk it out. They (Director) want to get it done. You feel steamrolled and disrespected. They feel slowed down and frustrated by 'pointless' discussion.",
+            "watch_fors": ["**Going Rogue:** They act without your permission to 'save time'.", "**Tuning Out:** They stop listening in meetings.", "**The Takeover:** They start running your meeting because you are 'too slow'."],
+            "intervention_steps": ["**1. Bottom Line Up Front:** Start with the decision, then discuss.", "**2. Give Autonomy:** Define the goal and let them run.", "**3. Be Firm:** Do not let them interrupt the process if the process is necessary."],
+            "scripts": {
+                "Opening": "**Script:** \"I know you want to move fast and just get this done.\"
+
+**Rationale:** Validates the Director's drive, showing you aren't oblivious to the clock.",
+                "Validation": "**Script:** \"I appreciate your bias for action. You drive us forward.\"
+
+**Rationale:** Frames their impatience as a positive trait (drive).",
+                "The Pivot": "**Script:** \"However, we need to align the team first or we will crash. If we don't get buy-in now, we will pay for it later with resistance.\"
+
+**Rationale:** Uses a pragmatic argument: 'Speed now = Crash later.' Directors hate crashing.",
+                "Crisis": "**Script:** \"I hear you. But the decision is X. We are moving.\"
+
+**Rationale:** Matching their directness. Short sentences signal authority.",
+                "Feedback": "**Script:** \"You are moving faster than the team can follow. Slow down to speed up. If you lose them, you aren't leading, you're just walking alone.\"
+
+**Rationale:** Hits them where it hurts: Ineffectiveness. Walking alone is failed leadership."
+            }
+        },
+        "Encourager": {
+            "tension": "Fairness vs. Favor (Process vs. Vibe)",
+            "psychology": "You (Facilitator) try to create a fair system where everyone is treated equally. They (Encourager) try to create a happy family where everyone feels liked. You clash when you try to enforce a rule for equity, and they try to bend it to save a relationship. You view them as playing favorites; they view you as cold or bureaucratic.",
+            "watch_fors": [
+                "**The 'Nice' Trap:** You both avoid conflict, so performance issues are ignored until they explode.",
+                "**The Talk Loop:** You listen to gather perspective; they talk to process. Meetings run overtime with no action items.",
+                "**Vibe over Fact:** They sell you an optimistic story ('It's going great!'). You want to believe the team is aligned, so you don't dig for the data."
+            ],
+            "intervention_steps": [
+                "**1. Data over Feeling:** They speak in generalities. You must force them to bring specific numbers/facts to supervision.",
+                "**2. The 'Bad Guy' Agreement:** You both struggle to be the enforcer. Explicitly agree on who delivers the bad news so you don't both ghost the issue.",
+                "**3. Written Action Items:** They forget details after the emotion fades. You value process. End every meeting with a written list of tasks."
+            ],
+            "scripts": {
+                "Opening": "**Script:** \"I love the energy you bring, but we need to look at the numbers and the plan.\"
+
+**Rationale:** Separation of 'Energy' and 'Plan.' You validate the person but pivot to the task.",
+                "Validation": "**Script:** \"I know you want to protect the team's morale and keep everyone happy.\"
+
+**Rationale:** Validates their motive so they don't feel 'caught' avoiding the work.",
+                "The Pivot": "**Script:** \"But by letting this slide, we are being unfair to the staff who follow the rules. Fairness means holding everyone to the same standard.\"
+
+**Rationale:** Appeals to the Facilitator's core value: Fairness. Playing favorites is unfair.",
+                "Crisis": "**Script:** \"We can't worry about feelings right now. We follow the protocol. Safety is the priority.\"
+
+**Rationale:** Externalizes the authority to the 'Protocol.' It makes the rule the bad guy, not you.",
+                "Feedback": "**Script:** \"You are great at the relationship, but I need you to be better at the paperwork/follow-through. The team needs structure as much as they need love.\"
+
+**Rationale:** Frames structure as a form of care, which appeals to the Encourager."
+            }
+        },
+        "Tracker": {
+            "tension": "Consensus vs. Compliance (People vs. Policy)",
+            "psychology": "You (Facilitator) want to talk it out. They (Tracker) want to get it done. You feel steamrolled and disrespected. They feel slowed down and frustrated by 'pointless' discussion.",
+            "watch_fors": ["**The Policy War:** They quote the handbook; you quote the 'context'.", "**Ignoring:** You ignoring their emails because they feel like nagging.", "**Anxiety:** They get anxious when you say 'let's just see how it goes'."],
+            "intervention_steps": ["**1. Validate the Rule:** Acknowledge the policy first.", "**2. Contextualize the Exception:** Explain *why* this specific situation requires a bend.", "**3. Define the New Boundary:** Create a temporary rule so they feel safe."],
+            "scripts": {
+                "Opening": "**Script:** \"I know this plan deviates from SOP, and I want to explain why.\"
+
+**Rationale:** Heads off the objection immediately. Shows you know the rule exists.",
+                "Validation": "**Script:** \"I appreciate you keeping us compliant. You are our safety net.\"
+
+**Rationale:** Defines their role as 'Safety Net' rather than 'Nag.'",
+                "The Pivot": "**Script:** \"In this specific case, following the rule strictly will cause escalation. We need to look at the context, not just the text.\"
+
+**Rationale:** Introduces 'Context' as a variable that matters as much as the rule.",
+                "Crisis": "**Script:** \"I am taking responsibility for this exception. Log it.\"
+
+**Rationale:** 'Log it' gives them a task and a way to protect themselves. 'Taking responsibility' removes their risk.",
+                "Feedback": "**Script:** \"I need you to see the gray areas. Leadership happens in the exceptions.\"
+
+**Rationale:** Philosophically reframes leadership. Rules manage the norm; leaders manage the exception."
+            }
+        }
+    },
+    "Tracker": {
+        "Tracker": {
+            "tension": "The Micro-War (Detail vs. Detail)",
+            "psychology": "It becomes a court case over the interpretation of a rule. You both dig into details to prove you are 'technically correct.' The team gets lost in the minutiae.",
+            "watch_fors": ["**The Email War:** Sending evidence-filled emails instead of talking.", "**Malicious Audit:** Looking for errors in each other's work.", "**Stalemate:** Refusing to move until policy is clarified."],
+            "intervention_steps": ["**1. Zoom Out:** Stop talking about the rule. Talk about the goal.", "**2. Pick a Lane:** Divide compliance tasks.", "**3. The 'Human Override':** Remind each other systems serve people."],
+            "scripts": {
+                "Opening": "**Script:** \"We are getting lost in the weeds and arguing over details.\"
+
+**Rationale:** Names the dynamic (The Weeds). Trackers hate inefficiency, and this argument is inefficient.",
+                "Validation": "**Script:** \"I know we both want to do this exactly right.\"
+
+**Rationale:** Confirms shared intent (Accuracy). We are on the same side.",
+                "The Pivot": "**Script:** \"Is this critical to safety, or just a preference? We are spending $100 of energy on a $10 problem.\"
+
+**Rationale:** Cost-Benefit Analysis. Trackers respond to logic and resource allocation.",
+                "Crisis": "**Script:** \"The procedure doesn't matter right now. Safety matters. Drop the checklist and look at the situation.\"
+
+**Rationale:** Re-prioritizes the ultimate rule: Safety.",
+                "Feedback": "**Script:** \"We need to stop using the rulebook as a weapon against each other.\"
+
+**Rationale:** A hard truth. Using rules to win an argument is weaponization, not leadership."
+            }
+        },
+        "Director": {
+            "tension": "Control vs. Autonomy (Rules vs. Results)",
+            "psychology": "You (Tracker) want compliance and safety. They (Director) want speed and results. You try to rein them in with rules; they try to run past you. You view them as a loose cannon; they view you as a bottleneck.",
+            "watch_fors": ["**Asking Forgiveness:** They do it their way and apologize later.", "**Over-Auditing:** You check their work excessively to 'catch' them.", "**Power Struggles:** Fighting over who has the final say on an SOP."],
+            "intervention_steps": ["**1. The 'Why' Explanation:** Don't just say 'No.' Explain the specific risk.", "**2. Pick Your Battles:** Only fight them on safety/legal issues, not preferences.", "**3. Give Them a Lane:** Define where they have total freedom."],
+            "scripts": {
+                "Opening": "**Script:** \"I need to pump the brakes on this idea before we crash.\"
+
+**Rationale:** Uses driving metaphors ('pump the brakes') which imply speed/movement, speaking their language.",
+                "Validation": "**Script:** \"I know you want to get this done fast and see results.\"
+
+**Rationale:** Validates their driver (Results).",
+                "The Pivot": "**Script:** \"But if we skip this step, we risk a lawsuit/safety failure. I'm not trying to stop you; I'm trying to keep you safe.\"
+
+**Rationale:** Reframes 'Stopping' as 'Protecting.' Directors hate being stopped, but they like being safe.",
+                "Crisis": "**Script:** \"Stop. This is a compliance violation. We cannot do this.\"
+
+**Rationale:** Hard stop. No fluff. Directors respect a hard wall if it's real.",
+                "Feedback": "**Script:** \"I want to help you win, but you have to let me safety-check the plan first. Don't view me as an obstacle.\"
+
+**Rationale:** Explicitly asks to be viewed as an ally, not a bottleneck."
+            }
+        },
+        "Encourager": {
+            "tension": "Task vs. Relationship (Business vs. Social)",
+            "psychology": "You (Tracker) focus on the error. They (Encourager) focus on the effort. You feel they are sloppy and unprofessional. They feel you are cold and mean. You speak data; they speak emotion.",
+            "watch_fors": ["**Tears:** They cry or shut down when you give feedback.", "**The Silent Treatment:** They withdraw warmth to punish you.", "**The 'Nice' Defense:** They excuse errors because 'they tried hard'."],
+            "intervention_steps": ["**1. Start with Warmth:** You must ask 'How are you?' before 'Here is the error.'", "**2. The Compliment Sandwich:** It feels fake to you, but it is necessary for them.", "**3. Focus on Support:** Frame the correction as 'helping them succeed.'"],
+            "scripts": {
+                "Opening": "**Script:** \"I want to help you get this right so you don't have to redo it later.\"
+
+**Rationale:** Frames the correction as 'Help,' not 'Punishment.'",
+                "Validation": "**Script:** \"I know you are working hard for the team and you care about them.\"
+
+**Rationale:** Validates Effort. Trackers usually ignore effort if the result is wrong; you must acknowledge it here.",
+                "The Pivot": "**Script:** \"However, this documentation error puts us at risk. Being 'nice' doesn't help if we lose funding.\"
+
+**Rationale:** Connects the boring detail (documentation) to the emotional outcome (losing funding/hurting the team).",
+                "Crisis": "**Script:** \"I need you to focus on the details right now. Empathy won't fix this audit finding.\"
+
+**Rationale:** A reality check. Sometimes facts > feelings.",
+                "Feedback": "**Script:** \"When you ignore the details, it makes more work for the team. True care includes accuracy.\"
+
+**Rationale:** Redefines 'Care.' If they care about the team, they should care about the details."
+            }
+        },
+        "Facilitator": {
+            "tension": "Rules vs. Context (Black & White vs. Gray)",
+            "psychology": "You (Tracker) want to follow the book. They (Facilitator) want to consider the context and feelings of the group. You see them as wishy-washy and inconsistent. They see you as rigid and uncaring.",
+            "watch_fors": ["**The Policy Debate:** You quote the handbook; they quote 'team sentiment'.", "**Stalled Decisions:** They won't enforce a rule because 'it's complicated'.", "**Frustration:** You feel like the only one holding the standard."],
+            "intervention_steps": ["**1. Define the Hard Line:** Agree on which rules are non-negotiable.", "**2. Allow the Gray:** Agree on which rules are up for interpretation.", "**3. United Front:** Do not disagree on policy in front of staff."],
+            "scripts": {
+                "Opening": "**Script:** \"We need to be clear on the standard. Ambiguity is dangerous.\"
+
+**Rationale:** Trackers hate ambiguity. Stating that it is 'dangerous' appeals to the Facilitator's desire to protect the group.",
+                "Validation": "**Script:** \"I know you want to be fair to everyone and hear all sides.\"
+
+**Rationale:** Validates their process (Fairness).",
+                "The Pivot": "**Script:** \"But a rule that isn't enforced isn't a rule. If we make an exception every time, we don't have a policy.\"
+
+**Rationale:** Logical argument. Facilitators value systems; show them the system is breaking.",
+                "Crisis": "**Script:** \"We follow the protocol. We can debrief feelings later.\"
+
+**Rationale:** Separates 'Action' from 'Processing.' Do the action now; process the feelings later.",
+                "Feedback": "**Script:** \"I need you to back me up when I enforce the policy. Don't undermine the rules to keep the peace.\"
+
+**Rationale:** Direct request for support. Facilitators want to be supportive; tell them how."
+            }
+        }
+    }
+}
 CAREER_PATHWAYS = {}
 TEAM_CULTURE_GUIDE = {}
 MISSING_VOICE_GUIDE = {}
@@ -1546,9 +1931,9 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 - If you treat stress as data, you intervene earlier and keep performance intact.
 
 **How to use it (Supervisor moves):**
-- **Name the pattern early** (low-stakes, non-accusatory): *"I'm noticing you are quieter and moving fast—are you overloaded?"*
-- **Ask for the first signal**: *"What usually changes first when you are nearing burnout—tone, sleep, patience, or focus?"*
-- **Separate person from behavior**: you are not judging character; you are reading a dashboard.
+- **Name the pattern early** (low-stakes, non-accusatory): *"I'm noticing you're quieter and moving fast—are you overloaded?"*
+- **Ask for the first signal**: *"What usually changes first when you're nearing burnout—tone, sleep, patience, or focus?"*
+- **Separate person from behavior**: you are not judging character; you're reading a dashboard.
 
 **Red flag rule:** If the stress signature is showing up **for 2+ shifts**, assume the environment and workload need adjustment—not just coaching.
 """)
@@ -1573,63 +1958,11 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         with sc1:
             st.markdown("#### 🚨 Stress Signature")
             st.error(f"**When they are unsupported, they will:**\n\n{stress_sig.get(p_comm)}")
-            # --- PEDAGOGY EXPANDED: why this stress signature shows up + what happens if missed
-            stress_why = {
-                'Director': 'When overloaded, Directors experience blocked control (too many barriers, too much talk, unclear authority). Their nervous system shifts into command-and-control to force progress.',
-                'Encourager': 'When overloaded, Encouragers read strain as relational risk (not being valued, not being supported). They may withdraw or become overly agreeable to keep peace.',
-                'Facilitator': 'When overloaded, Facilitators experience threat from conflict and ambiguity. The safest move becomes no move, so they freeze and keep asking for more input.',
-                'Tracker': 'When overloaded, Trackers experience threat from unpredictability. They narrow to rules and details to restore certainty and safety.'
-            }.get(p_comm, '')
-
-            stress_cost = {
-                'Director': ['Escalation into conflict with peers', 'Micromanaging that lowers morale', 'Burnout from carrying the unit alone'],
-                'Encourager': ['Disengagement masked as "fine"', 'Resentment and emotional exhaustion', 'Team culture drift (unspoken tension)'],
-                'Facilitator': ['Decision delays that create safety risk', 'Quiet resentment and avoidance', 'Team confusion about who decides'],
-                'Tracker': ['Rigid rule-enforcement that feels punitive', 'Fixation on minor errors while big risks grow', 'Anxiety-driven overload and shutdown']
-            }.get(p_comm, [])
-
-            with st.expander('Why this matters (and what happens if it is missed)', expanded=False):
-                st.info(f"Why this pattern shows up for {first_name}: {stress_why}")
-                st.markdown('If the stress signature is not addressed, you often see:')
-                for c in stress_cost:
-                    st.write(f"- {c}")
-                st.markdown('Supervisor move: Treat this as a dashboard, not a character flaw. Intervene earlier with small environmental adjustments.')
         with sc2:
             st.markdown("#### 💊 The Prescription")
             st.success("**Daily/Weekly Dosage:**")
             for r in rx.get(p_comm, []):
                 st.write(f"• {r}")
-            # --- PEDAGOGY EXPANDED: explain each prescription item
-            rx_details = {
-                'Director': {
-                    "Remove a barrier they can't move.": 'Why it works: it restores agency. How: ask what is blocking them, then remove/route it (approval, resource, decision).',
-                    "Give them a 'win' to chase.": 'Why it works: progress regulates them. How: define a short goal for this shift/week and let them own the path.',
-                    'Stop talking, start doing.': 'Why it works: long explanations feel like delay. How: give 1-2 clear next steps and move into action.'
-                },
-                'Encourager': {
-                    'Schedule face time (no agenda).': 'Why it works: connection restores safety. How: 5 minutes of real check-in before problem solving.',
-                    'Validate their emotional load.': 'Why it works: naming reduces shame. How: reflect what you see without fixing it immediately.',
-                    'Publicly praise a specific contribution.': 'Why it works: belonging + meaning. How: name the exact behavior and its impact on youth/team.'
-                },
-                'Facilitator': {
-                    'Give a clear deadline.': 'Why it works: it ends endless deliberation. How: set a decision date/time and define what input is needed.',
-                    'Take the blame for a hard decision.': 'Why it works: it removes relational fear. How: say you are deciding and they can reference you.',
-                    "Ask: 'What is the risk of doing nothing?'": 'Why it works: it moves from comfort to consequence. How: use it to unlock action in a stalemate.'
-                },
-                'Tracker': {
-                    "Give them the 'why' behind the chaos.": 'Why it works: meaning organizes uncertainty. How: explain the rationale behind last-minute changes in one paragraph.',
-                    'Protect them from last-minute changes.': 'Why it works: predictability reduces anxiety. How: bundle changes, give warning, and minimize surprise tasks.',
-                    "Explicitly define 'good enough.'": 'Why it works: prevents perfection loops. How: define the minimum safe standard for this shift.'
-                }
-            }.get(p_comm, {})
-
-            with st.expander('Why each prescription helps (and how to implement it)', expanded=False):
-                st.markdown('Use these as small, repeatable interventions. Consistency matters more than intensity.')
-                for item in rx.get(p_comm, []):
-                    detail = rx_details.get(item, '')
-                    if detail:
-                        st.markdown(f"**{item}**")
-                        st.write(detail)
 
     # 2. Environment Audit
     fuel_map = {"Achievement": "Clear Goals", "Growth": "New Challenges", "Purpose": "Mission Connection", "Connection": "Team Time"}
@@ -1664,82 +1997,10 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             st.metric("Top Fuel (Add This)", fuel_map.get(p_mot))
             st.caption("This is the #1 engagement fuel for them. Add small doses consistently.")
 
-        # --- PEDAGOGY EXPANDED: why friction/fuel are specific + what to do
-        friction_why = {
-            'Director': 'Red tape blocks forward motion and control. When they cannot move the system, they tighten on people.',
-            'Encourager': 'Isolation reads as rejection. Without belonging, they lose energy and may go quiet or appease.',
-            'Facilitator': 'Conflict creates threat. They freeze because any choice may damage relationships.',
-            'Tracker': 'Chaos removes predictability. They narrow to rules and details to feel safe.'
-        }.get(p_comm, '')
-
-        fuel_why = {
-            'Achievement': 'Visible progress calms and energizes them. Wins restore motivation and prevent the feeling of endless work.',
-            'Growth': 'Learning and stretch regulate them. Challenge plus feedback keeps them engaged and resilient.',
-            'Purpose': 'Meaning regulates them. Mission-connection prevents burnout when tasks feel heavy or bureaucratic.',
-            'Connection': 'Belonging regulates them. Team warmth and repair keep their nervous system steady.'
-        }.get(p_mot, '')
-
-        with st.expander('More on Top Friction (why it is this - and how to reduce it)', expanded=False):
-            st.info(f"Why this is the top friction for {first_name}: {friction_why}")
-            st.markdown('Supervisor levers you can actually use this week:')
-            if p_comm == 'Director':
-                for g in ['Pre-decide approvals where possible', 'Give clear lanes of ownership', 'Bundle changes instead of drip-feeding them']:
-                    st.write(f"- {g}")
-            elif p_comm == 'Encourager':
-                for g in ['Short face-time check-ins', 'Name appreciation with specificity', 'Address tension quickly; do not let it simmer']:
-                    st.write(f"- {g}")
-            elif p_comm == 'Facilitator':
-                for g in ['Set decision dates', 'State who decides in the moment', 'Promise a debrief window after the shift']:
-                    st.write(f"- {g}")
-            else:
-                for g in ['Write the plan in 3 bullets', 'Define what is good enough', 'Give advance warning on changes when possible']:
-                    st.write(f"- {g}")
-
-        with st.expander('More on Top Fuel (why it is this - and how to add it)', expanded=False):
-            st.info(f"Why this is the top fuel for {first_name}: {fuel_why}")
-            st.markdown('Supervisor micro-doses that work:')
-            if p_mot == 'Achievement':
-                for g in ['Define a short-term metric', 'Show progress visually', 'Celebrate completion (not just effort)']:
-                    st.write(f"- {g}")
-            elif p_mot == 'Growth':
-                for g in ['Assign one stretch task with guardrails', 'Debrief: what did you learn', 'Connect tasks to skill-building']:
-                    st.write(f"- {g}")
-            elif p_mot == 'Purpose':
-                for g in ['Explain the why behind policy', 'Share one impact story weekly', 'Invite ethical concerns briefly then decide']:
-                    st.write(f"- {g}")
-            else:
-                for g in ['Create micro-rituals (huddles)', 'Pair them with a peer', 'Repair conflict quickly']:
-                    st.write(f"- {g}")
-
-        st.markdown(f"#### Quick actions you can take this week for {first_name}")
-
-        # Profile-specific quick actions (teach the why/how)
-        ip_key = f"{p_comm}-{p_mot}"
-        qa = {
-            'Director-Achievement': [
-                ('Set a 7-day scoreboard', 'Why: progress regulates them. How: define 1 measurable goal and review it midweek.', 'Watch for: increased focus and fewer arguments.'),
-                ('Remove one approval bottleneck', 'Why: blocked agency creates stress. How: pre-clear a decision lane for this week.', 'Watch for: less micromanaging.'),
-                ('Define good-enough boundaries', 'Why: prevents perfection loops. How: name the minimum safe standard for the week.', 'Watch for: less over-control.')
-            ],
-            'Encourager-Connection': [
-                ('Do two 5-minute check-ins', 'Why: belonging restores regulation. How: no agenda, just presence + one appreciation.', 'Watch for: more initiative and less withdrawal.'),
-                ('Name one specific contribution publicly', 'Why: visibility fuels them. How: praise the exact behavior and impact.', 'Watch for: better mood and follow-through.'),
-                ('Repair one small tension quickly', 'Why: simmering conflict drains them. How: short script + closure.', 'Watch for: less gossip and more collaboration.')
-            ]
-        }.get(ip_key)
-
-        # Fallback if not explicitly listed
-        if not qa:
-            qa = [
-                ('Reduce one friction source', 'Why: environment drives burnout. How: remove one barrier or ambiguity this week.', 'Watch for: fewer stress signals.'),
-                ('Add one dose of fuel', 'Why: engagement is replenished, not demanded. How: add the top fuel in a small weekly rhythm.', 'Watch for: better energy and initiative.'),
-                ('Confirm what good looks like', 'Why: clarity reduces anxiety. How: define good-enough standards for the next 7 days.', 'Watch for: fewer errors and less overwhelm.')
-            ]
-
-        for title, whyhow, watch in qa:
-            st.markdown(f"**- {title}**")
-            st.write(whyhow)
-            st.caption(watch)
+        st.markdown("#### Quick actions you can take this week")
+        st.write("• Remove or reduce one friction source (a barrier, an ambiguity, a last-minute change).")
+        st.write("• Add one fuel source (clear goal, stretch task, mission story, or team touchpoint).")
+        st.write("• Confirm what 'good enough' looks like for the next 7 days.")
 
     # 3. Crisis Protocol
     crisis_script = {
@@ -1773,60 +2034,6 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 """)
 
         st.info(f"**When they are melting down, say this:**\n\n\"{crisis_script.get(p_comm)}\"")
-        # --- PEDAGOGY EXPANDED: why the script works + example crisis conversations
-        meltdown_teach = {
-            'Director': {
-                'strategy': 'Short, confident containment language that restores control and forward motion without debate.',
-                'why': 'In overload, they interpret long talk as delay and threat. A concise script reduces power struggle and gives a clear next step.',
-                'how': ['Lower your voice and slow your pace', 'Use 1-2 sentences only', 'Repeat once, do not argue', 'Debrief after regulation returns'],
-                'dialogues': [
-                    ('Supervisor', 'I am taking the pressure off. You do X. I will handle Y. We debrief after the shift.'),
-                    ('Staff', 'Fine.'),
-                    ('Supervisor', 'Good. One step: X now. I have the rest.')
-                ]
-            },
-            'Encourager': {
-                'strategy': 'Co-regulation language (togetherness + safety) paired with one simple next task.',
-                'why': 'They dysregulate when connection feels threatened. Belonging language reduces shame and restores engagement.',
-                'how': ['Face them, soften tone', 'Name safety: you are not alone', 'Give one simple task, then pause', 'Praise one regulated step afterward'],
-                'dialogues': [
-                    ('Supervisor', 'I am here with you. One step: grab the log, then we pause.'),
-                    ('Staff', 'I cannot do this.'),
-                    ('Supervisor', 'You do not have to do it alone. One step, then reset.')
-                ]
-            },
-            'Facilitator': {
-                'strategy': 'Containment through clear decision plus a promise to debrief later.',
-                'why': 'Conflict and ambiguity trigger freeze. When you decide, you remove relational risk and allow action.',
-                'how': ['Name the call: I am deciding this now', 'Remove discussion in the moment', 'Give the next 1-2 steps', 'Debrief later'],
-                'dialogues': [
-                    ('Supervisor', 'I am making the call. Do X now. We will talk it through after the shift.'),
-                    ('Staff', 'But they are upset...'),
-                    ('Supervisor', 'I hear you. Right now: X. Later: repair and debrief.')
-                ]
-            },
-            'Tracker': {
-                'strategy': 'Safety-through-structure language: protocol + minimum safe standard.',
-                'why': 'They stabilize when rules are clear. Protocol language reduces ambiguity and anxiety-driven control.',
-                'how': ['Point to protocol in 1 sentence', 'Define safe not perfect', 'Assign roles clearly', 'Review changes afterward'],
-                'dialogues': [
-                    ('Supervisor', 'We are following protocol. Step 1 now. I am responsible for the outcome.'),
-                    ('Staff', 'But it is not perfect.'),
-                    ('Supervisor', 'Tonight we need safe, not perfect. Step 1 now, then reassess.')
-                ]
-            }
-        }.get(p_comm, None)
-
-        if meltdown_teach:
-            with st.expander('Why this works + how to use it (training)', expanded=False):
-                st.markdown(f"**What this strategy is:** {meltdown_teach['strategy']}")
-                st.markdown(f"**Why it works:** {meltdown_teach['why']}")
-                st.markdown('**How to apply it:**')
-                for h in meltdown_teach['how']:
-                    st.write(f"- {h}")
-                st.markdown('**Example crisis conversations:**')
-                for speaker, line in meltdown_teach['dialogues']:
-                    st.write(f"**{speaker}:** {line}")
 
 
     # --- SECTION 7 & 8: THRIVING VS STRUGGLING ---
