@@ -1662,8 +1662,6 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         if bullets:
             for b in bullets:
                 st.markdown(f"- {b}")
-        st.markdown("<br>", unsafe_allow_html=True)
-
     def take(items, n=3):
         if not items:
             return []
@@ -1941,8 +1939,6 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             st.subheader("8. Struggling")
             st.error(data['s8'])
 
-        st.markdown("<br>", unsafe_allow_html=True)
-
         # --- 9-12: COACHING PLAN ---
     
         # --- 9: INDIVIDUAL PROFESSIONAL DEVELOPMENT PLAN (IPDP) ---
@@ -2036,27 +2032,21 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         # Expanded supervisor pedagogy: why this phase matters (blue boxes under each phase title)
     
         phase_why = {
-            1: """In Phase 1, the goal is not perfection - it is stability. When a staff member is new or overwhelmed, their working memory is already overloaded.
-
-Coaching boundaries (for example, practicing a respectful 'no') is a capacity skill. Pedagogically, you are teaching (1) self-regulation, (2) prioritization, and (3) professional identity. This is how staff learn to protect time, attention, and emotional bandwidth.
-
-Why supervisors should care: clear boundaries reduce burnout, improve follow-through, and create predictable care for youth. Staff who can name limits early are less likely to escalate, avoid tasks, or disengage.
-
-Your coaching impact: short, consistent feedback loops plus one micro-skill at a time builds durable habits that transfer under stress.""",
-            2: """Phase 2 is where skills become reliable in real conditions. This is the transfer-of-learning phase: staff may perform well in training, but now they must do it with noise, time pressure, and emotion in the room.
-
-Pedagogically, you are moving from 'tell and demonstrate' to 'guided practice and reflection.' That means more decision reps: brief scenarios, immediate coaching, and naming patterns (what happened, what you chose, what happened next).
-
-Why supervisors should care: this is where inconsistency becomes consistency. Good supervision here prevents avoidable incidents and reduces the need for constant reminders because staff begin to self-correct.
-
-Your coaching impact: reinforce what to do, when to do it, and how to recover after a mistake. That creates confidence without complacency.""",
-            3: """Phase 3 is about autonomy and leadership readiness. The staff member is no longer just learning tasks; they are learning to hold standards, influence others, and make decisions with incomplete information.
-
-Pedagogically, you are shifting from frequent direction to coaching thinking: asking reflective questions, requesting rationales, and supporting after-action reviews. You are also teaching leadership regulation - staying steady so others can stay steady.
-
-Why supervisors should care: Phase 3 creates your bench. Staff at this stage reduce supervisory load, stabilize team culture, and model the expectations that new staff imitate.
-
-Your coaching impact: give stretch assignments with clear guardrails, then debrief. This grows judgment while protecting safety and consistency for youth."""
+            1: """**Why this phase matters**
+- **Stability beats perfection:** New or overwhelmed staff have limited working memory. Your job is to reduce cognitive load so they can execute the basics reliably.
+- **Boundaries are a teachable safety skill:** Practicing a respectful ‘no’ trains self-regulation, prioritization, and professional identity.
+- **Burnout prevention is performance:** Clear limits improve follow-through, reduce avoidance, and create predictable care for youth.
+- **Your coaching method:** One micro-skill at a time + short feedback loops builds habits that hold under stress.""",
+            2: """**Why this phase matters**
+- **Transfer of learning:** Skills that look good in training must work with noise, time pressure, and emotion in the room.
+- **Guided practice + reflection:** Move from ‘tell/demonstrate’ to decision reps (brief scenarios, immediate coaching, pattern-naming).
+- **Consistency becomes culture:** This is where reminders shrink because staff start self-correcting.
+- **Your coaching method:** Reinforce what to do, when to do it, and how to recover after a mistake—confidence without complacency.""",
+            3: """**Why this phase matters**
+- **Autonomy + leadership readiness:** Staff learn to hold standards, influence others, and decide with incomplete information.
+- **Coach thinking, not just tasks:** Ask for rationales, run after-action reviews, and teach steady leadership regulation.
+- **Build your bench:** Phase 3 staff stabilize culture, reduce supervisory load, and model expectations new staff copy.
+- **Your coaching method:** Give stretch assignments with clear guardrails, then debrief—grow judgment while protecting safety.""",
         }
 
         phase_matrix = {
@@ -2683,8 +2673,6 @@ Your coaching impact: give stretch assignments with clear guardrails, then debri
 
         st.subheader("10. What You Should Celebrate")
         st.caption("Use this section to reinforce the behaviors you want repeated. Keep recognition timely, specific, and tied to impact.")
-        st.markdown("<br>", unsafe_allow_html=True)
-
         # --- VISUAL BREAK: CELEBRATION SIGNALS ---
         with st.container(border=True):
             st.subheader("🎉 Celebration Signals")
@@ -2772,31 +2760,74 @@ Your coaching impact: give stretch assignments with clear guardrails, then debri
 
         st.subheader("11. Coaching Questions")
 
-        # --- MICRO-VISUAL: QUESTION STARTERS MIX ---
+        # --- MICRO-VISUAL: QUESTION STARTERS MIX (click to filter) ---
         questions = data.get('coaching', []) or []
-        if questions:
-            starters = []
-            for q in questions:
-                q_clean = str(q).strip()
-                first = re.sub(r"[^a-z]+", "", re.split(r"\s+", q_clean)[0].lower()) or "other"
-                starters.append(first)
+        question_rows = []
+        for q in questions:
+            q_clean = str(q).strip()
+            first_word = (q_clean.split()[:1] or ["other"])[0].lower()
+            starter = re.sub(r"[^a-z]+", "", first_word) or "other"
+            question_rows.append({"question": q_clean, "starter": starter})
 
+        selected_starter = "All"
+
+        if question_rows:
+            starters = [r["starter"] for r in question_rows]
             starter_df = pd.Series(starters).value_counts().reset_index()
-            starter_df.columns = ['Starter', 'Count']
-            # Keep only top items so the chart stays readable
+            starter_df.columns = ["Starter", "Count"]
             starter_df = starter_df.head(10)
 
             with st.container(border=True):
                 st.subheader("🧠 Coaching Question Mix")
-                st.caption("A quick look at the kinds of prompts you're using most (who/what/how/why).")
-                fig_q = px.bar(starter_df, x="Count", y="Starter", orientation="h", title="Question Starters")
+                st.caption("Click a bar to filter the questions below (or use the dropdown as a fallback).")
+
+                fig_q = px.bar(
+                    starter_df,
+                    x="Count",
+                    y="Starter",
+                    orientation="h",
+                    title="Question Starters",
+                )
                 fig_q.update_layout(height=240, margin=dict(t=40, b=20, l=20, r=20), showlegend=False)
-                st.plotly_chart(fig_q, use_container_width=True)
 
-        for i, q in enumerate(questions):
-            st.write(f"{i+1}. {q}")
+                # Streamlit versions that support Plotly selection will return an event object.
+                try:
+                    event = st.plotly_chart(
+                        fig_q,
+                        use_container_width=True,
+                        on_select="rerun",
+                        selection_mode="points",
+                    )
+                    # event may be dict-like depending on Streamlit version
+                    sel = None
+                    if hasattr(event, "selection"):
+                        sel = event.selection
+                    elif isinstance(event, dict):
+                        sel = event.get("selection")
 
-        st.markdown("<br>", unsafe_allow_html=True)
+                    if sel and isinstance(sel, dict):
+                        pts = sel.get("points") or []
+                        if pts:
+                            # For horizontal bar, the category is typically in 'y'
+                            selected_starter = str(pts[0].get("y") or "All")
+                except TypeError:
+                    # Older Streamlit: no selection support
+                    event = None
+
+                # Fallback selector (also useful to clear the filter)
+                options = ["All"] + sorted(set([r["starter"] for r in question_rows]))
+                selected_starter = st.selectbox("Filter by starter", options, index=options.index(selected_starter) if selected_starter in options else 0)
+
+        # --- QUESTIONS LIST (filtered) ---
+        filtered = question_rows
+        if selected_starter != "All":
+            filtered = [r for r in question_rows if r["starter"] == selected_starter]
+
+        if not filtered:
+            st.info("No questions available for that starter.")
+        else:
+            for i, row in enumerate(filtered, start=1):
+                st.write(f"{i}. {row['question']}")
 
         show_section("12. Helping Them Prepare for Advancement", data['advancement'])
 
