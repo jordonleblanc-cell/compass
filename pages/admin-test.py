@@ -235,16 +235,6 @@ st.markdown("""
             background-color: var(--card-bg);
             border-radius: 8px;
         }
-
-        /* Custom Phase Card */
-        .phase-card {
-            background-color: var(--card-bg);
-            padding: 20px;
-            border-left: 5px solid var(--primary);
-            border-radius: 5px;
-            margin-bottom: 10px;
-            box-shadow: var(--shadow);
-        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -1395,10 +1385,10 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             st.plotly_chart(fig_compass, use_container_width=True, config={'displayModeBar': False})
             st.caption("The compass plots your bias: Task vs. People (X-Axis) and Change vs. Stability (Y-Axis).")
     
-    # --- SECTION 6: HOW YOU CAN BEST SUPPORT THEM ---
+    # --- SECTION 6: HOW YOU CAN BEST SUPPORT THEM (RESTRUCTURED) ---
     st.subheader("6. How You Can Best Support Them")
 
-    # Visual Aid: The Motivation Battery
+    # 1. The Energy Battery (Visual Motivation Aid)
     battery_map = {
         "Achievement": {"Charge": "Visible Wins & Checklists", "Drain": "Endless Meetings & Ambiguity", "Icon": "🏆"},
         "Growth": {"Charge": "New Problems & Feedback", "Drain": "Stagnation & Routine", "Icon": "🌱"},
@@ -1407,44 +1397,61 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     }
     bat = battery_map.get(p_mot, {"Charge": "Clarity", "Drain": "Confusion", "Icon": "🔋"})
     
-    with st.container(border=True):
-        st.markdown(f"#### {bat['Icon']} The Energy Battery: {p_mot}")
-        st.caption("Support isn't just about fixing problems; it's about managing their energy. Know what drains them and what recharges them.")
-        
-        bd_col1, bd_col2 = st.columns(2)
-        with bd_col1:
-            st.error(f"**🔻 What Drains Them:**\n\n{bat['Drain']}")
-        with bd_col2:
-            st.success(f"**⚡ What Recharges Them:**\n\n{bat['Charge']}")
+    # 2. The Support Language (Communication Based)
+    support_lang_map = {
+        "Director": "Respect their autonomy. Ask: 'What barriers can I remove so you can run?'",
+        "Encourager": "Validate their feelings. Ask: 'How are you holding up with the team energy?'",
+        "Facilitator": "Give them time to process. Ask: 'What do you need to think about before we decide?'",
+        "Tracker": "Give them specifics. Ask: 'Do you have all the data/policy info you need?'"
+    }
+    support_lang = support_lang_map.get(p_comm, "Ask them specifically what support looks like.")
 
-    # Parse and Display Integrated Support Tactics
-    support_text = data.get('s6', '')
-    if support_text:
-        # Regex to split by bold headers (e.g. **Header:**)
-        tactics = re.split(r'\*\*(.*?):\*\*', support_text)
-        # Result is [pre_text, header1, body1, header2, body2...]
-        
-        if len(tactics) > 1:
-            st.markdown("#### 🛠️ Tailored Support Moves")
-            # Iterate in pairs starting from index 1
-            # We use columns to make it look like cards
-            t_cols = st.columns(2)
-            col_idx = 0
+    # 3. & 4. The Operational Unlock & The Burnout Guardrail (Parsed from Profile Data)
+    # Parsing the original support text which usually has 2 paragraphs
+    raw_support_text = data.get('s6', '')
+    # Regex to split by bold headers (e.g. **Header:**)
+    tactics = re.split(r'\*\*(.*?):\*\*', raw_support_text)
+    
+    # Defaults if parsing fails
+    tactic_1_header = "Operational Unlock"
+    tactic_1_body = "Remove specific friction points for this profile."
+    tactic_2_header = "Burnout Guardrail"
+    tactic_2_body = "Watch for early warning signs of stress."
+
+    if len(tactics) > 2:
+        tactic_1_header = tactics[1].strip()
+        tactic_1_body = tactics[2].strip()
+    if len(tactics) > 4:
+        tactic_2_header = tactics[3].strip()
+        tactic_2_body = tactics[4].strip()
+
+    # LAYOUT: 2x2 Grid for the 4 Tools
+    
+    row1_1, row1_2 = st.columns(2)
+    with row1_1:
+        with st.container(border=True):
+            st.markdown(f"**1. {bat['Icon']} The Energy Battery**")
+            st.success(f"**Charge:** {bat['Charge']}")
+            st.error(f"**Drain:** {bat['Drain']}")
             
-            for i in range(1, len(tactics), 2):
-                header = tactics[i].strip()
-                body = tactics[i+1].strip()
-                
-                with t_cols[col_idx % 2]:
-                    with st.container(border=True):
-                        st.markdown(f"**{header}**")
-                        st.write(body)
-                col_idx += 1
-        else:
-             # Fallback if regex fails (e.g. formatting is different)
-             st.info(support_text)
+    with row1_2:
+        with st.container(border=True):
+            st.markdown(f"**2. 🗣️ The Support Language**")
+            st.info(f"**Golden Rule:** {support_lang}")
+            st.caption(f"Tailored for: {p_comm}")
 
-    # Additional Teaching
+    row2_1, row2_2 = st.columns(2)
+    with row2_1:
+        with st.container(border=True):
+            st.markdown(f"**3. 🔓 {tactic_1_header}**")
+            st.write(tactic_1_body)
+            
+    with row2_2:
+        with st.container(border=True):
+            st.markdown(f"**4. 🛡️ {tactic_2_header}**")
+            st.write(tactic_2_body)
+
+    # Psychology of Support Deep Dive
     with st.expander("🎓 Supervisor Deep Dive: The Psychology of Support"):
         st.markdown("""
         **1. Removal of Obstacles:**
