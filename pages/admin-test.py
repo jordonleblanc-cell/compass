@@ -1395,10 +1395,69 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             st.plotly_chart(fig_compass, use_container_width=True, config={'displayModeBar': False})
             st.caption("The compass plots your bias: Task vs. People (X-Axis) and Change vs. Stability (Y-Axis).")
     
-    # --- SECTION 6: SUPPORT ---
-    with st.container():
-        st.subheader("6. Best Support Tactics")
-        st.info(data['s6'])
+    # --- SECTION 6: HOW YOU CAN BEST SUPPORT THEM ---
+    st.subheader("6. How You Can Best Support Them")
+
+    # Visual Aid: The Motivation Battery
+    battery_map = {
+        "Achievement": {"Charge": "Visible Wins & Checklists", "Drain": "Endless Meetings & Ambiguity", "Icon": "🏆"},
+        "Growth": {"Charge": "New Problems & Feedback", "Drain": "Stagnation & Routine", "Icon": "🌱"},
+        "Purpose": {"Charge": "Mission Impact Stories", "Drain": "Bureaucracy & Policy w/o Why", "Icon": "🔥"},
+        "Connection": {"Charge": "Face Time & Team Rituals", "Drain": "Isolation & Cold Conflict", "Icon": "🤝"}
+    }
+    bat = battery_map.get(p_mot, {"Charge": "Clarity", "Drain": "Confusion", "Icon": "🔋"})
+    
+    with st.container(border=True):
+        st.markdown(f"#### {bat['Icon']} The Energy Battery: {p_mot}")
+        st.caption("Support isn't just about fixing problems; it's about managing their energy. Know what drains them and what recharges them.")
+        
+        bd_col1, bd_col2 = st.columns(2)
+        with bd_col1:
+            st.error(f"**🔻 What Drains Them:**\n\n{bat['Drain']}")
+        with bd_col2:
+            st.success(f"**⚡ What Recharges Them:**\n\n{bat['Charge']}")
+
+    # Parse and Display Integrated Support Tactics
+    support_text = data.get('s6', '')
+    if support_text:
+        # Regex to split by bold headers (e.g. **Header:**)
+        tactics = re.split(r'\*\*(.*?):\*\*', support_text)
+        # Result is [pre_text, header1, body1, header2, body2...]
+        
+        if len(tactics) > 1:
+            st.markdown("#### 🛠️ Tailored Support Moves")
+            # Iterate in pairs starting from index 1
+            # We use columns to make it look like cards
+            t_cols = st.columns(2)
+            col_idx = 0
+            
+            for i in range(1, len(tactics), 2):
+                header = tactics[i].strip()
+                body = tactics[i+1].strip()
+                
+                with t_cols[col_idx % 2]:
+                    with st.container(border=True):
+                        st.markdown(f"**{header}**")
+                        st.write(body)
+                col_idx += 1
+        else:
+             # Fallback if regex fails (e.g. formatting is different)
+             st.info(support_text)
+
+    # Additional Teaching
+    with st.expander("🎓 Supervisor Deep Dive: The Psychology of Support"):
+        st.markdown("""
+        **1. Removal of Obstacles:**
+        High performers (like this staff member) often don't need 'motivation'; they need *clear paths*. Your job is to identify the friction points (slow laptops, unclear rules, toxic peers) and remove them.
+        
+        **2. Predictive Support:**
+        Don't wait for them to ask. 
+        * **For Directors/Trackers:** Provide resources *before* the project starts.
+        * **For Encouragers/Facilitators:** Provide emotional bandwidth *after* a hard shift.
+        
+        **3. The 'Check-In' Ratio:**
+        Aim for a 3:1 ratio of 'Supportive Check-Ins' (How can I help?) to 'Directive Check-Ins' (Did you do X?). This builds the relational equity you need when you eventually have to give a hard directive.
+        """)
 
     # --- SECTION 7 & 8: THRIVING VS STRUGGLING ---
     col_t, col_s = st.columns(2)
