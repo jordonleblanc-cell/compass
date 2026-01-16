@@ -949,6 +949,129 @@ PEDAGOGY_GUIDE = {
     3: "**The Teaching Method: Socratic Empowerment.**\nThey know the 'how'; now they need the 'why' and the 'what if.' Stop giving answers. Ask 'What would you do?' and 'What are the risks?' to build their executive functioning."
 }
 
+
+# --- PDF HELPER: IPDP PHASE SUMMARY ---
+def _build_ipdp_summary_pdf(name, role, phase_num, p_comm=None, p_mot=None):
+    """Builds a small, phase-specific IPDP PDF.
+
+    Note: The on-screen IPDP matrix is dynamic (comm x motiv x phase). This helper
+    keeps the PDF aligned by regenerating the same 6 moves plus the pedagogy guide.
+    """
+    # Regenerate the same dynamic moves used on-screen (kept local for stability).
+    def _get_dynamic_coaching_moves(comm, motiv, phase):
+        c_moves = {
+            "Director": [
+                "The 'Bottom Line' Opener: Start with the goal, not the background.",
+                "The Autonomy Check: Ask 'What do you need to own this?'"
+            ],
+            "Encourager": [
+                "The Relational Buffer: Spend 2 mins on 'us' before 'the work'.",
+                "The Vision Connect: Link the boring task to the team vibe."
+            ],
+            "Facilitator": [
+                "The Advance Warning: Send the agenda 24hrs early.",
+                "The Process Map: Ask them to design the 'how'."
+            ],
+            "Tracker": [
+                "The Data Dive: Bring specific examples/numbers.",
+                "The Risk Assessment: Ask 'What risks do you see?'"
+            ]
+        }
+        m_moves = {
+            "Achievement": [
+                "The Scoreboard: Define what 'winning' looks like.",
+                "The Sprint: Set a short-term, high-intensity goal."
+            ],
+            "Growth": [
+                "The Stretch: Give a task slightly above their pay grade.",
+                "The Debrief: Ask 'What did you learn?' not just 'Did you do it?'"
+            ],
+            "Purpose": [
+                "The Impact Story: Share a specific youth success story.",
+                "The Why: Explain the mission value of the task."
+            ],
+            "Connection": [
+                "The Peer Mentor: Have them teach a peer.",
+                "The Team Check: Ask 'How is the team feeling?'"
+            ]
+        }
+        p_moves = {
+            1: [
+                "The Safety Net: 'Call me if you get stuck.'",
+                "The Binary Feedback: 'This was right/wrong.'"
+            ],
+            2: [
+                "The Scenario Drill: 'What would you do if...?'",
+                "The Pattern Spot: 'I see you doing X often.'"
+            ],
+            3: [
+                "The Delegation: 'You run the meeting today.'",
+                "The Systems Think: 'How do we fix this process?'"
+            ]
+        }
+        return c_moves.get(comm, []) + m_moves.get(motiv, []) + p_moves.get(phase, [])
+
+    comm = p_comm or "Director"
+    motiv = p_mot or "Achievement"
+    moves = _get_dynamic_coaching_moves(comm, motiv, int(phase_num))
+    pedagogy = PEDAGOGY_GUIDE.get(int(phase_num), "")
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+
+    blue = (26, 115, 232)
+    black = (0, 0, 0)
+
+    pdf.set_font("Arial", 'B', 18)
+    pdf.set_text_color(*blue)
+    pdf.cell(0, 10, clean_text("IPDP Phase Plan"), ln=True, align='C')
+
+    pdf.set_font("Arial", '', 11)
+    pdf.set_text_color(*black)
+    pdf.cell(0, 7, clean_text(f"For: {name} ({role})"), ln=True, align='C')
+    pdf.cell(0, 7, clean_text(f"Profile: {comm} x {motiv}"), ln=True, align='C')
+    pdf.cell(0, 7, clean_text(f"Selected Phase: {phase_num}"), ln=True, align='C')
+    pdf.ln(5)
+
+    # Matrix
+    pdf.set_font("Arial", 'B', 12)
+    pdf.set_text_color(*blue)
+    pdf.set_fill_color(240, 245, 250)
+    pdf.cell(0, 8, clean_text("Coaching Matrix: 6 High-Impact Moves"), ln=True, fill=True)
+    pdf.ln(2)
+
+    labels = [
+        "1) The Opener",
+        "2) The Assignment",
+        "3) The Fuel",
+        "4) The Hook",
+        "5) The Safety Valve",
+        "6) The Growth Edge"
+    ]
+    pdf.set_font("Arial", '', 11)
+    pdf.set_text_color(*black)
+    for i, lbl in enumerate(labels):
+        move = moves[i] if i < len(moves) else ""
+        pdf.set_font("Arial", 'B', 11)
+        pdf.multi_cell(0, 6, clean_text(lbl))
+        pdf.set_font("Arial", '', 11)
+        pdf.multi_cell(0, 5, clean_text(f"- {move}"))
+        pdf.ln(1)
+
+    pdf.ln(3)
+    pdf.set_font("Arial", 'B', 12)
+    pdf.set_text_color(*blue)
+    pdf.set_fill_color(240, 245, 250)
+    pdf.cell(0, 8, clean_text("Pedagogical Deep Dive"), ln=True, fill=True)
+    pdf.ln(2)
+    pdf.set_font("Arial", '', 11)
+    pdf.set_text_color(*black)
+    if pedagogy:
+        pdf.multi_cell(0, 5, clean_text(pedagogy.replace("**", "")))
+
+    return pdf.output(dest='S').encode('latin-1')
+
 # --- HELPER FUNCTIONS FOR VISUALS ---
 
 def create_comm_quadrant_chart(comm_style):
@@ -1405,52 +1528,37 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         st.caption("Stress signatures tell you what overload looks like for *this* person. Prescriptions tell you what helps them return to regulation and effectiveness.")
 
         with st.expander("Stress Signature (What it is / why it matters / how to use it)", expanded=False):
-            st.info(
-                "**What this is:** A *Stress Signature* is the predictable way a person changes when they are overloaded (tone, pace, rigidity, withdrawal, etc.)."
-            )
+            st.markdown("""
+**Definition:** A *Stress Signature* is the predictable way a person changes when they are overloaded (tone, pace, rigidity, withdrawal, etc.).
 
-            st.markdown("**Why it matters**")
-            st.markdown("- Stress signals are often misread as *attitude* or *defiance*.")
-            st.markdown("- When we punish stress, we escalate it—and we erode trust.")
-            st.markdown("- When we treat stress as data, we can intervene earlier and protect performance.")
+**Why it matters:**
+- Stress behavior is often misread as *attitude*.
+- If you treat stress as defiance, you escalate the situation and damage trust.
+- If you treat stress as data, you intervene earlier and keep performance intact.
 
-            st.warning(
-                "**If it goes unaddressed, you can get:** avoidable conflict, preventable mistakes, increased callouts, and eventually burnout or resignation. "
-                "Early intervention is almost always cheaper than cleanup."
-            )
+**How to use it (Supervisor moves):**
+- **Name the pattern early** (low-stakes, non-accusatory): *"I'm noticing you're quieter and moving fast—are you overloaded?"*
+- **Ask for the first signal**: *"What usually changes first when you're nearing burnout—tone, sleep, patience, or focus?"*
+- **Separate person from behavior**: you are not judging character; you're reading a dashboard.
 
-            st.markdown("**How to use it (Supervisor moves)**")
-            st.markdown('1. **Name the pattern early** (low-stakes, non-accusatory): *"I\'m noticing your pace is up and you\'re quieter—are you overloaded?"*')
-            st.markdown('2. **Ask for the first signal**: *"What changes first for you—tone, sleep, patience, focus, or flexibility?"*')
-            st.markdown('3. **Reduce the load**: narrow priorities, remove one barrier, and clarify what matters *right now*.')
-            st.markdown('4. **Separate person from behavior**: you are not judging character; you\'re reading a dashboard.')
-
-            st.caption("Red flag rule: if the stress signature is showing up **for 2+ shifts**, assume the environment and workload need adjustment—not just coaching.")
+**Red flag rule:** If the stress signature is showing up **for 2+ shifts**, assume the environment and workload need adjustment—not just coaching.
+""")
 
         with st.expander("The Prescription (What it is / why it matters / how to use it)", expanded=False):
-            st.info(
-                "**What this is:** The *Prescription* is the set of conditions that helps this person recover and function when stress is rising. "
-                "It's not a reward—it's a regulation tool."
-            )
+            st.markdown("""
+**Definition:** The *Prescription* is the set of conditions that helps this person recover and function when stress is rising.
 
-            st.markdown("**Why it matters**")
-            st.markdown("- What calms one person can **dysregulate** another.")
-            st.markdown("- If you use *your* coping style as the default, you may unintentionally escalate the staff member.")
-            st.markdown("- Matching the prescription shortens recovery time and prevents small stress from turning into crisis.")
+**Why it matters:** What calms one person can dysregulate another. A supervisor must avoid using *their own* coping style as the default intervention.
 
-            st.markdown("**How to use it (Supervisor moves)**")
-            st.markdown("1. **Use it early:** prescriptions work best *before* meltdown.")
-            st.markdown("2. **Make it operational:** choose actions you can actually do mid-shift (reduce ambiguity, remove a barrier, narrow priorities).")
-            st.markdown('3. **Repeat consistently:** predictability builds safety.')
+**How to use it (Supervisor moves):**
+- **Use it early**: prescriptions are most effective *before* meltdown.
+- **Be specific**: prescribe actions you can actually do on shift (remove a barrier, narrow priorities, give clarity).
+- **Document the dosage**: when you find what works, repeat it consistently.
 
-            st.markdown("**Two scripts to keep handy**")
-            st.markdown('- *"When things pile up, do you reset better with space or a quick check-in?"*')
-            st.markdown('- *"What helps you get back to your best self fastest—clarity, autonomy, a written plan, or connection?"*')
-
-            st.warning(
-                "**Supervisor note:** A good prescription works because it reduces *cognitive load* (fewer decisions), increases *control* (clear boundaries), "
-                "or restores *connection/meaning* (co-regulation). If it's not doing one of those, it won't stick."
-            )
+**Two scripts to keep handy:**
+- *"When things pile up, do you reset better with space or a quick check-in?"*
+- *"What helps you get back to your best self fastest—clarity, autonomy, a written plan, or connection?"*
+""")
 
         sc1, sc2 = st.columns(2)
         with sc1:
@@ -1471,24 +1579,21 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         st.caption("Burnout is often structural, not personal. Audit the environment before you intensify coaching.")
 
         with st.expander("Environment Audit (What it is / why it matters / how to use it)", expanded=False):
-            st.info(
-                "**What this is:** An *Environment Audit* is a quick review of how unit conditions are affecting performance and regulation. "
-                "It's how you troubleshoot the *system*, not just the person."
-            )
+            st.markdown("""
+**Definition:** An *Environment Audit* is a quick review of how the unit's conditions are affecting performance and regulation.
 
-            st.markdown("**Why it matters**")
-            st.markdown("- Most burnout is **structural**, not personal.")
-            st.markdown("- Coaching without fixing friction feels like blaming—and it creates resentment.")
-            st.markdown("- Supervisors lead by creating *containment*: clarity, predictability, and recovery rhythms.")
+**Why it matters:** If the environment is chaotic, unclear, or unrealistic, you cannot coach someone out of it. Supervisors lead by building *containment*: clarity, predictability, and recovery rhythms.
 
-            st.markdown("**How to use it (Supervisor checklist)**")
-            st.markdown("- **Workload realism:** Are we expecting superhuman output due to staffing gaps?")
-            st.markdown("- **Role clarity:** Does the person know what *good* looks like right now?")
-            st.markdown("- **Predictability:** Are plans changing mid-shift without warning?")
-            st.markdown("- **Noise + chaos:** Is the setting overstimulating (interruptions, no reset space)?")
-            st.markdown("- **Recovery rhythms:** Is there a built-in pause (micro-breaks, task rotation, huddle)?")
+**How to use it (Supervisor checklist):**
+- **Workload realism:** Are we expecting superhuman output due to staffing gaps?
+- **Role clarity:** Does the person know what "good" looks like right now?
+- **Predictability:** Are we changing plans mid-shift without warning?
+- **Noise + chaos:** Is the setting overstimulating (constant interruptions, no reset space)?
+- **Recovery rhythms:** Is there a built-in pause (micro-breaks, task rotation, huddle)?
 
-            st.warning("Rule of thumb: if stress is rising across multiple staff, your issue is likely **environmental**, not individual.")
+**Rule of thumb:**
+- If stress is rising across multiple staff, your issue is likely **environmental**, not individual.
+""")
 
         ac1, ac2 = st.columns(2)
         with ac1:
@@ -1625,7 +1730,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     
     # Original PDF Download Button (Logic preserved)
     # ... (PDF logic remains, referencing generic data for stability, but matrix on screen is new/dynamic) ...
-    pdf_bytes = _build_ipdp_summary_pdf(name, role, sel_num) # Reusing existing function for PDF
+    # Phase-specific IPDP PDF (aligned to this staff member's integrated profile)
+    pdf_bytes = _build_ipdp_summary_pdf(name, role, sel_num, p_comm=p_comm, p_mot=p_mot)
     st.download_button(f"🖨️ Download Phase {sel_num} Plan (PDF)", pdf_bytes, f"{name}_IPDP.pdf", "application/pdf", use_container_width=True)
 
 
