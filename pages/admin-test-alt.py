@@ -1012,9 +1012,146 @@ for sup in COMM_TRAITS:
     for staff in COMM_TRAITS:
         SUPERVISOR_CLASH_MATRIX[sup].setdefault(staff, make_default_clash(sup, staff))
 CAREER_PATHWAYS = {}
-TEAM_CULTURE_GUIDE = {}
-MISSING_VOICE_GUIDE = {}
-MOTIVATION_GAP_GUIDE = {}
+
+# ================================
+# TEAM DNA SUPPORTING KNOWLEDGE
+# ================================
+# These guides power the Team DNA page (dominant culture, missing voices, and motivation gaps).
+
+TEAM_CULTURE_GUIDE = {
+    "Director": {
+        "title": "Director Culture",
+        "impact_analysis": (
+            "Fast, decisive, outcome-first. The team moves quickly and hates wasted time. "
+            "This can be a superpower in crisis—but can also feel sharp to more relational styles."
+        ),
+        "management_strategy": """**How to lead it:**
+- Lead with the goal, the standard, and the deadline.
+- Give autonomy on the *how* but set clear checkpoints.
+- Add a deliberate ‘people check’ so relational safety doesn’t lag behind speed.
+""",
+        "meeting_protocol": (
+            "Start with outcomes (1 min), then decisions needed (2–3 bullets). "
+            "Use timeboxes. End with owners + due times."
+        ),
+        "team_building": "Run a 15-minute ‘wins + blockers’ huddle: one win, one obstacle, one ask for help.",
+    },
+    "Encourager": {
+        "title": "Encourager Culture",
+        "impact_analysis": (
+            "High energy, verbal processing, relationship-forward. Morale tends to be strong and the team rallies well. "
+            "Risk: enthusiasm can outpace follow-through or documentation."
+        ),
+        "management_strategy": """**How to lead it:**
+- Give space to talk, then ‘land the plane’ with written action items.
+- Ask for specifics: ‘What does success look like by end of shift?’
+- Pair big vision with checklists and simple accountability.
+""",
+        "meeting_protocol": (
+            "Open with a quick relational check-in (2 mins), then a structured agenda. "
+            "End by reading back decisions and sending a recap message."
+        ),
+        "team_building": "Do a ‘shout-out circle’ + one concrete appreciation tied to a behavior (not personality).",
+    },
+    "Facilitator": {
+        "title": "Facilitator Culture",
+        "impact_analysis": (
+            "Collaborative, consensus-seeking, process-aware. People feel heard and decisions are usually thoughtful. "
+            "Risk: decision speed can slow, and urgency can get diluted."
+        ),
+        "management_strategy": """**How to lead it:**
+- Send agendas early and ask for input before meetings.
+- Set a decision deadline to prevent endless processing.
+- Assign a ‘decider’ so ownership doesn’t blur.
+""",
+        "meeting_protocol": (
+            "Use round-robin input, then a clear decision point: ‘We decide by (time).’ "
+            "Capture pros/cons briefly, then lock next steps."
+        ),
+        "team_building": "Run a ‘what’s working / what’s hard / one change’ retro after tough weeks.",
+    },
+    "Tracker": {
+        "title": "Tracker Culture",
+        "impact_analysis": (
+            "Detail-driven, accuracy-focused, risk-aware. Documentation and compliance are typically strong. "
+            "Risk: perfectionism and caution can slow momentum or create frustration for faster styles."
+        ),
+        "management_strategy": """**How to lead it:**
+- Be specific with metrics and definitions.
+- Separate ‘must be perfect’ from ‘good enough for now.’
+- Provide templates and written expectations to reduce anxiety and rework.
+""",
+        "meeting_protocol": (
+            "Start with data (incidents, meds, logs), then exceptions/risks, then actions. "
+            "Document decisions and distribute notes."
+        ),
+        "team_building": "Create a shared ‘best practice library’ (templates, checklists, quick guides) and celebrate contributions.",
+    },
+    "Balanced": {
+        "title": "Balanced Culture",
+        "impact_analysis": (
+            "No single style dominates. This reduces blind spots and increases adaptability, "
+            "but can create friction because people optimize for different values (speed, safety, harmony, energy)."
+        ),
+        "management_strategy": """**How to lead it:**
+- Act as translator: name differences as *style*, not attitude.
+- Rotate ‘who leads’ based on the problem (crisis vs debrief vs audit).
+- Use shared standards + clear roles to prevent style wars.
+""",
+        "meeting_protocol": "Structured turn-taking + clear decision owner + written recap.",
+        "team_building": "Pair opposite styles for a ‘swap and learn’ shift: each teaches one tool that helps the other.",
+    },
+}
+
+MISSING_VOICE_GUIDE = {
+    "Director": {
+        "risk": "Decisions drift, urgency drops, and accountability can feel optional.",
+        "fix": "Assign a clear decider each shift and set 2–3 measurable outcomes with timeboxes.",
+    },
+    "Encourager": {
+        "risk": "Morale and buy-in may sag; feedback can feel cold or purely corrective.",
+        "fix": "Start meetings with wins and use frequent micro-recognition tied to specific behaviors.",
+    },
+    "Facilitator": {
+        "risk": "Conflict escalates quickly because nobody is smoothing tension or gathering perspectives.",
+        "fix": "Use round-robin check-ins and require ‘two viewpoints’ before locking decisions.",
+    },
+    "Tracker": {
+        "risk": "Details slip: documentation, meds, safety checks, and follow-through become inconsistent.",
+        "fix": "Adopt a shared checklist + end-of-shift audit (5 mins) with one owner.",
+    },
+}
+
+MOTIVATION_GAP_GUIDE = {
+    "Achievement": {
+        "warning": "This team is strongly Achievement-driven—if goals are unclear, frustration spikes fast.",
+        "coaching": """- Post a visible scoreboard (2–3 metrics).
+- Celebrate finished tasks (closed loops).
+- Give autonomy on *how* to hit the goal, but define the goal precisely.
+""",
+    },
+    "Growth": {
+        "warning": "This team is strongly Growth-driven—if work feels repetitive or stagnant, engagement drops.",
+        "coaching": """- Offer stretch roles (training, leading a debrief, mentoring).
+- Provide frequent developmental feedback (1 thing to sharpen).
+- Map today’s work to a skill they’ll need for the next level.
+""",
+    },
+    "Purpose": {
+        "warning": "This team is strongly Purpose-driven—if the ‘why’ is missing, they resist or burn out.",
+        "coaching": """- Tie every mandate to client safety and dignity.
+- Use stories (impact moments) to renew meaning after hard shifts.
+- Invite ethical questions, then translate them into actionable next steps.
+""",
+    },
+    "Connection": {
+        "warning": "This team is strongly Connection-driven—if relationships fray, performance usually follows.",
+        "coaching": """- Increase face-time check-ins and small rituals (huddles, debriefs, shared wins).
+- Address tension early (repair fast) to prevent avoidance and resentment.
+- Use buddy systems so support is built into the shift, not added on top.
+""",
+    },
+}
 PEDAGOGY_GUIDE = {
     1: "**The Teaching Method: Direct Instruction.**\nAt this stage, they don't know what they don't know. Stop asking 'What do you think?' and start showing 'This is how we do it.' Use the 'I do, We do, You do' model.",
     2: "**The Teaching Method: Guided Scaffolding.**\nThey have the knowledge but lack the muscle memory. Your role is the 'Safety Net.' Let them try, fail safely, and debrief immediately. Shift from instruction to feedback.",
