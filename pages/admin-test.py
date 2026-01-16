@@ -937,6 +937,33 @@ INTEGRATED_PROFILES = {
     }
 }
 
+COACHING_DEEP_DIVES = {
+    1: [
+        {"title": "The 1-Sentence Rule", "icon": "📏", "action": "Give instructions in one sentence, then stop.", "why": "Reduces cognitive load and forces clarity. Prevents 'over-explaining' anxiety."},
+        {"title": "The Micro-Check-In", "icon": "⏱️", "action": "Check in every 90 mins: 'What's one win? What's one sticking point?'", "why": "Builds a rhythm of support without hovering. Catches small errors before they become crises."},
+        {"title": "See One, Do One", "icon": "👀", "action": "Model the task explicitly, then watch them do it immediately.", "why": "Bridges the gap between theory and muscle memory. Removes the 'am I doing this right?' doubt."},
+        {"title": "The Safety Net", "icon": "🕸️", "action": "Explicitly state: 'If you get stuck, call me. I will not be mad.'", "why": "Establishes psychological safety. Fear of failure is the biggest blocker to learning in Phase 1."},
+        {"title": "Binary Feedback", "icon": "⚖️", "action": "Keep feedback simple: 'This was correct' or 'This needs adjustment.'", "why": "Nuance confuses beginners. Clear 'Green/Red' signals build a solid foundation."},
+        {"title": "The End-of-Shift Reset", "icon": "🔄", "action": "Spend 2 minutes debriefing: 'One thing to keep, one thing to change.'", "why": "Prevents them from taking work stress home. Builds the habit of reflective practice."}
+    ],
+    2: [
+        {"title": "The 'What If?' Drill", "icon": "🧠", "action": "Pose hypothetical scenarios: 'If X happened right now, what would you do?'", "why": "Builds adaptive thinking and judgment without the risk of a real crisis."},
+        {"title": "Role Reversal", "icon": "🎭", "action": "Ask them to lead a meeting or huddle while you observe.", "why": "Shifts perspective from 'participant' to 'owner'. Reveals gaps in their understanding of group dynamics."},
+        {"title": "The 2-Minute Warning", "icon": "⏳", "action": "Give them 2 minutes to solve a problem before you intervene.", "why": "Builds tolerance for discomfort and encourages independent problem-solving."},
+        {"title": "Observation Deck", "icon": "🔭", "action": "Task them to observe a peer and give *you* feedback on the peer's performance.", "why": "Sharpen's their critical eye and understanding of standards."},
+        {"title": "The 'Why' Interrogation", "icon": "❓", "action": "When they make a decision, ask 'Why?' three times to get to the root logic.", "why": "Moves them from intuition-based actions to principle-based logic."},
+        {"title": "Emotional Temp Check", "icon": "🌡️", "action": "Ask: 'How did your energy affect the client just now?'", "why": "Develops self-regulation and emotional intelligence, crucial for intermediate work."}
+    ],
+    3: [
+        {"title": "The Stretch Assignment", "icon": "🚀", "action": "Assign a project that is 20% beyond their current capability.", "why": "Prevents stagnation. High performers need to feel the risk of failure to stay engaged."},
+        {"title": "Peer Audit", "icon": "📋", "action": "Have them review the team's documentation or compliance for the week.", "why": "Shifts ownership of quality from you to them. Teaches the 'Supervisor Eye'."},
+        {"title": "System Architect", "icon": "🏗️", "action": "Ask: 'How would you improve this process for everyone?'", "why": "Encourages systems-thinking over task-thinking. Prepares them for management."},
+        {"title": "The 'Sit on Hands' Rule", "icon": "🧘", "action": "In a crisis, you do nothing. Let them run it. Debrief after.", "why": "The ultimate test of autonomy. Proves to them (and you) that they are ready."},
+        {"title": "Culture Keeper", "icon": "🔥", "action": "Task them with onboarding or mentoring a new hire.", "why": "Reinforces their own mastery by teaching. positions them as a culture carrier."},
+        {"title": "Legacy Building", "icon": "🏛️", "action": "Ask: 'What do you want to leave behind when you move up?'", "why": " shifts focus to long-term impact and succession planning."}
+    ]
+}
+
 # --- PLACEHOLDERS FOR MISSING DATA ---
 SUPERVISOR_CLASH_MATRIX = {}
 CAREER_PATHWAYS = {}
@@ -1530,27 +1557,27 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
             st.divider()
 
-            # --- 2. Coaching Matrix ---
-            st.markdown("#### 🧭 Coaching Matrix")
-            colA, colB, colC = st.columns(3)
-            current_moves = role_additions.get(role_key, {}).get(sel_num, [])
+            # --- 2. Coaching Matrix (6 Elements) ---
+            st.markdown("#### 🧭 Coaching Matrix: 6 High-Impact Moves")
             
-            with colA:
-                st.markdown("**Structure & Clarity**")
-                st.caption("Tighten expectations, reduce ambiguity.")
-                if len(current_moves) > 0: st.info(f"{current_moves[0]}")
-                else: st.info("Establish clear routines.")
-            with colB:
-                st.markdown("**Skill Application**")
-                st.caption("Practice in real situations.")
-                if len(current_moves) > 1: st.info(f"{current_moves[1]}")
-                else: st.info("Coach in the moment.")
-            with colC:
-                st.markdown("**Autonomy & Judgment**")
-                st.caption("Increase ownership.")
-                if len(current_moves) > 2: st.info(f"{current_moves[2]}")
-                else: st.info("Reflect on decisions.")
+            # Retrieve the 6 elements for this phase
+            matrix_elements = COACHING_DEEP_DIVES.get(sel_num, [])
+            
+            # Create 2 rows of 3 columns
+            for i in range(0, 6, 3):
+                cols = st.columns(3)
+                for j in range(3):
+                    if i + j < len(matrix_elements):
+                        elem = matrix_elements[i + j]
+                        with cols[j]:
+                            with st.container(border=True):
+                                st.markdown(f"### {elem['icon']} {elem['title']}")
+                                st.caption(elem['action'])
+                                with st.expander("Why this works"):
+                                    st.info(elem['why'])
 
+            st.divider()
+            
             st.markdown("#### 🎓 Pedagogical Deep Dive")
             st.info(PEDAGOGY_GUIDE.get(sel_num, "Guide and support consistent growth."))
 
