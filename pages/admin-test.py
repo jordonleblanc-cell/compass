@@ -475,7 +475,8 @@ MOTIV_PROFILES = {
             "**Efficiency:** Celebrate specific instances where they solved a complex logistical puzzle quickly. Quantify the time or money they saved.",
             "**Clarity:** Celebrate their ability to draw a hard line or make a tough call.",
             "**Resilience:** Celebrate their ability to bounce back immediately and focus on solutions."
-        ]
+        ],
+        "celebrate_deep_dive": "**Recognition Language: Competence & Impact.**\nThey don't want a generic 'good job.' They want you to notice the specific problem they solved. \n\n*Script:* 'I saw how you reorganized the log system; it saved the team 20 minutes tonight. That was brilliant efficiency.'"
     },
     "Growth": {
         "bullets": [
@@ -492,7 +493,8 @@ MOTIV_PROFILES = {
             "**Insight:** Celebrate specific moments where they identified a root cause others missed.",
             "**Development:** Celebrate a staff member who visibly improved under their guidance.",
             "**Courage:** Celebrate their willingness to try a new approach, even if it failed."
-        ]
+        ],
+        "celebrate_deep_dive": "**Recognition Language: Trajectory & Potential.**\nPraise the *change* in their behavior, not just the result. Validate their struggle and learning. \n\n*Script:* 'I noticed you handled that crisis differently than last month. You stayed calm and followed the protocol perfectly. Your growth here is obvious.'"
     },
     "Purpose": {
         "bullets": [
@@ -509,7 +511,8 @@ MOTIV_PROFILES = {
             "**Integrity:** Celebrate moments where they made a hard choice because it was the right thing to do.",
             "**Advocacy:** Celebrate when they gave a voice to the voiceless.",
             "**Consistency:** Celebrate their unwavering commitment to care."
-        ]
+        ],
+        "celebrate_deep_dive": "**Recognition Language: Mission & Values.**\nConnect their work to the human story. Show them the invisible impact on the child's life. \n\n*Script:* 'Because you stayed late to talk to that youth, they felt safe enough to sleep tonight. You are the reason this program works.'"
     },
     "Connection": {
         "bullets": [
@@ -526,7 +529,8 @@ MOTIV_PROFILES = {
             "**Loyalty:** Celebrate their standing up for the team.",
             "**Stabilization:** Celebrate their physical presence calming a room.",
             "**Culture:** Celebrate the strong identity of the unit. Praise the low turnover or the high morale."
-        ]
+        ],
+        "celebrate_deep_dive": "**Recognition Language: Belonging & Effort.**\nPraise their contribution to the team's health. Value the person, not just the worker. \n\n*Script:* 'The team vibe is so much better when you are on shift. Thank you for always looking out for your peers. We are lucky to have you.'"
     }
 }
 
@@ -934,13 +938,16 @@ INTEGRATED_PROFILES = {
 }
 
 # --- PLACEHOLDERS FOR MISSING DATA ---
-# These dictionaries were referenced in the provided code but not included in the text snippet.
-# Adding empty defaults to prevent NameErrors in tabs 2, 3, and 4.
 SUPERVISOR_CLASH_MATRIX = {}
 CAREER_PATHWAYS = {}
 TEAM_CULTURE_GUIDE = {}
 MISSING_VOICE_GUIDE = {}
 MOTIVATION_GAP_GUIDE = {}
+PEDAGOGY_GUIDE = {
+    1: "**The Teaching Method: Direct Instruction.**\nAt this stage, they don't know what they don't know. Stop asking 'What do you think?' and start showing 'This is how we do it.' Use the 'I do, We do, You do' model.",
+    2: "**The Teaching Method: Guided Scaffolding.**\nThey have the knowledge but lack the muscle memory. Your role is the 'Safety Net.' Let them try, fail safely, and debrief immediately. Shift from instruction to feedback.",
+    3: "**The Teaching Method: Socratic Empowerment.**\nThey know the 'how'; now they need the 'why' and the 'what if.' Stop giving answers. Ask 'What would you do?' and 'What are the risks?' to build their executive functioning."
+}
 
 # --- HELPER FUNCTIONS FOR VISUALS ---
 
@@ -1162,6 +1169,7 @@ def generate_profile_content(comm, motiv):
         "s8": i_data.get('struggling', ''),
         "s9_b": i_data.get('interventions', []),
         "s10_b": m_data.get('celebrate_bullets'),
+        "s10_deep": m_data.get('celebrate_deep_dive', ''),
         "coaching": i_data.get('questions', []),
         "advancement": i_data.get('advancement', ''),
         "cheat_do": c_data.get('supervising_bullets'),
@@ -1543,6 +1551,9 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 if len(current_moves) > 2: st.info(f"{current_moves[2]}")
                 else: st.info("Reflect on decisions.")
 
+            st.markdown("#### 🎓 Pedagogical Deep Dive")
+            st.info(PEDAGOGY_GUIDE.get(sel_num, "Guide and support consistent growth."))
+
             st.divider()
 
             # --- 3. Downloads & Extras ---
@@ -1574,12 +1585,22 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
     # --- SECTION 10: CELEBRATION (TROPHY CASE) ---
     st.subheader("10. What To Celebrate")
+    
+    # 1. Primary Bullets
     cel_cols = st.columns(3)
     if data['s10_b']:
         for i, item in enumerate(data['s10_b']):
             clean_item = item.replace("**", "")
             with cel_cols[i % 3]:
                 st.markdown(f"🏆 **{clean_item}**")
+    
+    st.markdown("")
+    
+    # 2. Deep Dive Box
+    with st.container(border=True):
+        st.markdown(f"### 💬 How to Speak Their Language")
+        st.markdown(data['s10_deep'])
+
 
     st.divider()
 
