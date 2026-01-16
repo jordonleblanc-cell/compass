@@ -1127,7 +1127,215 @@ def get_leadership_mechanics(comm, motiv):
     
     return mech
 
-# 5c. INTEGRATED PROFILES (Expanded & 10 Coaching Questions Logic)
+
+# 5b. SUPERVISOR HUD: CONTEXTUAL STRESS SIGNATURE + PRESCRIPTION
+def get_hud_context(comm: str, motiv: str, integrated_title: str = ""):
+    """Return tailored HUD training content based on the user's integrated profile.
+
+    This is intentionally contextual so the supervisor learns how *this specific profile*
+    tends to show stress and which interventions are most likely to work.
+    """
+
+    combo_key = f"{comm}-{motiv}"
+    title = integrated_title or INTEGRATED_PROFILES.get(combo_key, {}).get("title", combo_key)
+
+    # --- Stress Signature (contextual) ---
+    # Communication style drives HOW stress shows up (tone/pace/rigidity/withdrawal).
+    comm_sig = {
+        "Director": [
+            "Tone tightens and patience drops (more blunt, more urgent).",
+            "Moves into control mode: rapid directives, interrupting, or micromanaging.",
+            "Tolerance for extra conversation collapses—wants fast decisions and visible progress.",
+        ],
+        "Encourager": [
+            "Either emotional flooding (big feelings) or a sudden quiet/withdrawal.",
+            "Over-agrees to avoid conflict, then struggles with follow-through ('yes' without capacity).",
+            "Talks in broad themes/vision while missing concrete next steps.",
+        ],
+        "Facilitator": [
+            "Freezes or delays—needs more time, more input, more consensus.",
+            "Avoids conflict and hard calls; tries to smooth tension instead of resolving it.",
+            "Over-processes: revisits decisions, asks many questions, struggles to close.",
+        ],
+        "Tracker": [
+            "Becomes rigid and rule-bound; fixates on details and minor errors.",
+            "Seeks certainty: wants written confirmation, checklists, and clean procedures.",
+            "Gets visibly distressed by chaos, inconsistency, or last-minute change.",
+        ],
+    }
+
+    # Motivation drives WHY stress escalates (what feels threatened).
+    motiv_sig = {
+        "Achievement": [
+            "Stress spikes when success is unclear (no scoreboard) or progress feels blocked.",
+            "May push pace too hard ('just get it done') and burn themselves/others out.",
+        ],
+        "Growth": [
+            "Stress spikes when they feel stuck, corrected without a path forward, or treated as static.",
+            "May become critical (of self/others) or restless, chasing a new fix mid-shift.",
+        ],
+        "Purpose": [
+            "Stress spikes when tasks feel disconnected from safety/wellbeing or feel unethical.",
+            "May challenge directives or become 'mission angry' at systems/policies.",
+        ],
+        "Connection": [
+            "Stress spikes when the team feels unsafe, tense, or disconnected.",
+            "May absorb conflict, people-please, rescue others, or take feedback personally.",
+        ],
+    }
+
+    # What can happen if a supervisor misses or punishes the stress signature.
+    consequences = [
+        "You coach the wrong problem ('attitude') while the real driver (overload) grows.",
+        "The staff member escalates or shuts down, and the relationship takes a trust hit.",
+        "Performance slips: documentation errors, safety misses, short temper with peers/youth.",
+        "A discipline loop forms (correction → shame/defensiveness → more stress → more issues), accelerating turnover.",
+    ]
+
+    how_to_use_moves = [
+        "Name the pattern early and neutrally (no blame): 'I'm noticing a change in your pace/tone—what's loading you up right now?'",
+        "Make stress operational: 'What would make the next 60 minutes easier—clearer priorities, fewer tasks, or a quick reset?'",
+        "Pick one small intervention (a 'dosage'), then check back after 1–2 shifts to confirm it helped.",
+    ]
+
+    # --- Prescription (contextual) ---
+    # Communication-based prescriptions (what usually lands best on shift)
+    comm_rx = {
+        "Director": [
+            (
+                "Remove one barrier they can't move",
+                "Directors dysregulate fastest when blocked. Removing friction restores agency and reduces bluntness/steamrolling.",
+                "Ask: 'What's the one thing in your way that I can remove today?' Then remove/adjust it (coverage, approvals, competing priorities).",
+            ),
+            (
+                "Give a clear, winnable target",
+                "A visible win channels stress into productive action and prevents scattered over-control.",
+                "Define a short horizon: 'By 9pm: meds done + notes complete.' Make it measurable and time-bound.",
+            ),
+            (
+                "Use short, direct communication",
+                "Under stress they process less language. Fewer words reduces misinterpretation and power struggles.",
+                "Use 1–2 sentence asks. Save the longer debrief for after regulation returns.",
+            ),
+        ],
+        "Encourager": [
+            (
+                "Do a 2-minute human check-in",
+                "Encouragers regulate through relational safety. Feeling seen reduces emotional flooding and avoidance.",
+                "Script: 'How are you really doing today? One word.' Listen, reflect, then pivot to one next step.",
+            ),
+            (
+                "Convert feelings into one concrete next step",
+                "Stress can make them vague; concreteness restores executive function and follow-through.",
+                "Ask: 'What is the very next action we can take in the next 10 minutes?' Write it down.",
+            ),
+            (
+                "Close the loop in writing",
+                "When stressed, verbal agreements fade. A written recap protects memory and accountability without shame.",
+                "Send a 3-bullet recap: what, by when, who.",
+            ),
+        ],
+        "Facilitator": [
+            (
+                "Set a decision deadline",
+                "Facilitators get stuck seeking alignment. A deadline prevents paralysis and reduces anxiety.",
+                "Say: 'We decide by 3pm.' Offer 2 options, then choose if consensus doesn't form.",
+            ),
+            (
+                "Give permission to be direct",
+                "They often fear conflict. Explicit permission reduces avoidance and protects outcomes.",
+                "Script: 'Clarity is kind. Say it plainly, then we can repair feelings after.'",
+            ),
+            (
+                "Reduce the number of variables",
+                "Too many moving parts overwhelms their process brain. Fewer variables restores traction.",
+                "Narrow to one priority for the next hour/shift. Park non-urgent tasks.",
+            ),
+        ],
+        "Tracker": [
+            (
+                "Provide the 'why' behind the ask",
+                "Trackers calm when rules make sense. A mission-linked rationale reduces rigidity.",
+                "Connect to safety/compliance: 'This protects the youth and keeps us audit-safe.'",
+            ),
+            (
+                "Freeze changes and clarify 'good enough'",
+                "Ambiguity fuels perfectionism. Defining sufficiency reduces anxiety and nitpicking.",
+                "State: 'Good enough tonight is X. We'll refine tomorrow.'",
+            ),
+            (
+                "Give written structure",
+                "Written steps reduce uncertainty and prevent circular questioning.",
+                "Use a 3-step checklist or quick note: 1) A, 2) B, 3) C.",
+            ),
+        ],
+    }
+
+    # Motivation additions (what 'fuel' helps regulation return for this person)
+    motiv_rx_additions = {
+        "Achievement": (
+            "Add a visible scoreboard",
+            "Achievement types settle when they can see progress. It turns anxiety into focus.",
+            "Use a short checklist or whiteboard: '3 wins before shift end.'",
+        ),
+        "Growth": (
+            "Offer a micro-skill to practice",
+            "Growth types calm when stress becomes a learning target, not a personal failure.",
+            "Name one skill: 'Tonight, practice the de-escalation script once.'",
+        ),
+        "Purpose": (
+            "Reconnect to the mission",
+            "Purpose types regulate when they remember the human impact and ethical 'why.'",
+            "Share a 30-second impact link: 'This routine keeps them safe and builds trust.'",
+        ),
+        "Connection": (
+            "Create a quick relational anchor",
+            "Connection types regulate through belonging. A brief supportive touchpoint reduces spiraling.",
+            "Do a 30-second check-in and assign a buddy/backup if possible.",
+        ),
+    }
+
+    rx_items = list(comm_rx.get(comm, []))
+    if motiv in motiv_rx_additions:
+        rx_items.append(motiv_rx_additions[motiv])
+
+    # Keep it usable on shift
+    rx_items = rx_items[:4]
+
+    return {
+        "title": title,
+        "combo_key": combo_key,
+        "stress_signature": {
+            "what_it_is": (
+                f"A Stress Signature is the predictable way this person changes under overload. "
+                f"For {title}, stress often shows up as a communication shift (how they act) plus a motivation threat (why they're triggered)."
+            ),
+            "why_it_matters": (
+                "If you misread stress as defiance, you will escalate the relationship and miss the real lever (workload, clarity, connection, meaning). "
+                "Early recognition lets you intervene while the person still has access to logic and self-control."
+            ),
+            "how_to_use": how_to_use_moves,
+            "signature_bullets": comm_sig.get(comm, []) + motiv_sig.get(motiv, []),
+            "if_unaddressed": consequences,
+        },
+        "prescription": {
+            "what_it_is": (
+                f"The Prescription is the set of supervisor actions that helps {title} return to regulation and effective performance. "
+                "It works because it reduces the exact trigger for this profile and adds the exact 'fuel' their nervous system responds to."
+            ),
+            "why_it_matters": (
+                "Generic advice (e.g., 'calm down') often fails because it doesn't match the person's wiring. "
+                "A matched prescription prevents escalation, protects performance, and keeps coaching from becoming punishment."
+            ),
+            "how_to_use": [
+                "Use it early (first signals), not late (after a blow-up).",
+                "Pick 1–2 actions you can actually do on shift; consistency beats intensity.",
+                "Repeat what works and document the pattern so future supervisors can support them well.",
+            ],
+            "items": [{"suggestion": s, "why": w, "how": h} for (s, w, h) in rx_items],
+        },
+    }
+
 def generate_profile_content(comm, motiv):
     combo_key = f"{comm}-{motiv}"
     c_data = COMM_PROFILES.get(comm, {})
@@ -1385,67 +1593,67 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 4. **Debrief after recovery:** do coaching *after* regulation returns.
 """)
 
-    # 1. Stress Signature & Support Prescription
-    stress_sig = {
-        "Director": "Becomes aggressive, micromanages, stops listening.",
-        "Encourager": "Becomes silent, withdrawn, or overly agreeable (martyrdom).",
-        "Facilitator": "Becomes paralyzed, asks for endless data, refuses to decide.",
-        "Tracker": "Becomes rigid, quotes policy excessively, focuses on minor errors."
-    }
-
-    rx = {
-        "Director": ["Remove a barrier they can't move.", "Give them a 'win' to chase.", "Stop talking, start doing."],
-        "Encourager": ["Schedule face time (no agenda).", "Validate their emotional load.", "Publicly praise a specific contribution."],
-        "Facilitator": ["Give a clear deadline.", "Take the blame for a hard decision.", "Ask: 'What is the risk of doing nothing?'"],
-        "Tracker": ["Give them the 'why' behind the chaos.", "Protect them from last-minute changes.", "Explicitly define 'good enough.'"]
-    }
+    # 1. Stress Signature + The Prescription (CONTEXTUAL)
+    hud = get_hud_context(p_comm, p_mot, data.get('s5_title', ''))
+    ss = hud["stress_signature"]
+    pr = hud["prescription"]
 
     with st.container(border=True):
         st.markdown("### 1) Stress Signature + The Prescription")
-        st.caption("Stress signatures tell you what overload looks like for *this* person. Prescriptions tell you what helps them return to regulation and effectiveness.")
+        st.caption(
+            "Stress signatures tell you what overload looks like for *this* person. "
+            "Prescriptions tell you what helps them return to regulation and effectiveness—matched to their Integrated Profile."
+        )
 
         with st.expander("Stress Signature (What it is / why it matters / how to use it)", expanded=False):
-            st.markdown("""
-**Definition:** A *Stress Signature* is the predictable way a person changes when they are overloaded (tone, pace, rigidity, withdrawal, etc.).
+            st.markdown(f"**Context:** {hud['title']} (Integrated Profile)")
+            st.markdown(f"**What it is:** {ss['what_it_is']}")
+            st.markdown(f"**Why it matters:** {ss['why_it_matters']}")
 
-**Why it matters:**
-- Stress behavior is often misread as *attitude*.
-- If you treat stress as defiance, you escalate the situation and damage trust.
-- If you treat stress as data, you intervene earlier and keep performance intact.
+            st.markdown("**How to use it (Supervisor moves):**")
+            for move in ss["how_to_use"]:
+                st.write(f"• {move}")
 
-**How to use it (Supervisor moves):**
-- **Name the pattern early** (low-stakes, non-accusatory): *"I'm noticing you're quieter and moving fast—are you overloaded?"*
-- **Ask for the first signal**: *"What usually changes first when you're nearing burnout—tone, sleep, patience, or focus?"*
-- **Separate person from behavior**: you are not judging character; you're reading a dashboard.
+            st.markdown("**What stress often looks like for this profile (early warning signals):**")
+            for b in ss["signature_bullets"]:
+                st.write(f"• {b}")
 
-**Red flag rule:** If the stress signature is showing up **for 2+ shifts**, assume the environment and workload need adjustment—not just coaching.
-""")
+            st.markdown("**If this goes unaddressed, here's what commonly happens:**")
+            for c in ss["if_unaddressed"]:
+                st.write(f"• {c}")
+
+            st.markdown("**Supervisor teaching note:** The goal is not to diagnose a person—it is to prevent a predictable slide into burnout, conflict, and avoidable mistakes. Treat the signature like a dashboard light: you don't punish the car; you check what's causing the warning.")
 
         with st.expander("The Prescription (What it is / why it matters / how to use it)", expanded=False):
-            st.markdown("""
-**Definition:** The *Prescription* is the set of conditions that helps this person recover and function when stress is rising.
+            st.markdown(f"**Context:** {hud['title']} (Integrated Profile)")
+            st.markdown(f"**What it is:** {pr['what_it_is']}")
+            st.markdown(f"**Why it matters:** {pr['why_it_matters']}")
 
-**Why it matters:** What calms one person can dysregulate another. A supervisor must avoid using *their own* coping style as the default intervention.
+            st.markdown("**How to use it (Supervisor moves):**")
+            for move in pr["how_to_use"]:
+                st.write(f"• {move}")
 
-**How to use it (Supervisor moves):**
-- **Use it early**: prescriptions are most effective *before* meltdown.
-- **Be specific**: prescribe actions you can actually do on shift (remove a barrier, narrow priorities, give clarity).
-- **Document the dosage**: when you find what works, repeat it consistently.
+            st.markdown("**Why each suggestion works (and how to apply it):**")
+            for item in pr["items"]:
+                st.markdown(f"- **{item['suggestion']}**")
+                st.markdown(f"  - *Why it helps:* {item['why']}")
+                st.markdown(f"  - *How to do it on shift:* {item['how']}")
 
-**Two scripts to keep handy:**
-- *"When things pile up, do you reset better with space or a quick check-in?"*
-- *"What helps you get back to your best self fastest—clarity, autonomy, a written plan, or connection?"*
-""")
+            st.markdown("**Supervisor teaching note:** A prescription is not 'coddling'—it is performance engineering. You are shaping conditions so the staff member can think clearly, stay regulated, and keep the youth safe.")
 
         sc1, sc2 = st.columns(2)
         with sc1:
             st.markdown("#### 🚨 Stress Signature")
-            st.error(f"**When they are unsupported, they will:**\n\n{stress_sig.get(p_comm)}")
+            st.error("**Early warning signals for this profile:**")
+            for b in ss["signature_bullets"][:4]:
+                st.write(f"• {b}")
+            st.caption("Tip: If you see these for 2+ shifts, assume workload/environment needs adjustment—not just coaching.")
+
         with sc2:
             st.markdown("#### 💊 The Prescription")
-            st.success("**Daily/Weekly Dosage:**")
-            for r in rx.get(p_comm, []):
-                st.write(f"• {r}")
+            st.success("**Daily/Weekly Dosage (matched interventions):**")
+            for item in pr["items"]:
+                st.write(f"• **{item['suggestion']}** — {item['why']}")
 
     # 2. Environment Audit
     fuel_map = {"Achievement": "Clear Goals", "Growth": "New Challenges", "Purpose": "Mission Connection", "Connection": "Team Time"}
