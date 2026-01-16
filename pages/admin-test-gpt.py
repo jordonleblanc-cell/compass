@@ -2183,6 +2183,62 @@ Your coaching impact: give stretch assignments with clear guardrails, then debri
     
         }
 
+        # Role-aware additions used in the on-screen guide and in the Phase Summary PDF.
+        # Keys MUST match the role_key mapping used elsewhere: "YDP", "Shift Supervisor", "Program Supervisor".
+        role_additions = {
+            "YDP": {
+                1: [
+                    "Use a 3-part correction: (1) name the expectation, (2) name the immediate next step, (3) confirm the staff member can do it now.",
+                    "Coach one micro-skill per shift (not ten). Consistency beats intensity in Phase 1.",
+                    "When the staff member says 'yes' to everything, model a respectful redirect so they learn capacity management.",
+                ],
+                2: [
+                    "Increase decision reps: run a 60-second scenario, then ask 'What did you notice? What did you choose? What happened next?'",
+                    "Coach timing: in Phase 2, the difference is often *when* they intervene, not *what* they say.",
+                    "Use brief after-action reviews after hard moments to turn stress into learning, not shame.",
+                ],
+                3: [
+                    "Assign a stretch responsibility with guardrails (e.g., lead a routine, mentor a newer staff for 10 minutes) and debrief afterward.",
+                    "Shift from reminders to rationale: ask them to explain *why* they chose an approach.",
+                    "Coach leadership regulation: calm tone, steady pace, and repair language when things go sideways.",
+                ],
+            },
+            "Shift Supervisor": {
+                1: [
+                    "Standardize the shift 'first 10 minutes' checklist so new staff learn what 'good' looks like on arrival.",
+                    "Use 'see it / say it / support it': observe the behavior, name it neutrally, then coach the next move.",
+                    "Protect staff bandwidth: explicitly re-prioritize tasks when the floor gets busy so they learn to triage safely.",
+                ],
+                2: [
+                    "Calibrate consistency across staff: ensure everyone uses the same core language for expectations and limits.",
+                    "Coach handoffs: require concise, risk-focused communication between shifts.",
+                    "Track patterns (who, when, what conditions) and coach upstream prevention, not only reactive responses.",
+                ],
+                3: [
+                    "Delegate leadership: have the staff member run part of a shift routine (with oversight) and then debrief.",
+                    "Coach coaching: teach them how to give feedback to peers respectfully and specifically.",
+                    "Strengthen judgment: review one complex decision weekly and discuss alternatives and outcomes.",
+                ],
+            },
+            "Program Supervisor": {
+                1: [
+                    "Align expectations across the team: translate policy into one-page 'how we do it here' routines to reduce ambiguity.",
+                    "Build predictable coaching cadence: brief weekly check-ins with one measurable goal until stability improves.",
+                    "Use psychological safety: normalize early questions and early escalation to prevent silent failure.",
+                ],
+                2: [
+                    "Use data-informed coaching: review incidents, documentation quality, and routine completion trends to target coaching.",
+                    "Support transfer of learning: ensure training concepts are practiced on the floor with feedback within 24-48 hours.",
+                    "Coach accountability with support: clear standards + resources + follow-through.",
+                ],
+                3: [
+                    "Develop the bench: identify Phase 3 staff for mentoring, training support, and culture modeling.",
+                    "Increase autonomy with guardrails: assign ownership areas (documentation quality, routine integrity, peer onboarding) and review outcomes.",
+                    "Coach systems thinking: connect staff decisions to youth outcomes, team workload, and program stability.",
+                ],
+            },
+        }
+
     
         # Normalize role key (we want to match the staff member being coached)
     
