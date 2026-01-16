@@ -3,7 +3,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 import requests
 import pandas as pd
-import re
+import ree
 from fpdf import FPDF
 import plotly.express as px
 import plotly.graph_objects as go
@@ -2149,7 +2149,6 @@ if st.session_state.current_view == "Supervisor's Guide":
                                 st.error("Failed to save. Please check your internet connection or the Google Script URL.")
                     else:
                         st.error("Name is required.")
-
 # 2. TEAM DNA
 elif st.session_state.current_view == "Team DNA":
     st.subheader("🧬 Team DNA")
@@ -2694,3 +2693,4 @@ elif st.session_state.current_view == "Org Pulse":
                 else:
                     st.warning("Role data missing. Cannot analyze pipeline.")
     else: st.warning("No data available.")
+
