@@ -93,6 +93,52 @@ st.markdown("""
             letter-spacing: -0.5px;
         }
 
+        /* --- DENSITY TUNING (reduce excess blank space) --- */
+        /* Tighten markdown paragraph + list spacing without changing content */
+        div[data-testid="stMarkdownContainer"] p {
+            margin-block-start: 0.35rem;
+            margin-block-end: 0.35rem;
+            line-height: 1.35;
+        }
+        div[data-testid="stMarkdownContainer"] ul,
+        div[data-testid="stMarkdownContainer"] ol {
+            margin-block-start: 0.35rem;
+            margin-block-end: 0.35rem;
+            padding-inline-start: 1.25rem;
+        }
+        div[data-testid="stMarkdownContainer"] li {
+            margin-block-start: 0.15rem;
+            margin-block-end: 0.15rem;
+        }
+        /* Reduce default element-to-element gap (keeps layout intact) */
+        .element-container {
+            margin-bottom: 0.75rem;
+        }
+
+        /* --- DENSITY TUNING (reduce excess blank space) --- */
+        /* Tighten markdown paragraph + list spacing without changing content */
+        div[data-testid="stMarkdownContainer"] p {
+            margin-block-start: 0.35rem;
+            margin-block-end: 0.35rem;
+            line-height: 1.35;
+        }
+
+        div[data-testid="stMarkdownContainer"] ul,
+        div[data-testid="stMarkdownContainer"] ol {
+            margin-block-start: 0.35rem;
+            margin-block-end: 0.35rem;
+            padding-inline-start: 1.25rem;
+        }
+
+        div[data-testid="stMarkdownContainer"] li {
+            margin-block-start: 0.15rem;
+            margin-block-end: 0.15rem;
+        }
+
+        /* Reduce the default gap Streamlit inserts between elements */
+        .element-container {
+            margin-bottom: 0.75rem;
+        }
         /* --- COMPONENTS --- */
 
         /* Hide Sidebar Nav */
