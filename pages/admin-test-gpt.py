@@ -1336,6 +1336,297 @@ def get_hud_context(comm: str, motiv: str, integrated_title: str = ""):
         },
     }
 
+
+def get_environment_audit_context(comm: str, motiv: str, integrated_title: str = ""):
+    """Return a tailored Environment Audit based on the integrated profile.
+
+    This is intentionally contextual so the supervisor learns what *this specific profile*
+    experiences as environmental friction, what fuels engagement, and what actions are
+    most likely to reduce stress and improve performance this week.
+    """
+
+    combo_key = f"{comm}-{motiv}"
+    title = integrated_title or INTEGRATED_PROFILES.get(combo_key, {}).get("title", combo_key)
+
+    # --- Top friction (primary environmental drain) ---
+    friction = {
+        "Director": {
+            "label": "Red Tape / Blockers",
+            "what_it_feels_like": (
+                "When progress is slowed by unclear approvals, competing priorities, or unnecessary steps, "
+                "this profile experiences it as being *handcuffed*. Their stress response often becomes speed + control."
+            ),
+            "risks": [
+                "They start issuing rapid directives without buy-in (steamrolling), which creates team resistance.",
+                "They cut corners to restore speed, increasing compliance/safety risk.",
+                "They become blunt or impatient, damaging relationships and morale.",
+            ],
+            "fixes": [
+                "Remove one barrier they can't move (coverage, approvals, conflicting asks).",
+                "Clarify the decision-right: who decides what, by when.",
+                "Reduce meetings and replace with a 3-bullet written update when possible.",
+            ],
+        },
+        "Encourager": {
+            "label": "Isolation / Cold Culture",
+            "what_it_feels_like": (
+                "When the unit feels transactional, tense, or emotionally flat, this profile loses the relational safety "
+                "that helps them regulate. Isolation makes stress feel personal and heavy."
+            ),
+            "risks": [
+                "They over-promise or people-please to regain connection, then drop follow-through.",
+                "They emotionally flood, vent, or spiral, which can destabilize the room.",
+                "They disengage quietly ('checking out') and drift toward burnout.",
+            ],
+            "fixes": [
+                "Add predictable touchpoints (2-minute check-ins, quick huddles, end-of-shift gratitude).",
+                "Lower shame: correct privately, praise publicly, and use warm directness.",
+                "Create a buddy/backup pattern so they aren't carrying emotion alone.",
+            ],
+        },
+        "Facilitator": {
+            "label": "Conflict / Unresolved Tension",
+            "what_it_feels_like": (
+                "When there is simmering interpersonal tension, unclear expectations, or 'everyone is mad at everyone,' "
+                "this profile feels unsafe. Their system tries to restore harmony by delaying decisions and over-processing."
+            ),
+            "risks": [
+                "They avoid hard conversations, so problems fester and grow.",
+                "They slow down action to keep the peace, creating operational drift.",
+                "They absorb tension until they burn out or become passive-aggressive.",
+            ],
+            "fixes": [
+                "Name the conflict and contain it: define the issue, the timeline, and the decision date.",
+                "Use a simple meeting structure: agenda → options → decision → owner → deadline.",
+                "Create a 'repair ritual' (brief debrief + clear next step) after tense incidents.",
+            ],
+        },
+        "Tracker": {
+            "label": "Chaos / Inconsistency",
+            "what_it_feels_like": (
+                "When rules shift mid-shift, standards are unclear, or the unit is disorganized, this profile feels exposed. "
+                "Chaos triggers rigidity, over-checking, and anxiety-driven perfectionism."
+            ),
+            "risks": [
+                "They get stuck on details and miss the big picture, slowing the team.",
+                "They escalate rule enforcement to regain control, increasing friction with peers.",
+                "They become anxious and exhausted, increasing error risk and absenteeism.",
+            ],
+            "fixes": [
+                "Freeze changes: define 'good enough tonight' and stick to it.",
+                "Use written structure (3-step checklist) and predictable routines.",
+                "Reduce interruptions: batch requests and protect focus blocks when possible.",
+            ],
+        },
+    }.get(comm, {
+        "label": "Unknown Friction",
+        "what_it_feels_like": "",
+        "risks": [],
+        "fixes": [],
+    })
+
+    # --- Top fuel (primary engagement stabilizer) ---
+    fuel = {
+        "Achievement": {
+            "label": "Clear Goals / Scoreboard",
+            "what_it_does": (
+                "A scoreboard converts stress into focus. When success is visible, their nervous system relaxes because "
+                "it can answer: 'Are we winning?'"
+            ),
+            "how": [
+                "Define 1–3 measurable wins for the shift (and make them winnable).",
+                "Show progress visually (whiteboard/checklist).",
+                "Celebrate completion, not perfection: 'Done safely' beats 'done flawlessly.'",
+            ],
+        },
+        "Growth": {
+            "label": "Learning / New Challenge",
+            "what_it_does": (
+                "A learning target turns stress into development instead of shame. When they can practice a skill, "
+                "they feel movement—and movement is regulation for Growth types."
+            ),
+            "how": [
+                "Give one micro-skill to practice this week (script, boundary, de-escalation phrase).",
+                "Provide fast feedback in one sentence (what worked / what to tweak).",
+                "Offer a stretch assignment with guardrails (challenge + support).",
+            ],
+        },
+        "Purpose": {
+            "label": "Mission Connection",
+            "what_it_does": (
+                "Meaning stabilizes them. When tasks feel ethically grounded and tied to youth safety/wellbeing, "
+                "they can endure heavy workload without burning out as quickly."
+            ),
+            "how": [
+                "Connect the 'boring' task to safety or dignity: 'This note protects the youth and the staff.'",
+                "Share a quick impact story (30 seconds) to re-anchor morale.",
+                "Invite ethical concerns, then translate them into constructive action.",
+            ],
+        },
+        "Connection": {
+            "label": "Team Time / Belonging",
+            "what_it_does": (
+                "Belonging is their stabilizer. When the team feels safe and bonded, they regulate faster and "
+                "perform more consistently—especially under pressure."
+            ),
+            "how": [
+                "Create micro-rituals (2-minute huddle, shift handoff script, gratitude round).",
+                "Pair them with a steady coworker during high-stress blocks.",
+                "Use relational repair after conflict (name it, own it, reset).",
+            ],
+        },
+    }.get(motiv, {
+        "label": "Unknown Fuel",
+        "what_it_does": "",
+        "how": [],
+    })
+
+    # --- Quick actions (unique per integrated profile) ---
+    # Start with comm + motiv actions, then allow combo-specific overrides.
+    comm_actions = {
+        "Director": [
+            "Pick one bottleneck and remove it (approval, coverage gap, conflicting asks).",
+            "Replace one meeting with a 3-bullet written update.",
+        ],
+        "Encourager": [
+            "Schedule two 2-minute check-ins this week (start + mid-shift).",
+            "Use a written recap after any important verbal agreement.",
+        ],
+        "Facilitator": [
+            "Set a decision date for one lingering issue and close it.",
+            "Use a short agenda for huddles: issue → option → owner → deadline.",
+        ],
+        "Tracker": [
+            "Create a 3-step checklist for the messiest recurring task.",
+            "Define 'good enough tonight' and freeze changes for one week.",
+        ],
+    }.get(comm, [])
+
+    motiv_actions = {
+        "Achievement": [
+            "Post a 1–3 item 'win list' for the shift (visible scoreboard).",
+            "Celebrate one completion publicly with specifics (what improved / what it protected).",
+        ],
+        "Growth": [
+            "Name one micro-skill to practice and give one-sentence feedback within 24 hours.",
+            "Offer a small stretch task with guardrails (challenge + support).",
+        ],
+        "Purpose": [
+            "Share one mission anchor story during a huddle (30 seconds, concrete impact).",
+            "Translate one ethical concern into a concrete improvement action (policy, workflow, resource request).",
+        ],
+        "Connection": [
+            "Add one team ritual this week (2-minute gratitude, buddy system, consistent handoff).",
+            "Do one relational repair quickly after tension (name it, reset, move on).",
+        ],
+    }.get(motiv, [])
+
+    combo_overrides = {
+        # Directors need speed + guardrails
+        "Director-Achievement": [
+            "Choose one measurable target for the unit this week (e.g., 'notes complete by end of shift') and track it daily.",
+            "Assign one deputy to run a huddle so the leader practices 'pause before command.'",
+            "Remove one paperwork/approval step that doesn't protect safety or compliance.",
+        ],
+        "Director-Growth": [
+            "Pick one system to improve (handoff, logs, crisis response) and run a 7-day experiment.",
+            "Require a 2-minute 'why + plan' explanation before any new change rollout.",
+            "Identify one teammate to mentor—growth through others, not just upgrades.",
+        ],
+        "Director-Purpose": [
+            "Audit one policy friction point and rewrite the 'why' in plain language for staff.",
+            "Create a Tier list for battles (must-fight / debate / let-go) to prevent burnout.",
+            "Schedule one mission moment: connect a routine task to youth safety outcomes.",
+        ],
+        "Director-Connection": [
+            "Add one consistent touchpoint (5 minutes) with each staff member this week.",
+            "Delegate one 'care' task to prevent over-functioning (let someone else lead a ritual or debrief).",
+            "Partner with one outside unit/role to expand the circle of 'us'.",
+        ],
+        # Encouragers need structure + reality
+        "Encourager-Achievement": [
+            "Turn the week's priorities into a visible scoreboard (3 wins) and review it daily.",
+            "Limit new ideas: finish one project fully before starting another.",
+            "Follow every pep-talk with a written 'who/what/when' recap.",
+        ],
+        "Encourager-Growth": [
+            "Select one coaching skill to practice this week (direct feedback with warmth).",
+            "No new initiatives until last week's action items are fully closed.",
+            "Capture one mentoring practice into a reusable template (make growth systematic).",
+        ],
+        "Encourager-Purpose": [
+            "Build a quick 'fact vs feeling' habit: name the feeling, then name one observable fact.",
+            "Create an end-of-shift release ritual (one thing you did that mattered, one thing you let go).",
+            "Use your voice in a structured place (orientation/huddle), not in the heat of conflict.",
+        ],
+        "Encourager-Connection": [
+            "Define one professionalism boundary (friend vs leader) and practice it once this week.",
+            "Intentionally connect with the quiet/outside staff member (expand the circle).",
+            "Assign one task-focused 'deep work' block with no social interruptions.",
+        ],
+        # Facilitators need closure + containment
+        "Facilitator-Achievement": [
+            "Set a decision deadline for one open loop (then close it).",
+            "Create a weekly tracker for two metrics that matter (simple, visible).",
+            "Address one resentment directly using a script ('I need X by Y').",
+        ],
+        "Facilitator-Growth": [
+            "Practice 'imperfect action': choose a 'good enough' solution with a review date.",
+            "Teach one teammate a process tool you use (growth through process transfer).",
+            "Create a 2-option decision template to reduce over-processing.",
+        ],
+        "Facilitator-Purpose": [
+            "Write down the 'why' behind one tough call and share it with staff.",
+            "Create a 'values check' step in decision-making (safety, dignity, compliance).",
+            "Use a brief debrief after conflicts: what happened, what matters, what changes.",
+        ],
+        "Facilitator-Connection": [
+            "Run a 2-minute 'temperature check' in huddles ('1–5, how's the room?').",
+            "Use a repair ritual after tension (name it, own it, reset).",
+            "Assign buddies during high-risk times to reduce relational stress.",
+        ],
+        # Trackers need clarity + stability
+        "Tracker-Achievement": [
+            "Build a daily checklist scoreboard (3 wins) and mark it off in real time.",
+            "Define 'good enough' for documentation this week and stick to it.",
+            "Batch interruptions: set two specific times for questions/requests per shift.",
+        ],
+        "Tracker-Growth": [
+            "Pick one small process improvement and test it for 7 days (then refine).",
+            "Give one micro-skill to practice ('write it, then do it') and review results.",
+            "Allow safe failure: label it as 'data' and update the checklist.",
+        ],
+        "Tracker-Purpose": [
+            "Rewrite one compliance task into a mission sentence (how it protects youth).",
+            "Invite one ethical question and translate it into a workflow improvement.",
+            "Share one impact story that connects the 'rules' to real outcomes.",
+        ],
+        "Tracker-Connection": [
+            "Use predictable rituals (handoff script, huddle) to reduce social ambiguity.",
+            "Pair with a steady teammate during high-stress blocks.",
+            "Do one quick relational check-in: 'What do you need from me to feel supported?'.",
+        ],
+    }
+
+    quick_actions = combo_overrides.get(combo_key, [])
+    if not quick_actions:
+        quick_actions = []
+        quick_actions.extend(comm_actions)
+        quick_actions.extend(motiv_actions)
+        # Add one universal action that keeps the audit practical
+        quick_actions.append("Clarify the top 1–2 priorities for the next 7 days ('what matters most' + 'what can wait').")
+
+    # Keep it tight and usable
+    quick_actions = quick_actions[:6]
+
+    return {
+        "title": title,
+        "combo_key": combo_key,
+        "friction": friction,
+        "fuel": fuel,
+        "quick_actions": quick_actions,
+    }
+
 def generate_profile_content(comm, motiv):
     combo_key = f"{comm}-{motiv}"
     c_data = COMM_PROFILES.get(comm, {})
@@ -1655,43 +1946,67 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             for item in pr["items"]:
                 st.write(f"• **{item['suggestion']}** — {item['why']}")
 
-    # 2. Environment Audit
-    fuel_map = {"Achievement": "Clear Goals", "Growth": "New Challenges", "Purpose": "Mission Connection", "Connection": "Team Time"}
-    friction_map = {"Director": "Red Tape", "Encourager": "Isolation", "Facilitator": "Conflict", "Tracker": "Chaos"}
+    # 2. Environment Audit (contextual to integrated profile)
+    env = get_environment_audit_context(p_comm, p_mot, integrated_title=hud["title"])
 
     with st.container(border=True):
         st.markdown("### 2) Environment Audit")
         st.caption("Burnout is often structural, not personal. Audit the environment before you intensify coaching.")
 
         with st.expander("Environment Audit (What it is / why it matters / how to use it)", expanded=False):
-            st.markdown("""
-**Definition:** An *Environment Audit* is a quick review of how the unit's conditions are affecting performance and regulation.
+            st.markdown(f"**Context:** {env['title']} (Integrated Profile)")
+            st.markdown(
+                "**What it is:** An *Environment Audit* is a quick, supervisor-led scan of how unit conditions are shaping behavior, regulation, and performance. "
+                "It treats the environment as a *leadership lever*, not background noise."
+            )
 
-**Why it matters:** If the environment is chaotic, unclear, or unrealistic, you cannot coach someone out of it. Supervisors lead by building *containment*: clarity, predictability, and recovery rhythms.
+            st.markdown(
+                "**Why it matters:** Most 'performance problems' are actually the nervous system responding to the environment—unclear priorities, chaos, tension, or blocked progress. "
+                "If you only coach the person and ignore the setting, you risk creating a discipline loop (correction → stress → more mistakes → more correction). "
+                "Auditing the environment reduces burnout, prevents avoidable incidents, and protects retention."
+            )
 
-**How to use it (Supervisor checklist):**
-- **Workload realism:** Are we expecting superhuman output due to staffing gaps?
-- **Role clarity:** Does the person know what "good" looks like right now?
-- **Predictability:** Are we changing plans mid-shift without warning?
-- **Noise + chaos:** Is the setting overstimulating (constant interruptions, no reset space)?
-- **Recovery rhythms:** Is there a built-in pause (micro-breaks, task rotation, huddle)?
+            st.markdown("**How to use it (Supervisor steps):**")
+            st.write("• **Scan:** What changed this week (staffing, schedules, youth dynamics, expectations)?")
+            st.write("• **Name friction + fuel:** Identify the biggest drain and the biggest stabilizer for this profile.")
+            st.write("• **Adjust the environment first:** Make one change that lowers friction before you intensify coaching.")
+            st.write("• **Re-check after 1–2 shifts:** Did the change reduce stress signals and improve follow-through?")
 
-**Rule of thumb:**
-- If stress is rising across multiple staff, your issue is likely **environmental**, not individual.
-""")
+            st.markdown("---")
+            st.markdown(f"### Top Friction: {env['friction']['label']}")
+            st.markdown(f"**What it feels like for this profile:** {env['friction']['what_it_feels_like']}")
+
+            st.markdown("**Why this is important (what can happen if you don't address it):**")
+            for r in env["friction"]["risks"]:
+                st.write(f"• {r}")
+
+            st.markdown("**Supervisor levers (what to change in the environment):**")
+            for f in env["friction"]["fixes"]:
+                st.write(f"• {f}")
+
+            st.markdown("---")
+            st.markdown(f"### Top Fuel: {env['fuel']['label']}")
+            st.markdown(f"**Why it works for this profile:** {env['fuel']['what_it_does']}")
+            st.markdown("**How to add it in small doses (so it actually sticks):**")
+            for h in env["fuel"]["how"]:
+                st.write(f"• {h}")
+
+            st.markdown("**Supervisor teaching note:** Fuel is not a reward you 'give' after performance—it is a stabilizer you add *before* things fall apart. "
+                        "Small, consistent doses beat big, occasional gestures.")
 
         ac1, ac2 = st.columns(2)
         with ac1:
-            st.metric("Top Friction (Remove This)", friction_map.get(p_comm))
-            st.caption("This is the #1 friction point most likely to drain them. Try to reduce it first.")
+            st.metric("Top Friction (Remove This)", env["friction"]["label"])
+            st.caption("Removing friction is often the fastest way to reduce stress signals and prevent escalation.")
+            st.write(f"**What it looks like:** {env['friction']['what_it_feels_like']}")
         with ac2:
-            st.metric("Top Fuel (Add This)", fuel_map.get(p_mot))
-            st.caption("This is the #1 engagement fuel for them. Add small doses consistently.")
+            st.metric("Top Fuel (Add This)", env["fuel"]["label"])
+            st.caption("Fuel helps them stabilize and re-engage—especially under pressure.")
+            st.write(f"**Why it works:** {env['fuel']['what_it_does']}")
 
-        st.markdown("#### Quick actions you can take this week")
-        st.write("• Remove or reduce one friction source (a barrier, an ambiguity, a last-minute change).")
-        st.write("• Add one fuel source (clear goal, stretch task, mission story, or team touchpoint).")
-        st.write("• Confirm what 'good enough' looks like for the next 7 days.")
+        st.markdown("#### Quick actions you can take this week (matched to this Integrated Profile)")
+        for a in env["quick_actions"]:
+            st.write(f"• {a}")
 
     # 3. Crisis Protocol
     crisis_script = {
