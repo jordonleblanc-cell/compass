@@ -1284,6 +1284,111 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
     return pdf.output(dest='S').encode('latin-1')
 
+def get_integrated_hud_data(comm, motiv):
+    """
+    Returns specific, high-context strings for the Supervisor's HUD
+    based on the 16 combinations of Communication + Motivation.
+    """
+    # Defaults
+    s_sig, s_why, s_risk = "N/A", "N/A", "N/A"
+    rx_why = "This restores balance."
+
+    # 1. Stress Signature Logic
+    if comm == "Director":
+        if motiv == "Achievement":
+            s_sig = "Micromanaging, taking over tasks, visible irritation with any delay."
+            s_why = "They equate speed with competence. When things slow down, they feel the team is failing, so they 'rescue' it to protect the win."
+            s_risk = "They will burn out doing everyone else's job, and the team will stop trying because 'The Boss will just fix it anyway.'"
+            rx_why = "Removing a barrier proves you value their speed. Giving them a 'win' restores their sense of agency."
+        elif motiv == "Growth":
+            s_sig = "Become critical of others' intelligence, impatience with training, 'they just don't get it'."
+            s_why = "They fear incompetence. Stagnation feels like death to them. They lash out when they feel the team isn't growing fast enough."
+            s_risk = "They will alienate learning staff, creating a culture of fear where no one asks questions."
+            rx_why = "Feeding their brain with a new challenge distracts them from the team's slowness. Autonomy shows you trust their competence."
+        elif motiv == "Purpose":
+            s_sig = "Moralizing speed. 'We are failing the kids because we are slow.' Righteous anger."
+            s_why = "They view inefficiency as an ethical violation. To them, wasting time = hurting kids."
+            s_risk = "They will become a martyr, working 80 hours to 'save' the program, then crash hard."
+            rx_why = "Connecting speed to care validates their anger without enabling the burnout. Protective action shows you share their values."
+        elif motiv == "Connection":
+            s_sig = "Aggressively protective. 'I'll handle it, don't talk to my team.' Us vs. Them."
+            s_why = "They fear the team getting hurt or stressed. They use their power to build a fortress around their people."
+            s_risk = "They create a silo. The team loves them, but the agency can't work with them."
+            rx_why = "Validating their protection lowers their defenses so they can hear feedback. Delegated care builds their trust in you."
+
+    elif comm == "Encourager":
+        if motiv == "Achievement":
+            s_sig = "Over-promising, saying yes to everything, manic energy followed by a crash."
+            s_why = "They fear letting people down means failing. They try to 'win' relationships by doing favors."
+            s_risk = "Reliability craters. They drop balls because they are juggling too many 'yeses'."
+            rx_why = "A visual scoreboard grounds them in reality. Forced prioritization relieves the pressure of having to please everyone."
+        elif motiv == "Growth":
+            s_sig = "Chasing shiny objects, bored with routine, starting new initiatives without finishing old ones."
+            s_why = "Boredom is painful for them. They seek novelty to keep their energy up."
+            s_risk = "Lots of starts, no finishes. The team gets whiplash from constant pivots."
+            rx_why = "Project ownership focuses their chaotic energy. Explaining the 'why' of routine reframes boredom as a necessary skill."
+        elif motiv == "Purpose":
+            s_sig = "Emotional flooding, crying in meetings, taking on client trauma personally."
+            s_why = "They have high empathy and low filters. They feel the pain of the work acutely."
+            s_risk = "Compassion fatigue. They will burn out from the emotional weight, not the workload."
+            rx_why = "Mission stories refill their emotional tank. Boundaries framed as 'ethics' help them protect their heart without guilt."
+        elif motiv == "Connection":
+            s_sig = "Gossip, venting, wasting time on small talk, avoiding conflict at all costs."
+            s_why = "They fear rejection. They prioritize being liked over being effective."
+            s_risk = "Toxic harmony. Poor performance is tolerated to keep the peace."
+            rx_why = "Face time reassures them they are safe with you. Team rituals channel their social energy into productive culture building."
+
+    elif comm == "Facilitator":
+        if motiv == "Achievement":
+            s_sig = "Stalling to find the 'perfect' answer that satisfies everyone AND hits the goal."
+            s_why = "They fear making the wrong choice that hurts the outcome. They want 100% certainty before moving."
+            s_risk = "Missed deadlines. Opportunities die in committee."
+            rx_why = "The '51% Rule' gives them permission to move without perfection. Deadlines provide the safety of a container."
+        elif motiv == "Growth":
+            s_sig = "Endless research, asking 'What about this angle?', analysis paralysis."
+            s_why = "They desire mastery and completeness. They don't want to miss a piece of the puzzle."
+            s_risk = "Academic debate replaces actual work. Theory over practice."
+            rx_why = "Time-boxed research limits the scope. Pilot programs allow them to learn by doing, satisfying their need for growth."
+        elif motiv == "Purpose":
+            s_sig = "Moral gridlock. 'Neither option feels right.' Refusal to choose the lesser of two evils."
+            s_why = "They fear compromising their values. They want a solution where no one gets hurt."
+            s_risk = "Ethical stagnation. Urgent decisions are delayed, causing harm."
+            rx_why = "Framing the 'Least Bad Option' as the moral choice helps them move. Validating the struggle makes them feel seen."
+        elif motiv == "Connection":
+            s_sig = "Hiding, refusing to give bad news, mediating instead of leading."
+            s_why = "They fear breaking the relationship. They prioritize the group's cohesion over the task."
+            s_risk = "Leadership vacuum. The team runs the leader."
+            rx_why = "Shared decisions reduce their isolation. Pre-meeting alignment builds their confidence to speak up."
+
+    elif comm == "Tracker":
+        if motiv == "Achievement":
+            s_sig = "Obsessive formatting, working late on details, refusing to delegate because 'they won't do it right'."
+            s_why = "They equate perfection with success. Errors feel like personal failures."
+            s_risk = "Burnout on low-value tasks. They miss the forest for the trees."
+            rx_why = "Defining 'Done' stops the perfectionism loop. Metrics focus them on output, not just input."
+        elif motiv == "Growth":
+            s_sig = "Hoarding knowledge, correcting others' grammar/minor errors, acting superior."
+            s_why = "They view accuracy as competence. They protect their status by being the expert."
+            s_risk = "They alienate peers who feel judged. Collaboration stops."
+            rx_why = "Teaching others channels their expertise productively. Giving them an 'Expert Role' validates their status."
+        elif motiv == "Purpose":
+            s_sig = "Using rules to block action. 'Policy says we can't.' The Bureaucratic Wall."
+            s_why = "They believe rules protect the mission. Risk feels like a betrayal of the agency."
+            s_risk = "They become a bottleneck that kills innovation and morale."
+            rx_why = "Safe exceptions allow flexibility without fear. Explaining the logic behind the policy helps them connect rule to why."
+        elif motiv == "Connection":
+            s_sig = "Passive aggression, silent resentment, doing 'invisible' work and being mad no one noticed."
+            s_why = "They feel used. They show care through tasks, not words, and feel hurt when it's missed."
+            s_risk = "Explosive resignation. They quit 'suddenly' after months of silence."
+            rx_why = "Public appreciation makes their invisible work visible. Role clarity protects their boundaries."
+
+    return {
+        "s_sig": s_sig,
+        "s_why": s_why,
+        "s_risk": s_risk,
+        "rx_why": rx_why
+    }
+
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     data = generate_profile_content(p_comm, p_mot)
 
@@ -1370,56 +1475,36 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     
     # --- SECTION 6: THE SUPERVISOR'S HUD (REWORKED) ---
     st.subheader("6. The Supervisor's HUD (Heads-Up Display)")
-    st.info("This dashboard is your monthly maintenance checklist. Use it to diagnose burnout risks before they become resignations.")
+    st.caption("A dashboard for maintaining this staff member's engagement and preventing burnout. Check these indicators monthly.")
+
+    # Get contextual data based on INTEGRATED profile
+    hud_context = get_integrated_hud_data(p_comm, p_mot)
 
     # 1. Stress Signature
-    stress_data = {
-        "Director": {
-            "signal": "Becomes aggressive, micromanages, and stops listening.",
-            "root_cause": "They feel a loss of control or forward momentum. They are compensating by trying to force speed.",
-            "strategy": "Stop talking and start doing. Give them a specific, solvable problem to own immediately to restore their sense of agency.",
-            "rx": ["Remove a barrier they can't move.", "Give them a 'win' to chase.", "Shorten the meeting."]
-        },
-        "Encourager": {
-            "signal": "Becomes silent, withdrawn, or agrees to everything (martyrdom) while resentful.",
-            "root_cause": "They feel disconnected, unappreciated, or unsafe. They are 'checking out' to protect their emotions.",
-            "strategy": "Re-establish relational safety before addressing tasks. They cannot perform if they feel isolated.",
-            "rx": ["Schedule face time (no agenda).", "Validate their emotional load.", "Publicly praise a specific contribution."]
-        },
-        "Facilitator": {
-            "signal": "Becomes paralyzed, asks for endless data, and refuses to make a decision.",
-            "root_cause": "They fear making an unfair decision or upsetting the harmony. They are stalling to avoid conflict.",
-            "strategy": "Remove the burden of the final call. Step in and take responsibility for the decision so they feel safe.",
-            "rx": ["Give a clear deadline.", "Take the blame for a hard decision.", "Ask 'What is the risk of doing nothing?'"]
-        },
-        "Tracker": {
-            "signal": "Becomes rigid, quotes policy excessively, and focuses on minor errors.",
-            "root_cause": "They fear chaos, error, or liability. They are grasping for certainty in a chaotic environment.",
-            "strategy": "Restore order. Provide clarity, written instructions, and protection from last-minute changes.",
-            "rx": ["Give them the 'why' behind the chaos.", "Protect them from last-minute changes.", "Explicitly define 'good enough'."]
-        }
+    # Fallback/Base data for display
+    stress_base_rx = {
+        "Director": ["Remove a barrier they can't move.", "Give them a 'win' to chase.", "Shorten the meeting."],
+        "Encourager": ["Schedule face time (no agenda).", "Validate their emotional load.", "Publicly praise a specific contribution."],
+        "Facilitator": ["Give a clear deadline.", "Take the blame for a hard decision.", "Ask 'What is the risk of doing nothing?'"],
+        "Tracker": ["Give them the 'why' behind the chaos.", "Protect them from last-minute changes.", "Explicitly define 'good enough'."]
     }
-    
-    s_dat = stress_data.get(p_comm, {})
     
     with st.container(border=True):
         st.markdown("#### 🚨 Stress Signature (Early Warning System)")
-        with st.expander("🎓 **Training: How to read behavior as language**"):
-             st.markdown("""
-             **What this is:** High performers rarely admit they are drowning until they quit. Instead, they "act out" their stress profile.
-             **Why it matters:** Behavior change is a lagging indicator of burnout. If you see these signals, their "emotional battery" is already red.
-             **How to use:** Do not discipline the behavior immediately. Treat it as a symptom. Ask: "I see [Signal], which usually means you are feeling [Root Cause]. How can I help?"
-             """)
         
         col_sig, col_rx = st.columns([1, 1])
         with col_sig:
-            st.error(f"**The Signal (Watch for this):**\n{s_dat.get('signal')}")
-            st.caption(f"**Psychological Root Cause:** {s_dat.get('root_cause')}")
+            st.error(f"**The Signal (Watch for this):**\n{hud_context['s_sig']}")
+            st.caption(f"**Root Cause:** {hud_context['s_why']}")
+            st.caption(f"**Risk if Ignored:** {hud_context['s_risk']}")
+            
         with col_rx:
-            st.success(f"**The Antidote (Do This):**\n{s_dat.get('strategy')}")
-            st.write("**Specific Actions:**")
-            for r in s_dat.get('rx', []):
+            st.success(f"**The Prescription (Do This):**")
+            # We use the generic Rx list but explain WHY it works for this specific combination below
+            rx_list = stress_base_rx.get(p_comm, [])
+            for r in rx_list:
                 st.write(f"• {r}")
+            st.caption(f"**Why this works for them:** {hud_context['rx_why']}")
 
     # 2. Environment Audit
     env_data = {
@@ -1441,23 +1526,14 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
     with st.container(border=True):
         st.markdown("#### 🛠️ Environment Audit (Retention Check)")
-        with st.expander("🎓 **Training: Friction vs. Fuel**"):
-             st.markdown("""
-             **The Equation:** *Retention = (Fuel - Friction) x Connection*
-             **Friction:** The daily annoyances that drain energy. For a Director, waiting is friction. For a Tracker, chaos is friction.
-             **Fuel:** The specific psychological reward they crave. Money is temporary fuel; this is sustainable fuel.
-             **How to use:** Ask them monthly: "What is the biggest friction point in your day right now?" and fix it.
-             """)
         
         ac1, ac2 = st.columns(2)
         with ac1:
             st.metric("Top Friction (The Kryptonite)", fric.get('friction'))
-            st.write(f"**The Cost:** If this persists, they will quit emotionally before they quit physically.")
-            st.error(f"**Fix:** {fric.get('fix')}")
+            st.write(f"**How to remove it:** {fric.get('fix')}")
         with ac2:
             st.metric("Top Fuel (The Superpower)", fuel.get('fuel'))
-            st.write(f"**The ROI:** This is the cheapest way to buy their engagement.")
-            st.success(f"**Inject:** {fuel.get('fix')}")
+            st.write(f"**How to inject it:** {fuel.get('fix')}")
 
     # 3. Crisis Protocol
     crisis_data = {
@@ -1483,12 +1559,6 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
     with st.container(border=True):
         st.markdown("#### 🆘 Crisis Protocol (Break Glass in Emergency)")
-        with st.expander("🎓 **Training: Cognitive Tunneling**"):
-             st.markdown("""
-             **The Science:** In high-stress moments (crisis, restraint, deadline), the prefrontal cortex (logic brain) shuts down. Staff cannot process complex sentences or nuance.
-             **The Fix:** You need a "Short-Code" sentence that bypasses the panic and speaks directly to their core safety need.
-             **How to use:** Memorize the script below. Say it calmly, firmly, and exactly as written when they are melting down.
-             """)
         st.info(f"**Say exactly this:** \"{c_dat.get('script')}\"")
         st.caption(f"**Why it works:** {c_dat.get('why')}")
 
@@ -1533,6 +1603,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             3: ["The Delegation: 'You run the meeting today.'", "The Systems Think: 'How do we fix this process?'"]
         }
         
+        # Combine
         return c_moves.get(comm, []) + m_moves.get(motiv, []) + p_moves.get(phase, [])
 
     # Phase Selector
