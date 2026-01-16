@@ -235,16 +235,6 @@ st.markdown("""
             background-color: var(--card-bg);
             border-radius: 8px;
         }
-
-        /* Custom Phase Card */
-        .phase-card {
-            background-color: var(--card-bg);
-            padding: 20px;
-            border-left: 5px solid var(--primary);
-            border-radius: 5px;
-            margin-bottom: 10px;
-            box-shadow: var(--shadow);
-        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -411,77 +401,125 @@ MOTIV_TRAITS = ["Achievement", "Growth", "Purpose", "Connection"]
 COMM_PROFILES = {
     "Director": {
         "bullets": [
-            "**Clarity:** They prioritize the 'bottom line' over the backstory, speaking in headlines to ensure immediate understanding.",
-            "**Speed:** They process information rapidly and expect others to keep up, preferring a quick 80% solution over a delayed 100% solution.",
-            "**Conflict:** They view conflict as a tool for problem-solving rather than a relationship breaker."
+            "**Clarity:** They prioritize the 'bottom line' over the backstory, speaking in headlines to ensure immediate understanding. Supervisors should not mistake their brevity for rudeness.",
+            "**Speed:** They process information rapidly and expect others to keep up, preferring a quick 80% solution over a delayed 100% solution. They are likely to interrupt if they feel a conversation is dragging or becoming repetitive, signaling their desire to move on. Supervisors should be prepared to move quickly through agenda items to maintain their engagement. They view pause and hesitation as a lack of confidence or competence in others.",
+            "**Conflict:** They view conflict as a tool for problem-solving rather than a relationship breaker. They do not take disagreement personally and respect those who push back with logic. They are comfortable addressing issues head-on and may perceive hesitation in others as weakness or lack of preparation. For them, friction is necessary to sharpen ideas."
         ],
         "supervising_bullets": [
-            "**Be Concise:** Get to the point immediately; avoid 'sandwiching' feedback with small talk.",
-            "**Focus on Outcomes:** Tell them what needs to be achieved, but leave the how to them.",
-            "**Respect Autonomy:** Give them space to operate independently; tight oversight feels like distrust."
+            "**Be Concise:** Get to the point immediately; avoid 'sandwiching' feedback with small talk. They value their time and yours, and they respect supervisors who treat time as a resource. If you have five minutes of content, do not stretch it to thirty. They will tune out if they feel you are 'padding' the conversation.",
+            "**Focus on Outcomes:** Tell them what needs to be achieved, but leave the how to them. Focusing on the end result empowers them to find the most efficient path. Over-explaining the process will make them feel micromanaged and stifled. They trust their own ability to navigate the map; they just need you to identify the destination.",
+            "**Respect Autonomy:** Give them space to operate independently; tight oversight feels like distrust to a Director. Check in at agreed-upon milestones rather than hovering constantly. Trust that they will come to you if they hit a roadblock they cannot remove themselves. Their silence usually means they are working, not that they are lost."
         ]
     },
     "Encourager": {
         "bullets": [
-            "**Verbal Processing:** They think out loud and prefer talking through problems rather than reading about them.",
-            "**Optimism:** They naturally focus on the potential and the positive. They sell the vision effectively.",
-            "**Relationship-First:** They influence people through liking and charisma. They prioritize the 'vibe'."
+            "**Verbal Processing:** They think out loud and prefer talking through problems rather than reading about them. They are articulate and inspiring. They need to hear their own voice to know what they think. They process information externally and socially.",
+            "**Optimism:** They naturally focus on the potential and the positive. They sell the vision effectively but may gloss over the gritty details. They see the glass as overflowing. They are the cheerleaders of the organization.",
+            "**Relationship-First:** They influence people through liking and charisma. They prioritize the 'vibe' of the interaction. They want you to like them before they want you to understand them. They build bridges before they cross them."
         ],
         "supervising_bullets": [
-            "**Allow Discussion:** Give them a few minutes to chat and connect; cutting them off too early kills morale.",
-            "**Ask for Specifics:** They speak in generalities ('It's going great!'). Ask 'What specifically is going great?'",
-            "**Follow Up in Writing:** They may agree enthusiastically in the moment but forget the details."
+            "**Allow Discussion:** Give them a few minutes to chat and connect; cutting them off too early kills their morale. They need the relational runway to take off. Small talk is big work for them.",
+            "**Ask for Specifics:** They speak in generalities ('It's going great!'). Ask 'What specifically is going great?' to get the data. You must drill down to find the reality beneath the enthusiasm. Force them to define their terms.",
+            "**Follow Up in Writing:** They may agree enthusiastically in the moment but forget the details. Always send a recap email. Their memory is often tied to the emotion of the moment, not the facts. Document the boring parts for them."
         ]
     },
     "Facilitator": {
         "bullets": [
-            "**Listening:** They gather all perspectives before speaking. They are the quiet ones in the meeting.",
-            "**Consensus:** They prefer group agreement over unilateral action. They want everyone on the bus.",
-            "**Process:** They value how a decision is made as much as the decision itself. They hate chaos."
+            "**Listening:** They gather all perspectives before speaking. They are the quiet ones in the meeting who are taking notes. They want the full picture before they commit to an opinion. They value input from every chair in the room to ensure nothing is missed.",
+            "**Consensus:** They prefer group agreement over unilateral action. They view a 5-4 vote as a failure to align the team properly. They want everyone on the bus before the bus moves forward. They work hard to bring dissenters along to create a unified front.",
+            "**Process:** They value how a decision is made as much as the decision itself. They hate chaos and shooting from the hip without a plan. They want a clear agenda, a timeline, and a protocol to follow. They find comfort in the structure of a well-organized meeting."
         ],
         "supervising_bullets": [
-            "**Advance Notice:** Give them time to think before asking for a decision. Send the agenda early.",
-            "**Deadlines:** Set clear 'decision dates' to prevent endless deliberation.",
-            "**Solicit Opinion:** Ask them explicitly what they think. They will not fight for airtime."
+            "**Advance Notice:** Give them time to think before asking for a decision. Send the agenda 24 hours in advance so they can prepare. They hate being put on the spot and forced to react instantly. They need to process internally before they speak publicly to ensure they are accurate.",
+            "**Deadlines:** Set clear 'decision dates' to prevent endless deliberation. Without a deadline, they will process forever in search of the perfect consensus. You must close the window of discussion to ensure progress. Give them a specific time to stop thinking and start acting.",
+            "**Solicit Opinion:** Ask them explicitly what they think during meetings. They will not fight for airtime against louder voices. You have to hand them the microphone to get their valuable insight. Their silence does not mean they have nothing to say; it means they are waiting to be asked."
         ]
     },
     "Tracker": {
         "bullets": [
-            "**Detail-Oriented:** They communicate in data and precise details. They value accuracy above all else.",
-            "**Risk-Averse:** They are cautious, avoiding definitive statements until they are 100% sure.",
-            "**Process-Driven:** They are the guardians of the handbook. They quote the manual to settle disputes."
+            "**Detail-Oriented:** They communicate in spreadsheets, data, and precise details. They value accuracy above all else and will correct you if you are wrong. They want to be right, not just understood. They find safety in the specifics and mistrust vagueness.",
+            "**Risk-Averse:** They are cautious in their speech, avoiding definitive statements until they are 100% sure. They will often say 'let me check on that' rather than guessing. They view guessing as lying or irresponsibility. They speak carefully and deliberately.",
+            "**Process-Driven:** They talk about how we do things, not just what we do. They are the guardians of the handbook and the policy manual. They believe the rules exist to save us from chaos. They quote the manual to settle disputes."
         ],
         "supervising_bullets": [
-            "**Be Specific:** Do not use vague language. Give them the metric: 'Increase accuracy by 10%.'",
-            "**Provide Data:** If you want to persuade them, bring the numbers and the facts.",
-            "**Written Instructions:** Follow up verbal conversations with an email to provide a paper trail."
+            "**Be Specific:** Do not use vague language like 'do it better' or 'work harder.' Give them the metric: 'Increase accuracy by 10%.' They cannot hit a target they cannot see. Use numbers, not feelings, to drive behavior.",
+            "**Provide Data:** If you want to persuade them, bring the numbers and the facts. Emotional appeals will bounce off them. They respect logic, evidence, and precedent. Show them the proof that your idea works.",
+            "**Written Instructions:** Follow up every verbal conversation with an email. They trust the written word more than the spoken word. It provides a paper trail they crave for security. Document the ask to ensure alignment."
         ]
     }
 }
 
 MOTIV_PROFILES = {
     "Achievement": {
-        "bullets": ["**Scoreboard:** Needs to know if winning.", "**Completion:** Loves checking boxes.", "**Efficiency:** Hates waste."],
-        "strategies_bullets": ["**Visual Goals:** Dashboards.", "**Public Wins:** Acknowledge competence.", "**Autonomy:** Let them design the path."],
-        "celebrate_bullets": ["Efficiency", "Clarity", "Resilience"],
+        "bullets": [
+            "**Scoreboard:** They need to know if they are winning or losing at any given moment. Ambiguity is their enemy; they need quantifiable metrics to judge their own performance. Without a clear definition of success, they may become anxious or disengaged. They are driven by the comparison of 'where we were' vs 'where we are.'",
+            "**Completion:** They derive energy from finishing tasks and closing loops. An endless list of open-ended projects drains them; they need the dopamine hit of marking a task 'done.' Ensure they have a mix of short-term wins alongside long-term goals. If a project has no end in sight, they will manufacture a conclusion or lose interest.",
+            "**Efficiency:** They hate wasted time and redundancy more than almost anything else. If a meeting has no clear purpose, they will resent attending. They are motivated by streamlining processes and removing bottlenecks. They will work harder to build a system that saves time than they will to just do the work."
+        ],
+        "strategies_bullets": [
+            "**Visual Goals:** Use charts, dashboards, or checklists they can physically mark off. Seeing their progress visually reinforces their sense of forward momentum. Set up a system where they can self-monitor their data without needing to ask you. The visual representation of 'done' is a powerful psychological reward for them.",
+            "**Public Wins:** Acknowledge their success in front of peers, highlighting competence and results. They value respect for their capability more than praise for their personality. Be specific about what they achieved, using data whenever possible. General praise like 'good job' means less to them than 'you improved efficiency by 20%.'",
+            "**Autonomy:** Give them the goal and let them design the strategy. This appeals to their desire for control and efficiency. When they succeed using their own methods, their buy-in to the organization deepens significantly. It proves to them that you trust their competence."
+        ],
+        "celebrate_bullets": [
+            "**Efficiency:** Celebrate specific instances where they solved a complex logistical puzzle quickly. Quantify the time or money they saved.",
+            "**Clarity:** Celebrate their ability to draw a hard line or make a tough call.",
+            "**Resilience:** Celebrate their ability to bounce back immediately and focus on solutions."
+        ],
         "celebrate_deep_dive": "**Recognition Language: Competence & Impact.**\nThey don't want a generic 'good job.' They want you to notice the specific problem they solved. \n\n*Script:* 'I saw how you reorganized the log system; it saved the team 20 minutes tonight. That was brilliant efficiency.'"
     },
     "Growth": {
-        "bullets": ["**Curiosity:** Wants the 'why'.", "**Future-Focused:** Eye on next step.", "**Feedback:** Craves correction."],
-        "strategies_bullets": ["**Stretch Assignments:** Push them.", "**Career Pathing:** Map the future.", "**Mentorship:** Connect with leaders."],
-        "celebrate_bullets": ["Insight", "Development", "Courage"],
+        "bullets": [
+            "**Curiosity:** They are driven to understand the 'why' and 'how' behind every rule. They will not accept 'because we've always done it this way' as an answer. This curiosity is an asset for innovation but can feel like insubordination to insecure leaders. They need to take the machine apart to see how it works.",
+            "**Future-Focused:** They view their current role primarily as a stepping stone to the next challenge. They need to see a clear trajectory for their career or they will look elsewhere. They are constantly scanning the horizon for what is next, which keeps them ambitious but potentially dissatisfied with the present. They live in the future tense.",
+            "**Feedback:** They crave constructive correction over empty praise. Telling them 'good job' is less effective than telling them 'here is how you could do that 10% better.' They view criticism as free consulting for their personal brand and professional development. They want to be sharper, not just happier."
+        ],
+        "strategies_bullets": [
+            "**Stretch Assignments:** Assign tasks slightly above their current skill level. They are bored by mastery; they need to feel the tension of potential failure to stay engaged. Give them problems that no one else has solved yet.",
+            "**Career Pathing:** Discuss their professional future regularly, not just at annual reviews. Map out exactly how their current work contributes to their 5-year plan. Be honest about what skills they lack for the next level so they have a target to aim for.",
+            "**Mentorship:** Connect them with leaders they admire inside or outside the organization. They learn through observation and proximity to power/intellect. Facilitate introductions to senior leadership as a reward for performance."
+        ],
+        "celebrate_bullets": [
+            "**Insight:** Celebrate specific moments where they identified a root cause others missed.",
+            "**Development:** Celebrate a staff member who visibly improved under their guidance.",
+            "**Courage:** Celebrate their willingness to try a new approach, even if it failed."
+        ],
         "celebrate_deep_dive": "**Recognition Language: Trajectory & Potential.**\nPraise the *change* in their behavior, not just the result. Validate their struggle and learning. \n\n*Script:* 'I noticed you handled that crisis differently than last month. You stayed calm and followed the protocol perfectly. Your growth here is obvious.'"
     },
     "Purpose": {
-        "bullets": ["**Values-Driven:** Moral compass.", "**Advocacy:** Fights for underdog.", "**Meaning:** Needs the 'why'."],
-        "strategies_bullets": ["**The Why:** Connect to mission.", "**Storytelling:** Share impact.", "**Ethics:** Validate concerns."],
-        "celebrate_bullets": ["Integrity", "Advocacy", "Consistency"],
+        "bullets": [
+            "**Values-Driven:** They filter every decision through the lens of 'Is this right?' They are less concerned with 'Is this profitable?' or 'Is this efficient?' If a directive violates their internal code, they will resist it, often openly and fiercely. They act as the moral conscience of the room.",
+            "**Advocacy:** They are wired to fight for the underdog. They naturally align themselves with the most vulnerable person in the room (the client, the new staff member). They see themselves as the shield against a cold system. They will risk their own standing to protect someone else.",
+            "**Meaning:** They need the 'why' connected to client well-being. They cannot work for a paycheck alone; they must believe their work matters. If they lose connection to the mission, they burn out instantly. They need to feel they are part of a crusade, not just a company."
+        ],
+        "strategies_bullets": [
+            "**The Why:** Explain the mission behind every mandate. Never say 'because I said so' or 'because it's policy.' Connect the rule directly to how it keeps a child safe or helps a family heal. If they understand the noble purpose, they will endure any hardship.",
+            "**Storytelling:** Share narratives of redemption and impact. They are fueled by stories of success against the odds. Remind them of the specific lives they have touched. Use qualitative data to show them their impact.",
+            "**Ethics:** Allow space to voice moral concerns. Do not shut down their ethical questions; validate them. Even if you cannot change the decision, acknowledging their moral struggle builds trust. They need to know their leader has a soul."
+        ],
+        "celebrate_bullets": [
+            "**Integrity:** Celebrate moments where they made a hard choice because it was the right thing to do.",
+            "**Advocacy:** Celebrate when they gave a voice to the voiceless.",
+            "**Consistency:** Celebrate their unwavering commitment to care."
+        ],
         "celebrate_deep_dive": "**Recognition Language: Mission & Values.**\nConnect their work to the human story. Show them the invisible impact on the child's life. \n\n*Script:* 'Because you stayed late to talk to that youth, they felt safe enough to sleep tonight. You are the reason this program works.'"
     },
     "Connection": {
-        "bullets": ["**Belonging:** Team is family.", "**Harmony:** Absorbs tension.", "**Support:** Helps peers."],
-        "strategies_bullets": ["**Face Time:** In-person matters.", "**Team Rituals:** Build culture.", "**Personal Care:** Ask about life."],
-        "celebrate_bullets": ["Loyalty", "Stabilization", "Culture"],
+        "bullets": [
+            "**Belonging:** They view the team as a family. Their primary goal is to ensure everyone feels they belong. They are the first to welcome new hires and the last to leave a party. They define success by the tightness of the circle.",
+            "**Harmony:** They are sensitive to tension and will absorb it to protect others. A fight on the unit ruins their entire day. They want everyone to get along, but unlike the Peacemaker, they will fight to impose peace if necessary.",
+            "**Support:** They are motivated by helping peers. They will stay late to help a coworker even if their own work is done. They see service to the team as their primary job description."
+        ],
+        "strategies_bullets": [
+            "**Face Time:** Prioritize in-person check-ins. They value the relationship with you more than the tasks you assign. A text message is okay, but a face-to-face conversation is gold. They need to see your eyes to trust you.",
+            "**Team Rituals:** Encourage meals, huddles, and traditions. Give them the space to create culture. They thrive when the team has a shared identity and shared experiences.",
+            "**Personal Care:** Ask about life outside work. They bring their whole self to work and expect you to care about it. Knowing their kids' names or their hobbies matters deeply to them."
+        ],
+        "celebrate_bullets": [
+            "**Loyalty:** Celebrate their standing up for the team.",
+            "**Stabilization:** Celebrate their physical presence calming a room.",
+            "**Culture:** Celebrate the strong identity of the unit. Praise the low turnover or the high morale."
+        ],
         "celebrate_deep_dive": "**Recognition Language: Belonging & Effort.**\nPraise their contribution to the team's health. Value the person, not just the worker. \n\n*Script:* 'The team vibe is so much better when you are on shift. Thank you for always looking out for your peers. We are lucky to have you.'"
     }
 }
@@ -497,9 +535,9 @@ INTEGRATED_PROFILES = {
         "interventions": ["**Phase 1: The Pause Button:** Force a deliberate delay between thought and action.", "**Phase 2: Narrative Leadership:** Coach them to script the 'Why' before they speak.", "**Phase 3: Multiplier Effect:** Train them to sit on their hands while deputies lead."],
         "questions": ["How are you defining success today beyond just metrics?", "What is one win you can celebrate right now?", "Are you driving the team too hard?"],
         "advancement": "**Delegate Effectively:** Give away tasks to prove they can build a team.\n**Allow Safe Failure:** Let the team struggle so they can learn.\n**Focus on Strategy:** Move from the 'how' to the 'why'.",
-        "phase_1_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Safety Net", "Move 6: The Binary Feedback"],
-        "phase_2_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Scenario Drill", "Move 6: The Pattern Spot"],
-        "phase_3_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Delegation", "Move 6: The Systems Think"]
+        "phase_1_moves": ["Move 1: The 'Bottom Line' Opener: Start with the goal immediately.", "Move 2: The Autonomy Check: 'What do you need to own this?'", "Move 3: The Scoreboard: 'Here is how we define winning.'", "Move 4: The Sprint: 'Let's hit this target by Friday.'", "Move 5: The Safety Net: 'Call me if you get stuck.'", "Move 6: The Binary Feedback: 'This was right/wrong.'"],
+        "phase_2_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Scenario Drill: 'What would you do if...?'", "Move 6: The Pattern Spot: 'I see you doing X often.'"],
+        "phase_3_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Delegation: 'You run the meeting today.'", "Move 6: The Systems Think: 'How do we fix this process?'"]
     },
     "Director-Growth": {
         "title": "The Restless Improver",
@@ -510,7 +548,7 @@ INTEGRATED_PROFILES = {
         "interventions": ["**Phase 1: Validation:** Mandate that they validate the current effort before suggesting improvements.", "**Phase 2: Change Management:** Require a 'stakeholder analysis' for their next idea.", "**Phase 3: Capacity Building:** Shift them from idea generator to facilitator."],
         "questions": ["Where are you moving too fast for the team?", "Who haven't you heard from on this issue?", "What are you learning from this struggle?"],
         "advancement": "**Delegate Effectively:** Stop being the 'fixer', become the 'developer.'\n**Allow Safe Failure:** Resist the urge to jump in and correct every mistake.\n**Focus on Strategy:** Design tomorrow's solutions.",
-        "phase_1_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Stretch", "Move 4: The Debrief", "Move 5: The Safety Net", "Move 6: The Binary Feedback"],
+        "phase_1_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Stretch: 'This is slightly above your level.'", "Move 4: The Debrief: 'What did you learn?'", "Move 5: The Safety Net", "Move 6: The Binary Feedback"],
         "phase_2_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Stretch", "Move 4: The Debrief", "Move 5: The Scenario Drill", "Move 6: The Pattern Spot"],
         "phase_3_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Stretch", "Move 4: The Debrief", "Move 5: The Delegation", "Move 6: The Systems Think"]
     },
@@ -523,7 +561,7 @@ INTEGRATED_PROFILES = {
         "interventions": ["**Phase 1: The Gray Zone:** Practice identifying validity in opposing viewpoints.", "**Phase 2: Sustainable Advocacy:** Coach them to use a 'Tier System' for battles.", "**Phase 3: Cultural Architecture:** Move from fighting battles to building systems."],
         "questions": ["Where do you feel the system is failing your values?", "How can you advocate without burning bridges?", "Is this a hill worth dying on?"],
         "advancement": "**Delegate Effectively:** Build a team that protects children.\n**Allow Safe Failure:** Trust that others also care.\n**Focus on Strategy:** Build systems that prevent injustice.",
-        "phase_1_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Impact Story", "Move 4: The Why", "Move 5: The Safety Net", "Move 6: The Binary Feedback"],
+        "phase_1_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Impact Story: 'This helped [Youth].'", "Move 4: The Why: 'This rule protects safety.'", "Move 5: The Safety Net", "Move 6: The Binary Feedback"],
         "phase_2_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Impact Story", "Move 4: The Why", "Move 5: The Scenario Drill", "Move 6: The Pattern Spot"],
         "phase_3_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Impact Story", "Move 4: The Why", "Move 5: The Delegation", "Move 6: The Systems Think"]
     },
@@ -536,7 +574,7 @@ INTEGRATED_PROFILES = {
         "interventions": ["**Phase 1: Delegation of Care:** Stop being the only fixer; assign care tasks to others.", "**Phase 2: Organizational Citizenship:** Expand the circle of loyalty to the whole agency.", "**Phase 3: Mentorship:** Transition from Captain to Admiral."],
         "questions": ["Are you avoiding this conversation to be kind, or to be safe?", "How can you be direct and caring at the same time?", "Are you protecting them from growth?"],
         "advancement": "**Delegate Effectively:** Stop being 'camp parent.'\n**Allow Safe Failure:** Learn the team is resilient.\n**Focus on Strategy:** Expand loyalty to the whole agency.",
-        "phase_1_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Peer Mentor", "Move 4: The Team Check", "Move 5: The Safety Net", "Move 6: The Binary Feedback"],
+        "phase_1_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Peer Mentor: 'Teach a new staff member.'", "Move 4: The Team Check: 'How is the morale?'", "Move 5: The Safety Net", "Move 6: The Binary Feedback"],
         "phase_2_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Peer Mentor", "Move 4: The Team Check", "Move 5: The Scenario Drill", "Move 6: The Pattern Spot"],
         "phase_3_moves": ["Move 1: The 'Bottom Line' Opener", "Move 2: The Autonomy Check", "Move 3: The Peer Mentor", "Move 4: The Team Check", "Move 5: The Delegation", "Move 6: The Systems Think"]
     },
@@ -550,7 +588,7 @@ INTEGRATED_PROFILES = {
         "interventions": ["**Phase 1: Follow-Through:** Focus on finishing.", "**Phase 2: Data Discipline:** Move from 'feeling' to 'fact.'", "**Phase 3: Grooming Talent:** Challenge them to let others shine."],
         "questions": ["How do we keep this energy up when things get boring?", "What are the specific steps to get to that vision?", "Who is doing the work: you or the team?"],
         "advancement": "**Detail Management:** Prove they can handle the boring stuff.\n**Listening:** Learn to sit back and let others speak.\n**Consistency:** Prove they can maintain performance when excitement fades.",
-        "phase_1_moves": ["Move 1: The Relational Buffer", "Move 2: The Vision Connect", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Safety Net", "Move 6: The Binary Feedback"],
+        "phase_1_moves": ["Move 1: The Relational Buffer: 2 mins of chat first.", "Move 2: The Vision Connect: 'This helps the vibe.'", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Safety Net", "Move 6: The Binary Feedback"],
         "phase_2_moves": ["Move 1: The Relational Buffer", "Move 2: The Vision Connect", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Scenario Drill", "Move 6: The Pattern Spot"],
         "phase_3_moves": ["Move 1: The Relational Buffer", "Move 2: The Vision Connect", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Delegation", "Move 6: The Systems Think"]
     },
@@ -603,7 +641,7 @@ INTEGRATED_PROFILES = {
         "interventions": ["**Phase 1: Speaking Up:** Call on them first in meetings.", "**Phase 2: Imperfect Action:** Assign a task with an impossible deadline.", "**Phase 3: Direct Delegation:** Challenge them to assign tasks without asking."],
         "questions": ["What is the 'good enough' decision right now?", "Are you waiting for everyone to agree?", "How can we move forward even if it's messy?"],
         "advancement": "**Speed:** Make faster decisions with less data.\n**Conflict:** Call out underperformance directly.\n**Vision:** Look beyond the checklist.",
-        "phase_1_moves": ["Move 1: The Advance Warning", "Move 2: The Process Map", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Safety Net", "Move 6: The Binary Feedback"],
+        "phase_1_moves": ["Move 1: The Advance Warning: Send agenda early.", "Move 2: The Process Map: 'You design the how.'", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Safety Net", "Move 6: The Binary Feedback"],
         "phase_2_moves": ["Move 1: The Advance Warning", "Move 2: The Process Map", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Scenario Drill", "Move 6: The Pattern Spot"],
         "phase_3_moves": ["Move 1: The Advance Warning", "Move 2: The Process Map", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Delegation", "Move 6: The Systems Think"]
     },
@@ -656,7 +694,7 @@ INTEGRATED_PROFILES = {
         "interventions": ["**Phase 1: Flexibility:** Challenge them to identify one rule that can be bent.", "**Phase 2: People over Process:** Require them to mentor a disorganized staff member.", "**Phase 3: Big Picture:** Ask them to explain why the system exists."],
         "questions": ["How can you measure effort, not just outcome?", "Are you valuing the data more than the person?", "Where is flexibility needed right now?"],
         "advancement": "**Flexibility:** Handle chaos without breaking.\n**Delegation:** Trust others to do the work.\n**Warmth:** Connect with people, not just papers.",
-        "phase_1_moves": ["Move 1: The Data Dive", "Move 2: The Risk Assessment", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Safety Net", "Move 6: The Binary Feedback"],
+        "phase_1_moves": ["Move 1: The Data Dive: Bring specific examples.", "Move 2: The Risk Assessment: 'What risks do you see?'", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Safety Net", "Move 6: The Binary Feedback"],
         "phase_2_moves": ["Move 1: The Data Dive", "Move 2: The Risk Assessment", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Scenario Drill", "Move 6: The Pattern Spot"],
         "phase_3_moves": ["Move 1: The Data Dive", "Move 2: The Risk Assessment", "Move 3: The Scoreboard", "Move 4: The Sprint", "Move 5: The Delegation", "Move 6: The Systems Think"]
     },
@@ -1216,6 +1254,111 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
     return pdf.output(dest='S').encode('latin-1')
 
+def get_integrated_hud_data(comm, motiv):
+    """
+    Returns specific, high-context strings for the Supervisor's HUD
+    based on the 16 combinations of Communication + Motivation.
+    """
+    # Defaults
+    s_sig, s_why, s_risk = "N/A", "N/A", "N/A"
+    rx_why = "This restores balance."
+
+    # 1. Stress Signature Logic
+    if comm == "Director":
+        if motiv == "Achievement":
+            s_sig = "Micromanaging, taking over tasks, visible irritation with any delay."
+            s_why = "They equate speed with competence. When things slow down, they feel the goal slipping away, triggering an anxiety response that looks like aggression."
+            s_risk = "They will burn out doing everyone else's job, and the team will stop trying because 'The Boss will just fix it anyway.'"
+            rx_why = "Removing a barrier proves you value their speed. Giving them a 'win' restores their sense of agency."
+        elif motiv == "Growth":
+            s_sig = "Become critical of others' intelligence, impatience with training, 'they just don't get it'."
+            s_why = "They fear incompetence. Stagnation feels like death to them. They lash out when they feel the team isn't growing fast enough."
+            s_risk = "They will alienate learning staff, creating a culture of fear where no one asks questions."
+            rx_why = "Feeding their brain with a new challenge distracts them from the team's slowness. Autonomy shows you trust their competence."
+        elif motiv == "Purpose":
+            s_sig = "Moralizing speed. 'We are failing the kids because we are slow.' Righteous anger."
+            s_why = "They view inefficiency as an ethical violation. To them, wasting time = hurting kids."
+            s_risk = "They will become a martyr, working 80 hours to 'save' the program, then crash hard."
+            rx_why = "Connecting speed to care validates their anger without enabling the burnout. Protective action shows you share their values."
+        elif motiv == "Connection":
+            s_sig = "Aggressively protective. 'I'll handle it, don't talk to my team.' Us vs. Them."
+            s_why = "They fear the team getting hurt or stressed. They use their power to build a fortress around their people."
+            s_risk = "They create a silo. The team loves them, but the agency can't work with them."
+            rx_why = "Validating their protection lowers their defenses so they can hear feedback. Delegated care builds their trust in you."
+
+    elif comm == "Encourager":
+        if motiv == "Achievement":
+            s_sig = "Over-promising, saying yes to everything, manic energy followed by a crash."
+            s_why = "They fear letting people down means failing. They try to 'win' relationships by doing favors."
+            s_risk = "Reliability craters. They drop balls because they are juggling too many 'yeses'."
+            rx_why = "A visual scoreboard grounds them in reality. Forced prioritization relieves the pressure of having to please everyone."
+        elif motiv == "Growth":
+            s_sig = "Chasing shiny objects, bored with routine, starting new initiatives without finishing old ones."
+            s_why = "Boredom is painful for them. They seek novelty to keep their energy up."
+            s_risk = "Lots of starts, no finishes. The team gets whiplash from constant pivots."
+            rx_why = "Project ownership focuses their chaotic energy. Explaining the 'why' of routine reframes boredom as a necessary skill."
+        elif motiv == "Purpose":
+            s_sig = "Emotional flooding, crying in meetings, taking on client trauma personally."
+            s_why = "They have high empathy and low filters. They feel the pain of the work acutely."
+            s_risk = "Compassion fatigue. They will burn out from the emotional weight, not the workload."
+            rx_why = "Mission stories refill their emotional tank. Boundaries framed as 'ethics' help them protect their heart without guilt."
+        elif motiv == "Connection":
+            s_sig = "Gossip, venting, wasting time on small talk, avoiding conflict at all costs."
+            s_why = "They fear rejection. They prioritize being liked over being effective."
+            s_risk = "Toxic harmony. Poor performance is tolerated to keep the peace."
+            rx_why = "Face time reassures them they are safe with you. Team rituals channel their social energy into productive culture building."
+
+    elif comm == "Facilitator":
+        if motiv == "Achievement":
+            s_sig = "Stalling to find the 'perfect' answer that satisfies everyone AND hits the goal."
+            s_why = "They fear making the wrong choice that hurts the outcome. They want 100% certainty before moving."
+            s_risk = "Missed deadlines. Opportunities die in committee."
+            rx_why = "The '51% Rule' gives them permission to move without perfection. Deadlines provide the safety of a container."
+        elif motiv == "Growth":
+            s_sig = "Endless research, asking 'What about this angle?', analysis paralysis."
+            s_why = "They desire mastery and completeness. They don't want to miss a piece of the puzzle."
+            s_risk = "Academic debate replaces actual work. Theory over practice."
+            rx_why = "Time-boxed research limits the scope. Pilot programs allow them to learn by doing, satisfying their need for growth."
+        elif motiv == "Purpose":
+            s_sig = "Moral gridlock. 'Neither option feels right.' Refusal to choose the lesser of two evils."
+            s_why = "They fear compromising their values. They want a solution where no one gets hurt."
+            s_risk = "Ethical stagnation. Urgent decisions are delayed, causing harm."
+            rx_why = "Framing the 'Least Bad Option' as the moral choice helps them move. Validating the struggle makes them feel seen."
+        elif motiv == "Connection":
+            s_sig = "Hiding, refusing to give bad news, mediating instead of leading."
+            s_why = "They fear breaking the relationship. They prioritize the group's cohesion over the task."
+            s_risk = "Leadership vacuum. The team runs the leader."
+            rx_why = "Shared decisions reduce their isolation. Pre-meeting alignment builds their confidence to speak up."
+
+    elif comm == "Tracker":
+        if motiv == "Achievement":
+            s_sig = "Obsessive formatting, working late on details, refusing to delegate because 'they won't do it right'."
+            s_why = "They equate perfection with success. Errors feel like personal failures."
+            s_risk = "Burnout on low-value tasks. They miss the forest for the trees."
+            rx_why = "Defining 'Done' stops the perfectionism loop. Metrics focus them on output, not just input."
+        elif motiv == "Growth":
+            s_sig = "Hoarding knowledge, correcting others' grammar/minor errors, acting superior."
+            s_why = "They view accuracy as competence. They protect their status by being the expert."
+            s_risk = "They alienate peers who feel judged. Collaboration stops."
+            rx_why = "Teaching others channels their expertise productively. Giving them an 'Expert Role' validates their status."
+        elif motiv == "Purpose":
+            s_sig = "Using rules to block action. 'Policy says we can't.' The Bureaucratic Wall."
+            s_why = "They believe rules protect the mission. Risk feels like a betrayal of the agency."
+            s_risk = "They become a bottleneck that kills innovation and morale."
+            rx_why = "Safe exceptions allow flexibility without fear. Explaining the logic behind the policy helps them connect rule to why."
+        elif motiv == "Connection":
+            s_sig = "Passive aggression, silent resentment, doing 'invisible' work and being mad no one noticed."
+            s_why = "They feel used. They show care through tasks, not words, and feel hurt when it's missed."
+            s_risk = "Explosive resignation. They quit 'suddenly' after months of silence."
+            rx_why = "Public appreciation makes their invisible work visible. Role clarity protects their boundaries."
+
+    return {
+        "s_sig": s_sig,
+        "s_why": s_why,
+        "s_risk": s_risk,
+        "rx_why": rx_why
+    }
+
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     data = generate_profile_content(p_comm, p_mot)
 
@@ -1305,31 +1448,33 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.caption("A dashboard for maintaining this staff member's engagement and preventing burnout. Check these indicators monthly.")
 
     # Get contextual data based on INTEGRATED profile
-    hud_context = HUD_PROFILES.get(f"{p_comm}-{p_mot}", {
-        "stress_sig": "Behavior change under pressure.", 
-        "root_cause": "Misalignment of needs.", 
-        "prescription": ["Check in regularly.", "Clarify expectations."]
-    })
+    hud_context = get_integrated_hud_data(p_comm, p_mot)
 
     # 1. Stress Signature
+    # Fallback/Base data for display
+    stress_base_rx = {
+        "Director": ["Remove a barrier they can't move.", "Give them a 'win' to chase.", "Shorten the meeting."],
+        "Encourager": ["Schedule face time (no agenda).", "Validate their emotional load.", "Publicly praise a specific contribution."],
+        "Facilitator": ["Give a clear deadline.", "Take the blame for a hard decision.", "Ask 'What is the risk of doing nothing?'"],
+        "Tracker": ["Give them the 'why' behind the chaos.", "Protect them from last-minute changes.", "Explicitly define 'good enough'."]
+    }
+    
     with st.container(border=True):
         st.markdown("#### 🚨 Stress Signature (Early Warning System)")
         
         col_sig, col_rx = st.columns([1, 1])
         with col_sig:
-            st.error(f"**The Signal (Watch for this):**\n{hud_context['stress_sig']}")
-            st.markdown(f"**Root Cause Analysis:**\n{hud_context['root_cause']}")
+            st.error(f"**The Signal (Watch for this):**\n{hud_context['s_sig']}")
+            st.markdown(f"**Root Cause Analysis:**\n{hud_context['s_why']}")
+            st.markdown(f"**Risk if Ignored:**\n{hud_context['s_risk']}")
             
         with col_rx:
             st.success(f"**The Prescription (Do This):**")
             # We use the generic Rx list but explain WHY it works for this specific combination below
-            rx_list = hud_context.get('prescription', [])
+            rx_list = stress_base_rx.get(p_comm, [])
             for r in rx_list:
                 st.write(f"• {r}")
-            
-            # Add "Why this works" if available (it wasn't in original structure but requested context)
-            if 'why_rx' in hud_context:
-                st.info(f"**Why this works for them:**\n{hud_context['why_rx']}")
+            st.info(f"**Why this works for them:**\n{hud_context['rx_why']}")
 
     # 2. Environment Audit
     env_data = {
@@ -1428,6 +1573,11 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # Display Matrix
     st.markdown("#### 🧭 Coaching Matrix: 6 High-Impact Moves (Tailored)")
     
+    # Check that we have enough moves to prevent index error
+    if len(my_moves) < 6:
+        st.error("Profile data incomplete for this phase. Showing default framework.")
+        my_moves = ["Structure", "Clarity", "Support", "Feedback", "Autonomy", "Review"]
+
     colA, colB, colC = st.columns(3)
     
     # Move 1 & 2
@@ -1590,6 +1740,7 @@ if st.session_state.current_view == "Supervisor's Guide":
             options = {f"{s['name']} ({s['role']})": s for s in filtered_staff_list}
             staff_options_list = list(options.keys())
             
+            # --- FIX: Calculate Index for Persistence ---
             current_selection = st.session_state.get("t1_staff_select")
             default_index = None
             if current_selection in staff_options_list:
@@ -1694,11 +1845,13 @@ if st.session_state.current_view == "Supervisor's Guide":
             
             with st.form("offline_input_form"):
                 col_a, col_b = st.columns(2)
+                
                 with col_a:
                     off_name = st.text_input("Staff Name (Required)")
                     off_email = st.text_input("Email (Optional)")
                     off_role = st.selectbox("Role", ["YDP", "Shift Supervisor", "Program Supervisor", "Clinician", "TSS Staff", "Other"])
                     off_cottage = st.selectbox("Program/Cottage", ["Building 10", "Cottage 2", "Cottage 3", "Cottage 7", "Cottage 8", "Cottage 9", "Cottage 11", "Euclid", "Overnight", "Skeele Valley", "TSS Staff", "Other"])
+                
                 with col_b:
                     st.markdown("**Assessment Results**")
                     off_p_comm = st.selectbox("Primary Communication", COMM_TRAITS, key="off_pc")
@@ -1711,12 +1864,22 @@ if st.session_state.current_view == "Supervisor's Guide":
                     if off_name:
                         with st.spinner("Saving to Google Sheets..."):
                             payload = {
-                                "name": off_name, "email": off_email, "role": off_role, "cottage": off_cottage,
-                                "p_comm": off_p_comm, "s_comm": off_s_comm, "p_mot": off_p_mot, "s_mot": off_s_mot
+                                "name": off_name,
+                                "email": off_email,
+                                "role": off_role,
+                                "cottage": off_cottage,
+                                "p_comm": off_p_comm,
+                                "s_comm": off_s_comm,
+                                "p_mot": off_p_mot,
+                                "s_mot": off_s_mot
                             }
+                            
                             success = submit_data_to_google(payload)
+                            
                             if success:
                                 st.success(f"Successfully saved {off_name}!")
+                                
+                                # Manually update local session state so we don't have to reload to see them
                                 new_row = payload.copy()
                                 st.session_state.staff_df = pd.concat([st.session_state.staff_df, pd.DataFrame([new_row])], ignore_index=True)
                                 time.sleep(1)
