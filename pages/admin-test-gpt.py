@@ -1409,6 +1409,14 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     return pdf.output(dest='S').encode('latin-1')
 
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
+    # Staff-specific language is used throughout the HUD/IPDP.
+    # Ensure we always have a safe `first_name` for personalization.
+    try:
+        _safe_name = str(name).strip() if name is not None else ""
+    except Exception:
+        _safe_name = ""
+    first_name = (_safe_name.split()[0] if _safe_name else "this staff member")
+
     data = generate_profile_content(p_comm, p_mot)
 
     st.markdown("---")
