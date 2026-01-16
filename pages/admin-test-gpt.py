@@ -1662,6 +1662,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         if bullets:
             for b in bullets:
                 st.markdown(f"- {b}")
+        st.markdown("<br>", unsafe_allow_html=True)
 
     def take(items, n=3):
         if not items:
@@ -1940,746 +1941,305 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             st.subheader("8. Struggling")
             st.error(data['s8'])
 
+        st.markdown("<br>", unsafe_allow_html=True)
+
         # --- 9-12: COACHING PLAN ---
     
         # --- 9: INDIVIDUAL PROFESSIONAL DEVELOPMENT PLAN (IPDP) ---
-
-    
         st.subheader("9. Individual Professional Development Plan (IPDP)")
-    
         st.caption("A development-first framework for coaching growth, alignment, and performance over time. Select the current phase to get role-aware supervisor moves and a print-ready summary for check-ins.")
 
-    
         interventions_raw = data.get('s9_b', []) or []
 
-    
         def _parse_phase(item: str):
-    
             """Parse a phase entry like '**Phase 1: Title (0-6 Months):** body...' into structured parts."""
-    
             if not isinstance(item, str):
-    
                 return None
-    
             s = item.strip()
-    
             # Common formats in the profile library:
-    
             # **Phase 1: The Pause Button (0-6 Months):** You must...
-    
             m = re.match(r"^\*\*Phase\s*(\d+)\s*:\s*(.*?)\s*\((.*?)\)\s*:\*\*\s*(.*)$", s, flags=re.S)
-    
             if not m:
-    
                 # Fallback: try without parentheses timing
-    
                 m2 = re.match(r"^\*\*Phase\s*(\d+)\s*:\s*(.*?)\s*:\*\*\s*(.*)$", s, flags=re.S)
-    
                 if not m2:
-    
                     return None
-    
                 num = int(m2.group(1))
-    
                 title = m2.group(2).strip()
-    
                 timing = ""
-    
-                body_txt = m2.group(3).strip()
-    
-                return {"num": num, "title": title, "timing": timing, "body": body_txt}
-    
+                body = m2.group(3).strip()
+                return {"num": num, "title": title, "timing": timing, "body": body}
             num = int(m.group(1))
-    
             title = m.group(2).strip()
-    
             timing = m.group(3).strip()
-    
-            body_txt = m.group(4).strip()
-    
-            return {"num": num, "title": title, "timing": timing, "body": body_txt}
+            body = m.group(4).strip()
+            return {"num": num, "title": title, "timing": timing, "body": body}
 
-    
         phases = {}
-    
         for item in interventions_raw:
-    
             p = _parse_phase(item)
-    
             if p and p.get("num") in (1, 2, 3):
-    
                 phases[p["num"]] = p
 
-    
         # Sensible defaults if anything is missing
-    
         default_phase_meta = {
-    
-            1: {"num": 1, "title": "Foundation", "timing": "0-6 months", "body": "Establish clarity, consistency, and psychological safety. Reduce overwhelm, define expectations, and build repeatable habits."},
-    
-            2: {"num": 2, "title": "Skill Integration", "timing": "6-12 months", "body": "Practice skill application under real conditions. Increase reliability, sharpen judgment, and strengthen routines across scenarios."},
-    
+            1: {"num": 1, "title": "Foundation", "timing": "0–6 months", "body": "Establish clarity, consistency, and psychological safety. Reduce overwhelm, define expectations, and build repeatable habits."},
+            2: {"num": 2, "title": "Skill Integration", "timing": "6–12 months", "body": "Practice skill application under real conditions. Increase reliability, sharpen judgment, and strengthen routines across scenarios."},
             3: {"num": 3, "title": "Leadership Readiness", "timing": "12+ months", "body": "Build autonomy and leadership behaviors. Expand ownership, coach others, and strengthen decision-making in complex situations."},
-    
         }
-    
         for n in (1, 2, 3):
-    
             if n not in phases:
-    
                 phases[n] = default_phase_meta[n]
 
-    
-        # Expanded supervisor pedagogy: why this phase matters (blue boxes under each phase title)
-    
-        phase_why = {
-            1: """In Phase 1, the goal is not perfection - it is stability. When a staff member is new or overwhelmed, their working memory is already overloaded.
-
-Coaching boundaries (for example, practicing a respectful 'no') is a capacity skill. Pedagogically, you are teaching (1) self-regulation, (2) prioritization, and (3) professional identity. This is how staff learn to protect time, attention, and emotional bandwidth.
-
-Why supervisors should care: clear boundaries reduce burnout, improve follow-through, and create predictable care for youth. Staff who can name limits early are less likely to escalate, avoid tasks, or disengage.
-
-Your coaching impact: short, consistent feedback loops plus one micro-skill at a time builds durable habits that transfer under stress.""",
-            2: """Phase 2 is where skills become reliable in real conditions. This is the transfer-of-learning phase: staff may perform well in training, but now they must do it with noise, time pressure, and emotion in the room.
-
-Pedagogically, you are moving from 'tell and demonstrate' to 'guided practice and reflection.' That means more decision reps: brief scenarios, immediate coaching, and naming patterns (what happened, what you chose, what happened next).
-
-Why supervisors should care: this is where inconsistency becomes consistency. Good supervision here prevents avoidable incidents and reduces the need for constant reminders because staff begin to self-correct.
-
-Your coaching impact: reinforce what to do, when to do it, and how to recover after a mistake. That creates confidence without complacency.""",
-            3: """Phase 3 is about autonomy and leadership readiness. The staff member is no longer just learning tasks; they are learning to hold standards, influence others, and make decisions with incomplete information.
-
-Pedagogically, you are shifting from frequent direction to coaching thinking: asking reflective questions, requesting rationales, and supporting after-action reviews. You are also teaching leadership regulation - staying steady so others can stay steady.
-
-Why supervisors should care: Phase 3 creates your bench. Staff at this stage reduce supervisory load, stabilize team culture, and model the expectations that new staff imitate.
-
-Your coaching impact: give stretch assignments with clear guardrails, then debrief. This grows judgment while protecting safety and consistency for youth."""
-        }
-
-        phase_matrix = {
-    
-            1: {
-    
-                "Structure & Clarity": {
-    
-                    "goal": "Reduce ambiguity and cognitive load so staff can succeed reliably.",
-    
-                    "coach_moves": ["State the expectation in one sentence", "Show one concrete example", "Confirm understanding ('Tell me what you'll do first')"],
-    
-                    "look_for": ["Fewer missed steps", "More consistent routines", "Less defensive reactions to feedback"],
-    
-                    "script": "Today, the priority is ____. \"Good\" looks like ____. If it gets messy, do ____ first.",
-    
-                },
-    
-                "Skill Application": {
-    
-                    "goal": "Build one repeatable habit that works even when the environment is stressful.",
-    
-                    "coach_moves": ["Practice the micro-skill in the moment", "Use a 10-second correction", "Reinforce the first small win"],
-    
-                    "look_for": ["Attempts the skill without being prompted", "Accepts redirection and tries again", "Shows improved timing"],
-    
-                    "script": "Pause. Take one breath. Say it like this: ____. Let's try it once together.",
-    
-                },
-    
-                "Autonomy & Judgment": {
-    
-                    "goal": "Teach safe decision-making with guardrails (what is theirs to decide vs. what needs escalation).",
-    
-                    "coach_moves": ["Give 2 choices, not 10", "Name the escalation point", "Ask a short reflection after"],
-    
-                    "look_for": ["Asks for help earlier", "Uses policy without rigidity", "Can explain their decision"],
-    
-                    "script": "You can choose A or B. If you see ____, call me immediately. What made you choose that?",
-    
-                },
-    
-            },
-    
-            2: {
-    
-                "Structure & Clarity": {
-    
-                    "goal": "Make routines consistent across situations so the team can trust the handoff.",
-    
-                    "coach_moves": ["Use checklists and handoff standards", "Give feedback with evidence", "Set a weekly expectation review"],
-    
-                    "look_for": ["Cleaner documentation", "Fewer repeat reminders", "Improved coordination"],
-    
-                    "script": "Here's the standard for ____. I noticed ____. Next time, do ____ and we'll review Friday.",
-    
-                },
-    
-                "Skill Application": {
-    
-                    "goal": "Transfer skills into real-time performance (do it under pressure, not just in theory).",
-    
-                    "coach_moves": ["Run brief scenario reps", "Coach the 'why' behind the choice", "Increase complexity gradually"],
-    
-                    "look_for": ["Uses skills without freezing", "Adapts when the first approach fails", "Names patterns and triggers"],
-    
-                    "script": "What did you notice first? What option did you choose and why? What would you do 10 seconds earlier next time?",
-    
-                },
-    
-                "Autonomy & Judgment": {
-    
-                    "goal": "Increase decision reps while strengthening self-correction and timely escalation.",
-    
-                    "coach_moves": ["Let them lead with you shadowing", "Ask for a quick plan before acting", "Debrief decisions, not personality"],
-    
-                    "look_for": ["Plans before acting", "Adjusts when new info appears", "Escalates appropriately"],
-    
-                    "script": "Tell me your plan in one sentence. What's your backup plan? What would make you escalate?",
-    
-                },
-    
-            },
-    
-            3: {
-    
-                "Structure & Clarity": {
-    
-                    "goal": "Build standards that others can follow - clarity becomes culture.",
-    
-                    "coach_moves": ["Have them write or refine a checklist", "Teach-back: have them explain the standard", "Spot-check and reinforce"],
-    
-                    "look_for": ["Others follow their lead", "They correct drift respectfully", "They document and close loops"],
-    
-                    "script": "Explain the standard to a new staff member. What are the two most common mistakes and how do you correct them?",
-    
-                },
-    
-                "Skill Application": {
-    
-                    "goal": "Shift from doing the skill to coaching the skill (modeling + feedback).",
-    
-                    "coach_moves": ["Assign a mentoring shift", "Require a short after-action review", "Coach how to give feedback"],
-    
-                    "look_for": ["Models calm leadership", "Gives clear feedback without heat", "Improves team reliability"],
-    
-                    "script": "After that situation, what went well, what would you change, and what will you coach your partner to do next time?",
-    
-                },
-    
-                "Autonomy & Judgment": {
-    
-                    "goal": "Strengthen independent judgment in complex situations while staying accountable to policy and safety.",
-    
-                    "coach_moves": ["Give stretch ownership with check-points", "Ask reflective questions instead of giving answers", "Hold boundaries on safety and documentation"],
-    
-                    "look_for": ["Anticipates issues early", "Makes decisions with rationale", "Coaches others to escalate early"],
-    
-                    "script": "What signals told you this was shifting? What assumptions did you test? What will you do differently next time and why?",
-    
-                },
-    
-            },
-    
-        }
-
-        # Role-aware additions used in the on-screen guide and in the Phase Summary PDF.
-        # Keys MUST match the role_key mapping used elsewhere: "YDP", "Shift Supervisor", "Program Supervisor".
+        # Role-specific supervisor moves by phase (kept concise and actionable)
         role_additions = {
             "YDP": {
                 1: [
-                    "Use a 3-part correction: (1) name the expectation, (2) name the immediate next step, (3) confirm the staff member can do it now.",
-                    "Coach one micro-skill per shift (not ten). Consistency beats intensity in Phase 1.",
-                    "When the staff member says 'yes' to everything, model a respectful redirect so they learn capacity management.",
+                    "Use a 1-sentence expectation + 1 example ('Do X, like this...') to reduce ambiguity.",
+                    "Focus on one micro-skill per shift (tone, proximity, or follow-through) rather than 'everything.'",
+                    "End shifts with a 2-minute debrief: what worked / what to try next time."
                 ],
                 2: [
-                    "Increase decision reps: run a 60-second scenario, then ask 'What did you notice? What did you choose? What happened next?'",
-                    "Coach timing: in Phase 2, the difference is often *when* they intervene, not *what* they say.",
-                    "Use brief after-action reviews after hard moments to turn stress into learning, not shame.",
+                    "Assign one repeatable routine to own (e.g., meds prep support, shift handoff notes, activity setup).",
+                    "Practice 'IF/THEN' coaching: 'If youth escalates, then we...' to build judgment.",
+                    "Increase independence gradually: fewer prompts, more reflection after."
                 ],
                 3: [
-                    "Assign a stretch responsibility with guardrails (e.g., lead a routine, mentor a newer staff for 10 minutes) and debrief afterward.",
-                    "Shift from reminders to rationale: ask them to explain *why* they chose an approach.",
-                    "Coach leadership regulation: calm tone, steady pace, and repair language when things go sideways.",
-                ],
+                    "Have them model for a newer staff member for one shift/week (calm tone + clear directions).",
+                    "Give a small improvement project (checklist, routine, or engagement activity) to lead.",
+                    "Coach regulated leadership: steady first, then problem-solve."
+                ]
             },
             "Shift Supervisor": {
                 1: [
-                    "Standardize the shift 'first 10 minutes' checklist so new staff learn what 'good' looks like on arrival.",
-                    "Use 'see it / say it / support it': observe the behavior, name it neutrally, then coach the next move.",
-                    "Protect staff bandwidth: explicitly re-prioritize tasks when the floor gets busy so they learn to triage safely.",
+                    "Coach at point-of-performance: brief, calm corrections in the moment.",
+                    "Run 3-minute huddles: the 2 priorities + what 'good' looks like on this shift.",
+                    "Track patterns and document specific examples (facts, not impressions)."
                 ],
                 2: [
-                    "Calibrate consistency across staff: ensure everyone uses the same core language for expectations and limits.",
-                    "Coach handoffs: require concise, risk-focused communication between shifts.",
-                    "Track patterns (who, when, what conditions) and coach upstream prevention, not only reactive responses.",
+                    "Standardize shift operations: checklists, handoffs, and consistent follow-through.",
+                    "Use a weekly scenario drill (5 minutes) to build real-time judgment.",
+                    "Delegate one routine oversight item (supplies, schedule checks, or chart review) and review weekly."
                 ],
                 3: [
-                    "Delegate leadership: have the staff member run part of a shift routine (with oversight) and then debrief.",
-                    "Coach coaching: teach them how to give feedback to peers respectfully and specifically.",
-                    "Strengthen judgment: review one complex decision weekly and discuss alternatives and outcomes.",
-                ],
+                    "Coach other staff using the same framework (tone/pace/proof) to build consistency.",
+                    "Lead a mini-after-action review after incidents (what happened / what we learned / next time).",
+                    "Own a small quality improvement loop (spot check → feedback → follow-up)."
+                ]
             },
             "Program Supervisor": {
                 1: [
-                    "Align expectations across the team: translate policy into one-page 'how we do it here' routines to reduce ambiguity.",
-                    "Build predictable coaching cadence: brief weekly check-ins with one measurable goal until stability improves.",
-                    "Use psychological safety: normalize early questions and early escalation to prevent silent failure.",
+                    "Clarify the 'why' and the standard: align team expectations across shifts and cottages.",
+                    "Set a predictable supervision cadence (weekly micro-check-in + monthly deeper review).",
+                    "Remove friction: fix one systemic barrier (process, staffing pattern, documentation clarity)."
                 ],
                 2: [
-                    "Use data-informed coaching: review incidents, documentation quality, and routine completion trends to target coaching.",
-                    "Support transfer of learning: ensure training concepts are practiced on the floor with feedback within 24-48 hours.",
-                    "Coach accountability with support: clear standards + resources + follow-through.",
+                    "Audit routines and strengthen consistency across supervisors (handoff, documentation, escalation).",
+                    "Coach decision-making: What data did you use? What did you assume?",
+                    "Develop one cross-team skill focus per month (e.g., de-escalation, proactive engagement)."
                 ],
                 3: [
-                    "Develop the bench: identify Phase 3 staff for mentoring, training support, and culture modeling.",
-                    "Increase autonomy with guardrails: assign ownership areas (documentation quality, routine integrity, peer onboarding) and review outcomes.",
-                    "Coach systems thinking: connect staff decisions to youth outcomes, team workload, and program stability.",
-                ],
-            },
+                    "Build leadership pipeline: identify stretch assignments and coaching plans for emerging leaders.",
+                    "Improve systems: simplify a workflow, strengthen accountability loops, and celebrate wins publicly.",
+                    "Shift from 'check' to 'coach': ask reflective questions that build ownership."
+                ]
+            }
         }
 
-    
         # Normalize role key (we want to match the staff member being coached)
-    
         role_key = "YDP"
-    
         if isinstance(role, str):
-    
             if "Program Supervisor" in role:
-    
                 role_key = "Program Supervisor"
-    
             elif "Shift Supervisor" in role:
-    
                 role_key = "Shift Supervisor"
-    
             else:
-    
                 role_key = "YDP"
 
-    
-        # Phase selection (reliable; no broken 'save' button)
-    
+        # --- IPDP: phase content is PRE-RENDERED for all phases to avoid "losing progress" on selection.
+        # Streamlit reruns the script on widget interaction; instead of conditionally rendering one phase,
+        # we render all phases in expanders and only *highlight* the saved phase.
         phase_state_key = f"ipdp_phase__{name}".replace(" ", "_")
-    
+
         if phase_state_key not in st.session_state:
-    
-            st.session_state[phase_state_key] = 1
+            st.session_state[phase_state_key] = 1  # 1..3
 
-    
-        current_phase_num = st.radio(
-    
-            "Current phase",
-    
-            options=[1, 2, 3],
-    
-            format_func=lambda n: f"Phase {n}", 
-    
-            key=phase_state_key,
-    
-            horizontal=True
-    
-        )
-    
-        current_phase_num = int(current_phase_num) if int(current_phase_num) in (1, 2, 3) else 1
+        current_phase_num = int(st.session_state[phase_state_key]) if str(st.session_state[phase_state_key]).isdigit() else 1
+        current_phase_num = 1 if current_phase_num not in (1, 2, 3) else current_phase_num
 
-    
+        st.markdown(f"**Saved current phase:** Phase {current_phase_num}")
+        st.caption("Open any phase below. Setting a phase is optional and won’t change what’s displayed.")
+
         # --- Print-friendly summary export (PDF) ---
-    
         def _build_ipdp_summary_pdf(staff_name: str, staff_role: str, phase_num: int) -> bytes:
-    
             phase = phases[phase_num]
 
-    
             # FPDF (pyfpdf) requires latin-1 compatible text. Sanitize all strings written to the PDF.
-    
             def _safe_pdf_text(s):
-    
                 if s is None:
-    
                     return ""
-    
                 s = str(s)
 
-    
-                # Common smart punctuation / bullets that break latin-1 in FPDF:
-    
+                # Common “smart” punctuation / bullets that break latin-1 in FPDF:
                 replacements = {
-    
-                    "“": "\"", "”": "\"", "’": "'", "‘": "'",
-    
+                    "“": """, "”": """, "’": "'", "‘": "'",
                     "—": "-", "–": "-", "…": "...",
-    
                     "•": "*", "·": "*",
-    
                     "\u00a0": " ",
-    
                 }
-    
                 for a, b in replacements.items():
-    
                     s = s.replace(a, b)
 
-    
                 # Remove anything still outside latin-1 range
-    
                 s = s.encode("latin1", "ignore").decode("latin1")
-    
                 return s
 
-    
             pdf = FPDF()
-    
             pdf.set_auto_page_break(auto=True, margin=12)
-    
             pdf.add_page()
 
-    
             pdf.set_font("Arial", "B", 16)
-    
             pdf.cell(0, 10, _safe_pdf_text("Individual Professional Development Plan (IPDP)"), ln=True)
 
-    
             pdf.set_font("Arial", "", 12)
-    
             pdf.cell(0, 8, _safe_pdf_text(f"Staff: {staff_name}"), ln=True)
-    
             pdf.cell(0, 8, _safe_pdf_text(f"Role: {staff_role}"), ln=True)
-    
-            pdf.cell(0, 8, _safe_pdf_text(f"Current Phase: Phase {phase_num} - {phase['title']}"), ln=True)
-    
+            pdf.cell(0, 8, _safe_pdf_text(f"Current Phase: Phase {phase_num} — {phase['title']}"), ln=True)
             pdf.ln(3)
 
-    
             pdf.set_font("Arial", "B", 12)
-    
-            pdf.cell(0, 8, _safe_pdf_text("Why this phase matters"), ln=True)
-    
-            pdf.set_font("Arial", "", 11)
-    
-            pdf.multi_cell(0, 6, _safe_pdf_text(phase_why.get(phase_num, phase.get('body', ''))))
-    
-            pdf.ln(2)
-
-    
-            pdf.set_font("Arial", "B", 12)
-    
             pdf.cell(0, 8, _safe_pdf_text("Phase Summary"), ln=True)
-    
             pdf.set_font("Arial", "", 11)
-    
             pdf.multi_cell(0, 6, _safe_pdf_text(phase.get("body", "")))
-    
             pdf.ln(2)
 
-    
-            # Role-aware moves (for the staff member's role)
-    
+            # Role-aware moves (for the staff member’s role)
             role_key_pdf = "Program Supervisor" if "Program Supervisor" in str(staff_role) else "Shift Supervisor" if "Shift Supervisor" in str(staff_role) else "YDP"
-    
             bullets = role_additions.get(role_key_pdf, {}).get(phase_num, [])
 
-    
             pdf.set_font("Arial", "B", 12)
-    
             pdf.cell(0, 8, _safe_pdf_text("Role-Aware Supervisor Moves"), ln=True)
-    
             pdf.set_font("Arial", "", 11)
-    
             if bullets:
-    
                 for bullet in bullets:
-    
                     pdf.multi_cell(0, 6, _safe_pdf_text(f"- {bullet}"))
-    
             else:
-    
                 pdf.multi_cell(0, 6, _safe_pdf_text("- Use clear expectations, specific feedback, and consistent follow-through."))
 
-    
-            # Phase 1: add weekly coaching guidance (0-6 months)
-    
-            if int(phase_num) == 1:
-    
-                pdf.ln(2)
-    
-                pdf.set_font("Arial", "B", 12)
-    
-                pdf.cell(0, 8, _safe_pdf_text("Weekly Coaching Guidance (0-6 months)"), ln=True)
-    
-                pdf.set_font("Arial", "", 10)
-
-    
-                weekly_plan = [
-    
-                    (1, "Orientation baseline", "Confirm expectations + top 3 safety priorities", "What feels most unclear right now?"),
-    
-                    (2, "Boundaries + capacity", "Practice a respectful 'no' + redirect to priorities", "Where did you feel pulled in too many directions?"),
-    
-                    (3, "Tone + pace", "Model calm voice, slower pace; coach in-the-moment", "What changed when you slowed down?"),
-    
-                    (4, "Proximity + presence", "Coach safe positioning and proactive presence", "What early signals did you notice?"),
-    
-                    (5, "Routines", "Choose one repeatable routine to own and review", "Which step is easiest to miss and why?"),
-    
-                    (6, "Documentation basics", "Review 2 examples; coach facts vs. interpretations", "What evidence would help the next shift?"),
-    
-                    (7, "De-escalation micro-skill", "Practice one line + one choice; reinforce attempts", "What words helped the youth stay regulated?"),
-    
-                    (8, "Redirecting requests", "Teach 'I can help after I finish __'", "What is your default when interrupted?"),
-    
-                    (9, "Team handoff", "Coach concise handoff: what happened, what's next, risks", "What does the next staff need most?"),
-    
-                    (10, "Consistency under stress", "Run a quick scenario rep; coach first 10 seconds", "What do you do first when things spike?"),
-    
-                    (11, "Active engagement", "Coach 1 proactive engagement move per shift", "What got the best response this week?"),
-    
-                    (12, "Midpoint review", "Name gains + pick one skill to double down on", "What are you proud of improving?"),
-    
-                    (13, "Escalation thresholds", "Clarify what requires escalation vs. what they can decide", "What would make you call earlier next time?"),
-    
-                    (14, "Follow-through", "Coach closing loops (start -> finish -> document)", "Where do tasks tend to stall?"),
-    
-                    (15, "Repair after conflict", "Teach quick repair language; reinforce calm accountability", "What repair line feels natural to you?"),
-    
-                    (16, "Strength-based feedback", "Give specific praise tied to impact; require one next step", "What feedback helps you improve fastest?"),
-    
-                    (17, "Youth-centered rationale", "Connect routines to youth outcomes (predictability, safety)", "How did your actions change the environment?"),
-    
-                    (18, "Time management", "Coach prioritization: safety, supervision, tasks, extras", "What can wait without harm?"),
-    
-                    (19, "Policy in practice", "Pick one policy area; apply it to a real scenario", "What part of policy feels hardest to apply?"),
-    
-                    (20, "Independence with guardrails", "Reduce prompts; increase reflection questions", "What decision did you make confidently this week?"),
-    
-                    (21, "Reliability check", "Spot-check routines; reinforce consistency", "What helps you stay consistent across shifts?"),
-    
-                    (22, "Professional communication", "Practice concise updates to supervisor and team", "What detail is essential vs. noise?"),
-    
-                    (23, "Sustainability", "Review boundaries + recovery plan (breaks, asking early)", "What keeps you regulated on hard days?"),
-    
-                    (24, "Phase 1 closeout", "Summarize progress + decide readiness to enter Phase 2", "What skill do you want to strengthen next?"),
-    
-                ]
-
-    
-                pdf.multi_cell(0, 5, _safe_pdf_text("Use one brief check-in weekly. Keep it specific, behavior-based, and tied to safety and youth outcomes."))
-    
-                pdf.ln(1)
-    
-                for wk, focus, coach, reflect in weekly_plan:
-    
-                    line = f"Week {wk}: {focus} | Coach: {coach} | Ask: {reflect}"
-    
-                    pdf.multi_cell(0, 5, _safe_pdf_text(line))
-
-    
             pdf.ln(2)
-    
             pdf.set_font("Arial", "B", 12)
-    
             pdf.cell(0, 8, _safe_pdf_text("Recommended Check-In Notes Template"), ln=True)
-    
             pdf.set_font("Arial", "", 11)
-    
             template = (
-    
                 "Wins since last check-in:\n"
-    
                 "-\n\n"
-    
                 "One skill focus for next period:\n"
-    
                 "-\n\n"
-    
                 "Support needed from supervisor:\n"
-    
                 "-\n\n"
-    
                 "Next check-in date:"
-    
             )
-    
             pdf.multi_cell(0, 6, _safe_pdf_text(template))
 
-    
             return pdf.output(dest="S").encode("latin1", errors="ignore")
 
-    
         # --- Visual: emphasis per phase (simple + useful) ---
-    
         focus_weights = {
-    
             1: {"Structure & Clarity": 10, "Skill Application": 4, "Autonomy & Judgment": 2},
-    
             2: {"Structure & Clarity": 6, "Skill Application": 10, "Autonomy & Judgment": 6},
-    
             3: {"Structure & Clarity": 3, "Skill Application": 7, "Autonomy & Judgment": 10},
-    
         }
 
-    
-        # Pre-render all phases in expanders; highlight selected phase.
-    
+        # Pre-render all phases so changing phase doesn't "reset" the experience.
         for phase_num in (1, 2, 3):
-    
             phase = phases[phase_num]
-    
-            exp_label = f"Phase {phase_num} - {phase['title']} ({phase['timing']})"
+            exp_label = f"Phase {phase_num} — {phase['title']} ({phase['timing']})"
 
-    
             with st.expander(exp_label, expanded=(phase_num == current_phase_num)):
-    
                 # Phase header
-    
                 st.markdown(f"#### Phase {phase_num}: {phase['title']}")
-    
                 st.caption(f"Typical timeframe: {phase['timing']}")
+                st.info(phase.get("body", ""))
 
-    
-                # 1) Expanded 'Why this phase matters' immediately under the phase name
-    
-                st.info(phase_why.get(phase_num, phase.get('body', '')))
-
-    
-                # Phase summary (kept available; separate from 'why')
-    
-                with st.container(border=True):
-    
-                    st.subheader("Phase Summary")
-    
-                    st.write(phase.get('body', ''))
-
-    
                 # Snapshot chart for this phase
-    
                 snap_df = pd.DataFrame({
-    
                     "Focus": list(focus_weights[phase_num].keys()),
-    
                     "Emphasis": list(focus_weights[phase_num].values())
-    
                 }).sort_values("Emphasis", ascending=True)
 
-    
                 with st.container(border=True):
-    
                     st.subheader("📈 Development Focus Snapshot")
-    
                     st.caption("Higher bars = what to emphasize most during this phase.")
-    
                     fig_focus = px.bar(
-    
                         snap_df,
-    
                         x="Emphasis",
-    
                         y="Focus",
-    
                         orientation="h",
-    
                         title=None
-    
                     )
-    
                     fig_focus.update_layout(
-    
                         margin=dict(l=10, r=10, t=10, b=10),
-    
                         height=220
-    
                     )
-    
                     st.plotly_chart(fig_focus, use_container_width=True)
 
-    
-                # 2) Expanded Phase Coaching Matrix guidance
-    
+                # Phase Coaching Matrix (role-aware)
                 with st.container(border=True):
-    
                     st.subheader("🧭 Phase Coaching Matrix")
-    
-                    st.caption("Use this like a checklist when planning check-ins. Each column includes a goal, coaching moves, what to look for, and a script you can use.")
+                    st.caption("Use this like a checklist when planning check-ins. Role-aware moves are included for the staff member’s role.")
 
-    
                     colA, colB, colC = st.columns(3)
-    
-                    pillars = ["Structure & Clarity", "Skill Application", "Autonomy & Judgment"]
-    
-                    cols = [colA, colB, colC]
 
-    
-                    for c, pillar in zip(cols, pillars):
-    
-                        cfg = phase_matrix.get(phase_num, {}).get(pillar, {})
-    
-                        with c:
-    
-                            st.markdown(f"### {pillar}")
-    
-                            st.markdown(f"**Goal:** {cfg.get('goal','')}")
-    
-                            st.markdown("**Supervisor coaching moves:**")
-    
-                            for m in cfg.get('coach_moves', []):
-    
-                                st.write(f"• {m}")
-    
-                            st.markdown("**What to look/listen for:**")
-    
-                            for lf in cfg.get('look_for', []):
-    
-                                st.write(f"• {lf}")
-    
-                            st.markdown("**Quick script:**")
-    
-                            st.code(cfg.get('script',''), language=None)
+                    with colA:
+                        st.markdown("### Structure & Clarity")
+                        st.markdown("""- Tighten expectations
+    - Reduce ambiguity
+    - Make "good" visible""")
+                    with colB:
+                        st.markdown("### Skill Application")
+                        st.markdown("""- Practice the skill in real situations
+    - Use brief coaching loops
+    - Reinforce patterns""")
+                    with colC:
+                        st.markdown("### Autonomy & Judgment")
+                        st.markdown("""- Increase decision reps
+    - Coach judgment (not just rules)
+    - Build self-correction""")
 
-    
-                    st.markdown("#### Role-aware supervisor moves (for this staff member)")
-    
+                    # Role-aware moves for THIS staff member role
+                    st.markdown("#### Role-aware supervisor moves")
                     for bullet in role_additions.get(role_key, {}).get(phase_num, []):
-    
                         st.write(f"• {bullet}")
 
-    
                     with st.expander("See role-specific moves for other roles (helpful for succession / promotion coaching)"):
-    
                         for rk in ["YDP", "Shift Supervisor", "Program Supervisor"]:
-    
-                            st.markdown(f"**{rk} - Phase {phase_num} moves**")
-    
+                            st.markdown(f"**{rk} — Phase {phase_num} moves**")
                             for bullet in role_additions.get(rk, {}).get(phase_num, []):
-    
                                 st.write(f"• {bullet}")
-    
                             st.markdown("---")
 
-    
-                # 2a) Removed non-working save button (phase is set via radio above)
+                # Save current phase (optional)
+                cols_save = st.columns([1, 1, 2])
+                with cols_save[0]:
+                    if st.button(f"Set Phase {phase_num} as saved current phase", key=f"set_ipdp_phase__{name}__{phase_num}"):
+                        st.session_state[phase_state_key] = phase_num
+                        st.success(f"Saved current phase: Phase {phase_num}")
 
-    
                 # PDF download for this phase
-    
                 pdf_bytes = _build_ipdp_summary_pdf(name, role, phase_num)
-    
                 st.download_button(
-    
                     f"🖨️ Download Phase {phase_num} IPDP Summary (PDF)",
-    
                     data=pdf_bytes,
-    
                     file_name=f"{name.replace(' ', '_')}_IPDP_Phase_{phase_num}_Summary.pdf",
-    
                     mime="application/pdf",
-    
                     use_container_width=True,
-    
                     key=f"ipdp_pdf_dl__{name}__{phase_num}"
-    
                 )
-
 
         st.subheader("10. What You Should Celebrate")
         st.caption("Use this section to reinforce the behaviors you want repeated. Keep recognition timely, specific, and tied to impact.")
+        st.markdown("<br>", unsafe_allow_html=True)
+
         # --- VISUAL BREAK: CELEBRATION SIGNALS ---
         with st.container(border=True):
             st.subheader("🎉 Celebration Signals")
@@ -2769,7 +2329,6 @@ Your coaching impact: give stretch assignments with clear guardrails, then debri
 
         # --- MICRO-VISUAL: QUESTION STARTERS MIX ---
         questions = data.get('coaching', []) or []
-        selected_starter = None
         if questions:
             starters = []
             for q in questions:
@@ -2779,46 +2338,20 @@ Your coaching impact: give stretch assignments with clear guardrails, then debri
 
             starter_df = pd.Series(starters).value_counts().reset_index()
             starter_df.columns = ['Starter', 'Count']
+            # Keep only top items so the chart stays readable
             starter_df = starter_df.head(10)
 
             with st.container(border=True):
                 st.subheader("🧠 Coaching Question Mix")
-                st.caption("Click a bar to filter the questions below by starter type.")
+                st.caption("A quick look at the kinds of prompts you're using most (who/what/how/why).")
                 fig_q = px.bar(starter_df, x="Count", y="Starter", orientation="h", title="Question Starters")
                 fig_q.update_layout(height=240, margin=dict(t=40, b=20, l=20, r=20), showlegend=False)
+                st.plotly_chart(fig_q, use_container_width=True)
 
-                # Streamlit supports Plotly point selection in newer versions.
-                # If selection isn't available, we fall back to showing all questions.
-                try:
-                    sel = st.plotly_chart(
-                        fig_q,
-                        use_container_width=True,
-                        key="question_starters_chart",
-                        on_select="rerun",
-                        selection_mode="points",
-                    )
-                    if sel and isinstance(sel, dict):
-                        pts = (sel.get("selection") or {}).get("points") or []
-                        if pts:
-                            # For px.bar with orientation='h', the category is in 'y'
-                            selected_starter = str(pts[0].get("y") or "").strip() or None
-                except TypeError:
-                    # Older Streamlit versions may not support on_select/selection_mode
-                    st.plotly_chart(fig_q, use_container_width=True)
+        for i, q in enumerate(questions):
+            st.write(f"{i+1}. {q}")
 
-        # Display questions (optionally filtered by clicked starter)
-        if selected_starter:
-            filtered_questions = []
-            for q in questions:
-                q_str = str(q)
-                first = re.sub(r"[^a-z]+", "", re.split(r"\s+", q_str.strip())[0].lower()) or "other"
-                if first == selected_starter:
-                    filtered_questions.append(q_str)
-        else:
-            filtered_questions = [str(q) for q in questions]
-
-        for i, q_str in enumerate(filtered_questions, start=1):
-            st.write(f"{i}. {q_str}")
+        st.markdown("<br>", unsafe_allow_html=True)
 
         show_section("12. Helping Them Prepare for Advancement", data['advancement'])
 
