@@ -1370,57 +1370,127 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     
     # --- SECTION 6: THE SUPERVISOR'S HUD (REWORKED) ---
     st.subheader("6. The Supervisor's HUD (Heads-Up Display)")
-    st.caption("A dashboard for maintaining this staff member's engagement and preventing burnout. Check these indicators monthly.")
+    st.info("This dashboard is your monthly maintenance checklist. Use it to diagnose burnout risks before they become resignations.")
 
-    # 1. Stress Signature & Support Prescription
-    stress_sig = {
-        "Director": "Becomes aggressive, micromanages, stops listening.",
-        "Encourager": "Becomes silent, withdrawn, or overly agreeable (martyrdom).",
-        "Facilitator": "Becomes paralyzed, asks for endless data, refuses to decide.",
-        "Tracker": "Becomes rigid, quotes policy excessively, focuses on minor errors."
-    }
-    rx = {
-        "Director": ["Remove a barrier they can't move.", "Give them a 'win' to chase.", "Stop talking, start doing."],
-        "Encourager": ["Schedule face time (no agenda).", "Validate their emotional load.", "Publicly praise a specific contribution."],
-        "Facilitator": ["Give a clear deadline.", "Take the blame for a hard decision.", "Ask 'What is the risk of doing nothing?'"],
-        "Tracker": ["Give them the 'why' behind the chaos.", "Protect them from last-minute changes.", "Explicitly define 'good enough'."]
+    # 1. Stress Signature
+    stress_data = {
+        "Director": {
+            "signal": "Becomes aggressive, micromanages, and stops listening.",
+            "root_cause": "They feel a loss of control or forward momentum. They are compensating by trying to force speed.",
+            "strategy": "Stop talking and start doing. Give them a specific, solvable problem to own immediately to restore their sense of agency.",
+            "rx": ["Remove a barrier they can't move.", "Give them a 'win' to chase.", "Shorten the meeting."]
+        },
+        "Encourager": {
+            "signal": "Becomes silent, withdrawn, or agrees to everything (martyrdom) while resentful.",
+            "root_cause": "They feel disconnected, unappreciated, or unsafe. They are 'checking out' to protect their emotions.",
+            "strategy": "Re-establish relational safety before addressing tasks. They cannot perform if they feel isolated.",
+            "rx": ["Schedule face time (no agenda).", "Validate their emotional load.", "Publicly praise a specific contribution."]
+        },
+        "Facilitator": {
+            "signal": "Becomes paralyzed, asks for endless data, and refuses to make a decision.",
+            "root_cause": "They fear making an unfair decision or upsetting the harmony. They are stalling to avoid conflict.",
+            "strategy": "Remove the burden of the final call. Step in and take responsibility for the decision so they feel safe.",
+            "rx": ["Give a clear deadline.", "Take the blame for a hard decision.", "Ask 'What is the risk of doing nothing?'"]
+        },
+        "Tracker": {
+            "signal": "Becomes rigid, quotes policy excessively, and focuses on minor errors.",
+            "root_cause": "They fear chaos, error, or liability. They are grasping for certainty in a chaotic environment.",
+            "strategy": "Restore order. Provide clarity, written instructions, and protection from last-minute changes.",
+            "rx": ["Give them the 'why' behind the chaos.", "Protect them from last-minute changes.", "Explicitly define 'good enough'."]
+        }
     }
     
+    s_dat = stress_data.get(p_comm, {})
+    
     with st.container(border=True):
-        sc1, sc2 = st.columns(2)
-        with sc1:
-            st.markdown("#### 🚨 Stress Signature")
-            st.error(f"**When they are unsupported, they will:**\n\n{stress_sig.get(p_comm)}")
-        with sc2:
-            st.markdown("#### 💊 The Prescription")
-            st.success("**Daily/Weekly Dosage:**")
-            for r in rx.get(p_comm):
+        st.markdown("#### 🚨 Stress Signature (Early Warning System)")
+        with st.expander("🎓 **Training: How to read behavior as language**"):
+             st.markdown("""
+             **What this is:** High performers rarely admit they are drowning until they quit. Instead, they "act out" their stress profile.
+             **Why it matters:** Behavior change is a lagging indicator of burnout. If you see these signals, their "emotional battery" is already red.
+             **How to use:** Do not discipline the behavior immediately. Treat it as a symptom. Ask: "I see [Signal], which usually means you are feeling [Root Cause]. How can I help?"
+             """)
+        
+        col_sig, col_rx = st.columns([1, 1])
+        with col_sig:
+            st.error(f"**The Signal (Watch for this):**\n{s_dat.get('signal')}")
+            st.caption(f"**Psychological Root Cause:** {s_dat.get('root_cause')}")
+        with col_rx:
+            st.success(f"**The Antidote (Do This):**\n{s_dat.get('strategy')}")
+            st.write("**Specific Actions:**")
+            for r in s_dat.get('rx', []):
                 st.write(f"• {r}")
 
     # 2. Environment Audit
-    fuel_map = {"Achievement": "Clear Goals", "Growth": "New Challenges", "Purpose": "Mission Connection", "Connection": "Team Time"}
-    friction_map = {"Director": "Red Tape", "Encourager": "Isolation", "Facilitator": "Conflict", "Tracker": "Chaos"}
+    env_data = {
+        "Director": {"friction": "Red Tape & Inefficiency", "fix": "Give them a 'Fast Pass' on minor approvals where possible."},
+        "Encourager": {"friction": "Isolation & Coldness", "fix": "Create 'water cooler' moments and team touchpoints."},
+        "Facilitator": {"friction": "Rushed Conflict & Unfairness", "fix": "Ensure all voices are heard before closing a decision."},
+        "Tracker": {"friction": "Chaos & Ambiguity", "fix": "Provide written agendas and clear protocols."}
+    }
     
+    fuel_data = {
+        "Achievement": {"fuel": "Visual Progress", "fix": "Create a scoreboard or checklist they can mark 'Done'."},
+        "Growth": {"fuel": "New Challenges", "fix": "Assign a problem they haven't solved before."},
+        "Purpose": {"fuel": "Mission Connection", "fix": "Share a specific story of how they helped a youth."},
+        "Connection": {"fuel": "Belonging", "fix": "Publicly acknowledge their value to the team."}
+    }
+
+    fric = env_data.get(p_comm, {})
+    fuel = fuel_data.get(p_mot, {})
+
     with st.container(border=True):
-        st.markdown("#### 🛠️ Environment Audit")
+        st.markdown("#### 🛠️ Environment Audit (Retention Check)")
+        with st.expander("🎓 **Training: Friction vs. Fuel**"):
+             st.markdown("""
+             **The Equation:** *Retention = (Fuel - Friction) x Connection*
+             **Friction:** The daily annoyances that drain energy. For a Director, waiting is friction. For a Tracker, chaos is friction.
+             **Fuel:** The specific psychological reward they crave. Money is temporary fuel; this is sustainable fuel.
+             **How to use:** Ask them monthly: "What is the biggest friction point in your day right now?" and fix it.
+             """)
+        
         ac1, ac2 = st.columns(2)
         with ac1:
-            st.metric("Top Friction (Remove This)", friction_map.get(p_comm))
-            st.caption("This is the #1 thing that will make them quit.")
+            st.metric("Top Friction (The Kryptonite)", fric.get('friction'))
+            st.write(f"**The Cost:** If this persists, they will quit emotionally before they quit physically.")
+            st.error(f"**Fix:** {fric.get('fix')}")
         with ac2:
-            st.metric("Top Fuel (Add This)", fuel_map.get(p_mot))
-            st.caption("This is the #1 thing that keeps them engaged.")
+            st.metric("Top Fuel (The Superpower)", fuel.get('fuel'))
+            st.write(f"**The ROI:** This is the cheapest way to buy their engagement.")
+            st.success(f"**Inject:** {fuel.get('fix')}")
 
     # 3. Crisis Protocol
-    crisis_script = {
-        "Director": "I am giving you the ball. Run with it. I will block for you.",
-        "Encourager": "We are in this together. I have your back. Let's do this.",
-        "Facilitator": "I need you to trust my call on this one. We will debrief later.",
-        "Tracker": "Follow the protocol. I am responsible for the outcome."
+    crisis_data = {
+        "Director": {
+            "script": "I am giving you the ball. Run with it. I will block for you.",
+            "why": "Restores their sense of control and action (Agency)."
+        },
+        "Encourager": {
+            "script": "We are in this together. I have your back. Let's do this.",
+            "why": "Restores their sense of safety and connection (Belonging)."
+        },
+        "Facilitator": {
+            "script": "I need you to trust my call on this one. We will debrief later.",
+            "why": "Relieves them of the pressure to find consensus in an emergency (Absolution)."
+        },
+        "Tracker": {
+            "script": "Follow the protocol. I am responsible for the outcome.",
+            "why": "Relieves them of the fear of liability or error (Protection)."
+        }
     }
+    
+    c_dat = crisis_data.get(p_comm, {})
+
     with st.container(border=True):
-        st.markdown("#### 🆘 Crisis Protocol (Break Glass)")
-        st.info(f"**When they are melting down, say this:**\n\n\"{crisis_script.get(p_comm)}\"")
+        st.markdown("#### 🆘 Crisis Protocol (Break Glass in Emergency)")
+        with st.expander("🎓 **Training: Cognitive Tunneling**"):
+             st.markdown("""
+             **The Science:** In high-stress moments (crisis, restraint, deadline), the prefrontal cortex (logic brain) shuts down. Staff cannot process complex sentences or nuance.
+             **The Fix:** You need a "Short-Code" sentence that bypasses the panic and speaks directly to their core safety need.
+             **How to use:** Memorize the script below. Say it calmly, firmly, and exactly as written when they are melting down.
+             """)
+        st.info(f"**Say exactly this:** \"{c_dat.get('script')}\"")
+        st.caption(f"**Why it works:** {c_dat.get('why')}")
 
 
     # --- SECTION 7 & 8: THRIVING VS STRUGGLING ---
