@@ -1627,6 +1627,168 @@ def get_environment_audit_context(comm: str, motiv: str, integrated_title: str =
         "quick_actions": quick_actions,
     }
 
+
+# --- HUD HELPERS: QUICK ACTION DETAILS + CRISIS PROTOCOL (TAILORED) ---
+
+def get_quick_action_details(action: str, comm: str, motiv: str, combo_key: str, title: str):
+    """Provide brief teaching for a weekly action: why it matters, how to do it, and what to watch for.
+
+    We keep this lightweight and supervisor-friendly: 3 short lines that explain the *mechanism* so the
+    supervisor doesn't just 'do the thing'—they understand *why it works*.
+    """
+
+    a = (action or '').lower()
+
+    # Defaults
+    why = "This reduces friction and helps regulation return before performance drops."
+    how = "Make it small and specific; try it for 3–5 shifts and observe the impact."
+    watch = "Look for fewer stress signals, better follow-through, and less conflict (not perfection)."
+
+    # Action themes
+    if any(k in a for k in ["bottleneck", "barrier", "approval", "coverage", "conflicting"]):
+        why = "Removing blockers restores a sense of control and prevents stress from turning into urgency, sharp tone, or corner-cutting."
+        how = "Pick one concrete barrier. Clarify who decides, what happens next, and by when. Then communicate that decision once, clearly."
+        watch = "Watch whether the staff member stops escalating/pressing and returns to steady pacing."
+
+    elif any(k in a for k in ["scoreboard", "measurable", "track", "metric", "win list", "wins"]):
+        why = "Clarity calms the brain. When success is visible, ambiguity drops—and so does stress-driven reactivity."
+        how = "Use 1–3 winnable targets. Post them where the team can see them. Mark progress in real time, not after the shift."
+        watch = "Watch for improved focus, fewer side-quests, and less defensiveness during feedback."
+
+    elif any(k in a for k in ["checklist", "routine", "handoff", "script", "freeze changes"]):
+        why = "Predictable structure reduces cognitive load. When the environment is consistent, regulation lasts longer under pressure."
+        how = "Build a 3-step checklist or a simple handoff script. Keep it short enough to use on a bad night."
+        watch = "Watch whether mistakes cluster less and whether the staff member appears less anxious or rigid."
+
+    elif any(k in a for k in ["check-in", "touchpoint", "gratitude", "ritual", "buddy", "belong"]):
+        why = "Connection lowers threat. Micro-connection prevents stress from becoming isolation, resentment, or emotional flooding."
+        how = "Make it predictable (same time, same 30–120 seconds). Ask one concrete question: 'What do you need from me right now?'"
+        watch = "Watch for better tone, less venting, and faster recovery after tense moments."
+
+    elif any(k in a for k in ["decision", "close", "deadline", "open loop"]):
+        why = "Open loops keep people in alert mode. Closing one decision reduces background stress and restores forward motion."
+        how = "Set a decision date. Offer 2 options. Choose one. Assign owner + deadline in writing."
+        watch = "Watch for less rumination and fewer repeated conversations about the same issue."
+
+    elif any(k in a for k in ["why", "mission", "impact", "ethical", "values"]):
+        why = "Meaning is a stabilizer. When the task connects to safety/dignity, stress becomes tolerable instead of defeating."
+        how = "Use one sentence: 'This protects the youth and the staff by ____.' Keep it concrete, not inspirational." 
+        watch = "Watch for renewed engagement and less cynical/combative talk about policy."
+
+    # Slight tuning by integrated profile
+    if comm == "Director":
+        watch = watch + " If intensity rises, shorten your language and add one guardrail (what cannot be skipped)."
+    if comm == "Tracker":
+        how = how + " Put it in writing so it feels real and reliable."
+    if motiv == "Growth":
+        watch = watch + " Ask: 'What did we learn from trying this?' to keep it developmental."
+    if motiv == "Achievement":
+        watch = watch + " Tie it to a visible win so they feel momentum."
+
+    return {"action": action, "why": why, "how": how, "watch": watch}
+
+
+def get_crisis_protocol_context(comm: str, motiv: str, staff_first: str, title: str):
+    """Return crisis protocol teaching + scripts tailored to the staff member's integrated profile."""
+
+    # Base scripts by comm style (how they hear directives when stressed)
+    scripts_by_comm = {
+        "Director": {
+            "core": "I need you to pause. Safety first. Do these two steps now: (1) ____, (2) ____. We'll debrief after you reset.",
+            "why": "Direct profiles regulate faster with short, confident direction. Too much explanation feels like debate—and debate escalates."
+        },
+        "Encourager": {
+            "core": "I'm with you. You're not in trouble. Let's slow down together—take one breath, then do just this next step: ____.",
+            "why": "Encouragers regulate through safety + connection. Warm reassurance reduces shame, which is a common accelerant in meltdown."
+        },
+        "Facilitator": {
+            "core": "I'm taking the lead for the next 5 minutes. Follow me step-by-step. We'll make a plan and debrief when things are calm.",
+            "why": "Facilitators escalate when tension feels uncontained. Temporarily 'holding the structure' calms the system so they can re-engage."
+        },
+        "Tracker": {
+            "core": "Stick to the protocol with me. Step 1: ____. Step 2: ____. We'll document and review once we're stable.",
+            "why": "Trackers regulate through predictability. Invoking the protocol reduces uncertainty and helps them stop spiraling on 'doing it wrong.'"
+        },
+    }
+
+    # Motivational tuning (what threat looks like when they're melting down)
+    motiv_tune = {
+        "Achievement": {
+            "risk": "They may become sharp, urgent, or controlling because they feel they're 'losing' in the moment.",
+            "anchor": "Give a winnable next step and name the win: 'If we do X, we stabilize the room.'"
+        },
+        "Growth": {
+            "risk": "They may argue the 'right way' to handle it or get frustrated that others aren't learning fast enough.",
+            "anchor": "Give one simple step now; promise a learning debrief later: 'We'll study this after.'"
+        },
+        "Purpose": {
+            "risk": "They may moralize ('this is wrong!') or escalate advocacy in a way that heightens conflict.",
+            "anchor": "Frame your direction as protecting the mission: 'This keeps youth safe right now.'"
+        },
+        "Connection": {
+            "risk": "They may panic about relationships, feel rejected, or try to people-please mid-crisis.",
+            "anchor": "Reassure belonging and give a clear boundary: 'You're safe with me. Follow this step.'"
+        },
+    }
+
+    comm_block = scripts_by_comm.get(comm, scripts_by_comm["Facilitator"])
+    m_block = motiv_tune.get(motiv, motiv_tune["Connection"])
+
+    what_it_is = (
+        f"A Crisis Protocol is the plan you use when {staff_first}'s brain is in survival mode and coaching won't land. "
+        "Your job is containment: lower stimulation, reduce choices, give one clear next step, then debrief later."
+    )
+
+    why_it_matters = (
+        "If you treat a meltdown like a normal conversation, you accidentally escalate it. "
+        "In crisis, reasoning goes offline—so long explanations, arguing, or early consequences create a power struggle. "
+        "A consistent protocol protects safety, dignity, and retention by preventing shame spirals and repeat blow-ups."
+    )
+
+    how_to_use = [
+        "Use fewer words than you think you need; repeat the same short line if necessary.",
+        "Remove the audience and reduce stimulation (noise, extra people, competing demands).",
+        "Give one directive + one boundary: 'Do X now. We'll talk after you reset.'",
+        "Once stable, debrief with curiosity (earliest signals, what they needed, what to change next time).",
+    ]
+
+    say_this = comm_block["core"]
+    say_why = comm_block["why"] + " " + m_block["anchor"]
+
+    # Two example micro-dialogues
+    examples = []
+
+    examples.append({
+        "title": "Example 1: Fast containment (keep it short)",
+        "dialogue": [
+            ("Supervisor", f"{staff_first}, pause. Safety first. Do these two steps: step 1 ____, step 2 ____."),
+            ("Staff", "This is ridiculous—I'm the only one doing anything!"),
+            ("Supervisor", "I hear you. Not debating right now. Step 1 ____. Then we debrief."),
+        ],
+        "why": "Repeating the same short direction prevents the conversation from becoming a fight. You validate without negotiating."
+    })
+
+    examples.append({
+        "title": "Example 2: Shame reduction + boundary (especially helpful for Connection/Purpose/Encourager)",
+        "dialogue": [
+            ("Supervisor", f"{staff_first}, you're not in trouble. I'm with you. One breath. Next step is ____."),
+            ("Staff", "I'm failing—everyone thinks I'm bad at this."),
+            ("Supervisor", "You're safe with me. We handle one step at a time. Do ____ now; we'll talk after you reset."),
+        ],
+        "why": "Reassurance lowers threat, which lowers intensity. The boundary ('after you reset') prevents spiraling and keeps safety primary."
+    })
+
+    return {
+        "title": title,
+        "what_it_is": what_it_is,
+        "why_it_matters": why_it_matters,
+        "how_to_use": how_to_use,
+        "meltdown_script": say_this,
+        "meltdown_script_why": say_why,
+        "risk_pattern": m_block["risk"],
+        "examples": examples,
+    }
+
 def generate_profile_content(comm, motiv):
     combo_key = f"{comm}-{motiv}"
     c_data = COMM_PROFILES.get(comm, {})
@@ -2003,43 +2165,52 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             st.metric("Top Fuel (Add This)", env["fuel"]["label"])
             st.caption("Fuel helps them stabilize and re-engage—especially under pressure.")
             st.write(f"**Why it works:** {env['fuel']['what_it_does']}")
+        staff_first = str(name).split()[0] if str(name).strip() else "this staff member"
 
-        st.markdown("#### Quick actions you can take this week (matched to this Integrated Profile)")
-        for a in env["quick_actions"]:
-            st.write(f"• {a}")
+        st.markdown(f"#### Quick actions you can take this week for {staff_first}")
+        st.caption("These are small, high-leverage moves. The goal is earlier stability—not perfection.")
 
-    # 3. Crisis Protocol
-    crisis_script = {
-        "Director": "I am giving you the ball. Run with it. I will block for you.",
-        "Encourager": "We are in this together. I have your back. Let's do this.",
-        "Facilitator": "I need you to trust my call on this one. We will debrief later.",
-        "Tracker": "Follow the protocol. I am responsible for the outcome."
-    }
+        # Show three actions with teaching so supervisors understand the *mechanism*
+        for action in env["quick_actions"][:3]:
+            d = get_quick_action_details(action, p_comm, p_mot, env.get('combo_key', ''), env.get('title', ''))
+            st.markdown(f"- **{d['action']}**")
+            st.markdown(f"  - *Why this matters:* {d['why']}")
+            st.markdown(f"  - *How to do it:* {d['how']}")
+            st.markdown(f"  - *What to watch for:* {d['watch']}")
+    # 3. Crisis Protocol (tailored to this staff member)
+    staff_first = str(name).split()[0] if str(name).strip() else "this staff member"
+    crisis = get_crisis_protocol_context(p_comm, p_mot, staff_first=staff_first, title=hud.get('title',''))
 
     with st.container(border=True):
         st.markdown("### 3) Crisis Protocol (Break Glass)")
         st.caption("Use this when regulation is already lost. Stabilize first. Coach later.")
 
         with st.expander("Crisis Protocol (What it is / why it matters / how to use it)", expanded=False):
-            st.markdown("""
-**Definition:** A *Crisis Protocol* is the pre-planned response when a staff member is dysregulated enough that logic, coaching, or problem-solving won't land.
+            st.markdown(f"**Context:** {crisis['title']} (Integrated Profile)")
+            st.markdown(f"**What it is:** {crisis['what_it_is']}")
+            st.markdown(f"**Why it matters:** {crisis['why_it_matters']}")
 
-**Why it matters:** In crisis, reasoning goes offline. If you argue, over-explain, or threaten consequences too early, you escalate the moment and create a power struggle.
+            st.markdown("**How to use it (Supervisor steps):**")
+            for step in crisis['how_to_use']:
+                st.write(f"• {step}")
 
-**How to use it (Supervisor steps):**
-1. **Lower the temperature:** slow your voice, reduce words, give simple directions.
-2. **Prioritize safety:** reassign tasks, remove audience, reduce stimuli.
-3. **Use a short script:** one or two sentences, repeated if needed.
-4. **End the debate:** *"We will talk about this after the shift / after you reset."*
-5. **Debrief after recovery:** revisit what happened, what triggered it, and how to prevent it.
+            st.markdown("**Common meltdown risk for this profile:**")
+            st.write(f"• {crisis['risk_pattern']}")
 
-**Debrief framework (after regulation):**
-- What were the earliest signals?
-- What did you need in the moment?
-- What should we change in the environment next time?
-""")
+            st.markdown("**Debrief after recovery (2–5 minutes):**")
+            st.write("• Earliest signals you missed")
+            st.write(f"• What {staff_first} needed in the moment (prescription)")
+            st.write("• What to change in the environment next time (remove friction, add fuel)")
+        st.info(f"**When {staff_first} is melting down, say this:**\n\n\"{crisis['meltdown_script']}\"")
+        st.caption(f"**Why this helps:** {crisis['meltdown_script_why']}")
 
-        st.info(f"**When they are melting down, say this:**\n\n\"{crisis_script.get(p_comm)}\"")
+        with st.expander("Crisis conversation examples (with the 'why')", expanded=False):
+            for ex in crisis['examples']:
+                st.markdown(f"**{ex['title']}**")
+                for who, line in ex['dialogue']:
+                    st.markdown(f"- **{who}:** {line}")
+                st.caption(ex['why'])
+                st.markdown('---')
 
 
     # --- SECTION 7 & 8: THRIVING VS STRUGGLING ---
