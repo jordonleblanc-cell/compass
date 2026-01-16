@@ -939,7 +939,78 @@ INTEGRATED_PROFILES = {
 }
 
 # --- PLACEHOLDERS FOR MISSING DATA ---
+# NOTE: Conflict Mediator expects a protocol for *every* communication-style pairing.
+# If you later add hand-written protocols, keep them in SUPERVISOR_CLASH_MATRIX and
+# this auto-fill will preserve them while filling any missing pairs.
+
+# --- CONFLICT PROTOCOL AUTO-FILL (ensures every combo exists) ---
+STYLE_DIMENSIONS = {
+    # (focus, tempo)
+    "Director": ("Task", "Fast"),
+    "Tracker": ("Task", "Slow"),
+    "Encourager": ("People", "Fast"),
+    "Facilitator": ("People", "Slow"),
+}
+
+def make_default_clash(sup_style: str, staff_style: str) -> dict:
+    sup_focus, sup_tempo = STYLE_DIMENSIONS.get(sup_style, ("Mixed", "Mixed"))
+    stf_focus, stf_tempo = STYLE_DIMENSIONS.get(staff_style, ("Mixed", "Mixed"))
+
+    tension_bits = []
+    if sup_focus != stf_focus:
+        tension_bits.append(f"{sup_focus}-first vs {stf_focus}-first priorities")
+    if sup_tempo != stf_tempo:
+        tension_bits.append(f"{sup_tempo.lower()} pace vs {stf_tempo.lower()} pace")
+    if not tension_bits:
+        tension_bits.append(
+            "similar strengths that can still collide under stress (e.g., control, blind spots, or escalation loops)"
+        )
+
+    tension = f"{sup_style} vs {staff_style}: " + " + ".join(tension_bits)
+
+    psychology = (
+        f"When pressure rises, a **{sup_style}** tends to default to **{sup_focus.lower()} clarity** at a **{sup_tempo.lower()} pace**, "
+        f"while a **{staff_style}** defaults to **{stf_focus.lower()} safety** at a **{stf_tempo.lower()} pace**. "
+        f"This can create a loop where one side experiences the other as **too much / too fast / too vague / too slow**—even when both are trying to do the right thing."
+    )
+
+    watch_fors = [
+        f"{sup_style} gets sharper (more directive / blunt / impatient) while {staff_style} becomes more guarded or reactive.",
+        "Misinterpretation of intent: 'They don’t care' vs 'They’re attacking / controlling me.'",
+        "Escalation through mismatch: speed, detail level, or emotional tone.",
+        "Post-conflict residue: avoidance, passive resistance, or over-documenting / over-explaining.",
+    ]
+
+    intervention_steps = [
+        "1. **Name the mismatch without blame:** “I think we’re reacting differently under stress.”",
+        "2. **Align on the shared goal + minimum safe standard:** “What does ‘safe and good-enough’ look like for this shift?”",
+        "3. **Choose one lane for 24 hours:** either tempo (slow down/speed up) *or* focus (task/people) — not both at once.",
+        "4. **Close with roles + next check-in:** “You own X, I own Y. We regroup at (time).”",
+    ]
+
+    scripts = {
+        "Start": (
+            f"I want us on the same team. I think our {sup_style}/{staff_style} styles are colliding a bit—can we name what we each need to succeed right now?"
+        ),
+        "In-the-moment reset": "Let’s pause. One sentence each: what’s the goal, and what’s the next safest step?",
+        "Repair": "I’m not questioning your intentions. I want to repair how that landed. Next time, I’ll (adjust). What adjustment would help you too?",
+    }
+
+    return {
+        "tension": tension,
+        "psychology": psychology,
+        "watch_fors": watch_fors,
+        "intervention_steps": intervention_steps,
+        "scripts": scripts,
+    }
+
 SUPERVISOR_CLASH_MATRIX = {}
+
+# Fill every pair (including same-style pairs)
+for sup in COMM_TRAITS:
+    SUPERVISOR_CLASH_MATRIX.setdefault(sup, {})
+    for staff in COMM_TRAITS:
+        SUPERVISOR_CLASH_MATRIX[sup].setdefault(staff, make_default_clash(sup, staff))
 CAREER_PATHWAYS = {}
 TEAM_CULTURE_GUIDE = {}
 MISSING_VOICE_GUIDE = {}
