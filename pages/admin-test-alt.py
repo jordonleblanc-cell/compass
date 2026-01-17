@@ -1210,6 +1210,253 @@ CAREER_PATHWAYS = {
     },
 }
 
+
+
+# ================================
+# CAREER PATHFINDER: CONTENT EXPANSION
+# ================================
+# The app originally stored brief Career Pathfinder content. To support deeper coaching,
+# we enrich every pathway with expanded, teachable structure while preserving any
+# existing hand-written text.
+
+CAREER_STYLE_DIMENSIONS = {
+    # style: (focus, tempo)
+    "Director": ("Task", "Fast"),
+    "Tracker": ("Task", "Slow"),
+    "Encourager": ("People", "Fast"),
+    "Facilitator": ("People", "Slow"),
+}
+
+CAREER_ROLE_LENSES = {
+    "Shift Supervisor": {
+        "theme": "Floor leadership: tone regulation, de-escalation, and consistent baseline enforcement",
+        "new_scorecard": "Stability + follow-through across a full shift",
+        "risk": "Escalation loops, inconsistent standards, and staff confusion under pressure",
+    },
+    "Program Supervisor": {
+        "theme": "System leadership: repeatable routines, training, coaching cadence, and audit loops",
+        "new_scorecard": "Consistency when you’re not present",
+        "risk": "Hero mode, tribal knowledge, and brittle processes",
+    },
+    "Manager": {
+        "theme": "Leader-of-leaders: capacity management, retention, cross-site alignment, and developing supervisors",
+        "new_scorecard": "Bench strength + sustained outcomes over months",
+        "risk": "Burnout, turnover, and siloed operations",
+    },
+    "Director": {
+        "theme": "Enterprise leadership: strategy, risk architecture, stakeholder alignment, and culture design",
+        "new_scorecard": "Alignment + scalable systems that survive ambiguity",
+        "risk": "Stakeholder resistance, unmanaged risk, and culture drift",
+    },
+}
+
+def _listify(x):
+    if x is None:
+        return []
+    if isinstance(x, (list, tuple)):
+        return list(x)
+    return [str(x)]
+
+def _expand_shift(old_shift: str, style: str, role: str) -> dict:
+    focus, tempo = CAREER_STYLE_DIMENSIONS.get(style, ("Mixed", "Mixed"))
+    lens = CAREER_ROLE_LENSES.get(role, {})
+
+    shift_from = [
+        f"Leaning on your natural {style} strengths ({focus}-first, {tempo.lower()} pace)",
+        "Measuring success by personal competence and speed",
+        "Feeling safest when rules/logic provide a clean answer",
+    ]
+
+    shift_to = [
+        lens.get("theme", "Leading at a higher scope"),
+        f"Measuring success by {lens.get('new_scorecard','team outcomes')}",
+        "Making decisions in the gray zone with guardrails, documentation, and follow-through",
+    ]
+
+    supervisor_insight = (
+        "This shift is hard because it asks the candidate to trade **certainty for judgment**. "
+        "They are moving from *being right* to *being responsible*—and that can feel like exposure. "
+        "Your job as the supervisor is to provide **bounded authority**: clear standards + room to choose."
+    )
+
+    # If the original dict already had a custom shift string, preserve it as a summary.
+    summary = old_shift or f"From {style} comfort-zone execution to {role} scope leadership."
+
+    return {
+        "summary": summary,
+        "shift_from": shift_from,
+        "shift_to": shift_to,
+        "supervisor_insight": supervisor_insight,
+    }
+
+def _expand_psychology(old_why: str, style: str, role: str) -> dict:
+    focus, tempo = CAREER_STYLE_DIMENSIONS.get(style, ("Mixed", "Mixed"))
+    lens = CAREER_ROLE_LENSES.get(role, {})
+
+    fear = (
+        "Being blamed for outcomes you can’t fully control, especially when policy doesn’t provide a clean answer. "
+        "At this level, decisions don’t fail fast—they echo across shifts, staff morale, and documentation."
+    )
+
+    shows_up_now = (
+        "Earlier roles reward executing well inside clear boundaries. Growth roles introduce **ambiguous tradeoffs** "
+        "(safety vs independence, compassion vs accountability, census vs fit, speed vs accuracy). "
+        "That ambiguity is the point: it trains judgment."
+    )
+
+    manifests = [
+        "Over-relying on policy/precedent to avoid ownership",
+        "Binary decisions (all-or-nothing safety thinking)",
+        "Over-consulting or delaying to reduce personal exposure",
+        "Tone drift under stress (sharper, flatter, or overly persuasive)",
+    ]
+
+    what_supervisors_get_wrong = [
+        "Calling it attitude or resistance instead of a risk response",
+        "Adding pressure (“just decide”) instead of adding structure",
+        "Rescuing by making the call, which prevents growth",
+    ]
+
+    what_helps = [
+        "Name the gray zone explicitly: “This is a judgment call.”",
+        "Provide guardrails: minimum safety standard + decision deadline",
+        "Require documentation: risks, mitigations, residual risk, next check-in",
+        "Practice repair language so conflict doesn’t become avoidance",
+    ]
+
+    teaching_note = (
+        f"Supervisor teaching lens: A {style} tends to default to **{focus.lower()} clarity** at a **{tempo.lower()} pace**. "
+        f"A {role} must tolerate uncertainty while protecting safety. Treat this as skill-building, not compliance. "
+        f"Tie the growth edge to the {lens.get('risk','risk')} risk profile."
+    )
+
+    return {
+        "summary": old_why or "This promotion requires tolerating ambiguity and owning tradeoffs.",
+        "fear": fear,
+        "shows_up_now": shows_up_now,
+        "manifests": manifests,
+        "supervisor_misreads": what_supervisors_get_wrong,
+        "what_helps": what_helps,
+        "teaching_note": teaching_note,
+    }
+
+def _expand_conversation(old_conversation: str, old_supervisor_focus: str, style: str, role: str) -> dict:
+    focus, tempo = CAREER_STYLE_DIMENSIONS.get(style, ("Mixed", "Mixed"))
+    lens = CAREER_ROLE_LENSES.get(role, {})
+
+    intent = (
+        "To transfer authority **deliberately** while keeping safety and accountability intact. "
+        "This is not motivation; it’s calibration—teaching how to decide and follow through."
+    )
+
+    structure = [
+        "**1) Normalize the discomfort:** Promote-level work feels messier, and that’s expected.",
+        "**2) Name the growth edge:** What they must do differently at this level.",
+        "**3) Transfer authority with guardrails:** minimum standard + decision deadline.",
+        "**4) Anchor follow-through:** owners, documentation, and the next check-in time.",
+        "**5) Repair proactively:** clarify intent and prevent avoidance after tension.",
+    ]
+
+    examples = [
+        "“At this level, you won’t always get a clean policy answer. I’m asking for your recommendation, plus your risk plan.”",
+        "“Let’s define the minimum safe standard, then you choose the path that meets it.”",
+        "“Write it down: risks, mitigations, residual risk, and when we’ll review.”",
+        "“I’m not questioning your intentions. I’m tightening the standard so the team is protected.”",
+    ]
+
+    why_it_works = [
+        "It removes moral framing (right/wrong) and replaces it with risk thinking (manage/contain).",
+        "It reduces defensiveness by naming ambiguity instead of pretending it’s easy.",
+        "It builds reliable habits: decision → documentation → review cadence.",
+    ]
+
+    watch_fors = _listify(old_supervisor_focus) or [
+        f"Overcorrecting with {style} intensity (too {tempo.lower()})",
+        "Rescuing them by making the decision for them",
+        "Leaving the plan undocumented (creates repeat conflict)",
+    ]
+
+    return {
+        "summary": old_conversation or f"Coach a {style} into {role}-level judgment with clear guardrails.",
+        "intent": intent,
+        "structure": structure,
+        "examples": examples,
+        "why_it_works": why_it_works,
+        "watch_fors": watch_fors,
+        "lens_note": f"Conversation lens: {focus}-first, {tempo.lower()} pace → {lens.get('new_scorecard','broader scorecard')}.",
+    }
+
+def _expand_assignment(old_setup: str, old_task: str, old_success: str, old_red_flags: str, style: str, role: str) -> dict:
+    # Provide a real-world, gray-zone scenario template that can be customized per entry.
+    scenario = (
+        "**The Gray Zone Decision:** You must make a call where policy gives discretion, not certainty. "
+        "The goal is to design a path that protects safety without defaulting to avoidance."
+    )
+
+    setup = old_setup or "This assignment forces a decision under ambiguity with safety/accountability guardrails."
+
+    task = old_task or (
+        "Choose one high-stakes situation (admission fit, staffing hole, crisis plan, documentation failure). "
+        "Design a **Risk Mitigation Plan**: staffing/protocol changes, triggers, and a review time."
+    )
+
+    success = _listify(old_success) or [
+        "They made a recommendation instead of deflecting",
+        "They quantified risks and named residual risk",
+        "The mitigation plan was realistic and implementable",
+        "They scheduled a review/check-in",
+    ]
+
+    red_flags = _listify(old_red_flags) or [
+        "Immediate rejection/avoidance to eliminate all risk",
+        "Demanding guarantees of safety that don’t exist",
+        "Getting stuck in history instead of current safeguards",
+        "Refusing to recommend a path",
+    ]
+
+    return {
+        "setup": setup,
+        "scenario": scenario,
+        "task": task,
+        "success": success,
+        "red_flags": red_flags,
+    }
+
+def enrich_career_pathways(pathways: dict) -> dict:
+    enriched = {}
+    for style, by_role in pathways.items():
+        enriched[style] = {}
+        for role, p in by_role.items():
+            # Preserve original fields
+            old_shift = p.get("shift", "")
+            old_why = p.get("why", "")
+            old_conv = p.get("conversation", "")
+            old_focus = p.get("supervisor_focus", "")
+            old_setup = p.get("assignment_setup", "")
+            old_task = p.get("assignment_task", "")
+            old_success = p.get("success_indicators", "")
+            old_red = p.get("red_flags", "")
+
+            # Build expanded structure
+            expanded = {
+                "shift_expanded": _expand_shift(old_shift, style, role),
+                "psych_block": _expand_psychology(old_why, style, role),
+                "conversation_expanded": _expand_conversation(old_conv, old_focus, style, role),
+                "assignment_expanded": _expand_assignment(old_setup, old_task, old_success, old_red, style, role),
+            }
+
+            # Keep the originals so older UI sections (or other pages) still work
+            merged = dict(p)
+            merged.update(expanded)
+
+            # Normalize debrief questions to list
+            if "debrief_questions" in merged:
+                merged["debrief_questions"] = _listify(merged.get("debrief_questions"))
+
+            enriched[style][role] = merged
+    return enriched
+
+CAREER_PATHWAYS = enrich_career_pathways(CAREER_PATHWAYS)
 # ================================
 # TEAM DNA SUPPORTING KNOWLEDGE
 # ================================
