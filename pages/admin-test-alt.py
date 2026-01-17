@@ -1212,6 +1212,89 @@ CAREER_PATHWAYS = {
 
 
 
+
+
+# ================================
+# CAREER PATHFINDER: FULL MATRIX (DEFAULTS)
+# ================================
+# This block integrates the newer "full matrix" Career Pathways generator with the
+# rest of the app. We generate a complete baseline set of pathways for every
+# Communication Style x Target Role, then layer any hand-written pathways on top.
+# This guarantees the Career Pathfinder page never hits a missing pathway.
+
+def generate_default_career_pathways(styles=None, roles=None):
+    styles = styles or ["Director", "Encourager", "Facilitator", "Tracker"]
+    roles = roles or ["Shift Supervisor", "Program Supervisor", "Manager", "Director"]
+
+    base = {}
+    for style in styles:
+        base[style] = {}
+        for role in roles:
+            base[style][role] = {
+                "shift": f"From {style}-centered execution → to {role}-level systems leadership",
+                "why": (
+                    "This transition requires the staff member to move from relying on their "
+                    "natural communication strengths toward holding responsibility for people, "
+                    "systems, and outcomes that extend beyond their personal control.\n\n"
+                    "**Psychological block:** At this level, discomfort comes from ambiguity. "
+                    "The staff member can no longer optimize only for their own style; they must "
+                    "tolerate friction, competing needs, and imperfect outcomes. This often appears "
+                    "as over-control, hesitation, or withdrawal."
+                ),
+                "conversation": (
+                    "Supervisor intent: normalize discomfort and explicitly name this as a developmental edge. "
+                    "Explain that leadership maturity means holding tension, not resolving it immediately. "
+                    "Use language that transfers authority while keeping accountability anchored."
+                ),
+                "supervisor_focus": (
+                    "Do not rescue. Allow silence, uncertainty, and partial answers so the staff member "
+                    "learns to think systemically rather than stylistically."
+                ),
+                "assignment_setup": (
+                    "This assignment creates a controlled environment where the staff member must make a "
+                    "decision that impacts people, policy, and risk simultaneously."
+                ),
+                "assignment_task": (
+                    "Design and present a recommendation for a realistic operational dilemma where policy "
+                    "does not provide a clear answer. Include risk assessment, mitigation strategies, "
+                    "and a final recommendation."
+                ),
+                "success_indicators": (
+                    "• Ownership of the recommendation\n"
+                    "• Clear articulation of tradeoffs\n"
+                    "• Evidence of systems thinking\n"
+                    "• Acceptance of residual risk"
+                ),
+                "red_flags": (
+                    "• Deferring the decision upward\n"
+                    "• Hiding behind policy\n"
+                    "• Seeking certainty before acting\n"
+                    "• Avoiding accountability language"
+                ),
+                "debrief_questions": [
+                    "What felt most uncomfortable in making this decision?",
+                    "Where did your natural style help you?",
+                    "Where did it limit you?",
+                    "How would you approach this differently as a leader of leaders?",
+                ],
+            }
+    return base
+
+
+def _deep_merge_pathways(base: dict, overrides: dict) -> dict:
+    """Deep merge style->role dictionaries. Overrides win; base fills missing keys."""
+    merged = {k: dict(v) for k, v in base.items()}
+    for style, by_role in (overrides or {}).items():
+        merged.setdefault(style, {})
+        for role, payload in (by_role or {}).items():
+            merged[style].setdefault(role, {})
+            # Base first, then override values
+            merged[style][role] = {**merged[style][role], **(payload or {})}
+    return merged
+
+
+# Generate baseline matrix and layer hand-written pathways on top
+CAREER_PATHWAYS = _deep_merge_pathways(generate_default_career_pathways(), CAREER_PATHWAYS)
 # ================================
 # CAREER PATHFINDER: CONTENT EXPANSION
 # ================================
@@ -3142,7 +3225,30 @@ elif st.session_state.current_view == "Career Pathfinder":
                 
                 with st.container(border=True):
                     st.markdown("### 🧠 The Psychological Block")
-                    st.markdown(f"**Why it's hard:** {path['why']}")
+                    st.markdown(f"**Why it's hard:** {path.get('why','')}")
+                    pb = path.get('psych_block')
+                    if isinstance(pb, dict):
+                        # Expanded psychology (added by enrich_career_pathways)
+                        if pb.get('summary'):
+                            st.caption(pb.get('summary'))
+                        with st.expander('More detail'):
+                            if pb.get('fear'):
+                                st.markdown(f"**Core fear:** {pb.get('fear')}")
+                            if pb.get('shows_up_now'):
+                                st.markdown(f"**How it shows up at this level:** {pb.get('shows_up_now')}")
+                            if pb.get('manifests'):
+                                st.markdown('**Common manifestations:**')
+                                for item in pb.get('manifests', []):
+                                    st.markdown(f"- {item}")
+                            if pb.get('what_helps'):
+                                st.markdown('**What helps:**')
+                                for item in pb.get('what_helps', []):
+                                    st.markdown(f"- {item}")
+                            if pb.get('teaching_note'):
+                                st.info(pb.get('teaching_note'))
+                    elif isinstance(pb, str) and pb.strip():
+                        st.markdown(f"**Psychological block:** {pb}")
+
                 
                 c_a, c_b = st.columns(2)
                 with c_a:
