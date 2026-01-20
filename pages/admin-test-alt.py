@@ -1530,8 +1530,8 @@ def _expand_assignment(old_setup: str, old_task: str, old_success: str, old_red_
 
     # TASK (expanded, with required deliverables)
     base_task = (old_task or "").strip()
-    task = (
-        f"{base_task + '\\n\\n' if base_task else ''}"
+    prefix = (base_task + "\n\n") if base_task else ""
+    task = prefix + (
         "**Scenario Options (pick ONE):**\\n"
         "- A marginal-fit youth referral (risk behaviors) but census/revenue pressure\\n"
         "- A staffing hole that risks supervision ratios and youth engagement\\n"
@@ -1581,7 +1581,6 @@ def _expand_assignment(old_setup: str, old_task: str, old_success: str, old_red_
         "red_flags": red_list,
     }
 
-def enrich_career_pathways(
 def enrich_career_pathways(pathways: dict) -> dict:
     enriched = {}
     for style, by_role in pathways.items():
