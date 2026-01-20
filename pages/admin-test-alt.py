@@ -1823,6 +1823,219 @@ PEDAGOGY_GUIDE = {
 }
 
 
+def build_teaching_deep_dive(name: str, p_comm: str, s_comm: str, p_mot: str, s_mot: str, phase: int) -> str:
+    """Return phase-specific teaching guidance customized to an integrated profile.
+
+    This is intentionally self-contained (no external dependencies) to keep IPDP stable.
+    """
+    # Normalize
+    p_comm = (p_comm or "").strip()
+    s_comm = (s_comm or "").strip()
+    p_mot  = (p_mot or "").strip()
+    s_mot  = (s_mot or "").strip()
+    phase  = int(phase)
+
+    # --- Style lenses (Communication) ---
+    comm_lens = {
+        "Director": {
+            "optimizes": "speed, clarity, and decisive action",
+            "learns": "through responsibility, clear standards, and real-world outcomes",
+            "derail": [
+                "can sound abrupt when stressed",
+                "may skip relational repair after conflict",
+                "may assume others see the urgency"
+            ],
+            "teach": [
+                "Lead with the 'why' in one sentence, then the standard.",
+                "Ask for a recommendation, not a report.",
+                "Close loops: confirm owner, deadline, and escalation triggers."
+            ],
+            "micro_drills": [
+                "60‑second recommendation: 'My recommendation is X because Y. Biggest risk is Z; mitigation is ____.'",
+                "Two‑sentence debrief: 'What happened? What will you do differently next time?'"
+            ],
+        },
+        "Tracker": {
+            "optimizes": "accuracy, safety, and predictability",
+            "learns": "through examples, checklists, and repetition until consistent",
+            "derail": [
+                "can freeze in ambiguity",
+                "may over-focus on risk to avoid accountability",
+                "may delay decisions waiting for perfect info"
+            ],
+            "teach": [
+                "Reduce ambiguity: define 'good enough' thresholds.",
+                "Teach decision frameworks (risk list → mitigations → triggers → decision).",
+                "Praise judgment calls, not just compliance."
+            ],
+            "micro_drills": [
+                "Risk list in 3 minutes: identify 3–6 concrete risks (no 'vibes').",
+                "Trigger practice: 'If __ happens, I escalate to __ within __ minutes.'"
+            ],
+        },
+        "Encourager": {
+            "optimizes": "morale, trust, and relational safety",
+            "learns": "through coaching conversations, affirmation + clear next steps",
+            "derail": [
+                "may avoid hard feedback to preserve harmony",
+                "can absorb others' emotions and lose focus",
+                "may over-promise to help"
+            ],
+            "teach": [
+                "Pair warmth with boundaries: 'I care about you AND this standard matters.'",
+                "Use scripted feedback structures (SBI: Situation‑Behavior‑Impact).",
+                "Practice containment: clarify what is theirs vs. yours."
+            ],
+            "micro_drills": [
+                "SBI feedback rep: 'When __, you __, and the impact was __. Next time, do __.'",
+                "Boundary line: 'I can support you by __. I can’t do __ for you.'"
+            ],
+        },
+        "Facilitator": {
+            "optimizes": "collaboration, inclusion, and shared ownership",
+            "learns": "through reflection, dialogue, and seeing multiple perspectives",
+            "derail": [
+                "can get stuck in discussion instead of decisions",
+                "may over-include voices in urgent moments",
+                "may delay escalation trying to resolve peer-to-peer"
+            ],
+            "teach": [
+                "Time-box collaboration: explore → decide → assign.",
+                "Use decision rules (who decides, by when, using what criteria).",
+                "Teach escalation as care, not failure."
+            ],
+            "micro_drills": [
+                "90‑second timebox: list options → pick one → name owner + next step.",
+                "Escalation script: 'I’m escalating because safety/continuity requires it.'"
+            ],
+        },
+    }
+
+    # Secondary nuance: soften/shape primary
+    nuance = ""
+    if p_comm and s_comm and p_comm != s_comm:
+        if p_comm == "Director" and s_comm == "Facilitator":
+            nuance = "Secondary Facilitator softens the Director edge — you can use collaboration to increase buy‑in without losing clarity."
+        elif p_comm == "Director" and s_comm == "Encourager":
+            nuance = "Secondary Encourager helps you lead with warmth — use it to repair after hard calls."
+        elif p_comm == "Tracker" and s_comm == "Encourager":
+            nuance = "Secondary Encourager helps the Tracker communicate care — use it to deliver standards without sounding punitive."
+        elif p_comm == "Encourager" and s_comm == "Tracker":
+            nuance = "Secondary Tracker adds structure — use checklists and clear deadlines to prevent over-helping."
+        elif p_comm == "Facilitator" and s_comm == "Director":
+            nuance = "Secondary Director helps you decide — lean on it when time is short."
+        elif p_comm == "Facilitator" and s_comm == "Tracker":
+            nuance = "Secondary Tracker adds stability — document decisions and set triggers so collaboration stays safe."
+
+    primary = comm_lens.get(p_comm, {
+        "optimizes": "clarity and safety",
+        "learns": "through clear expectations and feedback",
+        "derail": ["may struggle when expectations are unclear"],
+        "teach": ["Clarify standards and practice the next right step."],
+        "micro_drills": ["Ask for a recommendation with one risk + one mitigation."]
+    })
+
+    # --- Motivation lenses ---
+    mot_lens = {
+        "Achievement": {
+            "hook": "progress, mastery, and clear wins",
+            "coach": [
+                "Set short, measurable goals and celebrate completion.",
+                "Use stretch assignments with defined success indicators."
+            ],
+            "risk": "may chase speed over process or safety if not anchored."
+        },
+        "Growth": {
+            "hook": "learning, feedback, and skill-building",
+            "coach": [
+                "Frame feedback as skill development, not character judgment.",
+                "Offer 'next rep' opportunities quickly after mistakes."
+            ],
+            "risk": "may intellectualize instead of executing if overwhelmed."
+        },
+        "Connection": {
+            "hook": "belonging, trust, and being valued",
+            "coach": [
+                "Use relational check-ins paired with clear expectations.",
+                "Reinforce that standards protect the team and youth."
+            ],
+            "risk": "may avoid conflict or over-help to keep relationships smooth."
+        },
+        "Purpose": {
+            "hook": "mission alignment and impact on youth",
+            "coach": [
+                "Tie tasks to youth outcomes and safety.",
+                "Use stories/examples to connect action to impact."
+            ],
+            "risk": "may burn out if they feel work is misaligned or chaotic."
+        },
+    }
+    mot_primary = mot_lens.get(p_mot, {"hook":"stability and meaningful work","coach":["Connect tasks to impact and clear standards."],"risk":"may disengage if goals are unclear."})
+    mot_secondary = mot_lens.get(s_mot, None)
+
+    # --- Phase-specific teaching focus ---
+    phase_focus = {
+        1: {
+            "focus": "baseline consistency and safety habits",
+            "teach_moves": ["Standard", "Triggers", "Close the loop"],
+            "supervisor_move": "Be concrete and repetitive: expectations → example → practice → feedback."
+        },
+        2: {
+            "focus": "judgment under ambiguity (gray zones)",
+            "teach_moves": ["Ownership", "Stress-test thinking", "Triggers"],
+            "supervisor_move": "Require recommendations: risk list → mitigations → decision statement."
+        },
+        3: {
+            "focus": "ownership, delegation, and systems thinking",
+            "teach_moves": ["Ownership", "Close the loop", "Align motivation"],
+            "supervisor_move": "Delegate outcomes, review patterns weekly, coach them to coach others."
+        },
+    }
+    pf = phase_focus.get(phase, phase_focus[1])
+
+    who = (name or "this staff member").split(" ")[0]
+    lines = []
+    lines.append(f"### Teaching Deep Dive for {who}'s Integrated Profile")
+    lines.append("")
+    lines.append(f"**Integrated Profile:** {p_comm}/{s_comm} communication • {p_mot}/{s_mot} motivation")
+    if nuance:
+        lines.append(f"**Secondary nuance:** {nuance}")
+    lines.append("")
+    lines.append(f"#### What this phase is teaching (Phase {phase})")
+    lines.append(f"- **Focus:** {pf['focus']}")
+    lines.append(f"- **Supervisor move:** {pf['supervisor_move']}")
+    lines.append("")
+    lines.append("#### How they naturally operate (Communication lens)")
+    lines.append(f"- **They optimize for:** {primary['optimizes']}")
+    lines.append(f"- **They learn best through:** {primary['learns']}")
+    lines.append("")
+    lines.append("#### Common derailers to watch for")
+    for d in primary["derail"]:
+        lines.append(f"- {d}")
+    lines.append("")
+    lines.append("#### How to teach and coach them in this phase")
+    for t in primary["teach"]:
+        lines.append(f"- {t}")
+    lines.append("")
+    lines.append("#### Motivation hook (to keep this sustainable)")
+    lines.append(f"- **Primary driver ({p_mot}):** {mot_primary['hook']}")
+    for c in mot_primary["coach"]:
+        lines.append(f"  - {c}")
+    lines.append(f"- **Risk if unmanaged:** {mot_primary['risk']}")
+    if mot_secondary:
+        lines.append(f"- **Secondary driver ({s_mot}):** {mot_secondary['hook']}")
+    lines.append("")
+    lines.append("#### Micro-drills (quick practice reps)")
+    for md in primary["micro_drills"]:
+        lines.append(f"- {md}")
+    lines.append("")
+    lines.append("#### What success looks like this month")
+    lines.append(f"- They demonstrate **{', '.join(pf['teach_moves'])}** without you prompting.")
+    lines.append("- Their work product includes: a clear decision, documented rationale, and escalation triggers.")
+    lines.append("- They can explain the **why** (youth safety + team stability) in one sentence.")
+    return "\n".join(lines)
+
+
 # --- PDF HELPER: IPDP PHASE SUMMARY ---
 def _build_ipdp_summary_pdf(name, role, phase_num, p_comm=None, p_mot=None):
     """Builds a small, phase-specific IPDP PDF.
@@ -3094,13 +3307,15 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             pdf.ln(1)
 
         _sh("Teaching Deep Dive")
+        if not teaching_text:
+            teaching_text = build_teaching_deep_dive(name, p_comm, "", p_mot, "", int(phase))
         _p(teaching_text or "—")
         out = pdf.output(dest="S")
         if isinstance(out, (bytes, bytearray)):
             return bytes(out)
         return out.encode("latin-1", errors="replace")
 
-    st.markdown("#### 🧩 Individual Professional Development Plan")
+    st.markdown("#### 🧩 IPDP Phases (collapsible)")
     st.caption("Each phase is isolated so an error in one phase won't break the others.")
 
     for _phase in (1, 2, 3):
@@ -3138,13 +3353,9 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
                 # 3) Teaching Deep Dive (collapsible)
                 with st.expander("📚 Teaching Deep Dive", expanded=False):
-                    teach_text = PEDAGOGY_GUIDE.get(int(_phase), "")
-                    if teach_text:
-                        st.markdown(teach_text)
-                    else:
-                        st.info("No teaching guide text found for this phase yet.")
-
-                # 4) PDF Download (collapsible)
+                    teach_text = build_teaching_deep_dive(name, p_comm, s_comm, p_mot, s_mot, int(_phase))
+                    st.markdown(teach_text)
+# 4) PDF Download (collapsible)
                 with st.expander("📄 PDF Download", expanded=False):
                     try:
                         teach_text = PEDAGOGY_GUIDE.get(int(_phase), "")
