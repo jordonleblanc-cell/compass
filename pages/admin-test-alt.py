@@ -2281,6 +2281,9 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     return pdf.output(dest='S').encode('latin-1')
 
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
+    # Derived helper for friendlier copy
+    first_name = (name.split()[0] if isinstance(name, str) and name.strip() else "this staff member")
+
     data = generate_profile_content(p_comm, p_mot)
 
     st.markdown("---")
@@ -2318,7 +2321,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         with st.container(border=True):
             st.markdown(f"**Style Map: {p_comm}**")
             fig = create_comm_quadrant_chart(p_comm)
-            st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+            st.plotly_chart(fig, width="stretch", config={'displayModeBar': False})
 
     st.divider()
 
@@ -2328,7 +2331,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         with st.container(border=True):
             st.markdown(f"**Primary Driver**")
             fig_g = create_motiv_gauge(p_mot)
-            st.plotly_chart(fig_g, use_container_width=True, config={'displayModeBar': False})
+            st.plotly_chart(fig_g, width="stretch", config={'displayModeBar': False})
     with c4:
         st.subheader(f"3. Motivation: {p_mot}")
         show_list(data['s3_b'])
@@ -2361,7 +2364,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         with i2:
             st.markdown(f"**🧭 Leadership Compass**")
             fig_compass = create_integrated_compass(p_comm, p_mot)
-            st.plotly_chart(fig_compass, use_container_width=True, config={'displayModeBar': False})
+            st.plotly_chart(fig_compass, width="stretch", config={'displayModeBar': False})
             st.caption("The compass plots your bias: Task vs. People (X-Axis) and Change vs. Stability (Y-Axis).")
     
     # --- SECTION 6: THE SUPERVISOR'S HUD (REWORKED) ---
@@ -2783,7 +2786,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # ... (PDF logic remains, referencing generic data for stability, but matrix on screen is new/dynamic) ...
     # Phase-specific IPDP PDF (aligned to this staff member's integrated profile)
     pdf_bytes = _build_ipdp_summary_pdf(name, role, sel_num, p_comm=p_comm, p_mot=p_mot)
-    st.download_button(f"🖨️ Download Phase {sel_num} Plan (PDF)", pdf_bytes, f"{name}_IPDP.pdf", "application/pdf", use_container_width=True)
+    st.download_button(f"🖨️ Download Phase {sel_num} Plan (PDF)", pdf_bytes, f"{name}_IPDP.pdf", "application/pdf", width="stretch")
 
 
     st.markdown("<br>", unsafe_allow_html=True)
@@ -2860,15 +2863,15 @@ st.markdown("""
 nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
 
 with nav_col1:
-    if st.button("📝 Supervisor's Guide\n\nCreate 12-point coaching manuals.", use_container_width=True): set_view("Supervisor's Guide")
+    if st.button("📝 Supervisor's Guide\n\nCreate 12-point coaching manuals.", width="stretch"): set_view("Supervisor's Guide")
 with nav_col2:
-    if st.button("🧬 Team DNA\n\nAnalyze unit culture & blindspots.", use_container_width=True): set_view("Team DNA")
+    if st.button("🧬 Team DNA\n\nAnalyze unit culture & blindspots.", width="stretch"): set_view("Team DNA")
 with nav_col3:
-    if st.button("⚖️ Conflict Mediator\n\nScripts for tough conversations.", use_container_width=True): set_view("Conflict Mediator")
+    if st.button("⚖️ Conflict Mediator\n\nScripts for tough conversations.", width="stretch"): set_view("Conflict Mediator")
 with nav_col4:
-    if st.button("🚀 Career Pathfinder\n\nPromotion readiness tests.", use_container_width=True): set_view("Career Pathfinder")
+    if st.button("🚀 Career Pathfinder\n\nPromotion readiness tests.", width="stretch"): set_view("Career Pathfinder")
 st.markdown("###")
-if st.button("📈 Organization Pulse (See All Data)", use_container_width=True): set_view("Org Pulse")
+if st.button("📈 Organization Pulse (See All Data)", width="stretch"): set_view("Org Pulse")
 st.markdown("---")
 
 # --- VIEW CONTROLLER ---
@@ -2905,7 +2908,7 @@ if st.session_state.current_view == "Supervisor's Guide":
                     c1,c2,c3 = st.columns(3)
                     c1.metric("Role", d['role']); c2.metric("Style", d['p_comm']); c3.metric("Drive", d['p_mot'])
                     
-                    if st.button("Generate Guide", type="primary", use_container_width=True):
+                    if st.button("Generate Guide", type="primary", width="stretch"):
                         st.session_state.generated_pdf = create_supervisor_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
                         st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
                         st.session_state.generated_name = d['name']
@@ -2922,11 +2925,11 @@ if st.session_state.current_view == "Supervisor's Guide":
                         data=st.session_state.generated_pdf, 
                         file_name=st.session_state.generated_filename, 
                         mime="application/pdf",
-                        use_container_width=True
+                        width="stretch"
                     )
                 
                 with ac2:
-                    with st.popover("📧 Email to Me", use_container_width=True):
+                    with st.popover("📧 Email to Me", width="stretch"):
                         email_input = st.text_input("Recipient Email", placeholder="name@elmcrest.org")
                         if st.button("Send Email"):
                             if email_input:
@@ -2965,9 +2968,9 @@ if st.session_state.current_view == "Supervisor's Guide":
             st.divider()
             ac1, ac2 = st.columns([1, 2])
             with ac1:
-                st.download_button("📥 Download PDF", st.session_state.manual_pdf, st.session_state.manual_fname, "application/pdf", use_container_width=True)
+                st.download_button("📥 Download PDF", st.session_state.manual_pdf, st.session_state.manual_fname, "application/pdf", width="stretch")
             with ac2:
-                with st.popover("📧 Email to Me", use_container_width=True):
+                with st.popover("📧 Email to Me", width="stretch"):
                     email_input_m = st.text_input("Recipient Email", key="manual_email")
                     if st.button("Send Email", key="btn_manual_email"):
                         if email_input_m:
@@ -3042,7 +3045,7 @@ elif st.session_state.current_view == "Team DNA":
                 with st.container(border=True):
                     # Weighted Communication
                     comm_counts = calculate_weighted_counts(tdf, 'p_comm', 's_comm')
-                    st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), use_container_width=True)
+                    st.plotly_chart(px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, title="Communication Mix", color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']]), width="stretch")
                 
                 # DOMINANT CULTURE ANALYSIS
                 if not comm_counts.empty:
@@ -3094,7 +3097,7 @@ elif st.session_state.current_view == "Team DNA":
                 with st.container(border=True):
                     # Weighted Motivation
                     mot_counts = calculate_weighted_counts(tdf, 'p_mot', 's_mot')
-                    st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers", color_discrete_sequence=[BRAND_COLORS['blue']]*4), use_container_width=True)
+                    st.plotly_chart(px.bar(x=mot_counts.index, y=mot_counts.values, title="Motivation Drivers", color_discrete_sequence=[BRAND_COLORS['blue']]*4), width="stretch")
                 
                 # MOTIVATION GAP ANALYSIS
                 if not mot_counts.empty:
@@ -3493,12 +3496,12 @@ elif st.session_state.current_view == "Org Pulse":
                 st.markdown("##### 🗣️ Communication Mix")
                 # Use pre-calculated weighted counts for the chart
                 fig_comm = px.pie(names=comm_counts.index, values=comm_counts.values, hole=0.4, color_discrete_sequence=[BRAND_COLORS['blue'], BRAND_COLORS['teal'], BRAND_COLORS['green'], BRAND_COLORS['gray']])
-                st.plotly_chart(fig_comm, use_container_width=True)
+                st.plotly_chart(fig_comm, width="stretch")
         with c_b: 
             with st.container(border=True):
                 st.markdown("##### 🔋 Motivation Drivers")
                 fig_mot = px.bar(x=mot_counts.values, y=mot_counts.index, orientation='h', color_discrete_sequence=[BRAND_COLORS['blue']])
-                st.plotly_chart(fig_mot, use_container_width=True)
+                st.plotly_chart(fig_mot, width="stretch")
 
         st.divider()
         st.header("🔍 Deep Organizational Analysis")
