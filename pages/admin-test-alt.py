@@ -2712,84 +2712,393 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # --- SECTION 9: INDIVIDUAL PROFESSIONAL DEVELOPMENT PLAN (IPDP) - DYNAMIC ---
     st.subheader("9. Individual Professional Development Plan (IPDP)")
     st.caption("A development-first framework for coaching growth, alignment, and performance over time.")
-    
-    # 1. Helper to generate DYNAMIC moves based on integrated profile
-    def get_dynamic_coaching_moves(comm, motiv, phase):
-        # Comm Moves (How they receive coaching)
-        c_moves = {
-            "Director": ["The 'Bottom Line' Opener: Start with the goal, not the background.", "The Autonomy Check: Ask 'What do you need to own this?'"],
-            "Encourager": ["The Relational Buffer: Spend 2 mins on 'us' before 'the work'.", "The Vision Connect: Link the boring task to the team vibe."],
-            "Facilitator": ["The Advance Warning: Send the agenda 24hrs early.", "The Process Map: Ask them to design the 'how'."],
-            "Tracker": ["The Data Dive: Bring specific examples/numbers.", "The Risk Assessment: Ask 'What risks do you see?'"]
-        }
-        # Motiv Moves (How they stay engaged)
-        m_moves = {
-            "Achievement": ["The Scoreboard: Define what 'winning' looks like.", "The Sprint: Set a short-term, high-intensity goal."],
-            "Growth": ["The Stretch: Give a task slightly above their pay grade.", "The Debrief: Ask 'What did you learn?' not just 'Did you do it?'"],
-            "Purpose": ["The Impact Story: Share a specific youth success story.", "The Why: Explain the mission value of the task."],
-            "Connection": ["The Peer Mentor: Have them teach a peer.", "The Team Check: Ask 'How is the team feeling?'"]
-        }
-        # Phase Moves (Developmental Stage)
-        p_moves = {
-            1: ["The Safety Net: 'Call me if you get stuck.'", "The Binary Feedback: 'This was right/wrong.'"],
-            2: ["The Scenario Drill: 'What would you do if...?'", "The Pattern Spot: 'I see you doing X often.'"],
-            3: ["The Delegation: 'You run the meeting today.'", "The Systems Think: 'How do we fix this process?'"]
-        }
-        
-        return c_moves.get(comm, []) + m_moves.get(motiv, []) + p_moves.get(phase, [])
 
-    # Phase Selector
+    # Snapshot: remind the supervisor who they are coaching (primary + secondary)
+    with st.container(border=True):
+        st.markdown("#### 🧩 Coaching Context (Integrated Profile)")
+        st.markdown(
+            f"**Staff:** {name}\n\n"
+            f"**Role:** {role}\n\n"
+            f"**Communication:** {p_comm}/{s_comm}\n\n"
+            f"**Motivation:** {p_mot}/{s_mot}"
+        )
+        st.caption(
+            "Use this plan as a **repeatable weekly coaching rhythm**: set expectations, practice judgment, "
+            "and build follow-through through documentation and review."
+        )
+
+    # ----------------------------
+    # IPDP: Coaching Matrix Engine
+    # ----------------------------
+    def build_coaching_matrix(comm_p, comm_s, mot_p, mot_s, phase):
+        """
+        Returns 6 structured moves:
+        - title, why, how, scripts, avoid
+        Moves are individualized by primary style, lightly adjusted by secondary style, and tuned by phase.
+        """
+
+        # --- Secondary nuance (tone modifiers) ---
+        # We don't invent new styles; we slightly adjust how hard/soft the delivery should be.
+        tone_mod = {
+            ("Director", "Facilitator"): "Keep it direct, but add a 10-second process preview so it lands as clarity (not pressure).",
+            ("Director", "Encourager"): "Keep it direct, but add a brief care statement so it lands as support (not criticism).",
+            ("Tracker", "Facilitator"): "Lead with data, but invite them to design the workflow so it doesn't feel rigid.",
+            ("Tracker", "Encourager"): "Lead with data, but explicitly affirm intent so it doesn't feel like distrust.",
+            ("Encourager", "Director"): "Hold warmth, but tighten the standard so care doesn't become avoidance.",
+            ("Facilitator", "Director"): "Collaborate, but name a decision deadline so the meeting doesn't drift.",
+        }
+        nuance = tone_mod.get((comm_p, comm_s), "")
+
+        # --- Phase focus cards ---
+        phase_focus = {
+            1: {
+                "title": "Phase 1: Safety + Consistency",
+                "aim": "Build a dependable baseline: routines, documentation habits, and “minimum safe standard.”",
+                "supervisor_role": "Be a safety net: coach in real time, keep scope small, review quickly.",
+                "common_pitfall": "Overloading them too early or letting unclear expectations create chaos.",
+            },
+            2: {
+                "title": "Phase 2: Judgment + Pattern Recognition",
+                "aim": "Move from task completion to decision quality: notice patterns, anticipate, prevent repeat issues.",
+                "supervisor_role": "Ask better questions: don’t rescue; require a recommendation + rationale.",
+                "common_pitfall": "They defer upward (“you decide”) or get rigid to avoid ambiguity.",
+            },
+            3: {
+                "title": "Phase 3: Ownership + Systems Thinking",
+                "aim": "Shift from managing moments to improving the system: prevention, delegation, team standards.",
+                "supervisor_role": "Delegate real ownership with guardrails; review outcomes over time.",
+                "common_pitfall": "They either over-control (do everything) or avoid hard calls that create conflict.",
+            },
+        }
+
+        # --- Style: how they receive coaching (comm) ---
+        comm_moves = {
+            "Director": {
+                "opener": {
+                    "title": "1) The Bottom-Line Opener",
+                    "why": "Direct styles respond best when you lead with the point. It reduces defensiveness and speeds alignment.",
+                    "how": "State the standard first, then the reason, then the next action.",
+                    "scripts": [
+                        "“Here’s the standard: _____. Here’s why it matters: _____. Here’s what I need next: _____.”",
+                        "“I’m going to be clear so you can be successful. The expectation is _____.”",
+                    ],
+                    "avoid": "Long preambles or vague hints that force them to guess what you mean.",
+                },
+                "assignment": {
+                    "title": "2) The Ownership Transfer",
+                    "why": "Direct styles grow when they are trusted with authority—but bounded by safety and review.",
+                    "how": "Give ownership plus guardrails: minimum safe standard, deadline, escalation triggers.",
+                    "scripts": [
+                        "“I want your recommendation by 3pm with a risk plan. If X happens, escalate immediately.”",
+                        "“You own this decision—my job is to verify it meets the minimum safe standard.”",
+                    ],
+                    "avoid": "Rescuing by taking it back or giving them the answer.",
+                },
+            },
+            "Encourager": {
+                "opener": {
+                    "title": "1) The Relational Buffer",
+                    "why": "Warm styles hear feedback as relational threat. A brief care statement helps them stay present to the standard.",
+                    "how": "Affirm intent, then name the impact, then set the boundary.",
+                    "scripts": [
+                        "“I see how much you care. And we still need the standard to be ____ because ____.”",
+                        "“This isn’t about your intentions—it’s about outcomes and safety. Let’s tighten ____.”",
+                    ],
+                    "avoid": "Over-softening to the point that the standard becomes optional.",
+                },
+                "assignment": {
+                    "title": "2) The Boundary + Care Pairing",
+                    "why": "They develop when they learn that holding limits is part of caring for youth and peers.",
+                    "how": "Give them a clear boundary statement + a repair statement to use afterward.",
+                    "scripts": [
+                        "“Try this line: ‘I care about you, and I’m not able to approve that because ____.’”",
+                        "“After the hard call, repair with: ‘I’m with you—let’s reset and move forward.’”",
+                    ],
+                    "avoid": "Avoiding conflict until it becomes a crisis.",
+                },
+            },
+            "Facilitator": {
+                "opener": {
+                    "title": "1) The Advance Map",
+                    "why": "Process-oriented styles engage when they understand the path. It prevents drift and increases follow-through.",
+                    "how": "Preview the agenda: what we’re deciding, by when, and what success looks like.",
+                    "scripts": [
+                        "“Today we’re deciding _____. We’ll pick a plan by _____. Success looks like ____.”",
+                        "“Let’s list options, name risks, then choose the safest workable plan.”",
+                    ],
+                    "avoid": "Open-ended meetings with no deadline or decision point.",
+                },
+                "assignment": {
+                    "title": "2) The Process Ownership",
+                    "why": "They grow when they design the “how” and then commit to it.",
+                    "how": "Ask them to draft the workflow and accountability steps—then lock it in.",
+                    "scripts": [
+                        "“Draft the process: who does what, by when, and how we’ll verify it’s done.”",
+                        "“Pick a plan and write the steps. We’ll review after the shift.”",
+                    ],
+                    "avoid": "Endless consensus-seeking that replaces leadership.",
+                },
+            },
+            "Tracker": {
+                "opener": {
+                    "title": "1) The Data-First Clarity",
+                    "why": "Detail-oriented styles feel safest when the feedback is specific and evidence-based.",
+                    "how": "Bring 2–3 concrete examples, then connect them to policy/safety, then define the correction.",
+                    "scripts": [
+                        "“Here are the specifics I saw: ____. Here’s the risk: ____. The expectation is ____.”",
+                        "“Let’s tighten documentation: by end of shift we need ____ completed.”",
+                    ],
+                    "avoid": "Vague feedback like “be better” with no examples.",
+                },
+                "assignment": {
+                    "title": "2) The Risk Assessment Prompt",
+                    "why": "They develop when they move from rule-following to risk thinking: what matters most right now?",
+                    "how": "Ask them to rank risks and propose mitigations when policy is unclear.",
+                    "scripts": [
+                        "“What are the top 3 risks here? Which one is most likely? What mitigation lowers it fastest?”",
+                        "“If policy is silent, what principle guides us: safety, supervision, documentation, dignity?”",
+                    ],
+                    "avoid": "Letting them freeze waiting for perfect certainty.",
+                },
+            },
+        }
+
+        # --- Motivation: what keeps them engaged (fuel) ---
+        motiv_moves = {
+            "Achievement": {
+                "title": "3) The Scoreboard",
+                "why": "Achievement drivers stay engaged when success is defined and measurable.",
+                "how": "Define 2–3 concrete outcomes and a short time horizon.",
+                "scripts": [
+                    "“Success looks like: (1) ____, (2) ____, (3) ____ by end of week.”",
+                    "“Let’s set a 7‑day sprint and review results next Friday.”",
+                ],
+                "avoid": "Open-ended goals with no finish line.",
+            },
+            "Growth": {
+                "title": "3) The Stretch + Debrief",
+                "why": "Growth drivers engage when the work feels like learning, not just compliance.",
+                "how": "Assign a stretch task and debrief learning, not just output.",
+                "scripts": [
+                    "“This is a stretch on purpose. After, we’ll debrief: what did you learn and what would you change?”",
+                    "“Try it once, then we’ll refine the approach together.”",
+                ],
+                "avoid": "Only measuring success as pass/fail with no learning reflection.",
+            },
+            "Purpose": {
+                "title": "3) The Mission Link",
+                "why": "Purpose drivers commit when they see the human impact.",
+                "how": "Connect the task to youth outcomes, safety, and dignity.",
+                "scripts": [
+                    "“This matters because it protects youth and builds trust on the unit.”",
+                    "“Documentation isn’t paperwork—it's continuity of care.”",
+                ],
+                "avoid": "Reducing everything to compliance without meaning.",
+            },
+            "Connection": {
+                "title": "3) The Team Anchor",
+                "why": "Connection drivers engage when the work strengthens relationships and shared trust.",
+                "how": "Tie the goal to team stability and peer support.",
+                "scripts": [
+                    "“This helps the whole team feel safe and consistent.”",
+                    "“Teach a peer your process—make the unit stronger.”",
+                ],
+                "avoid": "Isolating them or making it purely transactional.",
+            },
+        }
+
+        # --- Phase moves (safety valve + growth edge) ---
+        phase_moves = {
+            1: [
+                {
+                    "title": "5) The Safety Valve (Escalation Rules)",
+                    "why": "Phase 1 success depends on knowing when to escalate before risk grows.",
+                    "how": "Define triggers for calling you and what to document when they do.",
+                    "scripts": [
+                        "“Escalate if ____ happens. Document ____ and notify ____.”",
+                        "“If you’re unsure, call early. We can always step it down later.”",
+                    ],
+                    "avoid": "Waiting until it’s a crisis.",
+                },
+                {
+                    "title": "6) The Binary Feedback Loop",
+                    "why": "Early development improves fastest with clear yes/no feedback tied to a standard.",
+                    "how": "Name what was correct, what wasn’t, and the exact correction for next time.",
+                    "scripts": [
+                        "“This part met standard: ____. This part didn’t: ____. Next time do ____.”",
+                    ],
+                    "avoid": "Ambiguous feedback that leaves them guessing.",
+                },
+            ],
+            2: [
+                {
+                    "title": "5) The Scenario Drill",
+                    "why": "Phase 2 requires practicing judgment before the real moment hits.",
+                    "how": "Run 2-minute “what would you do if…?” drills and require a recommendation.",
+                    "scripts": [
+                        "“What would you do if a youth escalates during meds pass? Give me your first 3 moves.”",
+                        "“What’s your recommendation—and what risk plan supports it?”",
+                    ],
+                    "avoid": "Letting them answer with “I’d get a supervisor” as the whole plan.",
+                },
+                {
+                    "title": "6) The Pattern Spot",
+                    "why": "Noticing patterns turns reactions into prevention.",
+                    "how": "Name the recurring pattern and build a prevention step into the routine.",
+                    "scripts": [
+                        "“I notice X happens on these shifts. What prevention step can we add?”",
+                    ],
+                    "avoid": "Treating repeated issues as unrelated incidents.",
+                },
+            ],
+            3: [
+                {
+                    "title": "5) The Delegation Move",
+                    "why": "Phase 3 growth requires leading through others, not doing everything personally.",
+                    "how": "Delegate a real piece of ownership and make them teach it back.",
+                    "scripts": [
+                        "“You run the debrief tomorrow. Bring the agenda and the standard you’ll hold.”",
+                    ],
+                    "avoid": "Keeping all leadership tasks for yourself.",
+                },
+                {
+                    "title": "6) The Systems Fix",
+                    "why": "Phase 3 leaders prevent repeat problems by improving systems.",
+                    "how": "Ask for a process improvement proposal with a simple test plan.",
+                    "scripts": [
+                        "“Propose one system change: what we change, how we test it, and what success looks like.”",
+                    ],
+                    "avoid": "Only solving the same problem over and over in the moment.",
+                },
+            ],
+        }
+
+        # Compose the 6-move matrix
+        comm_pack = comm_moves.get(comm_p, comm_moves["Director"])
+        move_1 = comm_pack["opener"]
+        move_2 = comm_pack["assignment"]
+
+        move_3 = motiv_moves.get(mot_p, motiv_moves["Achievement"])
+
+        # Move 4: a universal alignment hook that varies by style
+        alignment = {
+            "Director": {
+                "title": "4) The Alignment Question",
+                "why": "It prevents power struggles by moving the conversation to shared standards.",
+                "how": "Ask a question that forces the standard + plan to be spoken out loud.",
+                "scripts": [
+                    "“What does ‘good’ look like here—and what’s your plan to get us there?”",
+                    "“What’s the safest workable option—and what mitigation makes it safe enough?”",
+                ],
+                "avoid": "Debating opinions without returning to standards.",
+            },
+            "Encourager": {
+                "title": "4) The Alignment Question",
+                "why": "It keeps warmth while still landing the standard.",
+                "how": "Ask for the standard + the repair language they’ll use.",
+                "scripts": [
+                    "“How will you hold the limit—and how will you repair after?”",
+                    "“What’s the boundary, and what will you say to keep the relationship intact?”",
+                ],
+                "avoid": "Only focusing on feelings without a plan.",
+            },
+            "Facilitator": {
+                "title": "4) The Alignment Question",
+                "why": "It turns discussion into a decision.",
+                "how": "Ask for options, risks, and the chosen plan by a deadline.",
+                "scripts": [
+                    "“What are the options, the risks, and your recommendation by end of this meeting?”",
+                ],
+                "avoid": "Letting it stay a brainstorm forever.",
+            },
+            "Tracker": {
+                "title": "4) The Alignment Question",
+                "why": "It connects details to priority and outcome.",
+                "how": "Ask which risk matters most and what control reduces it.",
+                "scripts": [
+                    "“Which risk is most likely, and what control reduces it fastest?”",
+                ],
+                "avoid": "Getting lost in all risks equally.",
+            },
+        }.get(comm_p, alignment["Director"])
+
+        move_5, move_6 = phase_moves.get(int(phase), phase_moves[1])
+
+        # Add secondary nuance as a note (if present)
+        if nuance:
+            for mv in (move_1, move_2, alignment):
+                mv["nuance"] = nuance
+
+        return [move_1, move_2, move_3, alignment, move_5, move_6], phase_focus.get(int(phase), phase_focus[1])
+
+    # Phase Selector (stable + per-staff session state)
     phase_state_key = f"ipdp_phase__{name}".replace(" ", "_")
-    if phase_state_key not in st.session_state: st.session_state[phase_state_key] = 1
-    
-    sel_num = st.radio("Select Phase:", [1, 2, 3], format_func=lambda x: f"Phase {x}", horizontal=True, key=phase_state_key)
+    if phase_state_key not in st.session_state:
+        st.session_state[phase_state_key] = 1
 
-    # Generate Dynamic Moves
-    my_moves = get_dynamic_coaching_moves(p_comm, p_mot, sel_num)
-    
-    # Display Matrix
-    st.markdown("#### 🧭 Coaching Matrix: 6 High-Impact Moves (Tailored)")
-    
-    colA, colB, colC = st.columns(3)
-    
-    # Move 1 & 2 (Comm)
-    with colA:
-        with st.container(border=True):
-            st.markdown("**1. The Opener**")
-            st.caption(my_moves[0])
-            st.markdown("---")
-            st.markdown("**2. The Assignment**")
-            st.caption(my_moves[1])
-            
-    # Move 3 & 4 (Motiv)
-    with colB:
-        with st.container(border=True):
-            st.markdown("**3. The Fuel**")
-            st.caption(my_moves[2])
-            st.markdown("---")
-            st.markdown("**4. The Hook**")
-            st.caption(my_moves[3])
-            
-    # Move 5 & 6 (Phase)
-    with colC:
-        with st.container(border=True):
-            st.markdown("**5. The Safety Valve**")
-            st.caption(my_moves[4])
-            st.markdown("---")
-            st.markdown("**6. The Growth Edge**")
-            st.caption(my_moves[5])
+    sel_num = st.radio(
+        "Select Phase:",
+        [1, 2, 3],
+        format_func=lambda x: f"Phase {x}",
+        horizontal=True,
+        key=phase_state_key
+    )
+
+    moves, phase_card = build_coaching_matrix(p_comm, s_comm, p_mot, s_mot, sel_num)
+
+    # Phase framing (better context formatting)
+    with st.container(border=True):
+        st.markdown(f"#### 🎯 {phase_card.get('title','Phase')}")
+        a, b, c = st.columns(3)
+        with a:
+            st.markdown("**Aim**")
+            st.write(phase_card.get("aim", ""))
+        with b:
+            st.markdown("**Supervisor Role**")
+            st.write(phase_card.get("supervisor_role", ""))
+        with c:
+            st.markdown("**Common Pitfall**")
+            st.write(phase_card.get("common_pitfall", ""))
+
+    # Expanded Coaching Matrix (clean, repeatable, teachable)
+    st.markdown("#### 🧭 Coaching Matrix (Expanded): 6 High-Impact Moves")
+    st.caption("Use these six moves as a repeatable structure for weekly coaching. Open with clarity, align on standards, fuel motivation, and lock follow-through.")
+
+    # Display as 2 columns x 3 rows for readability
+    grid_left, grid_right = st.columns(2)
+    for idx, mv in enumerate(moves, start=1):
+        target_col = grid_left if idx in (1, 3, 5) else grid_right
+        with target_col:
+            with st.container(border=True):
+                st.markdown(f"**{mv.get('title', f'{idx}) Move')}**")
+                if mv.get("nuance"):
+                    st.caption(f"Secondary nuance: {mv.get('nuance')}")
+                st.markdown("**Why this works**")
+                st.write(mv.get("why", ""))
+                st.markdown("**How to do it**")
+                st.write(mv.get("how", ""))
+                with st.expander("Scripts + What to avoid", expanded=False):
+                    st.markdown("**Scripts you can use**")
+                    for s in mv.get("scripts", []):
+                        st.success(f"“{s}”")
+                    st.markdown("**Avoid**")
+                    st.warning(mv.get("avoid", ""))
 
     st.markdown("#### 🎓 Pedagogical Deep Dive")
     st.info(PEDAGOGY_GUIDE.get(sel_num, "Guide and support consistent growth."))
-    
-    # Original PDF Download Button (Logic preserved)
-    # ... (PDF logic remains, referencing generic data for stability, but matrix on screen is new/dynamic) ...
+
     # Phase-specific IPDP PDF (aligned to this staff member's integrated profile)
     pdf_bytes = _build_ipdp_summary_pdf(name, role, sel_num, p_comm=p_comm, p_mot=p_mot)
-    st.download_button(f"🖨️ Download Phase {sel_num} Plan (PDF)", pdf_bytes, f"{name}_IPDP.pdf", "application/pdf", width="stretch")
-
+    st.download_button(
+        f"🖨️ Download Phase {sel_num} Plan (PDF)",
+        pdf_bytes,
+        f"{name}_IPDP.pdf",
+        "application/pdf",
+        width="stretch"
+    )
 
     st.markdown("<br>", unsafe_allow_html=True)
+
 
     # --- SECTION 10: CELEBRATION (TROPHY CASE) ---
     st.subheader("10. What To Celebrate")
