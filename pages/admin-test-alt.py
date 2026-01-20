@@ -2491,6 +2491,101 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # 12. Advancement
     add_section("12. Helping Them Prepare for Advancement", data['advancement'])
 
+    # --- NEW: Stress Signature & Support Prescription (matches on-screen detail) ---
+    try:
+        stress_sig = {
+            "Director": "Becomes aggressive, micromanages, stops listening.",
+            "Encourager": "Becomes silent, withdrawn, or overly agreeable (martyrdom).",
+            "Facilitator": "Becomes paralyzed, asks for endless data, refuses to decide.",
+            "Tracker": "Becomes rigid, nitpicky, anxious, policy-obsessed."
+        }.get(p_comm, "Stress patterns vary by person.")
+
+        support_rx = {
+            "Director": [
+                "Give a clear objective + the minimum non‑negotiables.",
+                "Limit scope: define what ‘good enough’ looks like.",
+                "Use short check‑ins (5–10 mins) focused on decisions + owners."
+            ],
+            "Encourager": [
+                "Name safety and belonging first; then address performance.",
+                "Give one clear priority (not 5) and a ‘finish line’.",
+                "Ask directly what support they need; don’t assume they’ll request it."
+            ],
+            "Facilitator": [
+                "Reduce ambiguity: define decision owner and deadline.",
+                "Offer a menu of 2–3 viable options (bounded choice).",
+                "Confirm next step in writing (who/what/when)."
+            ],
+            "Tracker": [
+                "Clarify the standard + the reason (safety, licensing, continuity).",
+                "Convert ambiguity into a checklist + thresholds.",
+                "Reassure: ‘We are aiming for safe + workable, not perfect.’"
+            ]
+        }.get(p_comm, [])
+
+        pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
+        pdf.cell(0, 8, "13. Stress Signature & Support Prescription", ln=True, fill=True); pdf.ln(2)
+        pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
+        pdf.multi_cell(0, 5, clean_text(f"Stress Signature: {stress_sig}"))
+        if support_rx:
+            pdf.ln(1)
+            pdf.multi_cell(0, 5, clean_text("Support Prescription:"))
+            for s in support_rx:
+                pdf.multi_cell(0, 5, clean_text(f"- {s}"))
+        pdf.ln(4)
+    except Exception:
+        pass
+
+    # --- NEW: IPDP Roadmap (Phase 1–3) including Coaching Matrix + Teaching Deep Dive ---
+    try:
+        pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
+        pdf.cell(0, 8, "14. IPDP Roadmap (Phases 1–3)", ln=True, fill=True); pdf.ln(2)
+        pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
+
+        for phase_num in (1, 2, 3):
+            moves, phase_card = build_coaching_matrix(p_comm, s_comm, p_mot, s_mot, phase_num)
+            pdf.set_font("Arial", 'B', 11); pdf.set_text_color(*black)
+            pdf.multi_cell(0, 6, clean_text(f"Phase {phase_num}: {phase_card.get('title','')}"))
+            pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
+            pdf.multi_cell(0, 5, clean_text(f"Aim: {phase_card.get('aim','')}"))
+            pdf.multi_cell(0, 5, clean_text(f"Supervisor Role: {phase_card.get('supervisor_role','')}"))
+            pdf.multi_cell(0, 5, clean_text(f"Common Pitfall: {phase_card.get('common_pitfall','')}"))
+            pdf.ln(1)
+
+            pdf.set_font("Arial", 'B', 11)
+            pdf.multi_cell(0, 5, clean_text("Coaching Matrix (6 Moves):"))
+            pdf.set_font("Arial", '', 11)
+            for idx, mv in enumerate(moves, start=1):
+                title = mv.get("title", f"Move {idx}")
+                pdf.multi_cell(0, 5, clean_text(f"{idx}) {title}"))
+                why = mv.get("why","")
+                how = mv.get("how","")
+                if why:
+                    pdf.multi_cell(0, 5, clean_text(f"   Why: {why}"))
+                if how:
+                    pdf.multi_cell(0, 5, clean_text(f"   How: {how}"))
+                scripts = mv.get("scripts", [])
+                if scripts:
+                    pdf.multi_cell(0, 5, clean_text("   Scripts:"))
+                    for s in scripts:
+                        pdf.multi_cell(0, 5, clean_text(f"   - {s}"))
+                avoid = mv.get("avoid","")
+                if avoid:
+                    pdf.multi_cell(0, 5, clean_text(f"   Avoid: {avoid}"))
+                pdf.ln(1)
+
+            pdf.set_font("Arial", 'B', 11)
+            pdf.multi_cell(0, 5, clean_text("Teaching Deep Dive (Profile‑Integrated):"))
+            pdf.set_font("Arial", '', 11)
+            deep = build_teaching_deep_dive(name, p_comm, s_comm, p_mot, s_mot, phase_num)
+            deep_clean = re.sub(r"[*_`#>]", "", deep)
+            deep_clean = re.sub(r"\n{3,}", "\n\n", deep_clean).strip()
+            pdf.multi_cell(0, 5, clean_text(deep_clean))
+            pdf.ln(4)
+    except Exception:
+        pass
+
+
     return pdf.output(dest='S').encode('latin-1')
 
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
@@ -2502,6 +2597,27 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.markdown("---")
     st.markdown(f"### 📘 Supervisory Guide: {name}")
     st.caption(f"Role: {role} | Profile: {p_comm} ({s_comm}) • {p_mot} ({s_mot})")
+
+
+# --- PDF (moved to top under header) ---
+pdf_bytes_top = None
+pdf_fname_top = None
+if "generated_pdf" in st.session_state and st.session_state.get("generated_name") == name:
+    pdf_bytes_top = st.session_state.get("generated_pdf")
+    pdf_fname_top = st.session_state.get("generated_filename", f"Guide_{name.replace(' ', '_')}.pdf")
+elif "manual_pdf" in st.session_state:
+    pdf_bytes_top = st.session_state.get("manual_pdf")
+    pdf_fname_top = st.session_state.get("manual_fname", f"Guide_{name.replace(' ', '_')}.pdf")
+
+if pdf_bytes_top:
+    st.download_button(
+        "📥 Save as PDF",
+        pdf_bytes_top,
+        pdf_fname_top,
+        "application/pdf",
+        key=f"dl_top_{name}",
+        width="stretch"
+    )
     
     with st.expander("⚡ Rapid Interaction Cheat Sheet", expanded=True):
         cc1, cc2, cc3 = st.columns(3)
@@ -3552,7 +3668,7 @@ if st.session_state.current_view == "Supervisor's Guide":
             st.divider()
             ac1, ac2 = st.columns([1, 2])
             with ac1:
-                st.download_button("📥 Download PDF", st.session_state.manual_pdf, st.session_state.manual_fname, "application/pdf")
+                st.caption("PDF download is available at the top of the guide.")
             with ac2:
                     email_input_m = st.text_input("Recipient Email", key="manual_email")
                     if st.button("Send Email", key="btn_manual_email"):
