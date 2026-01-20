@@ -3100,7 +3100,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             return bytes(out)
         return out.encode("latin-1", errors="replace")
 
-    st.markdown("#### 🧩 IPDP Phases (collapsible)")
+    st.markdown("#### 🧩 Individual Professional Development Plan")
     st.caption("Each phase is isolated so an error in one phase won't break the others.")
 
     for _phase in (1, 2, 3):
