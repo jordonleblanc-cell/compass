@@ -2982,7 +2982,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         move_3 = motiv_moves.get(mot_p, motiv_moves["Achievement"])
 
         # Move 4: a universal alignment hook that varies by style
-        alignment = {
+        alignment_map = {
             "Director": {
                 "title": "4) The Alignment Question",
                 "why": "It prevents power struggles by moving the conversation to shared standards.",
@@ -3021,7 +3021,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 ],
                 "avoid": "Getting lost in all risks equally.",
             },
-        }.get(comm_p, alignment["Director"])
+        }
+        alignment = alignment_map.get(comm_p, alignment_map["Director"])
 
         move_5, move_6 = phase_moves.get(int(phase), phase_moves[1])
 
