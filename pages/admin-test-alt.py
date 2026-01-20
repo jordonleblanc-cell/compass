@@ -3448,7 +3448,7 @@ st.markdown("""
 nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
 
 with nav_col1:
-    if st.button("📝 Supervisor\'s Guide
+    if st.button("📝 Supervisor's Guide
 
 Create 12-point coaching manuals.", width="stretch"): set_view("Supervisor\'s Guide")
 with nav_col2:
