@@ -3297,7 +3297,17 @@ elif st.session_state.current_view == "Career Pathfinder":
             style = d['p_comm']
             path = CAREER_PATHWAYS.get(style, {}).get(role)
             if path:
-                st.info(f"**Shift:** {path['shift']}")
+                st.info(f"**Shift:** {path.get('shift','')}")
+                shift = path.get("shift_expanded")
+                if isinstance(shift, dict):
+                    with st.expander("🔄 Understanding the Shift", expanded=True):
+                        st.markdown("**What this shift is:**")
+                        st.markdown(shift.get("explanation",""))
+                        st.markdown("**Why this shift is critical:**")
+                        st.markdown(shift.get("why_critical",""))
+                        st.markdown("**How supervisors can empower this shift:**")
+                        for a in shift.get("supervisor_actions", []):
+                            st.markdown(f"- {a}")
                 
                 with st.container(border=True):
                     st.markdown("### 🧠 The Psychological Block")
