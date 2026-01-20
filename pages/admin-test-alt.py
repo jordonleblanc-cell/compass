@@ -3099,7 +3099,6 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             pdf_bytes,
             f"{name}_IPDP.pdf",
             "application/pdf",
-            width="stretch"
         )
 
     st.markdown("<br>", unsafe_allow_html=True)
@@ -3177,7 +3176,7 @@ st.markdown("""
 nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
 
 with nav_col1:
-    if st.button("📝 Supervisor's Guide\n\nCreate 12-point coaching manuals.", width="stretch"): set_view("Supervisor's Guide")
+    if st.button("📝 Supervisor's Guide\n\nCreate 12-point coaching manuals."): set_view("Supervisor's Guide")
 with nav_col2:
     if st.button("🧬 Team DNA\n\nAnalyze unit culture & blindspots.", width="stretch"): set_view("Team DNA")
 with nav_col3:
@@ -3239,11 +3238,10 @@ if st.session_state.current_view == "Supervisor's Guide":
                         data=st.session_state.generated_pdf, 
                         file_name=st.session_state.generated_filename, 
                         mime="application/pdf",
-                        width="stretch"
                     )
                 
                 with ac2:
-                    with st.popover("📧 Email to Me", width="stretch"):
+                    with st.popover("📧 Email to Me"):
                         email_input = st.text_input("Recipient Email", placeholder="name@elmcrest.org")
                         if st.button("Send Email"):
                             if email_input:
@@ -3282,9 +3280,8 @@ if st.session_state.current_view == "Supervisor's Guide":
             st.divider()
             ac1, ac2 = st.columns([1, 2])
             with ac1:
-                st.download_button("📥 Download PDF", st.session_state.manual_pdf, st.session_state.manual_fname, "application/pdf", width="stretch")
+                st.download_button("📥 Download PDF", st.session_state.manual_pdf, st.session_state.manual_fname, "application/pdf")
             with ac2:
-                with st.popover("📧 Email to Me", width="stretch"):
                     email_input_m = st.text_input("Recipient Email", key="manual_email")
                     if st.button("Send Email", key="btn_manual_email"):
                         if email_input_m:
