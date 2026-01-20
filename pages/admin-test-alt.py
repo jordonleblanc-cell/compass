@@ -2714,18 +2714,19 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.caption("A development-first framework for coaching growth, alignment, and performance over time.")
 
     # Snapshot: remind the supervisor who they are coaching (primary + secondary)
-    with st.container(border=True):
-        st.markdown("#### 🧩 Coaching Context (Integrated Profile)")
-        st.markdown(
-            f"**Staff:** {name}\n\n"
-            f"**Role:** {role}\n\n"
-            f"**Communication:** {p_comm}/{s_comm}\n\n"
-            f"**Motivation:** {p_mot}/{s_mot}"
-        )
-        st.caption(
-            "Use this plan as a **repeatable weekly coaching rhythm**: set expectations, practice judgment, "
-            "and build follow-through through documentation and review."
-        )
+    with st.expander("🧩 Coaching Context (Integrated Profile)", expanded=True):
+        with st.container(border=True):
+            st.markdown("#### 🧩 Coaching Context (Integrated Profile)")
+            st.markdown(
+                f"**Staff:** {name}\n\n"
+                f"**Role:** {role}\n\n"
+                f"**Communication:** {p_comm}/{s_comm}\n\n"
+                f"**Motivation:** {p_mot}/{s_mot}"
+            )
+            st.caption(
+                "Use this plan as a **repeatable weekly coaching rhythm**: set expectations, practice judgment, "
+                "and build follow-through through documentation and review."
+            )
 
     # ----------------------------
     # IPDP: Coaching Matrix Engine
@@ -3047,55 +3048,59 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     moves, phase_card = build_coaching_matrix(p_comm, s_comm, p_mot, s_mot, sel_num)
 
     # Phase framing (better context formatting)
-    with st.container(border=True):
-        st.markdown(f"#### 🎯 {phase_card.get('title','Phase')}")
-        a, b, c = st.columns(3)
-        with a:
-            st.markdown("**Aim**")
-            st.write(phase_card.get("aim", ""))
-        with b:
-            st.markdown("**Supervisor Role**")
-            st.write(phase_card.get("supervisor_role", ""))
-        with c:
-            st.markdown("**Common Pitfall**")
-            st.write(phase_card.get("common_pitfall", ""))
+    with st.expander("🎯 Phase Overview", expanded=True):
+        with st.container(border=True):
+            st.markdown(f"#### 🎯 {phase_card.get('title','Phase')}")
+            a, b, c = st.columns(3)
+            with a:
+                st.markdown("**Aim**")
+                st.write(phase_card.get("aim", ""))
+            with b:
+                st.markdown("**Supervisor Role**")
+                st.write(phase_card.get("supervisor_role", ""))
+            with c:
+                st.markdown("**Common Pitfall**")
+                st.write(phase_card.get("common_pitfall", ""))
 
-    # Expanded Coaching Matrix (clean, repeatable, teachable)
-    st.markdown("#### 🧭 Coaching Matrix (Expanded): 6 High-Impact Moves")
-    st.caption("Use these six moves as a repeatable structure for weekly coaching. Open with clarity, align on standards, fuel motivation, and lock follow-through.")
+        # Expanded Coaching Matrix (clean, repeatable, teachable)
+    with st.expander("🧭 Coaching Matrix (Expanded): 6 High-Impact Moves", expanded=True):
+        st.markdown("#### 🧭 Coaching Matrix (Expanded): 6 High-Impact Moves")
+        st.caption("Use these six moves as a repeatable structure for weekly coaching. Open with clarity, align on standards, fuel motivation, and lock follow-through.")
 
-    # Display as 2 columns x 3 rows for readability
-    grid_left, grid_right = st.columns(2)
-    for idx, mv in enumerate(moves, start=1):
-        target_col = grid_left if idx in (1, 3, 5) else grid_right
-        with target_col:
-            with st.container(border=True):
-                st.markdown(f"**{mv.get('title', f'{idx}) Move')}**")
-                if mv.get("nuance"):
-                    st.caption(f"Secondary nuance: {mv.get('nuance')}")
-                st.markdown("**Why this works**")
-                st.write(mv.get("why", ""))
-                st.markdown("**How to do it**")
-                st.write(mv.get("how", ""))
-                with st.expander("Scripts + What to avoid", expanded=False):
-                    st.markdown("**Scripts you can use**")
-                    for s in mv.get("scripts", []):
-                        st.success(f"“{s}”")
-                    st.markdown("**Avoid**")
-                    st.warning(mv.get("avoid", ""))
+        # Display as 2 columns x 3 rows for readability
+        grid_left, grid_right = st.columns(2)
+        for idx, mv in enumerate(moves, start=1):
+            target_col = grid_left if idx in (1, 3, 5) else grid_right
+            with target_col:
+                with st.container(border=True):
+                    st.markdown(f"**{mv.get('title', f'{idx}) Move')}**")
+                    if mv.get("nuance"):
+                        st.caption(f"Secondary nuance: {mv.get('nuance')}")
+                    st.markdown("**Why this works**")
+                    st.write(mv.get("why", ""))
+                    st.markdown("**How to do it**")
+                    st.write(mv.get("how", ""))
+                    with st.expander("Scripts + What to avoid", expanded=False):
+                        st.markdown("**Scripts you can use**")
+                        for s in mv.get("scripts", []):
+                            st.success(f"“{s}”")
+                        st.markdown("**Avoid**")
+                        st.warning(mv.get("avoid", ""))
 
-    st.markdown("#### 🎓 Pedagogical Deep Dive")
-    st.info(PEDAGOGY_GUIDE.get(sel_num, "Guide and support consistent growth."))
+    with st.expander("🎓 Pedagogical Deep Dive", expanded=False):
+        st.markdown("#### 🎓 Pedagogical Deep Dive")
+        st.info(PEDAGOGY_GUIDE.get(sel_num, "Guide and support consistent growth."))
 
-    # Phase-specific IPDP PDF (aligned to this staff member's integrated profile)
-    pdf_bytes = _build_ipdp_summary_pdf(name, role, sel_num, p_comm=p_comm, p_mot=p_mot)
-    st.download_button(
-        f"🖨️ Download Phase {sel_num} Plan (PDF)",
-        pdf_bytes,
-        f"{name}_IPDP.pdf",
-        "application/pdf",
-        width="stretch"
-    )
+    with st.expander("🖨️ Download Plan (PDF)", expanded=False):
+        # Phase-specific IPDP PDF (aligned to this staff member's integrated profile)
+        pdf_bytes = _build_ipdp_summary_pdf(name, role, sel_num, p_comm=p_comm, p_mot=p_mot)
+        st.download_button(
+            f"🖨️ Download Phase {sel_num} Plan (PDF)",
+            pdf_bytes,
+            f"{name}_IPDP.pdf",
+            "application/pdf",
+            width="stretch"
+        )
 
     st.markdown("<br>", unsafe_allow_html=True)
 
