@@ -1427,84 +1427,161 @@ def _expand_conversation(old_conversation: str, old_supervisor_focus: str, style
     focus, tempo = CAREER_STYLE_DIMENSIONS.get(style, ("Mixed", "Mixed"))
     lens = CAREER_ROLE_LENSES.get(role, {})
 
-    intent = (
-        "To transfer authority **deliberately** while keeping safety and accountability intact. "
-        "This is not motivation; it’s calibration—teaching how to decide and follow through."
+    # WHY this conversation matters (supervisor teaching)
+    why_important = (
+        "Promotion readiness is less about talent and more about **reliable judgment under stress**. "
+        "This conversation is the hinge point: it transfers authority intentionally, sets the risk frame, "
+        "and prevents the two most common failures in residential leadership - **avoidance** and **over-control**. "
+        "When supervisors skip this talk, staff either (a) freeze and defer upward, or (b) act fast without guardrails."
     )
 
+    # Intent: what we are trying to accomplish
+    intent = (
+        "To transfer authority **deliberately** while keeping safety and accountability intact. "
+        "This is not hype. It is calibration - teaching how to decide, document, and review."
+    )
+
+    # Structure: a repeatable script supervisors can run
     structure = [
-        "**1) Normalize the discomfort:** Promote-level work feels messier, and that’s expected.",
-        "**2) Name the growth edge:** What they must do differently at this level.",
-        "**3) Transfer authority with guardrails:** minimum standard + decision deadline.",
-        "**4) Anchor follow-through:** owners, documentation, and the next check-in time.",
-        "**5) Repair proactively:** clarify intent and prevent avoidance after tension.",
+        "**1) Name the promotion reality:** this level is messier; the goal is judgment, not perfection.",
+        "**2) Put the work in a risk frame:** move from right/wrong to manage/contain/repair.",
+        "**3) Set guardrails:** minimum safe standard + decision deadline + when to escalate.",
+        "**4) Require a recommendation:** \"Bring me your call + your mitigation plan.\"",
+        "**5) Anchor follow-through:** owners, documentation, and a scheduled review.",
+        "**6) Repair language:** clarify intent so tension does not become avoidance.",
     ]
 
+    # How to run it: micro-skills that make the conversation work
+    how_to_have = [
+        "**Lead with safety + standards:** \"My job is to protect youth, staff, and licensing. Clarity is care.\"",
+        "**Ask for thinking, not feelings:** \"What risks do you see? What mitigations make this safe enough?\"",
+        "**Hold the pause:** let them sit with uncertainty; do not rush to rescue.",
+        "**Use the 'Two outcomes' frame:** \"We need safety AND follow-through - not one or the other.\"",
+        "**Close with a next checkpoint:** \"Bring your write-up by (time). We review at (time).\"",
+    ]
+
+    # Example lines supervisors can copy/paste
     examples = [
-        "“At this level, you won’t always get a clean policy answer. I’m asking for your recommendation, plus your risk plan.”",
-        "“Let’s define the minimum safe standard, then you choose the path that meets it.”",
-        "“Write it down: risks, mitigations, residual risk, and when we’ll review.”",
-        "“I’m not questioning your intentions. I’m tightening the standard so the team is protected.”",
+        "At this level, policy will not always give you a clean answer. I want your recommendation, plus your risk plan.",
+        "Let's define the minimum safe standard. Then you choose the path that meets it.",
+        "Write it down: risks, mitigations, residual risk, and when we will review.",
+        "I am not questioning your intentions. I am tightening the standard so the team is protected.",
+        "If you are unsure, escalate early - but still bring a draft recommendation.",
     ]
 
+    # Why it works (mechanism)
     why_it_works = [
-        "It removes moral framing (right/wrong) and replaces it with risk thinking (manage/contain).",
-        "It reduces defensiveness by naming ambiguity instead of pretending it’s easy.",
-        "It builds reliable habits: decision → documentation → review cadence.",
+        "It removes moral framing (right/wrong) and replaces it with **risk thinking** (manage/contain/repair).",
+        "It reduces defensiveness by naming ambiguity instead of pretending it is easy.",
+        "It builds the habit loop: **decision -> documentation -> review cadence**.",
+        "It increases retention: clarity reduces chaos and burnout in residential work.",
     ]
 
+    # Watch-fors (supervisor traps)
     watch_fors = _listify(old_supervisor_focus) or [
         f"Overcorrecting with {style} intensity (too {tempo.lower()})",
         "Rescuing them by making the decision for them",
-        "Leaving the plan undocumented (creates repeat conflict)",
+        "Letting it stay verbal (no written plan = repeat conflict)",
+        "Turning it into a lecture instead of a skill practice",
     ]
 
     return {
-        "summary": old_conversation or f"Coach a {style} into {role}-level judgment with clear guardrails.",
+        "summary": (old_conversation or "").strip() or f"Coach a {style} into {role}-level judgment with clear guardrails.",
+        "why_important": why_important,
         "intent": intent,
         "structure": structure,
+        "how_to_have": how_to_have,
         "examples": examples,
         "why_it_works": why_it_works,
         "watch_fors": watch_fors,
-        "lens_note": f"Conversation lens: {focus}-first, {tempo.lower()} pace → {lens.get('new_scorecard','broader scorecard')}.",
+        "lens_note": f"Conversation lens: {focus}-first, {tempo.lower()} pace -> {lens.get('new_scorecard','broader scorecard')}.",
     }
 
+
+
 def _expand_assignment(old_setup: str, old_task: str, old_success: str, old_red_flags: str, style: str, role: str) -> dict:
-    # Provide a real-world, gray-zone scenario template that can be customized per entry.
+    """
+    Expands the assignment into a structured, high-signal exercise that mirrors the app's "Gray Zone" example:
+
+    ✅ Assignment
+    Setup: (why this is the right developmental exposure)
+    Task: (scenario + required outputs)
+    Success: (observable indicators)
+    Red Flags: (common avoidance patterns)
+
+    Notes:
+    - We keep the user-provided text if present, then wrap it in a stronger coaching frame.
+    - We output lists for success/red flags so the UI can render bullets cleanly.
+    """
+    # A real-world, gray-zone scenario template (policy offers discretion, not certainty).
     scenario = (
         "**The Gray Zone Decision:** You must make a call where policy gives discretion, not certainty. "
-        "The goal is to design a path that protects safety without defaulting to avoidance."
+        "Your goal is to protect safety **without defaulting to avoidance**, by designing a plan that makes a responsible \"Yes\" possible when appropriate."
     )
 
-    setup = old_setup or "This assignment forces a decision under ambiguity with safety/accountability guardrails."
-
-    task = old_task or (
-        "Choose one high-stakes situation (admission fit, staffing hole, crisis plan, documentation failure). "
-        "Design a **Risk Mitigation Plan**: staffing/protocol changes, triggers, and a review time."
+    # SETUP (expanded teaching)
+    base_setup = (old_setup or "").strip()
+    setup = (
+        f"{base_setup + ' ' if base_setup else ''}"
+        "This assignment forces a decision where **the standard is safety**, but the method requires judgment. "
+        "It exposes the staff member to the exact stressor that breaks emerging leaders: *ambiguity with accountability*. "
+        "As the supervisor, your job is to hold the guardrails (minimum safe standard + decision deadline), not to give the answer."
     )
 
-    success = _listify(old_success) or [
-        "They made a recommendation instead of deflecting",
-        "They quantified risks and named residual risk",
-        "The mitigation plan was realistic and implementable",
-        "They scheduled a review/check-in",
-    ]
+    # TASK (expanded, with required deliverables)
+    base_task = (old_task or "").strip()
+    task = (
+        f"{base_task + '\\n\\n' if base_task else ''}"
+        "**Scenario Options (pick ONE):**\\n"
+        "- A marginal-fit youth referral (risk behaviors) but census/revenue pressure\\n"
+        "- A staffing hole that risks supervision ratios and youth engagement\\n"
+        "- A documentation failure that puts licensing/clinical continuity at risk\\n"
+        "- A conflict between staff that risks escalation and morale\\n\\n"
+        "**Deliverable:** You cannot just say \"No\" because it feels risky. You must design a **Risk Mitigation Plan** that makes a safe \"Yes\" possible *if appropriate*.\\n"
+        "Your plan must include:\\n"
+        "1) **Risk list** (3-6 concrete risks; not vibes)\\n"
+        "2) **Mitigations** (staffing/protocols, supervision cadence, environmental controls, youth plan)\\n"
+        "3) **Triggers** (what would make you pause/adjust/escalate)\\n"
+        "4) **Documentation** (what gets written, where, and by when)\\n"
+        "5) **Decision statement** (your recommendation + rationale)\\n"
+        "6) **Review time** (when we re-check the plan and who is accountable)\\n\\n"
+        "**Supervisor requirement:** The staff member must present this as a recommendation, not a brainstorm. "
+        "You may ask questions, but do not rewrite it for them."
+    )
 
-    red_flags = _listify(old_red_flags) or [
-        "Immediate rejection/avoidance to eliminate all risk",
-        "Demanding guarantees of safety that don’t exist",
-        "Getting stuck in history instead of current safeguards",
-        "Refusing to recommend a path",
-    ]
+    # SUCCESS (expanded into observable indicators)
+    success_list = _listify(old_success) or []
+    if not success_list:
+        success_list = [
+            "They found a pathway to a responsible \"Yes\" rather than defaulting to \"No\"",
+            "The mitigation plan is realistic, detailed, and implementable on this unit",
+            "They quantified risk (likelihood/impact) instead of only fearing it",
+            "They named residual risk and explained why it is tolerable (or not)",
+            "They used accountability language (owners, due times, check-ins)",
+            "They documented the decision trail so it can survive shift change",
+        ]
+
+    # RED FLAGS (expanded into avoidance patterns)
+    red_list = _listify(old_red_flags) or []
+    if not red_list:
+        red_list = [
+            "Immediate rejection/avoidance to eliminate all risk",
+            "Demanding guarantees of safety that are impossible",
+            "Getting stuck in past history rather than designing current safeguards",
+            "Deflecting upward (\"you decide\") instead of owning a recommendation",
+            "Overcomplicating the plan to delay the decision",
+            "No documentation, no owners, no review time (guarantees repeat conflict)",
+        ]
 
     return {
         "setup": setup,
         "scenario": scenario,
         "task": task,
-        "success": success,
-        "red_flags": red_flags,
+        "success": success_list,
+        "red_flags": red_list,
     }
 
+def enrich_career_pathways(
 def enrich_career_pathways(pathways: dict) -> dict:
     enriched = {}
     for style, by_role in pathways.items():
@@ -3254,16 +3331,58 @@ elif st.session_state.current_view == "Career Pathfinder":
                 with c_a:
                     with st.container(border=True):
                         st.markdown("##### 🗣️ The Conversation")
-                        st.write(path['conversation'])
-                        if 'supervisor_focus' in path: st.warning(f"**Watch For:** {path['supervisor_focus']}")
+                        conv = path.get("conversation_expanded")
+                        if isinstance(conv, dict):
+                            st.write(conv.get("summary", ""))
+                            if conv.get("lens_note"):
+                                st.caption(conv.get("lens_note"))
+                            with st.expander("Why this conversation matters (Supervisor Teaching)", expanded=True):
+                                st.markdown(conv.get("why_important", ""))
+                                st.markdown("**Conversation Intent:**")
+                                st.markdown(conv.get("intent", ""))
+                                st.markdown("**How to run it (micro-skills):**")
+                                for item in conv.get("how_to_have", []):
+                                    st.markdown(f"- {item}")
+                            with st.expander("Conversation Structure + Scripts", expanded=False):
+                                st.markdown("**Structure (run it the same way every time):**")
+                                for step in conv.get("structure", []):
+                                    st.markdown(f"- {step}")
+                                st.markdown("**Example lines you can use:**")
+                                for line in conv.get("examples", []):
+                                    st.success(f"\"{line}\"")
+                                st.markdown("**Why it works:**")
+                                for w in conv.get("why_it_works", []):
+                                    st.markdown(f"- {w}")
+                                st.markdown("**Watch For (Supervisor traps):**")
+                                for wf in conv.get("watch_fors", []):
+                                    st.warning(wf)
+                        else:
+                            st.write(path.get("conversation", ""))
+                            if 'supervisor_focus' in path:
+                                st.warning(f"**Watch For:** {path.get('supervisor_focus','')}")
+
                 with c_b:
                     with st.container(border=True):
                         st.markdown("##### ✅ Assignment")
-                        st.write(f"**Setup:** {path['assignment_setup']}")
-                        st.write(f"**Task:** {path['assignment_task']}")
-                        st.divider()
-                        st.success(f"**Success:** {path['success_indicators']}")
-                        st.error(f"**Red Flags:** {path['red_flags']}")
+                        a = path.get("assignment_expanded")
+                        if isinstance(a, dict):
+                            st.markdown(f"**Setup:** {a.get('setup','')}")
+                            if a.get("scenario"):
+                                st.info(a.get("scenario"))
+                            st.markdown(f"**Task:** {a.get('task','')}")
+                            st.divider()
+                            st.success("**Success Indicators:**")
+                            for s in a.get("success", []):
+                                st.markdown(f"- {s}")
+                            st.error("**Red Flags:**")
+                            for r in a.get("red_flags", []):
+                                st.markdown(f"- {r}")
+                        else:
+                            st.write(f"**Setup:** {path.get('assignment_setup','')}")
+                            st.write(f"**Task:** {path.get('assignment_task','')}")
+                            st.divider()
+                            st.success(f"**Success:** {path.get('success_indicators','')}")
+                            st.error(f"**Red Flags:** {path.get('red_flags','')}")
                 if 'debrief_questions' in path:
                     with st.expander("🧠 Post-Assignment Debrief Questions"):
                         for q in path['debrief_questions']: st.markdown(f"- {q}")
