@@ -3033,79 +3033,139 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
         return [move_1, move_2, move_3, alignment, move_5, move_6], phase_focus.get(int(phase), phase_focus[1])
 
-    # Phase Selector (stable + per-staff session state)
-    phase_state_key = f"ipdp_phase__{name}".replace(" ", "_")
-    if phase_state_key not in st.session_state:
-        st.session_state[phase_state_key] = 1
+        # NOTE: Removed phase selector radio (it forces full reruns and could crash the section).
+    # We render all phases as isolated, collapsible expanders instead.
 
-    sel_num = st.radio(
-        "Select Phase:",
-        [1, 2, 3],
-        format_func=lambda x: f"Phase {x}",
-        horizontal=True,
-        key=phase_state_key
-    )
+    def _ipdp_tone_nuance(comm_p, comm_s):
+        tone_mod = {
+            ("Director", "Facilitator"): "Keep it direct, but add a 10-second process preview so it lands as clarity (not pressure).",
+            ("Director", "Encourager"): "Keep it direct, but add a brief care statement so it lands as support (not criticism).",
+            ("Tracker", "Facilitator"): "Lead with data, but invite them to design the workflow so it doesn't feel rigid.",
+            ("Tracker", "Encourager"): "Lead with data, but explicitly affirm intent so it doesn't feel like distrust.",
+            ("Encourager", "Director"): "Hold warmth, but tighten the standard so care doesn't become avoidance.",
+            ("Facilitator", "Director"): "Collaborate, but name a decision deadline so the meeting doesn't drift.",
+        }
+        return tone_mod.get((comm_p, comm_s), "")
 
-    moves, phase_card = build_coaching_matrix(p_comm, s_comm, p_mot, s_mot, sel_num)
+    def _build_ipdp_phase_pdf_bytes(person_name, role, p_comm, s_comm, p_mot, s_mot, phase_num, phase_card, moves, teaching_text):
+        """Creates a small phase-specific PDF. Returns bytes."""
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=15)
 
-    # Phase framing (better context formatting)
-    with st.expander("🎯 Phase Overview", expanded=True):
-        with st.container(border=True):
-            st.markdown(f"#### 🎯 {phase_card.get('title','Phase')}")
-            a, b, c = st.columns(3)
-            with a:
-                st.markdown("**Aim**")
-                st.write(phase_card.get("aim", ""))
-            with b:
-                st.markdown("**Supervisor Role**")
-                st.write(phase_card.get("supervisor_role", ""))
-            with c:
-                st.markdown("**Common Pitfall**")
-                st.write(phase_card.get("common_pitfall", ""))
+        def _h(txt):
+            pdf.set_font("Helvetica", "B", 14)
+            pdf.multi_cell(0, 8, txt)
+            pdf.ln(1)
 
-        # Expanded Coaching Matrix (clean, repeatable, teachable)
-    with st.expander("🧭 Coaching Matrix (Expanded): 6 High-Impact Moves", expanded=True):
-        st.markdown("#### 🧭 Coaching Matrix (Expanded): 6 High-Impact Moves")
-        st.caption("Use these six moves as a repeatable structure for weekly coaching. Open with clarity, align on standards, fuel motivation, and lock follow-through.")
+        def _sh(txt):
+            pdf.set_font("Helvetica", "B", 11)
+            pdf.multi_cell(0, 6, txt)
 
-        # Display as 2 columns x 3 rows for readability
-        grid_left, grid_right = st.columns(2)
-        for idx, mv in enumerate(moves, start=1):
-            target_col = grid_left if idx in (1, 3, 5) else grid_right
-            with target_col:
+        def _p(txt):
+            pdf.set_font("Helvetica", "", 10)
+            pdf.multi_cell(0, 5, txt)
+
+        _h(f"IPDP - Phase {phase_num}")
+        _p(f"Staff: {person_name} | Role: {role}")
+        _p(f"Communication: {p_comm}/{s_comm} | Motivation: {p_mot}/{s_mot}")
+        pdf.ln(2)
+
+        _sh(phase_card.get("title", f"Phase {phase_num} Overview"))
+        _p(f"Aim: {phase_card.get('aim','')}")
+        _p(f"Supervisor role: {phase_card.get('supervisor_role','')}")
+        _p(f"Common pitfall: {phase_card.get('common_pitfall','')}")
+        pdf.ln(2)
+
+        _sh("Coaching Matrix")
+        for mv in moves:
+            pdf.set_font("Helvetica", "B", 10)
+            pdf.multi_cell(0, 5, mv.get("title", "Move"))
+            pdf.set_font("Helvetica", "", 10)
+            pdf.multi_cell(0, 5, f"Why: {mv.get('why','')}")
+            pdf.multi_cell(0, 5, f"How: {mv.get('how','')}")
+            scripts = mv.get("scripts") or []
+            if scripts:
+                pdf.multi_cell(0, 5, "Scripts:")
+                for s in scripts:
+                    pdf.multi_cell(0, 5, f"- {s}")
+            if mv.get("avoid"):
+                pdf.multi_cell(0, 5, f"Avoid: {mv.get('avoid')}")
+            pdf.ln(1)
+
+        _sh("Teaching Deep Dive")
+        _p(teaching_text or "—")
+        out = pdf.output(dest="S")
+        if isinstance(out, (bytes, bytearray)):
+            return bytes(out)
+        return out.encode("latin-1", errors="replace")
+
+    st.markdown("#### 🧩 IPDP Phases (collapsible)")
+    st.caption("Each phase is isolated so an error in one phase won't break the others.")
+
+    for _phase in (1, 2, 3):
+        with st.expander(f"Phase {_phase}", expanded=(_phase == 1)):
+            try:
+                moves, phase_card = build_coaching_matrix(p_comm, s_comm, p_mot, s_mot, _phase)
+                nuance = _ipdp_tone_nuance(p_comm, s_comm)
+
+                # 1) Phase Overview (boxed)
                 with st.container(border=True):
-                    st.markdown(f"**{mv.get('title', f'{idx}) Move')}**")
-                    if mv.get("nuance"):
-                        st.caption(f"Secondary nuance: {mv.get('nuance')}")
-                    st.markdown("**Why this works**")
-                    st.write(mv.get("why", ""))
-                    st.markdown("**How to do it**")
-                    st.write(mv.get("how", ""))
-                    with st.expander("Scripts + What to avoid", expanded=False):
-                        st.markdown("**Scripts you can use**")
-                        for s in mv.get("scripts", []):
-                            st.success(f"“{s}”")
-                        st.markdown("**Avoid**")
-                        st.warning(mv.get("avoid", ""))
+                    st.markdown(f"### 🎯 {phase_card.get('title', f'Phase {_phase}')}")
+                    st.markdown(f"**Aim:** {phase_card.get('aim','')}")
+                    st.markdown(f"**Supervisor role:** {phase_card.get('supervisor_role','')}")
+                    st.markdown(f"**Common pitfall:** {phase_card.get('common_pitfall','')}")
+                    if nuance:
+                        st.info(f"**Secondary-style nuance:** {nuance}")
 
-    with st.expander("🎓 Pedagogical Deep Dive", expanded=False):
-        st.markdown("#### 🎓 Pedagogical Deep Dive")
-        st.info(PEDAGOGY_GUIDE.get(sel_num, "Guide and support consistent growth."))
+                # 2) Coaching Matrix (collapsible)
+                with st.expander("🧭 Coaching Matrix", expanded=False):
+                    cols = st.columns(3)
+                    for idx, mv in enumerate(moves):
+                        col = cols[idx % 3]
+                        with col:
+                            with st.container(border=True):
+                                st.markdown(f"**{mv.get('title','Move')}**")
+                                st.markdown(f"**Why:** {mv.get('why','')}")
+                                st.markdown(f"**How:** {mv.get('how','')}")
+                                scripts = mv.get("scripts") or []
+                                if scripts:
+                                    st.markdown("**Scripts:**")
+                                    for s in scripts:
+                                        st.write(f"- {s}")
+                                if mv.get("avoid"):
+                                    st.markdown(f"**Avoid:** {mv.get('avoid')}")
 
-    with st.expander("🖨️ Download Plan (PDF)", expanded=False):
-        # Phase-specific IPDP PDF (aligned to this staff member's integrated profile)
-        pdf_bytes = _build_ipdp_summary_pdf(name, role, sel_num, p_comm=p_comm, p_mot=p_mot)
-        st.download_button(
-            f"🖨️ Download Phase {sel_num} Plan (PDF)",
-            pdf_bytes,
-            f"{name}_IPDP.pdf",
-            "application/pdf",
-        )
+                # 3) Teaching Deep Dive (collapsible)
+                with st.expander("📚 Teaching Deep Dive", expanded=False):
+                    teach_text = PEDAGOGY_GUIDE.get(int(_phase), "")
+                    if teach_text:
+                        st.markdown(teach_text)
+                    else:
+                        st.info("No teaching guide text found for this phase yet.")
 
-    st.markdown("<br>", unsafe_allow_html=True)
+                # 4) PDF Download (collapsible)
+                with st.expander("📄 PDF Download", expanded=False):
+                    try:
+                        teach_text = PEDAGOGY_GUIDE.get(int(_phase), "")
+                        pdf_bytes = _build_ipdp_phase_pdf_bytes(
+                            name, role, p_comm, s_comm, p_mot, s_mot, _phase, phase_card, moves, teach_text
+                        )
+                        st.download_button(
+                            label=f"Download Phase {_phase} IPDP PDF",
+                            data=pdf_bytes,
+                            file_name=f"IPDP_Phase{_phase}_{name.replace(' ', '_')}.pdf",
+                            mime="application/pdf",
+                            key=f"ipdp_pdf_{name.replace(' ', '_')}_{_phase}",
+                        )
+                    except Exception as e:
+                        st.warning(f"PDF generation failed for Phase {_phase}: {e}")
+
+            except Exception as e:
+                st.error(f"⚠️ Phase {_phase} encountered an error (isolated): {e}")
 
 
-    # --- SECTION 10: CELEBRATION (TROPHY CASE) ---
+# --- SECTION 10: CELEBRATION (TROPHY CASE) ---
     st.subheader("10. What To Celebrate")
     
     # 1. Primary Bullets
