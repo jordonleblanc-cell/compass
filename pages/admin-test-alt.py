@@ -1340,37 +1340,98 @@ def _listify(x):
         return list(x)
     return [str(x)]
 
+
 def _expand_shift(old_shift: str, style: str, role: str) -> dict:
-    focus, tempo = CAREER_STYLE_DIMENSIONS.get(style, ("Mixed", "Mixed"))
-    lens = CAREER_ROLE_LENSES.get(role, {})
+    """
+    Provides individualized guidance for:
+    - What this shift is
+    - Why it is critical
+    - How supervisors can actively empower it
+    """
 
-    shift_from = [
-        f"Leaning on your natural {style} strengths ({focus}-first, {tempo.lower()} pace)",
-        "Measuring success by personal competence and speed",
-        "Feeling safest when rules/logic provide a clean answer",
-    ]
+    SHIFT_EXPLANATIONS = {
+        "Director": {
+            "base": (
+                "This shift moves the staff member from relying on personal decisiveness and authority "
+                "to holding responsibility for outcomes that unfold over time. Decisions are no longer "
+                "about being fast or correct in the moment, but about setting conditions that others must carry forward."
+            ),
+            "empower": [
+                "Slow the tempo intentionally and reward thoughtful risk analysis.",
+                "Ask for written recommendations rather than verbal decisions.",
+                "Model how you review outcomes days or weeks later, not just immediately.",
+                "Coach them to tolerate ambiguity without reverting to control."
+            ]
+        },
+        "Encourager": {
+            "base": (
+                "This shift requires the staff member to move from relational harmony toward role-based authority. "
+                "They must learn to hold standards even when it creates discomfort or emotional tension."
+            ),
+            "empower": [
+                "Affirm that discomfort does not mean relational damage.",
+                "Coach them to separate empathy from avoidance.",
+                "Practice language that holds both care and boundaries.",
+                "Debrief emotional reactions after hard decisions."
+            ]
+        },
+        "Facilitator": {
+            "base": (
+                "This shift moves the staff member from consensus-building toward decisive stewardship. "
+                "They must learn when collaboration ends and leadership responsibility begins."
+            ),
+            "empower": [
+                "Set clear decision deadlines so consensus does not become avoidance.",
+                "Name when enough input has been gathered.",
+                "Encourage them to make provisional decisions and revisit them.",
+                "Reinforce that clarity can be an act of care."
+            ]
+        },
+        "Tracker": {
+            "base": (
+                "This shift requires moving from procedural safety toward contextual judgment. "
+                "Rules and systems remain important, but they are no longer sufficient on their own."
+            ),
+            "empower": [
+                "Ask them to articulate intent, not just compliance.",
+                "Coach them to prioritize which rules matter most in a given moment.",
+                "Practice scenarios where policy is silent or conflicting.",
+                "Reinforce that judgment complements, not replaces, structure."
+            ]
+        }
+    }
 
-    shift_to = [
-        lens.get("theme", "Leading at a higher scope"),
-        f"Measuring success by {lens.get('new_scorecard','team outcomes')}",
-        "Making decisions in the gray zone with guardrails, documentation, and follow-through",
-    ]
+    ROLE_CRITICALITY = {
+        "Shift Supervisor": (
+            "At this level, staff stop working only for themselves and begin setting the tone for others on shift. "
+            "If this shift is missed, chaos or inconsistency shows up immediately in the unit."
+        ),
+        "Program Supervisor": (
+            "Here, decisions affect multiple shifts and staff teams. "
+            "Failure to make this shift leads to chronic confusion, uneven enforcement, and staff burnout."
+        ),
+        "Manager": (
+            "At the manager level, decisions linger. "
+            "Avoidance or over-control here creates systemic risk rather than isolated mistakes."
+        ),
+        "Director": (
+            "At the director level, leadership is primarily indirect. "
+            "If this shift is not made, the organization becomes dependent on the leader instead of resilient."
+        )
+    }
 
-    supervisor_insight = (
-        "This shift is hard because it asks the candidate to trade **certainty for judgment**. "
-        "They are moving from *being right* to *being responsible*—and that can feel like exposure. "
-        "Your job as the supervisor is to provide **bounded authority**: clear standards + room to choose."
-    )
-
-    # If the original dict already had a custom shift string, preserve it as a summary.
-    summary = old_shift or f"From {style} comfort-zone execution to {role} scope leadership."
+    base_info = SHIFT_EXPLANATIONS.get(style, {})
+    explanation = base_info.get("base", "")
+    why_critical = ROLE_CRITICALITY.get(role, "")
+    supervisor_actions = base_info.get("empower", [])
 
     return {
-        "summary": summary,
-        "shift_from": shift_from,
-        "shift_to": shift_to,
-        "supervisor_insight": supervisor_insight,
+        "summary": old_shift or f"From {style}-centered execution to {role}-level leadership.",
+        "explanation": explanation,
+        "why_critical": why_critical,
+        "supervisor_actions": supervisor_actions,
     }
+
 
 def _expand_psychology(old_why: str, style: str, role: str) -> dict:
     focus, tempo = CAREER_STYLE_DIMENSIONS.get(style, ("Mixed", "Mixed"))
