@@ -5,6 +5,46 @@ import requests
 import pandas as pd
 import re
 from fpdf import FPDF
+
+# --- PDF sanitization for FPDF (latin-1) ---
+# FPDF (fpdf==1.x) cannot encode many Unicode punctuation marks (e.g., en dash “–”).
+# We sanitize all text written into PDFs to avoid UnicodeEncodeError.
+_PDF_REPLACEMENTS = {
+    "\u2013": "-",   # en dash
+    "\u2014": "--",  # em dash
+    "\u2212": "-",   # minus sign
+    "\u2018": "'", "\u2019": "'",  # curly single quotes
+    "\u201C": '"', "\u201D": '"',  # curly double quotes
+    "\u2026": "...", # ellipsis
+    "\u2022": "-",   # bullet
+    "\u00A0": " ",   # non-breaking space
+}
+
+def pdf_safe(value):
+    if value is None:
+        return ""
+    s = str(value)
+    for k, v in _PDF_REPLACEMENTS.items():
+        s = s.replace(k, v)
+    # Fallback: drop any remaining chars not representable in latin-1
+    try:
+        s.encode("latin-1")
+        return s
+    except UnicodeEncodeError:
+        return s.encode("latin-1", "ignore").decode("latin-1")
+
+class SafeFPDF(FPDF):
+    def cell(self, w, h=0, txt="", border=0, ln=0, align="", fill=False, link=""):
+        return super().cell(w, h, pdf_safe(txt), border, ln, align, fill, link)
+
+    def multi_cell(self, w, h, txt="", border=0, align="J", fill=False):
+        return super().multi_cell(w, h, pdf_safe(txt), border, align, fill)
+
+    def write(self, h, txt="", link=""):
+        return super().write(h, pdf_safe(txt), link)
+
+    def text(self, x, y, txt=""):
+        return super().text(x, y, pdf_safe(txt))
 import plotly.express as px
 import plotly.graph_objects as go
 import time
@@ -260,40 +300,18 @@ def fetch_staff_data():
 
 def submit_data_to_google(payload):
     try:
-        # Support both legacy payloads (p_comm/s_comm/p_mot/s_mot) and newer
-        # payloads that already include a full `scores` object + per-question `answers`.
-        #
-        # Expected shape (new):
-        # {
-        #   action: "save",
-        #   name, email, role, cottage,
-        #   scores: {...},
-        #   answers: {"COMM_C01": 4, ...}
-        # }
-
-        # If a full scores object is provided, prefer it.
-        scores = payload.get("scores")
-        if not isinstance(scores, dict) or not scores:
-            # Fallback: construct minimal scores from the legacy fields.
-            scores = {
-                "primaryComm": payload.get("p_comm", ""),
-                "secondaryComm": payload.get("s_comm", ""),
-                "primaryMotiv": payload.get("p_mot", ""),
-                "secondaryMotiv": payload.get("s_mot", ""),
-            }
-
-        answers = payload.get("answers")
-        if not isinstance(answers, dict):
-            answers = {}
-
         data_to_send = {
-            "action": payload.get("action", "save"),
-            "name": payload.get('name', ''),
+            "action": "save",
+            "name": payload['name'],
             "email": payload.get('email', ''),
-            "role": payload.get('role', ''),
-            "cottage": payload.get('cottage', ''),
-            "scores": scores,
-            "answers": answers,
+            "role": payload['role'],
+            "cottage": payload['cottage'],
+            "scores": {
+                "primaryComm": payload['p_comm'],
+                "secondaryComm": payload['s_comm'],
+                "primaryMotiv": payload['p_mot'],
+                "secondaryMotiv": payload['s_mot']
+            }
         }
         response = requests.post(GOOGLE_SCRIPT_URL, json=data_to_send)
         if response.status_code == 200: return True
@@ -2124,7 +2142,7 @@ def _build_ipdp_summary_pdf(name, role, phase_num, p_comm=None, p_mot=None):
     moves = _get_dynamic_coaching_moves(comm, motiv, int(phase_num))
     pedagogy = PEDAGOGY_GUIDE.get(int(phase_num), "")
 
-    pdf = FPDF()
+    pdf = SafeFPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
 
@@ -2438,7 +2456,7 @@ def send_pdf_via_email(to_email, subject, body, pdf_bytes, filename="Guide.pdf")
         return False, f"Email Error: {str(e)}"
 
 def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
-    pdf = FPDF()
+    pdf = SafeFPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
     blue = (26, 115, 232); green = (52, 168, 83); red = (234, 67, 53); black = (0, 0, 0)
@@ -3400,7 +3418,7 @@ if pdf_bytes_top:
 
     def _build_ipdp_phase_pdf_bytes(person_name, role, p_comm, s_comm, p_mot, s_mot, phase_num, phase_card, moves, teaching_text):
         """Creates a small phase-specific PDF. Returns bytes."""
-        pdf = FPDF()
+        pdf = SafeFPDF()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
 
