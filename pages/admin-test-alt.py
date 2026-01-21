@@ -3799,22 +3799,218 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     
     # --- SECTION 12: ADVANCEMENT (NEXT LEVEL) ---
     st.subheader("12. Preparing for Advancement")
-    adv_text = data['advancement']
-    if adv_text:
-        adv_points = adv_text.split('\n\n')
-        ac1, ac2, ac3 = st.columns(3)
-        cols = [ac1, ac2, ac3]
-        for i, point in enumerate(adv_points):
-            if i < 3:
-                with cols[i]:
-                    if "**" in point:
-                        parts = point.split("**")
-                        title = parts[1] if len(parts) > 1 else "Focus Area"
-                        body = parts[2] if len(parts) > 2 else point
-                        st.metric(label=title, value="Readiness Check")
-                        st.caption(body)
-                    else:
-                        st.info(point)
+    st.caption("This section helps you translate **potential** into **readiness**. We’re not just asking “could they do more?” — we’re building the habits that make promotion safe for the team, the youth, and the staff member.")
+
+    def _build_advancement_plan(comm_p, comm_s, mot_p, mot_s):
+        # Core "next-level" growth edges by primary communication style
+        comm_plans = {
+            "Director": {
+                "shift": "From **decider** → to **capacity builder** (still decisive, but through other people).",
+                "readiness": [
+                    "Delegates with clarity (defines outcomes + guardrails, not every step).",
+                    "Uses authority to create **calm**, not pressure (tone stays steady in chaos).",
+                    "Checks impact: can name how decisions affect youth safety, staff morale, and compliance.",
+                    "Moves from “tell” to “coach”: asks 2–3 questions before giving the answer.",
+                ],
+                "stretch": [
+                    "Run a 2-week micro-project where they must delegate tasks to peers and track progress (you only observe).",
+                    "Lead one incident debrief using a structured format: facts → impact → lessons → prevention.",
+                    "Facilitate a staffing plan meeting where they must invite concerns *before* finalizing the plan.",
+                ],
+                "watch": [
+                    "Overfunctioning: taking over because it’s faster.",
+                    "Intensity spikes: urgency turns into harshness.",
+                ],
+            },
+            "Encourager": {
+                "shift": "From **morale booster** → to **standards keeper** (warmth + accountability together).",
+                "readiness": [
+                    "Can deliver corrective feedback without softening it into ambiguity.",
+                    "Holds a boundary even when someone is upset (doesn’t rescue).",
+                    "Names expectations in observable behaviors (not vibes).",
+                    "Can tolerate being “the bad guy” *temporarily* for long-term safety and trust.",
+                ],
+                "stretch": [
+                    "Practice a ‘clear expectations’ huddle: 3 non-negotiables, 2 supports, 1 check-in time.",
+                    "Lead one performance conversation using a script (behavior → impact → expectation → support → follow-up).",
+                    "Own a documentation quality push for one week: audit, coach, re-check (no shaming).",
+                ],
+                "watch": [
+                    "Avoiding conflict to preserve connection.",
+                    "Overpromising support instead of setting limits.",
+                ],
+            },
+            "Facilitator": {
+                "shift": "From **bridge builder** → to **decision driver** (consensus with a clock).",
+                "readiness": [
+                    "Can summarize inputs and then *choose* a direction (even when not everyone agrees).",
+                    "Keeps meetings from looping: sets agendas, timeboxes, and outcomes.",
+                    "Uses authority when needed (doesn’t outsource decisions upward).",
+                    "Holds two truths: empathy for staff + commitment to policy/youth safety.",
+                ],
+                "stretch": [
+                    "Run a 15-minute ‘rapid alignment’ meeting: 5 min facts, 5 min options, 5 min decision + next steps.",
+                    "Practice ‘decision statements’: “Given X and Y, we will do Z. Here’s why.”",
+                    "Lead a cross-shift handoff improvement: design a simple handoff template and train staff.",
+                ],
+                "watch": [
+                    "Endless processing: more talk becomes a delay tactic.",
+                    "Over-accommodating: agreement replaces accountability.",
+                ],
+            },
+            "Tracker": {
+                "shift": "From **rule guardian** → to **judgment leader** (policy + discretion in gray zones).",
+                "readiness": [
+                    "Can prioritize: distinguishes ‘must fix now’ vs ‘fix next’ vs ‘monitor.’",
+                    "Communicates policy as **support for safety**, not as control.",
+                    "Makes recommendations in uncertainty (doesn’t freeze waiting for perfect clarity).",
+                    "Can zoom out: connects documentation/compliance to youth outcomes and unit stability.",
+                ],
+                "stretch": [
+                    "Complete one ‘gray zone’ decision memo: risks, mitigations, decision, review plan.",
+                    "Build a 1-page quick-reference guide for staff (simple, usable, no jargon).",
+                    "Coach a peer on a compliance issue using a supportive tone (teach, don’t police).",
+                ],
+                "watch": [
+                    "Perfectionism: delays decisions until everything is certain.",
+                    "Rigid framing: policy becomes the goal instead of youth safety being the goal.",
+                ],
+            },
+        }
+
+        # Motivation lens: what makes advancement energizing vs. destabilizing
+        mot_plans = {
+            "Growth": {
+                "fuel": "They advance best when the path includes **skill-building**, feedback, and increasing complexity.",
+                "risk": "If promotion feels like ‘more responsibility without coaching,’ they can stall or disengage.",
+                "supervisor_moves": [
+                    "Offer *laddered* responsibility: add one new difficulty at a time.",
+                    "Give weekly feedback loops: “What did you try? What did you learn? What will you adjust?”",
+                ],
+            },
+            "Purpose": {
+                "fuel": "They advance best when leadership is framed as **protecting youth** and strengthening dignity/safety.",
+                "risk": "If promoted into ‘admin only’ with no meaning, motivation drops fast.",
+                "supervisor_moves": [
+                    "Tie tasks to mission: “This policy protects youth because…”",
+                    "Use values-based debriefs: “What did we do that upheld dignity and safety?”",
+                ],
+            },
+            "Connection": {
+                "fuel": "They advance best when leadership is framed as **building the team** and belonging.",
+                "risk": "If leadership requires hard boundaries, they may fear harming relationships.",
+                "supervisor_moves": [
+                    "Teach ‘care + clarity’ scripts: warm tone, clear expectation, follow-up.",
+                    "Normalize discomfort: “Short-term tension can create long-term trust.”",
+                ],
+            },
+            "Achievement": {
+                "fuel": "They advance best with **clear success criteria**, metrics, and visible wins.",
+                "risk": "Ambiguity in leadership roles can create anxiety or overcontrol.",
+                "supervisor_moves": [
+                    "Define 2–3 measurable outcomes for the stretch assignment.",
+                    "Use simple dashboards/checklists to show progress.",
+                ],
+            },
+        }
+
+        comm_block = comm_plans.get(comm_p, comm_plans["Director"])
+        mot_block = mot_plans.get(mot_p, mot_plans["Growth"])
+
+        # Secondary style: add nuance to coaching tone
+        nuance = {
+            "Director": "Keep it direct and timebound.",
+            "Encourager": "Keep it relational and affirm effort.",
+            "Facilitator": "Keep it collaborative and reflective.",
+            "Tracker": "Keep it structured and specific.",
+        }.get(comm_s, "Keep it simple and specific.")
+
+        return {
+            "shift": comm_block["shift"],
+            "what_it_means": [
+                f"**Primary style focus ({comm_p})**: {comm_block['shift']}",
+                f"**Motivation lens ({mot_p})**: {mot_block['fuel']}",
+                f"**Secondary-style nuance ({comm_s})**: {nuance}",
+            ],
+            "why_critical": [
+                "Advancement changes the *surface area* of impact: one person’s habits shape the whole unit.",
+                "The next level requires **systems thinking** (youth safety + staffing + documentation + culture), not just personal competence.",
+                "If you promote without training the shift, you amplify stress signatures — and turnover follows.",
+            ],
+            "readiness_signals": comm_block["readiness"],
+            "stretch_assignments": comm_block["stretch"],
+            "supervisor_playbook": mot_block["supervisor_moves"] + [
+                "Name the new identity: “You’re practicing *leadership*, not just ‘helping out.’”",
+                "Protect learning time: debrief within 24–48 hours (short, specific).",
+                "Let them struggle *safely*: ask questions before you rescue the outcome.",
+            ],
+            "red_flags": comm_block["watch"] + [mot_block["risk"]],
+            "conversation_script": [
+                "1) **Name the potential:** “I see leadership ability in you when you ____.”",
+                "2) **Name the shift:** “To move to the next level, the skill is ____ (not just working harder).”",
+                "3) **Offer a test:** “Let’s run a 2-week stretch assignment to practice it.”",
+                "4) **Define success:** “Success looks like ____ (observable behaviors).”",
+                "5) **Commit to support:** “I’ll debrief with you on ____ day/time.”",
+            ],
+        }
+
+    plan = _build_advancement_plan(p_comm, s_comm, p_mot, s_mot)
+
+    # Visual layout: tabs for clarity
+    tab_r, tab_s, tab_p = st.tabs(["✅ Readiness Signals", "🧪 Stretch Assignments", "🧭 Supervisor Playbook"])
+
+    with tab_r:
+        with st.container(border=True):
+            st.markdown("### The Shift You’re Training")
+            st.markdown(plan["shift"])
+            st.markdown("**What this shift is (in plain terms):**")
+            for b in plan["what_it_means"]:
+                st.write(f"- {b}")
+
+        with st.container(border=True):
+            st.markdown("### Why this shift is critical")
+            for b in plan["why_critical"]:
+                st.write(f"- {b}")
+
+        st.markdown("### ✅ Signals they’re ready")
+        cols = st.columns(2)
+        for i, sig in enumerate(plan["readiness_signals"]):
+            with cols[i % 2]:
+                st.success(sig)
+
+        with st.expander("🗣️ Promotion Conversation (script + why it works)", expanded=False):
+            st.markdown("This conversation works because it **frames advancement as a skill shift**, not a reward. It reduces anxiety, clarifies expectations, and makes the next step measurable.")
+            for line in plan["conversation_script"]:
+                st.write(line)
+
+    with tab_s:
+        st.markdown("### 🧪 Recommended stretch assignments")
+        st.caption("Pick **one** stretch assignment to start. Your job is to create a safe test where they must make decisions, communicate expectations, and manage follow-through.")
+        for item in plan["stretch_assignments"]:
+            with st.container(border=True):
+                st.markdown(f"**{item}**")
+                st.write("**Supervisor coaching tip:** Ask for a short plan (who/what/when), then let them run it. Debrief with: *What happened? What did you try? What will you change next time?*")
+
+        # Legacy notes (if configured)
+        adv_text = data.get("advancement")
+        if adv_text:
+            with st.expander("📎 Legacy advancement notes (from older version)", expanded=False):
+                st.markdown(adv_text)
+
+    with tab_p:
+        c1, c2 = st.columns(2)
+        with c1:
+            with st.container(border=True):
+                st.markdown("### How supervisors can empower this shift")
+                for b in plan["supervisor_playbook"]:
+                    st.write(f"- {b}")
+
+        with c2:
+            with st.container(border=True):
+                st.markdown("### 🚩 Red flags to coach early")
+                st.caption("Red flags aren’t disqualifiers — they’re **training targets**.")
+                for r in plan["red_flags"]:
+                    st.warning(r)
 
 # --- 6. MAIN APP LOGIC ---
 # Reset Helpers
