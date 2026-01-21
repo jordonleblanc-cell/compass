@@ -2642,13 +2642,18 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 # --- PDF (moved to top under header) ---
 pdf_bytes_top = None
 pdf_fname_top = None
-if "generated_pdf" in st.session_state and st.session_state.get("generated_name") == name:
-    pdf_bytes_top = st.session_state.get("generated_pdf")
-    pdf_fname_top = st.session_state.get("generated_filename", f"Guide_{name.replace(' ', '_')}.pdf")
-elif "manual_pdf" in st.session_state:
-    pdf_bytes_top = st.session_state.get("manual_pdf")
-    pdf_fname_top = st.session_state.get("manual_fname", f"Guide_{name.replace(' ', '_')}.pdf")
 
+# NOTE: This block must not depend on a local `name` variable because this page-level
+# section can render before a staff profile is selected.
+default_name = st.session_state.get("generated_name") or st.session_state.get("generated_name", "") or "Staff"
+safe_default = str(default_name).replace(" ", "_") if default_name else "Staff"
+
+if st.session_state.get("generated_pdf"):
+    pdf_bytes_top = st.session_state.get("generated_pdf")
+    pdf_fname_top = st.session_state.get("generated_filename", f"Guide_{safe_default}.pdf")
+elif st.session_state.get("manual_pdf"):
+    pdf_bytes_top = st.session_state.get("manual_pdf")
+    pdf_fname_top = st.session_state.get("manual_fname", f"Guide_{safe_default}.pdf")
 if pdf_bytes_top:
     st.download_button(
         "📥 Save as PDF",
