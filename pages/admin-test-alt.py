@@ -260,18 +260,40 @@ def fetch_staff_data():
 
 def submit_data_to_google(payload):
     try:
-        data_to_send = {
-            "action": "save",
-            "name": payload['name'],
-            "email": payload.get('email', ''),
-            "role": payload['role'],
-            "cottage": payload['cottage'],
-            "scores": {
-                "primaryComm": payload['p_comm'],
-                "secondaryComm": payload['s_comm'],
-                "primaryMotiv": payload['p_mot'],
-                "secondaryMotiv": payload['s_mot']
+        # Support both legacy payloads (p_comm/s_comm/p_mot/s_mot) and newer
+        # payloads that already include a full `scores` object + per-question `answers`.
+        #
+        # Expected shape (new):
+        # {
+        #   action: "save",
+        #   name, email, role, cottage,
+        #   scores: {...},
+        #   answers: {"COMM_C01": 4, ...}
+        # }
+
+        # If a full scores object is provided, prefer it.
+        scores = payload.get("scores")
+        if not isinstance(scores, dict) or not scores:
+            # Fallback: construct minimal scores from the legacy fields.
+            scores = {
+                "primaryComm": payload.get("p_comm", ""),
+                "secondaryComm": payload.get("s_comm", ""),
+                "primaryMotiv": payload.get("p_mot", ""),
+                "secondaryMotiv": payload.get("s_mot", ""),
             }
+
+        answers = payload.get("answers")
+        if not isinstance(answers, dict):
+            answers = {}
+
+        data_to_send = {
+            "action": payload.get("action", "save"),
+            "name": payload.get('name', ''),
+            "email": payload.get('email', ''),
+            "role": payload.get('role', ''),
+            "cottage": payload.get('cottage', ''),
+            "scores": scores,
+            "answers": answers,
         }
         response = requests.post(GOOGLE_SCRIPT_URL, json=data_to_send)
         if response.status_code == 200: return True
