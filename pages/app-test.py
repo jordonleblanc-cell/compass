@@ -388,6 +388,74 @@ def plot_comm_style_map(comm_scores: dict, dominant_label: str = None):
     return fig, m
 
 
+def create_comm_quadrant_chart(comm_input, dominant_label: str = None):
+    """Unified Style Map helper.
+
+    Supports:
+      - comm_input as a *string* (e.g., 'Facilitator'): plots the point in the center of that quadrant
+        (Supervisor Guide behavior).
+      - comm_input as a *dict* of comm scores: plots a point based on the relative quadrant pull
+        (App behavior that shows *how far* into the quadrant the person landed).
+    Returns a Plotly figure.
+    """
+    # Supervisor-guide mode: string style -> fixed quadrant center
+    if isinstance(comm_input, str):
+        comm_style = comm_input
+        coords = {
+            "Director": {"x": -0.5, "y": 0.5, "color": BRAND_COLORS.get('red', '#ea4335')},
+            "Encourager": {"x": 0.5, "y": 0.5, "color": BRAND_COLORS.get('yellow', '#fbbc04')},
+            "Tracker": {"x": -0.5, "y": -0.5, "color": BRAND_COLORS.get('blue', '#1a73e8')},
+            "Facilitator": {"x": 0.5, "y": -0.5, "color": BRAND_COLORS.get('green', '#34a853')},
+        }
+        data = coords.get(comm_style, {"x": 0.0, "y": 0.0, "color": "gray"})
+        fig = go.Figure()
+
+        # Quadrant backgrounds (slightly darker for the app theme)
+        fig.add_shape(type="rect", x0=-1, y0=0, x1=0, y1=1, fillcolor="rgba(234, 67, 53, 0.18)", line_width=0, layer="below")  # Director
+        fig.add_shape(type="rect", x0=0, y0=0, x1=1, y1=1, fillcolor="rgba(251, 188, 4, 0.18)", line_width=0, layer="below")   # Encourager
+        fig.add_shape(type="rect", x0=-1, y0=-1, x1=0, y1=0, fillcolor="rgba(26, 115, 232, 0.18)", line_width=0, layer="below") # Tracker
+        fig.add_shape(type="rect", x0=0, y0=-1, x1=1, y1=0, fillcolor="rgba(52, 168, 83, 0.18)", line_width=0, layer="below")    # Facilitator
+
+        # Crosshairs
+        fig.add_vline(x=0, line_width=2, line_color="rgba(255,255,255,0.35)")
+        fig.add_hline(y=0, line_width=2, line_color="rgba(255,255,255,0.35)")
+
+        label = dominant_label or comm_style
+        fig.add_trace(go.Scatter(
+            x=[data["x"]], y=[data["y"]],
+            mode="markers+text",
+            text=[label],
+            textposition="bottom center",
+            marker=dict(size=22, color=data["color"], line=dict(width=2, color="white")),
+            hovertemplate="<b>%{text}</b><extra></extra>",
+            textfont=dict(size=14)
+        ))
+
+        fig.update_layout(
+            title=dict(text=f"Style Map: {label}", x=0.0),
+            height=320,
+            margin=dict(t=50, b=40, l=40, r=40),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(range=[-1, 1], showgrid=False, zeroline=False, showticklabels=False, title=""),
+            yaxis=dict(range=[-1, 1], showgrid=False, zeroline=False, showticklabels=False, title=""),
+            annotations=[
+                dict(x=0, y=1.05, xref="x", yref="y", text="FAST / ACTION", showarrow=False, font=dict(size=10, color="rgba(255,255,255,0.7)")),
+                dict(x=0, y=-1.10, xref="x", yref="y", text="SLOW / PROCESS", showarrow=False, font=dict(size=10, color="rgba(255,255,255,0.7)")),
+                dict(x=-1.05, y=0, xref="x", yref="y", text="TASK", showarrow=False, textangle=-90, font=dict(size=10, color="rgba(255,255,255,0.7)")),
+                dict(x=1.05, y=0, xref="x", yref="y", text="PEOPLE", showarrow=False, textangle=90, font=dict(size=10, color="rgba(255,255,255,0.7)")),
+            ],
+            showlegend=False,
+        )
+        fig.update_yaxes(scaleanchor="x", scaleratio=1)
+        return fig
+
+    # Default: app mode (score dict -> continuous point)
+    fig, _meta = plot_comm_style_map(comm_input, dominant_label=dominant_label)
+    return fig
+
+
+
 ROLE_RELATIONSHIP_LABELS = {
     "Program Supervisor": {"directReportsLabel": "Shift Supervisors", "youthLabel": "youth on your units", "supervisorLabel": "Residential Programs Manager", "leadershipLabel": "agency leadership"},
     "Shift Supervisor": {"directReportsLabel": "YDPs", "youthLabel": "youth you support", "supervisorLabel": "Program Supervisor", "leadershipLabel": "agency leadership"},
@@ -2276,7 +2344,8 @@ if st.session_state.step == 'results':
         
         with vc1:
             # 1. COMMUNICATION STYLE MAP (QUADRANT)
-            fig_comm_map, comm_map = plot_comm_style_map(res.get('commScores', {}), dominant_label=res.get('primaryComm'))
+            fig_comm_map = create_comm_quadrant_chart(res.get('commScores', {}), dominant_label=res.get('primaryComm'))
+            comm_map = build_comm_style_map(res.get('commScores', {}))
             st.plotly_chart(fig_comm_map, use_container_width=True)
 
             # Small readout: how far / leaning
