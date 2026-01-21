@@ -446,6 +446,59 @@ IPSATIVE_BLOCKS = [
     ]},
 ]
 
+# --- Text normalization: make statements read as a complete sentence with the intro ---
+def _normalize_statement_text(intro: str, text: str) -> str:
+    """Ensure each option can follow the intro smoothly (e.g., '... if I feel ...')."""
+    if not text:
+        return text
+    t = str(text).strip()
+
+    # Remove leading bullets/dashes if present
+    t = re.sub(r"^[\-•\u2022\s]+", "", t)
+
+    # Common gerund-to-first-person rewrites for cohesion
+    replacements = [
+        (r"^Feeling\b", "I feel"),
+        (r"^Being\b", "I am"),
+        (r"^Having\b", "I have"),
+        (r"^Needing\b", "I need"),
+        (r"^Getting\b", "I get"),
+        (r"^Lacking\b", "I lack"),
+        (r"^Missing\b", "I miss"),
+        (r"^Not\s+having\b", "I don't have"),
+        (r"^Not\s+feeling\b", "I don't feel"),
+        (r"^Not\s+being\b", "I'm not"),
+    ]
+    for pattern, repl in replacements:
+        if re.match(pattern, t, flags=re.IGNORECASE):
+            t = re.sub(pattern, repl, t, flags=re.IGNORECASE)
+            break
+
+    # If the intro ends with "if" or "if..." and the statement doesn't start with a connector, prefix "I"
+    intro_l = (intro or "").strip().lower()
+    needs_prefix = (" if" in intro_l) or intro_l.endswith("if...") or intro_l.endswith("if") or intro_l.endswith("if:")
+    starts_ok = bool(re.match(r"^(I\b|I'm\b|I\s|My\b|When\b|If\b|Because\b|That\b|To\b|In\b|On\b|At\b)", t))
+    if needs_prefix and not starts_ok:
+        # Lowercase first letter for smoother read (unless it's an acronym)
+        t2 = t[0].lower() + t[1:] if (len(t) > 1 and t[0].isalpha() and not (len(t) > 2 and t[:2].isupper())) else t
+        t = f"I {t2}"
+
+    # Ensure it ends with a period for consistent readability
+    if not re.search(r"[\.!?]\s*$", t):
+        t = t + "."
+
+    return t
+
+def normalize_ipsative_blocks_(blocks):
+    for b in blocks:
+        intro = b.get("intro", "")
+        for s in b.get("statements", []):
+            s["text"] = _normalize_statement_text(intro, s.get("text", ""))
+    return blocks
+
+# Normalize the hardcoded block text once at import time
+IPSATIVE_BLOCKS = normalize_ipsative_blocks_(IPSATIVE_BLOCKS)
+
 # --- SCORING (IPSATIVE) ---
 def compute_results_from_ipsative(blocks, answers_by_block_id):
     """
@@ -1624,6 +1677,57 @@ def scroll_to_top():
     components.html(js, height=0)
 
 
+def enable_enter_to_advance(next_labels=None):
+    """Allow Enter/Return to activate the Next/Complete button on assessment pages."""
+    if next_labels is None:
+        next_labels = ["Next Block →", "Complete & View Profile →"]
+
+    # JS: if Enter pressed (and not in a text input), click the first enabled matching button.
+    labels_js = json.dumps(next_labels)
+    js = f"""
+    <script>
+      (function() {{
+        const NEXT_LABELS = {labels_js};
+        const isTypingContext = (el) => {{
+          if (!el) return false;
+          const tag = (el.tagName || '').toLowerCase();
+          if (tag === 'textarea') return true;
+          if (tag === 'input') {{
+            const t = (el.getAttribute('type') || '').toLowerCase();
+            // allow Enter to advance even when focus is on radios/checkboxes/buttons
+            return !(t === 'radio' || t === 'checkbox' || t === 'button' || t === 'submit');
+          }}
+          return el.isContentEditable === true;
+        }};
+
+        // Avoid attaching multiple listeners across reruns
+        if (window.__elmcrest_enter_listener_attached__) return;
+        window.__elmcrest_enter_listener_attached__ = true;
+
+        window.parent.document.addEventListener('keydown', function(e) {{
+          if (e.key !== 'Enter') return;
+          if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
+
+          const active = window.parent.document.activeElement;
+          if (isTypingContext(active)) return;
+
+          // Find Streamlit buttons and click the first enabled one with a matching label
+          const buttons = Array.from(window.parent.document.querySelectorAll('button'));
+          for (const b of buttons) {{
+            const label = (b.innerText || '').trim();
+            const disabled = b.disabled || b.getAttribute('aria-disabled') === 'true';
+            if (!disabled && NEXT_LABELS.includes(label)) {{
+              b.click();
+              e.preventDefault();
+              return false;
+            }}
+          }}
+        }}, true);
+      }})();
+    </script>
+    """
+    components.html(js, height=0)
+
 if 'step' not in st.session_state:
     st.session_state.step = 'intro'
 
@@ -1925,6 +2029,8 @@ if st.session_state.step == 'assessment':
         st.warning("Select **one MOST** and **one LEAST** statement (they must be different) to continue.", icon="⚠️")
 
     st.markdown("<br>", unsafe_allow_html=True)
+
+    enable_enter_to_advance()
 
     back_col, next_col = st.columns([1, 1])
 
