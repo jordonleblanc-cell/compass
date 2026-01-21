@@ -2644,6 +2644,34 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     
     data = generate_profile_content(p_comm, p_mot)
 
+    # --- TABLE OF CONTENTS ---
+    # (Short, printable overview — the PDF itself includes all sections expanded.)
+    pdf.set_fill_color(240, 245, 250)
+    pdf.set_font("Arial", 'B', 13)
+    pdf.set_text_color(*blue)
+    pdf.cell(0, 9, "Table of Contents", ln=True, fill=True)
+    pdf.set_font("Arial", '', 11)
+    pdf.set_text_color(*black)
+    toc_lines = [
+        "Rapid Interaction Cheat Sheet",
+        "1. Communication Profile + 1A. How to Speak Their Language",
+        "2. Motivation Profile",
+        "3. What They Need From You",
+        "4. How They Prefer Feedback",
+        "5. How To Set Expectations",
+        "6. Delegation & Follow-Through",
+        "7. Red Flags Under Stress",
+        "8. Repair & Reset Scripts",
+        "9. Coaching Questions",
+        "10. What To Celebrate",
+        "11. Individual Professional Development Plan (Phases 1–3)",
+        "12. Preparing for Advancement",
+        "Stress Signature + Support Prescription",
+    ]
+    for line in toc_lines:
+        pdf.multi_cell(0, 5, clean_text(f"• {line}"))
+    pdf.ln(3)
+
     # --- CHEAT SHEET SECTION ---
     pdf.set_fill_color(240, 240, 240)
     pdf.set_font("Arial", 'B', 14)
@@ -2726,8 +2754,169 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         pdf.multi_cell(0, 5, clean_text(f"{i+1}. {q}"))
     pdf.ln(4)
 
-    # 12. Advancement
-    add_section("12. Helping Them Prepare for Advancement", data['advancement'])
+    # 12. Preparing for Advancement (expanded, profile-specific)
+    try:
+        def _label(p, s):
+            return f"{p}/{s}" if s else f"{p}"
+
+        staff_style = _label(p_comm, s_comm)
+        staff_driver = _label(p_mot, s_mot)
+
+        ADV_STYLE = {
+            "Director": {
+                "shift": "From being the fastest problem-solver → to building clarity, delegation, and durable systems.",
+                "critical": "Directors can ‘win the shift’ through force of will. Advancement requires winning through people and repeatable structure.",
+                "empower": [
+                    "Give scope, not tasks: a problem area they must improve through others.",
+                    "Require a delegation plan: owners, cadence, definition of done.",
+                    "Coach ‘why before what’ so buy-in grows with clarity."
+                ],
+                "signals": [
+                    "Results improve even when they aren’t present.",
+                    "They bring options + a recommendation (not just urgency).",
+                    "They create calm by clarifying owners and timelines."
+                ],
+                "redflags": [
+                    "Micromanaging instead of delegating.",
+                    "Speed replaces judgment; buy-in collapses.",
+                    "Escalation through pressure instead of structure."
+                ],
+                "stretch": [
+                    "Run a weekly huddle with agenda + outcomes.",
+                    "Own one quality metric and improve it 10–15% over 30–60 days.",
+                    "Deliver corrective feedback using: Impact → Expectation → Support → Check-back."
+                ],
+            },
+            "Encourager": {
+                "shift": "From being the emotional engine → to holding warm accountability and clear standards.",
+                "critical": "Encouragers stabilize teams, but advancement requires firmness without losing warmth—support and standards at the same time.",
+                "empower": [
+                    "Teach ‘Warm + Clear’ scripts (relationship AND expectation in one sentence).",
+                    "Practice boundaries: what you can support vs what you must require.",
+                    "Give structured leadership reps (opening meetings, closing decisions)."
+                ],
+                "signals": [
+                    "They hold standards without guilt or overexplaining.",
+                    "Staff feel supported AND clear about expectations.",
+                    "They handle conflict without rescuing or triangulating."
+                ],
+                "redflags": [
+                    "Avoiding accountability to keep peace.",
+                    "Over-functioning emotionally; burnout risk.",
+                    "Softening messages until expectations blur."
+                ],
+                "stretch": [
+                    "Lead a ‘wins + standards’ huddle (2 wins + 1 expectation).",
+                    "Give one corrective feedback per week using a script.",
+                    "Own a morale + performance initiative (recognition + follow-through)."
+                ],
+            },
+            "Facilitator": {
+                "shift": "From building agreement → to closing decisions with timelines and ownership.",
+                "critical": "Facilitators prevent conflict, but advancement requires containment: decide, assign, then debrief—especially under pressure.",
+                "empower": [
+                    "Teach ‘contain then collaborate’: decision first, processing second.",
+                    "Give decision authority with guardrails (deadline + non-negotiables).",
+                    "Set escalation thresholds (when discussion ends and action begins)."
+                ],
+                "signals": [
+                    "They close decisions clearly and on time.",
+                    "Conflict resolves without endless meetings.",
+                    "They balance fairness with urgency."
+                ],
+                "redflags": [
+                    "Consensus-seeking delays action.",
+                    "Neutrality replaces leadership.",
+                    "Over-processing conflict instead of containing it."
+                ],
+                "stretch": [
+                    "Lead a timed case conference: discuss → decide → assign → confirm.",
+                    "Bring two options + a recommendation weekly.",
+                    "Run a post-incident debrief: facts, learning, next steps."
+                ],
+            },
+            "Tracker": {
+                "shift": "From protecting compliance → to influencing behavior and building systems people can follow.",
+                "critical": "Trackers keep programs safe, but advancement requires translating ‘policy’ into coaching and engagement—without becoming punitive.",
+                "empower": [
+                    "Give system-building scope: simplify tools, standardize routines.",
+                    "Coach them to translate compliance into ‘why it protects youth/staff.’",
+                    "Assign gray-zone recommendations: risk mitigation, not just risk listing."
+                ],
+                "signals": [
+                    "Routines improve without resentment.",
+                    "They decide in ambiguity using mitigation logic.",
+                    "They coach without sounding punitive."
+                ],
+                "redflags": [
+                    "Fixating on details at the expense of people.",
+                    "Rigidity in gray zones; avoidance of decisions.",
+                    "Correcting without teaching or follow-up."
+                ],
+                "stretch": [
+                    "Run a weekly audit + coaching loop (spot-check → teach → follow-up).",
+                    "Create a one-page SOP/checklist for a recurring pain point.",
+                    "Present a risk mitigation plan with a clear recommendation."
+                ],
+            },
+        }
+
+        ADV_MOT = {
+            "Growth": {
+                "need": "Skill targets, stretch reps with coaching, and feedback loops that show improvement.",
+                "moves": [
+                    "Co-create a 30/60/90 skill ladder (one skill per month).",
+                    "Give one stretch rep per week with a debrief.",
+                    "Celebrate learning signals: better questions, better framing, better follow-through."
+                ],
+            },
+            "Purpose": {
+                "need": "Connection between leadership tasks and youth outcomes; ability to shape practice, not just enforce it.",
+                "moves": [
+                    "Frame accountability as safety + dignity, not control.",
+                    "Invite policy translation: ‘how do we make this workable for kids?’",
+                    "Assign a mission-aligned improvement project (engagement routines, de-escalation)."
+                ],
+            },
+            "Connection": {
+                "need": "Relational safety plus scripts for holding standards so connection doesn’t become avoidance.",
+                "moves": [
+                    "Teach warm accountability scripts; practice them weekly.",
+                    "Give visible leadership roles with support.",
+                    "Normalize tension as part of leadership—equip instead of protect."
+                ],
+            },
+            "Achievement": {
+                "need": "Clear targets, a scoreboard, and stable definitions of success.",
+                "moves": [
+                    "Assign measurable outcomes (documentation %, training completion, engagement minutes).",
+                    "Use goal → plan → owner → check-back cadence weekly.",
+                    "Celebrate progress and quality of execution."
+                ],
+            },
+        }
+
+        style_pack = ADV_STYLE.get(p_comm, ADV_STYLE["Director"])
+        mot_pack = ADV_MOT.get(p_mot, ADV_MOT["Growth"])
+
+        add_section("12. Preparing for Advancement", f"Profile: {staff_style} | Driver: {staff_driver}")
+
+        add_section("12A. The Shift", style_pack["shift"])
+        add_section("12B. Why This Shift Is Critical", style_pack["critical"])
+        add_section("12C. How Supervisors Can Empower This Shift", None, style_pack["empower"])
+        add_section("12D. Proof They’re Ready", None, style_pack["signals"])
+        add_section("12E. Stretch Assignments", None, style_pack["stretch"])
+        add_section("12F. Red Flags", None, style_pack["redflags"])
+
+        add_section("12G. Motivation-Aware Coaching", f"What they need: {mot_pack['need']}", mot_pack["moves"])
+
+        # Preserve any legacy advancement copy if present
+        if data.get("advancement"):
+            add_section("12H. Notes (Legacy Guidance)", data["advancement"])
+
+    except Exception:
+        # Fallback to legacy text if anything unexpected happens
+        add_section("12. Helping Them Prepare for Advancement", data.get('advancement', ''))
 
     # --- NEW: Stress Signature & Support Prescription (matches on-screen detail) ---
     try:
@@ -2837,37 +3026,63 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.caption(f"Role: {role} | Profile: {p_comm} ({s_comm}) • {p_mot} ({s_mot})")
 
 
-    # --- PDF (moved to top under header) ---
-    # NOTE: This block must be inside display_guide(). It is written defensively so it won't crash
-    # even if a PDF was generated for a different person or if special characters appear in filenames.
+    
+    # --- Actions (moved to top under header) ---
+    # PDF download + email are placed here so supervisors always see them immediately.
     pdf_bytes_top = None
     pdf_fname_top = None
 
     # Prefer the latest generated PDF (from the Generate Guide button).
-    if st.session_state.get('generated_pdf'):
-        pdf_bytes_top = st.session_state.get('generated_pdf')
-        pdf_fname_top = st.session_state.get('generated_filename')
+    if st.session_state.get("generated_pdf"):
+        pdf_bytes_top = st.session_state.get("generated_pdf")
+        pdf_fname_top = st.session_state.get("generated_filename")
 
     # Fallback to manual PDF if present.
-    if not pdf_bytes_top and st.session_state.get('manual_pdf'):
-        pdf_bytes_top = st.session_state.get('manual_pdf')
-        pdf_fname_top = st.session_state.get('manual_fname')
+    if not pdf_bytes_top and st.session_state.get("manual_pdf"):
+        pdf_bytes_top = st.session_state.get("manual_pdf")
+        pdf_fname_top = st.session_state.get("manual_fname")
 
     # Final filename fallback (never reference a non-existent variable).
     if pdf_bytes_top and not pdf_fname_top:
-        safe_staff = st.session_state.get('generated_name') or st.session_state.get('manual_name') or name or 'Staff'
+        safe_staff = st.session_state.get("generated_name") or st.session_state.get("manual_name") or name or "Staff"
         pdf_fname_top = f"Guide_{str(safe_staff).replace(' ', '_')}.pdf"
 
-    if pdf_bytes_top:
-        st.download_button(
-            "📥 Save as PDF",
-            pdf_bytes_top,
-            pdf_fname_top,
-            "application/pdf",
-            key=f"dl_top_{str(name)}",
-            width="stretch",
-        )
+    with st.container(border=True):
+        st.markdown("#### 📤 Actions")
+        ac1, ac2 = st.columns([1, 2])
+
+        with ac1:
+            if pdf_bytes_top:
+                st.download_button(
+                    "📥 Download PDF",
+                    pdf_bytes_top,
+                    pdf_fname_top,
+                    "application/pdf",
+                    key=f"dl_top_{str(name)}",
+                    width="stretch",
+                )
+            else:
+                st.button("📥 Download PDF", disabled=True, width="stretch", help="Generate the guide to enable the PDF download.")
+
+        with ac2:
+            if pdf_bytes_top:
+                with st.popover("📧 Email to Me"):
+                    email_input = st.text_input("Recipient Email", placeholder="name@elmcrest.org", key=f"email_to_me_{str(name)}")
+                    if st.button("Send Email", key=f"send_email_{str(name)}"):
+                        if email_input:
+                            with st.spinner("Sending..."):
+                                success, msg = send_pdf_via_email(pdf_bytes_top, pdf_fname_top, email_input)
+                                if success:
+                                    st.success(msg)
+                                else:
+                                    st.error(msg)
+                        else:
+                            st.warning("Please enter a recipient email address.")
+            else:
+                st.info("Generate the guide to enable emailing the PDF.")
+
     with st.expander("⚡ Rapid Interaction Cheat Sheet", expanded=True):
+, expanded=True):
         cc1, cc2, cc3 = st.columns(3)
         with cc1:
             st.markdown("##### ✅ Do This")
@@ -4085,37 +4300,7 @@ if st.session_state.current_view == "Supervisor's Guide":
                         display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
 
             if "generated_pdf" in st.session_state and st.session_state.get("generated_name") == d['name']:
-                st.divider()
-                st.markdown("#### 📤 Actions")
-                ac1, ac2 = st.columns([1, 2])
-                
-                with ac1:
-                    st.download_button(
-                        label="📥 Download PDF", 
-                        data=st.session_state.generated_pdf, 
-                        file_name=st.session_state.generated_filename, 
-                        mime="application/pdf",
-                    )
-                
-                with ac2:
-                    with st.popover("📧 Email to Me"):
-                        email_input = st.text_input("Recipient Email", placeholder="name@elmcrest.org")
-                        if st.button("Send Email"):
-                            if email_input:
-                                with st.spinner("Sending..."):
-                                    success, msg = send_pdf_via_email(
-                                        to_email=email_input,
-                                        subject=f"Supervisor Guide: {d['name']}",
-                                        body=f"Attached is the Compass Supervisor Guide for {d['name']}.",
-                                        pdf_bytes=st.session_state.generated_pdf,
-                                        filename=st.session_state.generated_filename
-                                    )
-                                    if success: st.success(msg)
-                                    else: st.error(msg)
-                            else:
-                                st.warning("Please enter an email address.")
-                
-            st.button("Reset", on_click=reset_t1)
+st.button("Reset", on_click=reset_t1)
 
     # --- MANUAL TAB ---
     with sub2:
