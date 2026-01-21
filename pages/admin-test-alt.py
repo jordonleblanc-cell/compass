@@ -2639,26 +2639,36 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.caption(f"Role: {role} | Profile: {p_comm} ({s_comm}) • {p_mot} ({s_mot})")
 
 
-# --- PDF (moved to top under header) ---
-pdf_bytes_top = None
-pdf_fname_top = None
-if "generated_pdf" in st.session_state and st.session_state.get("generated_name") == name:
-    pdf_bytes_top = st.session_state.get("generated_pdf")
-    pdf_fname_top = st.session_state.get("generated_filename", f"Guide_{name.replace(' ', '_')}.pdf")
-elif "manual_pdf" in st.session_state:
-    pdf_bytes_top = st.session_state.get("manual_pdf")
-    pdf_fname_top = st.session_state.get("manual_fname", f"Guide_{name.replace(' ', '_')}.pdf")
+    # --- PDF (moved to top under header) ---
+    # NOTE: This block must be inside display_guide(). It is written defensively so it won't crash
+    # even if a PDF was generated for a different person or if special characters appear in filenames.
+    pdf_bytes_top = None
+    pdf_fname_top = None
 
-if pdf_bytes_top:
-    st.download_button(
-        "📥 Save as PDF",
-        pdf_bytes_top,
-        pdf_fname_top,
-        "application/pdf",
-        key=f"dl_top_{name}",
-        width="stretch"
-    )
-    
+    # Prefer the latest generated PDF (from the Generate Guide button).
+    if st.session_state.get('generated_pdf'):
+        pdf_bytes_top = st.session_state.get('generated_pdf')
+        pdf_fname_top = st.session_state.get('generated_filename')
+
+    # Fallback to manual PDF if present.
+    if not pdf_bytes_top and st.session_state.get('manual_pdf'):
+        pdf_bytes_top = st.session_state.get('manual_pdf')
+        pdf_fname_top = st.session_state.get('manual_fname')
+
+    # Final filename fallback (never reference a non-existent variable).
+    if pdf_bytes_top and not pdf_fname_top:
+        safe_staff = st.session_state.get('generated_name') or st.session_state.get('manual_name') or name or 'Staff'
+        pdf_fname_top = f"Guide_{str(safe_staff).replace(' ', '_')}.pdf"
+
+    if pdf_bytes_top:
+        st.download_button(
+            "📥 Save as PDF",
+            pdf_bytes_top,
+            pdf_fname_top,
+            "application/pdf",
+            key=f"dl_top_{str(name)}",
+            width="stretch",
+        )
     with st.expander("⚡ Rapid Interaction Cheat Sheet", expanded=True):
         cc1, cc2, cc3 = st.columns(3)
         with cc1:
