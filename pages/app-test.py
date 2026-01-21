@@ -446,6 +446,56 @@ IPSATIVE_BLOCKS = [
     ]},
 ]
 
+# --- SCORING (IPSATIVE) ---
+def compute_results_from_ipsative(blocks, answers_by_block_id):
+    """Compute style/driver scores from ipsative MOST(+3) / LEAST(-1) picks."""
+    comm_styles = ['Director', 'Encourager', 'Facilitator', 'Tracker']
+    motiv_drivers = ['Growth', 'Purpose', 'Connection', 'Achievement']
+    comm_scores = {k: 0 for k in comm_styles}
+    motiv_scores = {k: 0 for k in motiv_drivers}
+
+    # Block id -> section mapping
+    section_by_id = {b.get('id'): b.get('section') for b in blocks}
+
+    for bid, picks in (answers_by_block_id or {}).items():
+        if not isinstance(picks, dict):
+            continue
+        section = section_by_id.get(bid)
+        most = picks.get('most')
+        least = picks.get('least')
+        if most is None or least is None or most == least:
+            continue
+
+        if section == 'comm':
+            if most in comm_scores: comm_scores[most] += 3
+            if least in comm_scores: comm_scores[least] -= 1
+        elif section == 'motiv':
+            if most in motiv_scores: motiv_scores[most] += 3
+            if least in motiv_scores: motiv_scores[least] -= 1
+
+    def _pick_primary(score_dict, preferred_order):
+        # Deterministic tie-break: preferred_order then alpha.
+        items = list(score_dict.items())
+        max_score = max([v for _, v in items], default=None)
+        if max_score is None:
+            return None
+        tied = [k for k, v in items if v == max_score]
+        for k in preferred_order:
+            if k in tied:
+                return k
+        return sorted(tied)[0] if tied else None
+
+    primary_comm = _pick_primary(comm_scores, comm_styles)
+    primary_motiv = _pick_primary(motiv_scores, motiv_drivers)
+
+    return {
+        'primaryComm': primary_comm,
+        'primaryMotiv': primary_motiv,
+        'commScores': comm_scores,
+        'motivScores': motiv_scores,
+    }
+
+
 
 # --- DATA DICTIONARIES (Updated with new content) ---
 
@@ -1817,6 +1867,9 @@ if st.session_state.step == 'assessment':
                 st.rerun()
         else:
             if st.button("Complete & View Profile →", disabled=not valid):
+                # Compute results from this run (ipsative scoring)
+                computed = compute_results_from_ipsative(st.session_state.blocks, st.session_state.answers_ipsative)
+                st.session_state.results = computed
                 st.session_state.step = 'results'
                 st.rerun()
 
@@ -1830,6 +1883,14 @@ if st.session_state.step == 'results':
     if "results" not in st.session_state or not isinstance(st.session_state.results, dict):
         st.error("No valid results found. Please restart the assessment.")
         if st.button("Restart"):
+            st.session_state.clear()
+            st.rerun()
+        st.stop()
+
+    # Ensure scoring produced usable primaries
+    if not st.session_state.results.get("primaryComm") or not st.session_state.results.get("primaryMotiv"):
+        st.error("Your responses were saved, but we couldn’t calculate a profile. Please retake the assessment.")
+        if st.button("Restart Assessment"):
             st.session_state.clear()
             st.rerun()
         st.stop()
