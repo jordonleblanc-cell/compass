@@ -3082,7 +3082,6 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 st.info("Generate the guide to enable emailing the PDF.")
 
     with st.expander("⚡ Rapid Interaction Cheat Sheet", expanded=True):
-, expanded=True):
         cc1, cc2, cc3 = st.columns(3)
         with cc1:
             st.markdown("##### ✅ Do This")
@@ -4299,8 +4298,7 @@ if st.session_state.current_view == "Supervisor's Guide":
                         st.session_state.generated_name = d['name']
                         display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
 
-            if "generated_pdf" in st.session_state and st.session_state.get("generated_name") == d['name']:
-st.button("Reset", on_click=reset_t1)
+    st.button("Reset", key="reset_t1", on_click=reset_t1)
 
     # --- MANUAL TAB ---
     with sub2:
