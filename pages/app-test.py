@@ -11,6 +11,7 @@ from email.mime.multipart import MIMEMultipart
 import streamlit.components.v1 as components  # Required for scrolling
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
@@ -272,6 +273,119 @@ BRAND_COLORS = {
     "red": "#ea4335",
     "yellow": "#fbbc04"
 }
+
+# --- Communication Style Map (Quadrant) ---
+# Axes:
+#   X: Task (-1)  <->  People (+1)
+#   Y: Slow/Process (-1)  <->  Fast/Action (+1)
+# Quadrants (typical mapping):
+#   Director      = Task + Fast
+#   Encourager    = People + Fast
+#   Facilitator   = People + Slow
+#   Tracker       = Task + Slow
+def build_comm_style_map(comm_scores: dict):
+    # Defensive defaults
+    scores = {k: float(v) for k, v in (comm_scores or {}).items()}
+    d = scores.get("Director", 0.0)
+    e = scores.get("Encourager", 0.0)
+    f = scores.get("Facilitator", 0.0)
+    t = scores.get("Tracker", 0.0)
+
+    people = e + f
+    task = d + t
+    fast = d + e
+    slow = t + f
+
+    x_raw = people - task
+    y_raw = fast - slow
+
+    # Theoretical max abs difference with MOST=+3 / LEAST=-1 and balanced design
+    # (Used only for scaling the visual to a stable range)
+    denom = 48.0
+    x = max(-1.0, min(1.0, x_raw / denom))
+    y = max(-1.0, min(1.0, y_raw / denom))
+
+    intensity = min(1.0, (x*x + y*y) ** 0.5)  # 0..1
+    return {
+        "x": x,
+        "y": y,
+        "x_raw": x_raw,
+        "y_raw": y_raw,
+        "intensity": intensity,
+        "quadrant": comm_primary_from_point(x, y),
+    }
+
+def comm_primary_from_point(x: float, y: float) -> str:
+    # If on an axis, fall back to "Blend"
+    if abs(x) < 1e-9 and abs(y) < 1e-9:
+        return "Blend"
+    if x >= 0 and y >= 0:
+        return "Encourager"
+    if x < 0 and y >= 0:
+        return "Director"
+    if x >= 0 and y < 0:
+        return "Facilitator"
+    return "Tracker"
+
+def plot_comm_style_map(comm_scores: dict, dominant_label: str = None):
+    m = build_comm_style_map(comm_scores)
+    x, y = m["x"], m["y"]
+
+    # Background quadrants (subtle)
+    quad_opacity = 0.18
+    shapes = [
+        # Top-left (Director)
+        dict(type="rect", x0=-1, x1=0, y0=0, y1=1, line=dict(width=0), fillcolor="rgba(234,67,53,{})".format(quad_opacity)),
+        # Top-right (Encourager)
+        dict(type="rect", x0=0, x1=1, y0=0, y1=1, line=dict(width=0), fillcolor="rgba(251,188,4,{})".format(quad_opacity)),
+        # Bottom-left (Tracker)
+        dict(type="rect", x0=-1, x1=0, y0=-1, y1=0, line=dict(width=0), fillcolor="rgba(26,115,232,{})".format(quad_opacity)),
+        # Bottom-right (Facilitator)
+        dict(type="rect", x0=0, x1=1, y0=-1, y1=0, line=dict(width=0), fillcolor="rgba(52,168,83,{})".format(quad_opacity)),
+        # Crosshairs
+        dict(type="line", x0=-1, x1=1, y0=0, y1=0, line=dict(color="rgba(255,255,255,0.35)", width=2)),
+        dict(type="line", x0=0, x1=0, y0=-1, y1=1, line=dict(color="rgba(255,255,255,0.35)", width=2)),
+    ]
+
+    fig = go.Figure()
+
+    # Point + label
+    label = dominant_label or m["quadrant"]
+    fig.add_trace(go.Scatter(
+        x=[x],
+        y=[y],
+        mode="markers+text",
+        text=[label],
+        textposition="bottom center",
+        marker=dict(size=22, line=dict(width=2, color="white")),
+        hovertemplate=(
+            "<b>%{text}</b><br>"
+            "People ↔ Task: %{x:.2f}<br>"
+            "Fast ↔ Slow: %{y:.2f}<br>"
+            "Intensity: " + f"{m['intensity']*100:.0f}%" + "<extra></extra>"
+        ),
+    ))
+
+    fig.update_layout(
+        title=dict(text=f"Style Map: {label}", x=0.0),
+        height=320,
+        margin=dict(t=50, b=40, l=40, r=40),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        xaxis=dict(range=[-1, 1], showgrid=False, zeroline=False, showticklabels=False, title=""),
+        yaxis=dict(range=[-1, 1], showgrid=False, zeroline=False, showticklabels=False, title=""),
+        shapes=shapes,
+        annotations=[
+            dict(x=0, y=1.05, xref="x", yref="y", text="FAST / ACTION", showarrow=False, font=dict(size=10, color="rgba(255,255,255,0.7)")),
+            dict(x=0, y=-1.10, xref="x", yref="y", text="SLOW / PROCESS", showarrow=False, font=dict(size=10, color="rgba(255,255,255,0.7)")),
+            dict(x=-1.05, y=0, xref="x", yref="y", text="TASK", showarrow=False, textangle=-90, font=dict(size=10, color="rgba(255,255,255,0.7)")),
+            dict(x=1.05, y=0, xref="x", yref="y", text="PEOPLE", showarrow=False, textangle=90, font=dict(size=10, color="rgba(255,255,255,0.7)")),
+        ],
+        showlegend=False,
+    )
+    fig.update_yaxes(scaleanchor="x", scaleratio=1)
+    return fig, m
+
 
 ROLE_RELATIONSHIP_LABELS = {
     "Program Supervisor": {"directReportsLabel": "Shift Supervisors", "youthLabel": "youth on your units", "supervisorLabel": "Residential Programs Manager", "leadershipLabel": "agency leadership"},
@@ -2160,13 +2274,16 @@ if st.session_state.step == 'results':
         vc1, vc2 = st.columns(2)
         
         with vc1:
-            # 1. COMMUNICATION RADAR
-            # Use real scores from the assessment results
-            radar_df = pd.DataFrame(dict(r=[max(v, 0) for v in res['commScores'].values()], theta=list(res['commScores'].keys())))
-            fig_comm = px.line_polar(radar_df, r='r', theta='theta', line_close=True, title="Communication Footprint", range_r=[0,36])
-            fig_comm.update_traces(fill='toself', line_color=BRAND_COLORS['blue'])
-            fig_comm.update_layout(height=300, margin=dict(t=30, b=30, l=30, r=30))
-            st.plotly_chart(fig_comm, use_container_width=True)
+            # 1. COMMUNICATION STYLE MAP (QUADRANT)
+            fig_comm_map, comm_map = plot_comm_style_map(res.get('commScores', {}), dominant_label=res.get('primaryComm'))
+            st.plotly_chart(fig_comm_map, use_container_width=True)
+
+            # Small readout: how far / leaning
+            intensity_pct = int(round(comm_map.get("intensity", 0) * 100))
+            st.caption(
+                f"Position shows your overall lean across **Task ↔ People** and **Slow/Process ↔ Fast/Action**. "
+                f"**Intensity:** {intensity_pct}%."
+            )
             
         with vc2:
             # 2. MOTIVATION BATTERY
