@@ -5,6 +5,46 @@ import requests
 import pandas as pd
 import re
 from fpdf import FPDF
+
+# --- PDF sanitization for FPDF (latin-1) ---
+# FPDF (fpdf==1.x) cannot encode many Unicode punctuation marks (e.g., en dash “–”).
+# We sanitize all text written into PDFs to avoid UnicodeEncodeError.
+_PDF_REPLACEMENTS = {
+    "\u2013": "-",   # en dash
+    "\u2014": "--",  # em dash
+    "\u2212": "-",   # minus sign
+    "\u2018": "'", "\u2019": "'",  # curly single quotes
+    "\u201C": '"', "\u201D": '"',  # curly double quotes
+    "\u2026": "...", # ellipsis
+    "\u2022": "-",   # bullet
+    "\u00A0": " ",   # non-breaking space
+}
+
+def pdf_safe(value):
+    if value is None:
+        return ""
+    s = str(value)
+    for k, v in _PDF_REPLACEMENTS.items():
+        s = s.replace(k, v)
+    # Fallback: drop any remaining chars not representable in latin-1
+    try:
+        s.encode("latin-1")
+        return s
+    except UnicodeEncodeError:
+        return s.encode("latin-1", "ignore").decode("latin-1")
+
+class SafeFPDF(FPDF):
+    def cell(self, w, h=0, txt="", border=0, ln=0, align="", fill=False, link=""):
+        return super().cell(w, h, pdf_safe(txt), border, ln, align, fill, link)
+
+    def multi_cell(self, w, h, txt="", border=0, align="J", fill=False):
+        return super().multi_cell(w, h, pdf_safe(txt), border, align, fill)
+
+    def write(self, h, txt="", link=""):
+        return super().write(h, pdf_safe(txt), link)
+
+    def text(self, x, y, txt=""):
+        return super().text(x, y, pdf_safe(txt))
 import plotly.express as px
 import plotly.graph_objects as go
 import time
@@ -2102,7 +2142,7 @@ def _build_ipdp_summary_pdf(name, role, phase_num, p_comm=None, p_mot=None):
     moves = _get_dynamic_coaching_moves(comm, motiv, int(phase_num))
     pedagogy = PEDAGOGY_GUIDE.get(int(phase_num), "")
 
-    pdf = FPDF()
+    pdf = SafeFPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
 
@@ -2337,6 +2377,182 @@ def get_leadership_mechanics(comm, motiv):
     return mech
 
 # 5c. INTEGRATED PROFILES (Expanded & 10 Coaching Questions Logic)
+# --- Celebration Teaching Builder (Profile-Integrated) ---
+def _praise_language_by_comm(comm_style: str):
+    """Return quick praise templates based on how this person best receives feedback."""
+    comm_style = (comm_style or "").strip()
+    return {
+        "Director": {
+            "tone": "direct + specific + outcome-focused",
+            "openers": [
+                "Good call on {behavior}. That protected {outcome}.",
+                "I appreciate how you {behavior}. It moved us toward {outcome}.",
+            ],
+            "closers": [
+                "Keep doing that—it's a leadership move.",
+                "Do that again next shift; it raises the standard."
+            ],
+            "avoid": "Overly long praise, vague compliments, or emotional over-explaining."
+        },
+        "Encourager": {
+            "tone": "warm + relational + impact-on-people",
+            "openers": [
+                "I saw how you {behavior}. That helped {who} feel {emotion}.",
+                "Thank you for bringing {behavior}—it changed the energy in the unit."
+            ],
+            "closers": [
+                "I'm glad you're on this team.",
+                "That matters more than you know."
+            ],
+            "avoid": "Praise that feels transactional or only about metrics."
+        },
+        "Facilitator": {
+            "tone": "calm + reflective + process-aware",
+            "openers": [
+                "I noticed you {behavior}. That created space for {outcome}.",
+                "You slowed things down in the right way when you {behavior}."
+            ],
+            "closers": [
+                "That's the kind of steady leadership that prevents escalation.",
+                "Keep modeling that—others learn from it."
+            ],
+            "avoid": "Overhyping or putting them on the spot publicly."
+        },
+        "Tracker": {
+            "tone": "precise + integrity + safety/continuity",
+            "openers": [
+                "Great job on {behavior}. That reduced risk and kept us in compliance.",
+                "I appreciate the way you {behavior}—it protected continuity for the youth."
+            ],
+            "closers": [
+                "That level of precision builds trust.",
+                "Keep that up; it's what keeps the unit safe."
+            ],
+            "avoid": "Vague praise like 'good job' with no specifics."
+        }
+    }.get(comm_style, {
+        "tone": "specific + sincere",
+        "openers": ["I noticed you {behavior}. That helped {outcome}."],
+        "closers": ["Keep it up."],
+        "avoid": "Vagueness."
+    })
+
+def build_celebration_teaching(p_comm: str, p_mot: str, celebrate_bullets):
+    """Create 3 'celebrate' cards with teaching tailored to motivation + how they hear praise."""
+    p_mot = (p_mot or "").strip()
+    celebrate_bullets = celebrate_bullets or []
+
+    # Provide stable defaults when the dictionary doesn't specify bullets yet.
+    defaults = {
+        "Growth": [
+            "Skill-building momentum (they got better at something real).",
+            "Healthy risk-taking in leadership (stretch without recklessness).",
+            "Reflection after a hard moment (they learned, not just survived).",
+        ],
+        "Purpose": [
+            "Values-aligned judgment calls (dignity + safety together).",
+            "Advocacy that improves youth outcomes (not just opinions).",
+            "Consistency under pressure (they held the line for what's right).",
+        ],
+        "Connection": [
+            "Repair and relational leadership (they restored trust).",
+            "Team climate protection (they lowered tension and kept people engaged).",
+            "Presence in hard moments (they stayed with youth/staff instead of checking out).",
+        ],
+        "Achievement": [
+            "Clear outcomes delivered (they finished what mattered).",
+            "Reliable follow-through (they closed loops).",
+            "Measurable improvement (documentation, routines, ratios, safety checks).",
+        ],
+    }
+    if not celebrate_bullets:
+        celebrate_bullets = defaults.get(p_mot, defaults.get("Achievement"))
+
+    praise = _praise_language_by_comm(p_comm)
+
+    sample_template = praise.get("openers", ["I noticed you <behavior>. That helped <outcome>."])[0]
+    sample_script = (str(sample_template)
+        .replace("{behavior}", "<behavior>")
+        .replace("{outcome}", "<outcome>")
+        .replace("{who}", "<who>")
+        .replace("{emotion}", "<emotion>")
+    )
+
+    # Motivation-specific WHY + WHAT TO LOOK FOR anchors
+    mot_frames = {
+        "Growth": {
+            "why": "Celebrating growth tells them: 'effort + learning is the path to trust here.' It increases coachability and reduces shame after mistakes.",
+            "look_for": [
+                "They ask for feedback or clarification instead of hiding.",
+                "They try a new skill (de-escalation tool, documentation habit, coaching script).",
+                "They reflect: 'Next time I'd…' without spiraling into self-criticism."
+            ],
+            "avoid": "Only celebrating talent or speed. Praise the learning loop, not just the outcome."
+        },
+        "Purpose": {
+            "why": "Celebrating purpose keeps them engaged when the work is messy. It anchors decision-making in dignity + safety and prevents cynical burnout.",
+            "look_for": [
+                "They connect a policy decision to youth safety/clinical continuity.",
+                "They advocate with solutions (not just objections).",
+                "They hold boundaries compassionately."
+            ],
+            "avoid": "Shaming them for caring 'too much' or dismissing values talk as 'extra'."
+        },
+        "Connection": {
+            "why": "Celebrating connection builds loyalty and stability. It reduces staff conflict, increases retention, and keeps the unit emotionally regulated.",
+            "look_for": [
+                "They repair after tension (apology, reset, reconnect).",
+                "They notice someone struggling and respond with support + structure.",
+                "They stabilize the room (tone, pacing, teamwork)."
+            ],
+            "avoid": "Praising only crisis-hero moments. Celebrate steady relationship maintenance too."
+        },
+        "Achievement": {
+            "why": "Celebrating achievement reduces chaos because it reinforces clarity, follow-through, and visible standards. It prevents burnout caused by 'never knowing if I'm winning.'",
+            "look_for": [
+                "They define success and hit it (ratios, routines, documentation).",
+                "They close the loop (handoff notes, follow-ups, audit fixes).",
+                "They make progress visible (simple tracking, checklists, dashboards)."
+            ],
+            "avoid": "Moving the goalposts after they succeed or praising only huge wins."
+        }
+    }
+    frame = mot_frames.get(p_mot, mot_frames["Achievement"])
+
+    # Build 3 teaching cards aligned to the 3 bullets.
+    cards = []
+    for b in celebrate_bullets[:3]:
+        title = str(b).replace("**", "").strip()
+        cards.append({
+            "title": title,
+            "what_to_look_for": frame["look_for"],
+            "why_it_matters": frame["why"],
+            "how_to_celebrate": [
+                f"**Tone:** {praise['tone']}",
+                f"**Try:** “{sample_script}”",
+                f"**Close:** “{praise['closers'][0]}”",
+                "Praise it within 24 hours when possible (the brain links cause/effect).",
+                "Be concrete: name the behavior, the impact, and the standard it reinforces."
+            ],
+            "avoid": f"{praise['avoid']} Also: {frame['avoid']}",
+        })
+
+    # Ensure exactly 3 cards for layout stability.
+    while len(cards) < 3:
+        cards.append({
+            "title": "Consistent progress under pressure",
+            "what_to_look_for": frame["look_for"],
+            "why_it_matters": frame["why"],
+            "how_to_celebrate": [
+                f"**Tone:** {praise['tone']}",
+                "Name the specific behavior you want repeated next shift.",
+                "Connect it to youth safety, team stability, or continuity."
+            ],
+            "avoid": f"{praise['avoid']} Also: {frame['avoid']}",
+        })
+
+    return cards
+
 def generate_profile_content(comm, motiv):
     combo_key = f"{comm}-{motiv}"
     c_data = COMM_PROFILES.get(comm, {})
@@ -2379,6 +2595,8 @@ def generate_profile_content(comm, motiv):
         "s9_b": i_data.get('interventions', []),
         "s10_b": m_data.get('celebrate_bullets'),
         "s10_deep": m_data.get('celebrate_deep_dive', ''),
+        "comm_language": m_data.get('celebrate_deep_dive', ''),
+        "s10_teach": build_celebration_teaching(comm, motiv, m_data.get('celebrate_bullets')),
         "coaching": i_data.get('questions', []),
         "advancement": i_data.get('advancement', ''),
         "cheat_do": c_data.get('supervising_bullets'),
@@ -2416,7 +2634,7 @@ def send_pdf_via_email(to_email, subject, body, pdf_bytes, filename="Guide.pdf")
         return False, f"Email Error: {str(e)}"
 
 def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
-    pdf = FPDF()
+    pdf = SafeFPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
     blue = (26, 115, 232); green = (52, 168, 83); red = (234, 67, 53); black = (0, 0, 0)
@@ -2425,6 +2643,34 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C'); pdf.ln(5)
     
     data = generate_profile_content(p_comm, p_mot)
+
+    # --- TABLE OF CONTENTS ---
+    # (Short, printable overview — the PDF itself includes all sections expanded.)
+    pdf.set_fill_color(240, 245, 250)
+    pdf.set_font("Arial", 'B', 13)
+    pdf.set_text_color(*blue)
+    pdf.cell(0, 9, "Table of Contents", ln=True, fill=True)
+    pdf.set_font("Arial", '', 11)
+    pdf.set_text_color(*black)
+    toc_lines = [
+        "Rapid Interaction Cheat Sheet",
+        "1. Communication Profile + 1A. How to Speak Their Language",
+        "2. Motivation Profile",
+        "3. What They Need From You",
+        "4. How They Prefer Feedback",
+        "5. How To Set Expectations",
+        "6. Delegation & Follow-Through",
+        "7. Red Flags Under Stress",
+        "8. Repair & Reset Scripts",
+        "9. Coaching Questions",
+        "10. What To Celebrate",
+        "11. Individual Professional Development Plan (Phases 1–3)",
+        "12. Preparing for Advancement",
+        "Stress Signature + Support Prescription",
+    ]
+    for line in toc_lines:
+        pdf.multi_cell(0, 5, clean_text(f"• {line}"))
+    pdf.ln(3)
 
     # --- CHEAT SHEET SECTION ---
     pdf.set_fill_color(240, 240, 240)
@@ -2469,7 +2715,11 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         pdf.ln(4)
 
     # Sections 1-10
-    add_section(f"1. Communication Profile: {p_comm}", None, data['s1_b']) 
+    add_section(f"1. Communication Profile: {p_comm}", None, data['s1_b'])
+    # Moved from Section 10 (online): helps supervisors tailor direction/feedback to this communication style
+    if data.get("comm_language"):
+        add_section("1A. How to Speak Their Language", data["comm_language"])
+ 
     add_section("2. Supervising Their Communication", None, data['s2_b'])
     add_section(f"3. Motivation Profile: {p_mot}", None, data['s3_b'])
     add_section("4. Motivating This Staff Member", None, data['s4_b'])
@@ -2478,7 +2728,23 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     add_section("7. What They Look Like When Thriving", data['s7'])
     add_section("8. What They Look Like When Struggling", data['s8'])
     add_section("9. Individual Professional Development Plan (IPDP)", None, data['s9_b'])
-    add_section("10. What You Should Celebrate", None, data['s10_b'])
+    # Build an expanded celebration section (bullets + teaching) for the PDF
+    celebrate_pdf = []
+    for card in (data.get("s10_teach") or [])[:3]:
+        title = card.get("title", "Celebrate This")
+        celebrate_pdf.append(f"**Celebrate:** {title}")
+        for w in card.get("what_to_look_for", [])[:4]:
+            celebrate_pdf.append(f"  - Look for: {w}")
+        if card.get("why_it_matters"):
+            celebrate_pdf.append(f"  - Why it matters: {card.get('why_it_matters')}")
+        for h in card.get("how_to_celebrate", [])[:4]:
+            celebrate_pdf.append(f"  - How: {h}")
+        if card.get("avoid"):
+            celebrate_pdf.append(f"  - Avoid: {card.get('avoid')}")
+        celebrate_pdf.append("")  # spacer
+
+    add_section("10. What You Should Celebrate", None, celebrate_pdf if celebrate_pdf else data['s10_b'])
+
 
     # 11. Coaching Questions
     pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
@@ -2488,8 +2754,169 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         pdf.multi_cell(0, 5, clean_text(f"{i+1}. {q}"))
     pdf.ln(4)
 
-    # 12. Advancement
-    add_section("12. Helping Them Prepare for Advancement", data['advancement'])
+    # 12. Preparing for Advancement (expanded, profile-specific)
+    try:
+        def _label(p, s):
+            return f"{p}/{s}" if s else f"{p}"
+
+        staff_style = _label(p_comm, s_comm)
+        staff_driver = _label(p_mot, s_mot)
+
+        ADV_STYLE = {
+            "Director": {
+                "shift": "From being the fastest problem-solver → to building clarity, delegation, and durable systems.",
+                "critical": "Directors can ‘win the shift’ through force of will. Advancement requires winning through people and repeatable structure.",
+                "empower": [
+                    "Give scope, not tasks: a problem area they must improve through others.",
+                    "Require a delegation plan: owners, cadence, definition of done.",
+                    "Coach ‘why before what’ so buy-in grows with clarity."
+                ],
+                "signals": [
+                    "Results improve even when they aren’t present.",
+                    "They bring options + a recommendation (not just urgency).",
+                    "They create calm by clarifying owners and timelines."
+                ],
+                "redflags": [
+                    "Micromanaging instead of delegating.",
+                    "Speed replaces judgment; buy-in collapses.",
+                    "Escalation through pressure instead of structure."
+                ],
+                "stretch": [
+                    "Run a weekly huddle with agenda + outcomes.",
+                    "Own one quality metric and improve it 10–15% over 30–60 days.",
+                    "Deliver corrective feedback using: Impact → Expectation → Support → Check-back."
+                ],
+            },
+            "Encourager": {
+                "shift": "From being the emotional engine → to holding warm accountability and clear standards.",
+                "critical": "Encouragers stabilize teams, but advancement requires firmness without losing warmth—support and standards at the same time.",
+                "empower": [
+                    "Teach ‘Warm + Clear’ scripts (relationship AND expectation in one sentence).",
+                    "Practice boundaries: what you can support vs what you must require.",
+                    "Give structured leadership reps (opening meetings, closing decisions)."
+                ],
+                "signals": [
+                    "They hold standards without guilt or overexplaining.",
+                    "Staff feel supported AND clear about expectations.",
+                    "They handle conflict without rescuing or triangulating."
+                ],
+                "redflags": [
+                    "Avoiding accountability to keep peace.",
+                    "Over-functioning emotionally; burnout risk.",
+                    "Softening messages until expectations blur."
+                ],
+                "stretch": [
+                    "Lead a ‘wins + standards’ huddle (2 wins + 1 expectation).",
+                    "Give one corrective feedback per week using a script.",
+                    "Own a morale + performance initiative (recognition + follow-through)."
+                ],
+            },
+            "Facilitator": {
+                "shift": "From building agreement → to closing decisions with timelines and ownership.",
+                "critical": "Facilitators prevent conflict, but advancement requires containment: decide, assign, then debrief—especially under pressure.",
+                "empower": [
+                    "Teach ‘contain then collaborate’: decision first, processing second.",
+                    "Give decision authority with guardrails (deadline + non-negotiables).",
+                    "Set escalation thresholds (when discussion ends and action begins)."
+                ],
+                "signals": [
+                    "They close decisions clearly and on time.",
+                    "Conflict resolves without endless meetings.",
+                    "They balance fairness with urgency."
+                ],
+                "redflags": [
+                    "Consensus-seeking delays action.",
+                    "Neutrality replaces leadership.",
+                    "Over-processing conflict instead of containing it."
+                ],
+                "stretch": [
+                    "Lead a timed case conference: discuss → decide → assign → confirm.",
+                    "Bring two options + a recommendation weekly.",
+                    "Run a post-incident debrief: facts, learning, next steps."
+                ],
+            },
+            "Tracker": {
+                "shift": "From protecting compliance → to influencing behavior and building systems people can follow.",
+                "critical": "Trackers keep programs safe, but advancement requires translating ‘policy’ into coaching and engagement—without becoming punitive.",
+                "empower": [
+                    "Give system-building scope: simplify tools, standardize routines.",
+                    "Coach them to translate compliance into ‘why it protects youth/staff.’",
+                    "Assign gray-zone recommendations: risk mitigation, not just risk listing."
+                ],
+                "signals": [
+                    "Routines improve without resentment.",
+                    "They decide in ambiguity using mitigation logic.",
+                    "They coach without sounding punitive."
+                ],
+                "redflags": [
+                    "Fixating on details at the expense of people.",
+                    "Rigidity in gray zones; avoidance of decisions.",
+                    "Correcting without teaching or follow-up."
+                ],
+                "stretch": [
+                    "Run a weekly audit + coaching loop (spot-check → teach → follow-up).",
+                    "Create a one-page SOP/checklist for a recurring pain point.",
+                    "Present a risk mitigation plan with a clear recommendation."
+                ],
+            },
+        }
+
+        ADV_MOT = {
+            "Growth": {
+                "need": "Skill targets, stretch reps with coaching, and feedback loops that show improvement.",
+                "moves": [
+                    "Co-create a 30/60/90 skill ladder (one skill per month).",
+                    "Give one stretch rep per week with a debrief.",
+                    "Celebrate learning signals: better questions, better framing, better follow-through."
+                ],
+            },
+            "Purpose": {
+                "need": "Connection between leadership tasks and youth outcomes; ability to shape practice, not just enforce it.",
+                "moves": [
+                    "Frame accountability as safety + dignity, not control.",
+                    "Invite policy translation: ‘how do we make this workable for kids?’",
+                    "Assign a mission-aligned improvement project (engagement routines, de-escalation)."
+                ],
+            },
+            "Connection": {
+                "need": "Relational safety plus scripts for holding standards so connection doesn’t become avoidance.",
+                "moves": [
+                    "Teach warm accountability scripts; practice them weekly.",
+                    "Give visible leadership roles with support.",
+                    "Normalize tension as part of leadership—equip instead of protect."
+                ],
+            },
+            "Achievement": {
+                "need": "Clear targets, a scoreboard, and stable definitions of success.",
+                "moves": [
+                    "Assign measurable outcomes (documentation %, training completion, engagement minutes).",
+                    "Use goal → plan → owner → check-back cadence weekly.",
+                    "Celebrate progress and quality of execution."
+                ],
+            },
+        }
+
+        style_pack = ADV_STYLE.get(p_comm, ADV_STYLE["Director"])
+        mot_pack = ADV_MOT.get(p_mot, ADV_MOT["Growth"])
+
+        add_section("12. Preparing for Advancement", f"Profile: {staff_style} | Driver: {staff_driver}")
+
+        add_section("12A. The Shift", style_pack["shift"])
+        add_section("12B. Why This Shift Is Critical", style_pack["critical"])
+        add_section("12C. How Supervisors Can Empower This Shift", None, style_pack["empower"])
+        add_section("12D. Proof They’re Ready", None, style_pack["signals"])
+        add_section("12E. Stretch Assignments", None, style_pack["stretch"])
+        add_section("12F. Red Flags", None, style_pack["redflags"])
+
+        add_section("12G. Motivation-Aware Coaching", f"What they need: {mot_pack['need']}", mot_pack["moves"])
+
+        # Preserve any legacy advancement copy if present
+        if data.get("advancement"):
+            add_section("12H. Notes (Legacy Guidance)", data["advancement"])
+
+    except Exception:
+        # Fallback to legacy text if anything unexpected happens
+        add_section("12. Helping Them Prepare for Advancement", data.get('advancement', ''))
 
     # --- NEW: Stress Signature & Support Prescription (matches on-screen detail) ---
     try:
@@ -2537,45 +2964,113 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         pass
 
     # --- NEW: IPDP Roadmap (Phase 1–3) including Coaching Matrix + Teaching Deep Dive ---
+    # IMPORTANT: The on-screen IPDP matrix helpers live inside the Streamlit view.
+    # For PDF reliability, we generate a parallel (pure) roadmap here so the phases
+    # always render (and we don't silently skip due to scope errors).
     try:
         pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
         pdf.cell(0, 8, "14. IPDP Roadmap (Phases 1–3)", ln=True, fill=True); pdf.ln(2)
         pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
 
+        def _pdf_phase_overview(phase_num: int):
+            return {
+                1: {
+                    "title": "Phase 1: Safety + Consistency",
+                    "aim": "Build a dependable baseline: routines, documentation habits, and the minimum safe standard.",
+                    "supervisor_role": "Coach in real time, keep scope small, verify quickly, and praise consistency.",
+                    "common_pitfall": "Overloading too early or letting expectations stay vague, creating avoidable chaos.",
+                },
+                2: {
+                    "title": "Phase 2: Judgment + Pattern Recognition",
+                    "aim": "Move from task completion to decision quality: spot patterns, anticipate needs, prevent repeats.",
+                    "supervisor_role": "Don’t rescue—require a recommendation + rationale and coach the thinking.",
+                    "common_pitfall": "They defer upward (‘you decide’) or get rigid to avoid ambiguity.",
+                },
+                3: {
+                    "title": "Phase 3: Ownership + Systems Thinking",
+                    "aim": "Shift from managing moments to improving systems: delegation, prevention, team standards.",
+                    "supervisor_role": "Delegate real ownership with guardrails and review outcomes over time.",
+                    "common_pitfall": "They over-control (do everything) or avoid hard calls that protect standards.",
+                },
+            }.get(int(phase_num), {"title": f"Phase {phase_num}", "aim": "", "supervisor_role": "", "common_pitfall": ""})
+
+        def _pdf_dynamic_moves(comm: str, motiv: str, phase: int):
+            # Keep it stable + aligned with the phase PDF helper.
+            c_moves = {
+                "Director": [
+                    "The 'Bottom Line' Opener: Start with the goal, not the background.",
+                    "The Autonomy Check: Ask 'What do you need to own this?'"
+                ],
+                "Encourager": [
+                    "The Relational Buffer: Spend 2 mins on 'us' before 'the work'.",
+                    "The Vision Connect: Link the boring task to the team vibe."
+                ],
+                "Facilitator": [
+                    "The Advance Warning: Send the agenda 24hrs early.",
+                    "The Process Map: Ask them to design the 'how'."
+                ],
+                "Tracker": [
+                    "The Data Dive: Bring specific examples/numbers.",
+                    "The Risk Assessment: Ask 'What risks do you see?'"
+                ]
+            }
+            m_moves = {
+                "Achievement": [
+                    "The Scoreboard: Define what 'winning' looks like.",
+                    "The Sprint: Set a short-term, high-intensity goal."
+                ],
+                "Growth": [
+                    "The Stretch: Give a task slightly above their pay grade.",
+                    "The Debrief: Ask 'What did you learn?' not just 'Did you do it?'"
+                ],
+                "Purpose": [
+                    "The Impact Story: Share a specific youth success story.",
+                    "The Why: Explain the mission value of the task."
+                ],
+                "Connection": [
+                    "The Peer Mentor: Have them teach a peer.",
+                    "The Team Check: Ask 'How is the team feeling?'"
+                ]
+            }
+            p_moves = {
+                1: [
+                    "The Safety Net: 'Call me if you get stuck.'",
+                    "The Binary Feedback: 'This was right/wrong.'"
+                ],
+                2: [
+                    "The Scenario Drill: 'What would you do if...?'",
+                    "The Pattern Spot: 'I see you doing X often.'"
+                ],
+                3: [
+                    "The Delegation: 'You run the meeting today.'",
+                    "The Systems Think: 'How do we fix this process?'"
+                ]
+            }
+            return c_moves.get(comm, []) + m_moves.get(motiv, []) + p_moves.get(int(phase), [])
+
         for phase_num in (1, 2, 3):
-            moves, phase_card = build_coaching_matrix(p_comm, s_comm, p_mot, s_mot, phase_num)
+            card = _pdf_phase_overview(phase_num)
             pdf.set_font("Arial", 'B', 11); pdf.set_text_color(*black)
-            pdf.multi_cell(0, 6, clean_text(f"Phase {phase_num}: {phase_card.get('title','')}"))
+            pdf.multi_cell(0, 6, clean_text(f"{card.get('title','Phase')}"))
             pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
-            pdf.multi_cell(0, 5, clean_text(f"Aim: {phase_card.get('aim','')}"))
-            pdf.multi_cell(0, 5, clean_text(f"Supervisor Role: {phase_card.get('supervisor_role','')}"))
-            pdf.multi_cell(0, 5, clean_text(f"Common Pitfall: {phase_card.get('common_pitfall','')}"))
+            if card.get("aim"):
+                pdf.multi_cell(0, 5, clean_text(f"Aim: {card.get('aim','')}"))
+            if card.get("supervisor_role"):
+                pdf.multi_cell(0, 5, clean_text(f"Supervisor Role: {card.get('supervisor_role','')}"))
+            if card.get("common_pitfall"):
+                pdf.multi_cell(0, 5, clean_text(f"Common Pitfall: {card.get('common_pitfall','')}"))
             pdf.ln(1)
 
             pdf.set_font("Arial", 'B', 11)
-            pdf.multi_cell(0, 5, clean_text("Coaching Matrix (6 Moves):"))
+            pdf.multi_cell(0, 5, clean_text("Coaching Matrix (6 High-Impact Moves):"))
             pdf.set_font("Arial", '', 11)
-            for idx, mv in enumerate(moves, start=1):
-                title = mv.get("title", f"Move {idx}")
-                pdf.multi_cell(0, 5, clean_text(f"{idx}) {title}"))
-                why = mv.get("why","")
-                how = mv.get("how","")
-                if why:
-                    pdf.multi_cell(0, 5, clean_text(f"   Why: {why}"))
-                if how:
-                    pdf.multi_cell(0, 5, clean_text(f"   How: {how}"))
-                scripts = mv.get("scripts", [])
-                if scripts:
-                    pdf.multi_cell(0, 5, clean_text("   Scripts:"))
-                    for s in scripts:
-                        pdf.multi_cell(0, 5, clean_text(f"   - {s}"))
-                avoid = mv.get("avoid","")
-                if avoid:
-                    pdf.multi_cell(0, 5, clean_text(f"   Avoid: {avoid}"))
-                pdf.ln(1)
+            moves = _pdf_dynamic_moves(p_comm or "Director", p_mot or "Achievement", int(phase_num))
+            for i, mv in enumerate(moves, start=1):
+                pdf.multi_cell(0, 5, clean_text(f"{i}) {mv}"))
 
+            pdf.ln(1)
             pdf.set_font("Arial", 'B', 11)
-            pdf.multi_cell(0, 5, clean_text("Teaching Deep Dive (Profile‑Integrated):"))
+            pdf.multi_cell(0, 5, clean_text("Teaching Deep Dive (Profile-Integrated):"))
             pdf.set_font("Arial", '', 11)
             deep = build_teaching_deep_dive(name, p_comm, s_comm, p_mot, s_mot, phase_num)
             deep_clean = re.sub(r"[*_`#>]", "", deep)
@@ -2599,26 +3094,61 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.caption(f"Role: {role} | Profile: {p_comm} ({s_comm}) • {p_mot} ({s_mot})")
 
 
-# --- PDF (moved to top under header) ---
-pdf_bytes_top = None
-pdf_fname_top = None
-if "generated_pdf" in st.session_state and st.session_state.get("generated_name") == name:
-    pdf_bytes_top = st.session_state.get("generated_pdf")
-    pdf_fname_top = st.session_state.get("generated_filename", f"Guide_{name.replace(' ', '_')}.pdf")
-elif "manual_pdf" in st.session_state:
-    pdf_bytes_top = st.session_state.get("manual_pdf")
-    pdf_fname_top = st.session_state.get("manual_fname", f"Guide_{name.replace(' ', '_')}.pdf")
-
-if pdf_bytes_top:
-    st.download_button(
-        "📥 Save as PDF",
-        pdf_bytes_top,
-        pdf_fname_top,
-        "application/pdf",
-        key=f"dl_top_{name}",
-        width="stretch"
-    )
     
+    # --- Actions (moved to top under header) ---
+    # PDF download + email are placed here so supervisors always see them immediately.
+    pdf_bytes_top = None
+    pdf_fname_top = None
+
+    # Prefer the latest generated PDF (from the Generate Guide button).
+    if st.session_state.get("generated_pdf"):
+        pdf_bytes_top = st.session_state.get("generated_pdf")
+        pdf_fname_top = st.session_state.get("generated_filename")
+
+    # Fallback to manual PDF if present.
+    if not pdf_bytes_top and st.session_state.get("manual_pdf"):
+        pdf_bytes_top = st.session_state.get("manual_pdf")
+        pdf_fname_top = st.session_state.get("manual_fname")
+
+    # Final filename fallback (never reference a non-existent variable).
+    if pdf_bytes_top and not pdf_fname_top:
+        safe_staff = st.session_state.get("generated_name") or st.session_state.get("manual_name") or name or "Staff"
+        pdf_fname_top = f"Guide_{str(safe_staff).replace(' ', '_')}.pdf"
+
+    with st.container(border=True):
+        st.markdown("#### 📤 Actions")
+        ac1, ac2 = st.columns([1, 2])
+
+        with ac1:
+            if pdf_bytes_top:
+                st.download_button(
+                    "📥 Download PDF",
+                    pdf_bytes_top,
+                    pdf_fname_top,
+                    "application/pdf",
+                    key=f"dl_top_{str(name)}",
+                    width="stretch",
+                )
+            else:
+                st.button("📥 Download PDF", disabled=True, width="stretch", help="Generate the guide to enable the PDF download.")
+
+        with ac2:
+            if pdf_bytes_top:
+                with st.popover("📧 Email to Me"):
+                    email_input = st.text_input("Recipient Email", placeholder="name@elmcrest.org", key=f"email_to_me_{str(name)}")
+                    if st.button("Send Email", key=f"send_email_{str(name)}"):
+                        if email_input:
+                            with st.spinner("Sending..."):
+                                success, msg = send_pdf_via_email(pdf_bytes_top, pdf_fname_top, email_input)
+                                if success:
+                                    st.success(msg)
+                                else:
+                                    st.error(msg)
+                        else:
+                            st.warning("Please enter a recipient email address.")
+            else:
+                st.info("Generate the guide to enable emailing the PDF.")
+
     with st.expander("⚡ Rapid Interaction Cheat Sheet", expanded=True):
         cc1, cc2, cc3 = st.columns(3)
         with cc1:
@@ -2637,12 +3167,46 @@ if pdf_bytes_top:
         if bullets:
             for b in bullets: st.markdown(f"- {b}")
 
-    # --- SECTION 1 & 2: COMMUNICATION ---
+    
+    # --- Jump Table of Contents ---
+    with st.container(border=True):
+        st.markdown("### 🔎 Jump to Section")
+        st.caption("Click a section to jump. (Tip: open sections in a new tab if your browser supports it.)")
+        tcol1, tcol2 = st.columns(2)
+        with tcol1:
+            st.markdown(
+                "- [1. Communication](#sec1)\n"
+                "- [2. Supervising Strategies](#sec2)\n"
+                "- [3. Motivation](#sec3)\n"
+                "- [4. How to Motivate](#sec4)\n"
+                "- [6. Supervisor’s HUD](#sec6)",
+                unsafe_allow_html=True
+            )
+        with tcol2:
+            st.markdown(
+                "- [9. IPDP](#sec9)\n"
+                "- [10. What To Celebrate](#sec10)\n"
+                "- [11. Coaching Questions](#sec11)\n"
+                "- [12. Preparing for Advancement](#sec12)",
+                unsafe_allow_html=True
+            )
+    st.markdown("<div style='height: 0.25rem;'></div>", unsafe_allow_html=True)
+
+# --- SECTION 1 & 2: COMMUNICATION ---
     c1, c2 = st.columns([2, 1])
     with c1:
+        st.markdown("<div id='sec1'></div>", unsafe_allow_html=True)
         st.subheader(f"1. Communication: {p_comm}")
         show_list(data['s1_b'])
+
+        # Moved here from Section 10: teaches the supervisor how this person best receives direction/feedback
+        if data.get("comm_language"):
+            with st.container(border=True):
+                st.markdown("### 💬 How to Speak Their Language")
+                st.markdown(data["comm_language"])
+
         st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<div id='sec2'></div>", unsafe_allow_html=True)
         st.subheader("2. Supervising Strategies")
         show_list(data['s2_b'])
     
@@ -2662,9 +3226,11 @@ if pdf_bytes_top:
             fig_g = create_motiv_gauge(p_mot)
             st.plotly_chart(fig_g, width="stretch", config={'displayModeBar': False})
     with c4:
+        st.markdown("<div id='sec3'></div>", unsafe_allow_html=True)
         st.subheader(f"3. Motivation: {p_mot}")
         show_list(data['s3_b'])
         st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<div id='sec4'></div>", unsafe_allow_html=True)
         st.subheader("4. How to Motivate")
         show_list(data['s4_b'])
 
@@ -2697,7 +3263,8 @@ if pdf_bytes_top:
             st.caption("The compass plots your bias: Task vs. People (X-Axis) and Change vs. Stability (Y-Axis).")
     
     # --- SECTION 6: THE SUPERVISOR'S HUD (REWORKED) ---
-    st.subheader("6. The Supervisor's HUD (Heads-Up Display)")
+    st.markdown("<div id='sec6'></div>", unsafe_allow_html=True)
+        st.subheader("6. The Supervisor's HUD (Heads-Up Display)")
     st.caption("A real-time dashboard for maintaining this staff member's engagement and preventing burnout. Use it as an early-warning system—not a report card.")
 
     with st.expander("How to use the HUD (Training)", expanded=False):
@@ -3039,7 +3606,8 @@ if pdf_bytes_top:
     st.divider()
 
     # --- SECTION 9: INDIVIDUAL PROFESSIONAL DEVELOPMENT PLAN (IPDP) - DYNAMIC ---
-    st.subheader("9. Individual Professional Development Plan (IPDP)")
+    st.markdown("<div id='sec9'></div>", unsafe_allow_html=True)
+        st.subheader("9. Individual Professional Development Plan (IPDP)")
     st.caption("A development-first framework for coaching growth, alignment, and performance over time.")
 
     # Snapshot: remind the supervisor who they are coaching (primary + secondary)
@@ -3378,7 +3946,7 @@ if pdf_bytes_top:
 
     def _build_ipdp_phase_pdf_bytes(person_name, role, p_comm, s_comm, p_mot, s_mot, phase_num, phase_card, moves, teaching_text):
         """Creates a small phase-specific PDF. Returns bytes."""
-        pdf = FPDF()
+        pdf = SafeFPDF()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
 
@@ -3493,28 +4061,48 @@ if pdf_bytes_top:
 
 
 # --- SECTION 10: CELEBRATION (TROPHY CASE) ---
-    st.subheader("10. What To Celebrate")
-    
-    # 1. Primary Bullets
+    st.markdown("<div id='sec10'></div>", unsafe_allow_html=True)
+        st.subheader("10. What To Celebrate")
+    st.caption("Use celebration as a *training tool*: you are reinforcing the behaviors you want repeated under pressure.")
+
+    # 1) Three quick trophies (headline-only)
     cel_cols = st.columns(3)
-    if data['s10_b']:
-        for i, item in enumerate(data['s10_b']):
-            clean_item = item.replace("**", "")
+    bullets = data.get('s10_b') or []
+    if bullets:
+        for i, item in enumerate(bullets[:3]):
+            clean_item = str(item).replace("**", "")
             with cel_cols[i % 3]:
                 st.markdown(f"🏆 **{clean_item}**")
-    
-    st.markdown("")
-    
-    # 2. Deep Dive Box
-    with st.container(border=True):
-        st.markdown(f"### 💬 How to Speak Their Language")
-        st.markdown(data['s10_deep'])
+    else:
+        st.info("No celebration bullets configured for this profile yet.")
 
+    st.markdown("")
+
+    # 2) Teaching for each trophy (collapsible)
+    teach_cards = data.get("s10_teach") or []
+    for card in teach_cards[:3]:
+        title = card.get("title", "Celebrate This")
+        with st.expander(f"🏅 Celebrate: {title}", expanded=False):
+            tc1, tc2 = st.columns([1, 1])
+            with tc1:
+                st.markdown("#### 🔎 What to look for (in real life)")
+                for w in card.get("what_to_look_for", []):
+                    st.write(f"- {w}")
+                st.markdown("#### 🧠 Why this matters")
+                st.markdown(card.get("why_it_matters", ""))
+
+            with tc2:
+                st.markdown("#### 🎉 How to celebrate it (scripts + method)")
+                for h in card.get("how_to_celebrate", []):
+                    st.write(f"- {h}")
+                st.markdown("#### 🚫 What to avoid")
+                st.warning(card.get("avoid", "Avoid vague praise."))
 
     st.divider()
 
     # --- SECTION 11: COACHING QUESTIONS ---
-    st.subheader("11. Coaching Questions")
+    st.markdown("<div id='sec11'></div>", unsafe_allow_html=True)
+        st.subheader("11. Coaching Questions")
     with st.container(border=True):
         if data['coaching']:
             for i, q in enumerate(data['coaching']):
@@ -3525,23 +4113,220 @@ if pdf_bytes_top:
     st.markdown("<br>", unsafe_allow_html=True)
     
     # --- SECTION 12: ADVANCEMENT (NEXT LEVEL) ---
-    st.subheader("12. Preparing for Advancement")
-    adv_text = data['advancement']
-    if adv_text:
-        adv_points = adv_text.split('\n\n')
-        ac1, ac2, ac3 = st.columns(3)
-        cols = [ac1, ac2, ac3]
-        for i, point in enumerate(adv_points):
-            if i < 3:
-                with cols[i]:
-                    if "**" in point:
-                        parts = point.split("**")
-                        title = parts[1] if len(parts) > 1 else "Focus Area"
-                        body = parts[2] if len(parts) > 2 else point
-                        st.metric(label=title, value="Readiness Check")
-                        st.caption(body)
-                    else:
-                        st.info(point)
+    st.markdown("<div id='sec12'></div>", unsafe_allow_html=True)
+        st.subheader("12. Preparing for Advancement")
+    st.caption("This section helps you translate **potential** into **readiness**. We’re not just asking “could they do more?” — we’re building the habits that make promotion safe for the team, the youth, and the staff member.")
+
+    def _build_advancement_plan(comm_p, comm_s, mot_p, mot_s):
+        # Core "next-level" growth edges by primary communication style
+        comm_plans = {
+            "Director": {
+                "shift": "From **decider** → to **capacity builder** (still decisive, but through other people).",
+                "readiness": [
+                    "Delegates with clarity (defines outcomes + guardrails, not every step).",
+                    "Uses authority to create **calm**, not pressure (tone stays steady in chaos).",
+                    "Checks impact: can name how decisions affect youth safety, staff morale, and compliance.",
+                    "Moves from “tell” to “coach”: asks 2–3 questions before giving the answer.",
+                ],
+                "stretch": [
+                    "Run a 2-week micro-project where they must delegate tasks to peers and track progress (you only observe).",
+                    "Lead one incident debrief using a structured format: facts → impact → lessons → prevention.",
+                    "Facilitate a staffing plan meeting where they must invite concerns *before* finalizing the plan.",
+                ],
+                "watch": [
+                    "Overfunctioning: taking over because it’s faster.",
+                    "Intensity spikes: urgency turns into harshness.",
+                ],
+            },
+            "Encourager": {
+                "shift": "From **morale booster** → to **standards keeper** (warmth + accountability together).",
+                "readiness": [
+                    "Can deliver corrective feedback without softening it into ambiguity.",
+                    "Holds a boundary even when someone is upset (doesn’t rescue).",
+                    "Names expectations in observable behaviors (not vibes).",
+                    "Can tolerate being “the bad guy” *temporarily* for long-term safety and trust.",
+                ],
+                "stretch": [
+                    "Practice a ‘clear expectations’ huddle: 3 non-negotiables, 2 supports, 1 check-in time.",
+                    "Lead one performance conversation using a script (behavior → impact → expectation → support → follow-up).",
+                    "Own a documentation quality push for one week: audit, coach, re-check (no shaming).",
+                ],
+                "watch": [
+                    "Avoiding conflict to preserve connection.",
+                    "Overpromising support instead of setting limits.",
+                ],
+            },
+            "Facilitator": {
+                "shift": "From **bridge builder** → to **decision driver** (consensus with a clock).",
+                "readiness": [
+                    "Can summarize inputs and then *choose* a direction (even when not everyone agrees).",
+                    "Keeps meetings from looping: sets agendas, timeboxes, and outcomes.",
+                    "Uses authority when needed (doesn’t outsource decisions upward).",
+                    "Holds two truths: empathy for staff + commitment to policy/youth safety.",
+                ],
+                "stretch": [
+                    "Run a 15-minute ‘rapid alignment’ meeting: 5 min facts, 5 min options, 5 min decision + next steps.",
+                    "Practice ‘decision statements’: “Given X and Y, we will do Z. Here’s why.”",
+                    "Lead a cross-shift handoff improvement: design a simple handoff template and train staff.",
+                ],
+                "watch": [
+                    "Endless processing: more talk becomes a delay tactic.",
+                    "Over-accommodating: agreement replaces accountability.",
+                ],
+            },
+            "Tracker": {
+                "shift": "From **rule guardian** → to **judgment leader** (policy + discretion in gray zones).",
+                "readiness": [
+                    "Can prioritize: distinguishes ‘must fix now’ vs ‘fix next’ vs ‘monitor.’",
+                    "Communicates policy as **support for safety**, not as control.",
+                    "Makes recommendations in uncertainty (doesn’t freeze waiting for perfect clarity).",
+                    "Can zoom out: connects documentation/compliance to youth outcomes and unit stability.",
+                ],
+                "stretch": [
+                    "Complete one ‘gray zone’ decision memo: risks, mitigations, decision, review plan.",
+                    "Build a 1-page quick-reference guide for staff (simple, usable, no jargon).",
+                    "Coach a peer on a compliance issue using a supportive tone (teach, don’t police).",
+                ],
+                "watch": [
+                    "Perfectionism: delays decisions until everything is certain.",
+                    "Rigid framing: policy becomes the goal instead of youth safety being the goal.",
+                ],
+            },
+        }
+
+        # Motivation lens: what makes advancement energizing vs. destabilizing
+        mot_plans = {
+            "Growth": {
+                "fuel": "They advance best when the path includes **skill-building**, feedback, and increasing complexity.",
+                "risk": "If promotion feels like ‘more responsibility without coaching,’ they can stall or disengage.",
+                "supervisor_moves": [
+                    "Offer *laddered* responsibility: add one new difficulty at a time.",
+                    "Give weekly feedback loops: “What did you try? What did you learn? What will you adjust?”",
+                ],
+            },
+            "Purpose": {
+                "fuel": "They advance best when leadership is framed as **protecting youth** and strengthening dignity/safety.",
+                "risk": "If promoted into ‘admin only’ with no meaning, motivation drops fast.",
+                "supervisor_moves": [
+                    "Tie tasks to mission: “This policy protects youth because…”",
+                    "Use values-based debriefs: “What did we do that upheld dignity and safety?”",
+                ],
+            },
+            "Connection": {
+                "fuel": "They advance best when leadership is framed as **building the team** and belonging.",
+                "risk": "If leadership requires hard boundaries, they may fear harming relationships.",
+                "supervisor_moves": [
+                    "Teach ‘care + clarity’ scripts: warm tone, clear expectation, follow-up.",
+                    "Normalize discomfort: “Short-term tension can create long-term trust.”",
+                ],
+            },
+            "Achievement": {
+                "fuel": "They advance best with **clear success criteria**, metrics, and visible wins.",
+                "risk": "Ambiguity in leadership roles can create anxiety or overcontrol.",
+                "supervisor_moves": [
+                    "Define 2–3 measurable outcomes for the stretch assignment.",
+                    "Use simple dashboards/checklists to show progress.",
+                ],
+            },
+        }
+
+        comm_block = comm_plans.get(comm_p, comm_plans["Director"])
+        mot_block = mot_plans.get(mot_p, mot_plans["Growth"])
+
+        # Secondary style: add nuance to coaching tone
+        nuance = {
+            "Director": "Keep it direct and timebound.",
+            "Encourager": "Keep it relational and affirm effort.",
+            "Facilitator": "Keep it collaborative and reflective.",
+            "Tracker": "Keep it structured and specific.",
+        }.get(comm_s, "Keep it simple and specific.")
+
+        return {
+            "shift": comm_block["shift"],
+            "what_it_means": [
+                f"**Primary style focus ({comm_p})**: {comm_block['shift']}",
+                f"**Motivation lens ({mot_p})**: {mot_block['fuel']}",
+                f"**Secondary-style nuance ({comm_s})**: {nuance}",
+            ],
+            "why_critical": [
+                "Advancement changes the *surface area* of impact: one person’s habits shape the whole unit.",
+                "The next level requires **systems thinking** (youth safety + staffing + documentation + culture), not just personal competence.",
+                "If you promote without training the shift, you amplify stress signatures — and turnover follows.",
+            ],
+            "readiness_signals": comm_block["readiness"],
+            "stretch_assignments": comm_block["stretch"],
+            "supervisor_playbook": mot_block["supervisor_moves"] + [
+                "Name the new identity: “You’re practicing *leadership*, not just ‘helping out.’”",
+                "Protect learning time: debrief within 24–48 hours (short, specific).",
+                "Let them struggle *safely*: ask questions before you rescue the outcome.",
+            ],
+            "red_flags": comm_block["watch"] + [mot_block["risk"]],
+            "conversation_script": [
+                "1) **Name the potential:** “I see leadership ability in you when you ____.”",
+                "2) **Name the shift:** “To move to the next level, the skill is ____ (not just working harder).”",
+                "3) **Offer a test:** “Let’s run a 2-week stretch assignment to practice it.”",
+                "4) **Define success:** “Success looks like ____ (observable behaviors).”",
+                "5) **Commit to support:** “I’ll debrief with you on ____ day/time.”",
+            ],
+        }
+
+    plan = _build_advancement_plan(p_comm, s_comm, p_mot, s_mot)
+
+    # Visual layout: tabs for clarity
+    tab_r, tab_s, tab_p = st.tabs(["✅ Readiness Signals", "🧪 Stretch Assignments", "🧭 Supervisor Playbook"])
+
+    with tab_r:
+        with st.container(border=True):
+            st.markdown("### The Shift You’re Training")
+            st.markdown(plan["shift"])
+            st.markdown("**What this shift is (in plain terms):**")
+            for b in plan["what_it_means"]:
+                st.write(f"- {b}")
+
+        with st.container(border=True):
+            st.markdown("### Why this shift is critical")
+            for b in plan["why_critical"]:
+                st.write(f"- {b}")
+
+        st.markdown("### ✅ Signals they’re ready")
+        cols = st.columns(2)
+        for i, sig in enumerate(plan["readiness_signals"]):
+            with cols[i % 2]:
+                st.success(sig)
+
+        with st.expander("🗣️ Promotion Conversation (script + why it works)", expanded=False):
+            st.markdown("This conversation works because it **frames advancement as a skill shift**, not a reward. It reduces anxiety, clarifies expectations, and makes the next step measurable.")
+            for line in plan["conversation_script"]:
+                st.write(line)
+
+    with tab_s:
+        st.markdown("### 🧪 Recommended stretch assignments")
+        st.caption("Pick **one** stretch assignment to start. Your job is to create a safe test where they must make decisions, communicate expectations, and manage follow-through.")
+        for item in plan["stretch_assignments"]:
+            with st.container(border=True):
+                st.markdown(f"**{item}**")
+                st.write("**Supervisor coaching tip:** Ask for a short plan (who/what/when), then let them run it. Debrief with: *What happened? What did you try? What will you change next time?*")
+
+        # Legacy notes (if configured)
+        adv_text = data.get("advancement")
+        if adv_text:
+            with st.expander("📎 Legacy advancement notes (from older version)", expanded=False):
+                st.markdown(adv_text)
+
+    with tab_p:
+        c1, c2 = st.columns(2)
+        with c1:
+            with st.container(border=True):
+                st.markdown("### How supervisors can empower this shift")
+                for b in plan["supervisor_playbook"]:
+                    st.write(f"- {b}")
+
+        with c2:
+            with st.container(border=True):
+                st.markdown("### 🚩 Red flags to coach early")
+                st.caption("Red flags aren’t disqualifiers — they’re **training targets**.")
+                for r in plan["red_flags"]:
+                    st.warning(r)
 
 # --- 6. MAIN APP LOGIC ---
 # Reset Helpers
@@ -3615,38 +4400,7 @@ if st.session_state.current_view == "Supervisor's Guide":
                         st.session_state.generated_name = d['name']
                         display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
 
-            if "generated_pdf" in st.session_state and st.session_state.get("generated_name") == d['name']:
-                st.divider()
-                st.markdown("#### 📤 Actions")
-                ac1, ac2 = st.columns([1, 2])
-                
-                with ac1:
-                    st.download_button(
-                        label="📥 Download PDF", 
-                        data=st.session_state.generated_pdf, 
-                        file_name=st.session_state.generated_filename, 
-                        mime="application/pdf",
-                    )
-                
-                with ac2:
-                    with st.popover("📧 Email to Me"):
-                        email_input = st.text_input("Recipient Email", placeholder="name@elmcrest.org")
-                        if st.button("Send Email"):
-                            if email_input:
-                                with st.spinner("Sending..."):
-                                    success, msg = send_pdf_via_email(
-                                        to_email=email_input,
-                                        subject=f"Supervisor Guide: {d['name']}",
-                                        body=f"Attached is the Compass Supervisor Guide for {d['name']}.",
-                                        pdf_bytes=st.session_state.generated_pdf,
-                                        filename=st.session_state.generated_filename
-                                    )
-                                    if success: st.success(msg)
-                                    else: st.error(msg)
-                            else:
-                                st.warning("Please enter an email address.")
-                
-            st.button("Reset", on_click=reset_t1)
+    st.button("Reset", key="reset_t1", on_click=reset_t1)
 
     # --- MANUAL TAB ---
     with sub2:
