@@ -2102,7 +2102,7 @@ def _build_ipdp_summary_pdf(name, role, phase_num, p_comm=None, p_mot=None):
     moves = _get_dynamic_coaching_moves(comm, motiv, int(phase_num))
     pedagogy = PEDAGOGY_GUIDE.get(int(phase_num), "")
 
-    pdf = FPDF()
+    pdf = SafeFPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
 
@@ -2415,8 +2415,48 @@ def send_pdf_via_email(to_email, subject, body, pdf_bytes, filename="Guide.pdf")
     except Exception as e:
         return False, f"Email Error: {str(e)}"
 
+
+# ---------------------------
+# PDF text sanitization (FPDF is latin-1 only by default)
+# ---------------------------
+def pdf_safe(text):
+    """Make text safe for FPDF's latin-1 encoding by replacing common unicode punctuation
+    and dropping anything that can't be encoded."""
+    if text is None:
+        return ""
+    if not isinstance(text, str):
+        text = str(text)
+    replacements = {
+        "–": "-",   # en dash
+        "—": "-",   # em dash
+        "−": "-",   # minus
+        "’": "'",   # right single quote
+        "‘": "'",   # left single quote
+        "“": '"',   # left double quote
+        "”": '"',   # right double quote
+        "…": "...", # ellipsis
+        "\u00A0": " ",  # nbsp (sometimes comes through oddly)
+        "•": "-",   # bullet
+    }
+    for k, v in replacements.items():
+        text = text.replace(k, v)
+    return text.encode("latin-1", errors="ignore").decode("latin-1")
+
+
+class SafeFPDF(FPDF):
+    """FPDF subclass that sanitizes all text so PDF generation never fails on unicode."""
+
+    def cell(self, w, h=0, txt="", border=0, ln=0, align="", fill=False, link=""):
+        return super().cell(w, h, pdf_safe(txt), border, ln, align, fill, link)
+
+    def multi_cell(self, w, h, txt="", border=0, align="J", fill=False):
+        return super().multi_cell(w, h, pdf_safe(txt), border, align, fill)
+
+    def write(self, h, txt="", link=""):
+        return super().write(h, pdf_safe(txt), link)
+
 def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
-    pdf = FPDF()
+    pdf = SafeFPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
     blue = (26, 115, 232); green = (52, 168, 83); red = (234, 67, 53); black = (0, 0, 0)
@@ -3378,7 +3418,7 @@ if pdf_bytes_top:
 
     def _build_ipdp_phase_pdf_bytes(person_name, role, p_comm, s_comm, p_mot, s_mot, phase_num, phase_card, moves, teaching_text):
         """Creates a small phase-specific PDF. Returns bytes."""
-        pdf = FPDF()
+        pdf = SafeFPDF()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
 
