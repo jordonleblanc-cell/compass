@@ -971,12 +971,67 @@ def clean_text(text):
     if not text: return ""
     return text.replace('\u2018', "'").replace('\u2019', "'").replace('\u201c', '"').replace('\u201d', '"').replace('\u2013', '-').replace('—', '-').encode('latin-1', 'replace').decode('latin-1')
 
+def build_flat_answers_payload():
+    """Flatten all assessment answers into a single dict suitable for Google Sheets.
+
+    Keys are stable question IDs (e.g., cL1, cF1, mL1, mB1).
+    Values are human-readable:
+      - Likert items: integer 1-5
+      - Forced-choice items: the chosen statement text (A or B)
+
+    This pairs well with an Apps Script that creates one column per question ID.
+    """
+    flat = {}
+
+    # Communication answers
+    comm_ans = st.session_state.get('answers_comm', {}) or {}
+    for q in COMM_QUESTIONS:
+        qid = q.get('id')
+        if not qid:
+            continue
+        raw = comm_ans.get(qid)
+        if raw is None:
+            continue
+        if q.get('type') == 'forced':
+            flat[qid] = q.get('a_text') if raw == 'A' else q.get('b_text')
+        else:
+            try:
+                flat[qid] = int(raw)
+            except Exception:
+                flat[qid] = raw
+
+    # Motivation answers (including burnout context)
+    mot_ans = st.session_state.get('answers_motiv', {}) or {}
+    for q in MOTIVATION_QUESTIONS:
+        qid = q.get('id')
+        if not qid:
+            continue
+        raw = mot_ans.get(qid)
+        if raw is None:
+            continue
+        if q.get('type') == 'forced':
+            flat[qid] = q.get('a_text') if raw == 'A' else q.get('b_text')
+        else:
+            try:
+                flat[qid] = int(raw)
+            except Exception:
+                flat[qid] = raw
+
+    return flat
+
 def submit_to_google_sheets(data, action="save"):
-    # Sends data to Google Scripts
+    """Send payload to Google Apps Script.
+
+    The backend can store both summary scores and, if provided, an `answers` dict
+    for per-question columns.
+    """
     url = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
     data["action"] = action
     try:
-        requests.post(url, json=data)
+        resp = requests.post(url, json=data, timeout=15)
+        if resp.status_code != 200:
+            st.error(f"Google Sheets Error ({resp.status_code}): {resp.text}")
+            return False
         return True
     except Exception as e:
         st.error(f"Connection Error: {e}")
@@ -1721,13 +1776,17 @@ elif st.session_state.step == 'processing':
     # Logic to clean cottage name (remove "Cottage " prefix)
     raw_cottage = st.session_state.user_info['cottage']
     clean_cottage = raw_cottage.replace("Cottage ", "")
-    
+
+    # Option A: store each question response as its own column (Apps Script side)
+    flat_answers = build_flat_answers_payload()
+
     payload = {
         "name": st.session_state.user_info['name'],
         "email": st.session_state.user_info['email'],
         "role": st.session_state.user_info['role'],
-        "cottage": clean_cottage, # Use cleaned version
-        "scores": st.session_state.results
+        "cottage": clean_cottage,  # Use cleaned version
+        "scores": st.session_state.results,
+        "answers": flat_answers,
     }
     
     with st.spinner("Analyzing results..."):
