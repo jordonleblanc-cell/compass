@@ -1678,7 +1678,6 @@ if st.session_state.step == 'intro':
 
 # --- COMM ---
 
-el
 # --- ASSESSMENT (IPSATIVE, ONE BLOCK AT A TIME) ---
 if st.session_state.step == 'assessment':
     scroll_to_top()
