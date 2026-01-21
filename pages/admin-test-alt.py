@@ -2330,6 +2330,51 @@ def create_integrated_compass(comm, motiv):
     )
     return fig
 
+def create_leadership_signature_radar(comm, motiv):
+    """A radar-style 'signature' chart so the Leadership Compass doesn't visually duplicate the Comm Style Map."""
+    # reuse same coordinate logic as the 2D compass
+    comm_map = {
+        "Director": {"x": -6, "y": 6}, "Encourager": {"x": 6, "y": 6},
+        "Facilitator": {"x": 6, "y": -6}, "Tracker": {"x": -6, "y": -6}
+    }
+    mot_map = {
+        "Achievement": {"x": -3, "y": 4}, "Growth": {"x": 2, "y": 7},
+        "Purpose": {"x": 5, "y": 3}, "Connection": {"x": 7, "y": -2}
+    }
+
+    c_pt = comm_map.get(comm, {"x": 0, "y": 0})
+    m_pt = mot_map.get(motiv, {"x": 0, "y": 0})
+    final_x = (c_pt["x"] + m_pt["x"]) / 2
+    final_y = (c_pt["y"] + m_pt["y"]) / 2
+
+    # Convert X/Y to 4 readable dimensions (0-10)
+    max_axis = 7.0  # keeps scale consistent across mappings
+    people = min(10, max(0, final_x) / max_axis * 10)
+    task = min(10, max(0, -final_x) / max_axis * 10)
+    change = min(10, max(0, final_y) / max_axis * 10)
+    stability = min(10, max(0, -final_y) / max_axis * 10)
+
+    categories = ["People", "Task", "Change", "Stability"]
+    values = [people, task, change, stability]
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatterpolar(
+        r=values + [values[0]],
+        theta=categories + [categories[0]],
+        fill='toself',
+        name="Leadership Signature"
+    ))
+
+    fig.update_layout(
+        showlegend=False,
+        margin=dict(l=20, r=20, t=30, b=20),
+        polar=dict(
+            radialaxis=dict(visible=True, range=[0, 10])
+        )
+    )
+    return fig
+
+
 # --- LOGIC HELPER FOR SECTION 5 EXPANSION ---
 def get_leadership_mechanics(comm, motiv):
     """
@@ -3168,7 +3213,29 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             for b in bullets: st.markdown(f"- {b}")
 
     
-    # --- Jump Table of Contents ---
+    
+    # --- Section Heading Helper (matches Section 5 styling) ---
+    def render_section_heading(sec_num: int, label: str, title: str, anchor_id: str | None = None):
+        """Renders a centered section label + title in the same visual style as Section 5."""
+        if anchor_id:
+            st.markdown(f"<div id='{anchor_id}'></div>", unsafe_allow_html=True)
+
+        st.markdown(
+            f"""<div style='text-align:center; margin-bottom: .25rem;'>
+                    <span style='font-size: .85rem; letter-spacing: .12em; font-weight: 700; color: #6b7280;'>
+                        SECTION {sec_num}: {label.upper()}
+                    </span>
+                  </div>""",
+            unsafe_allow_html=True
+        )
+        st.markdown(
+            f"""<h2 style='text-align:center; color:#202124; margin-top:0; margin-bottom:.75rem;'>
+                    {title}
+                  </h2>""",
+            unsafe_allow_html=True
+        )
+
+# --- Jump Table of Contents ---
     with st.container(border=True):
         st.markdown("### 🔎 Jump to Section")
         st.caption("Click a section to jump. (Tip: open sections in a new tab if your browser supports it.)")
@@ -3195,8 +3262,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 # --- SECTION 1 & 2: COMMUNICATION ---
     c1, c2 = st.columns([2, 1])
     with c1:
-        st.markdown("<div id='sec1'></div>", unsafe_allow_html=True)
-        st.subheader(f"1. Communication: {p_comm}")
+        render_section_heading(1, "Communication", f"Communication: {p_comm}", "sec1")
         show_list(data['s1_b'])
 
         # Moved here from Section 10: teaches the supervisor how this person best receives direction/feedback
@@ -3206,8 +3272,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 st.markdown(data["comm_language"])
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("<div id='sec2'></div>", unsafe_allow_html=True)
-        st.subheader("2. Supervising Strategies")
+        render_section_heading(2, "Supervising Strategies", "Supervising Strategies", "sec2")
         show_list(data['s2_b'])
     
     with c2:
@@ -3226,12 +3291,10 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             fig_g = create_motiv_gauge(p_mot)
             st.plotly_chart(fig_g, width="stretch", config={'displayModeBar': False})
     with c4:
-        st.markdown("<div id='sec3'></div>", unsafe_allow_html=True)
-        st.subheader(f"3. Motivation: {p_mot}")
+        render_section_heading(3, "Motivation", f"Motivation: {p_mot}", "sec3")
         show_list(data['s3_b'])
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("<div id='sec4'></div>", unsafe_allow_html=True)
-        st.subheader("4. How to Motivate")
+        render_section_heading(4, "How to Motivate", "How to Motivate", "sec4")
         show_list(data['s4_b'])
 
     st.markdown("<br>", unsafe_allow_html=True)
@@ -3257,14 +3320,12 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             st.markdown(f"**3. Trust Builder:** {mech['trust']}")
 
         with i2:
-            st.markdown(f"**🧭 Leadership Compass**")
-            fig_compass = create_integrated_compass(p_comm, p_mot)
-            st.plotly_chart(fig_compass, width="stretch", config={'displayModeBar': False})
-            st.caption("The compass plots your bias: Task vs. People (X-Axis) and Change vs. Stability (Y-Axis).")
+            st.markdown("**🧭 Leadership Signature**")
+            fig_sig = create_leadership_signature_radar(p_comm, p_mot)
+            st.plotly_chart(fig_sig, width="stretch", config={'displayModeBar': False})
+            st.caption("This signature translates their integrated profile into four dimensions: People, Task, Change, and Stability.")
     
-    # --- SECTION 6: THE SUPERVISOR'S HUD (REWORKED) ---
-    st.markdown("<div id='sec6'></div>", unsafe_allow_html=True)
-    st.subheader("6. The Supervisor's HUD (Heads-Up Display)")
+    # --- SECTION 6: THE SUPERVISOR'S HUD (REWORKED) ---    render_section_heading(6, "Supervisor's HUD", "The Supervisor's HUD (Heads-Up Display)", "sec6")
     st.caption("A real-time dashboard for maintaining this staff member's engagement and preventing burnout. Use it as an early-warning system—not a report card.")
 
     with st.expander("How to use the HUD (Training)", expanded=False):
@@ -3596,18 +3657,16 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     col_t, col_s = st.columns(2)
     with col_t:
         with st.container(border=True):
-            st.subheader("✅ 7. When Thriving")
+            render_section_heading(7, "When Thriving", "✅ When Thriving")
             st.write(data['s7'])
     with col_s:
         with st.container(border=True):
-            st.subheader("⚠️ 8. When Struggling")
+            render_section_heading(8, "When Struggling", "⚠️ When Struggling")
             st.write(data['s8'])
 
     st.divider()
 
-    # --- SECTION 9: INDIVIDUAL PROFESSIONAL DEVELOPMENT PLAN (IPDP) - DYNAMIC ---
-    st.markdown("<div id='sec9'></div>", unsafe_allow_html=True)
-    st.subheader("9. Individual Professional Development Plan (IPDP)")
+    # --- SECTION 9: INDIVIDUAL PROFESSIONAL DEVELOPMENT PLAN (IPDP) - DYNAMIC ---    render_section_heading(9, "Individual Professional Development Plan", "Individual Professional Development Plan (IPDP)", "sec9")
     st.caption("A development-first framework for coaching growth, alignment, and performance over time.")
 
     # Snapshot: remind the supervisor who they are coaching (primary + secondary)
@@ -4060,9 +4119,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 st.error(f"⚠️ Phase {_phase} encountered an error (isolated): {e}")
 
 
-# --- SECTION 10: CELEBRATION (TROPHY CASE) ---
-    st.markdown("<div id='sec10'></div>", unsafe_allow_html=True)
-    st.subheader("10. What To Celebrate")
+# --- SECTION 10: CELEBRATION (TROPHY CASE) ---    render_section_heading(10, "What To Celebrate", "What To Celebrate", "sec10")
     st.caption("Use celebration as a *training tool*: you are reinforcing the behaviors you want repeated under pressure.")
 
     # 1) Three quick trophies (headline-only)
@@ -4100,9 +4157,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
     st.divider()
 
-    # --- SECTION 11: COACHING QUESTIONS ---
-    st.markdown("<div id='sec11'></div>", unsafe_allow_html=True)
-    st.subheader("11. Coaching Questions")
+    # --- SECTION 11: COACHING QUESTIONS ---    render_section_heading(11, "Coaching Questions", "Coaching Questions", "sec11")
     with st.container(border=True):
         if data['coaching']:
             for i, q in enumerate(data['coaching']):
@@ -4112,9 +4167,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # --- SECTION 12: ADVANCEMENT (NEXT LEVEL) ---
-    st.markdown("<div id='sec12'></div>", unsafe_allow_html=True)
-    st.subheader("12. Preparing for Advancement")
+    # --- SECTION 12: ADVANCEMENT (NEXT LEVEL) ---    render_section_heading(12, "Preparing for Advancement", "Preparing for Advancement", "sec12")
     st.caption("This section helps you translate **potential** into **readiness**. We’re not just asking “could they do more?” — we’re building the habits that make promotion safe for the team, the youth, and the staff member.")
 
     def _build_advancement_plan(comm_p, comm_s, mot_p, mot_s):
