@@ -276,15 +276,80 @@ BRAND_COLORS = {
 
 # --- HELPER: Supervisor Guide Style Map ---
 
-def create_comm_quadrant_chart(comm_style: str):
-    """Supervisor Guide Style Map: fixed quadrant placement by dominant communication style."""
+def create_comm_quadrant_chart(comm_input, dominant_label: str = None):
+    """Unified Style Map helper.
+
+    Supports:
+      - comm_input as a *string* (e.g., 'Facilitator'): plots the point in the center of that quadrant
+        (Supervisor Guide behavior).
+      - comm_input as a *dict* of comm scores: plots a point based on the relative quadrant pull
+        (User Profile behavior that shows *how far* into the quadrant the person landed).
+
+    Returns a Plotly Figure.
+    """
+
+    # Color + default point by style
     coords = {
-        "Director": {"x": -0.5, "y": 0.5, "color": BRAND_COLORS["red"]},
-        "Encourager": {"x": 0.5, "y": 0.5, "color": BRAND_COLORS["yellow"]},
-        "Tracker": {"x": -0.5, "y": -0.5, "color": BRAND_COLORS["blue"]},
-        "Facilitator": {"x": 0.5, "y": -0.5, "color": BRAND_COLORS["green"]},
+        "Director": {"x": -0.5, "y": 0.5, "color": BRAND_COLORS.get("red", "#ea4335")},
+        "Encourager": {"x": 0.5, "y": 0.5, "color": BRAND_COLORS.get("yellow", "#fbbc04")},
+        "Tracker": {"x": -0.5, "y": -0.5, "color": BRAND_COLORS.get("blue", "#1a73e8")},
+        "Facilitator": {"x": 0.5, "y": -0.5, "color": BRAND_COLORS.get("green", "#34a853")},
     }
-    data = coords.get(comm_style, {"x": 0, "y": 0, "color": BRAND_COLORS.get("gray", "gray")})
+
+    # --- Supervisor Guide mode: string style -> fixed quadrant center ---
+    if isinstance(comm_input, str):
+        comm_style = comm_input
+        data = coords.get(comm_style, {"x": 0.0, "y": 0.0, "color": BRAND_COLORS.get("gray", "gray")})
+        label = comm_style or "—"
+        hover = f"<b>{label}</b><extra></extra>"
+
+        fig = go.Figure()
+
+        # Quadrant backgrounds (match Supervisor Guide)
+        fig.add_shape(type="rect", x0=-1, y0=0, x1=0, y1=1, fillcolor="rgba(234, 67, 53, 0.1)", line_width=0, layer="below")   # Director
+        fig.add_shape(type="rect", x0=0, y0=0, x1=1, y1=1, fillcolor="rgba(251, 188, 4, 0.1)", line_width=0, layer="below")      # Encourager
+        fig.add_shape(type="rect", x0=-1, y0=-1, x1=0, y1=0, fillcolor="rgba(26, 115, 232, 0.1)", line_width=0, layer="below")   # Tracker
+        fig.add_shape(type="rect", x0=0, y0=-1, x1=1, y1=0, fillcolor="rgba(52, 168, 83, 0.1)", line_width=0, layer="below")     # Facilitator
+
+        # Center lines
+        fig.add_vline(x=0, line_width=1, line_color="gray")
+        fig.add_hline(y=0, line_width=1, line_color="gray")
+
+        # Point + label
+        fig.add_trace(go.Scatter(
+            x=[data["x"]], y=[data["y"]],
+            mode="markers+text",
+            marker=dict(size=25, color=data["color"], line=dict(width=2, color="white")),
+            text=[label],
+            textposition="bottom center",
+            textfont=dict(size=14, family="Arial", weight="bold"),
+            hovertemplate=hover,
+        ))
+
+        # Axis labels
+        fig.add_annotation(x=0, y=1.1, text="FAST / ACTION", showarrow=False, font=dict(size=10, color="gray"))
+        fig.add_annotation(x=0, y=-1.1, text="SLOW / PROCESS", showarrow=False, font=dict(size=10, color="gray"))
+        fig.add_annotation(x=-1.1, y=0, text="TASK", showarrow=False, textangle=-90, font=dict(size=10, color="gray"))
+        fig.add_annotation(x=1.1, y=0, text="PEOPLE", showarrow=False, textangle=90, font=dict(size=10, color="gray"))
+
+        fig.update_layout(
+            title=dict(text=f"Style Map: {label}", x=0.0),
+            xaxis=dict(range=[-1.2, 1.2], showgrid=False, zeroline=False, visible=False),
+            yaxis=dict(range=[-1.2, 1.2], showgrid=False, zeroline=False, visible=False),
+            margin=dict(l=20, r=20, t=45, b=20),
+            height=320,
+            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)",
+            showlegend=False,
+        )
+        fig.update_yaxes(scaleanchor="x", scaleratio=1)
+        return fig
+
+    # --- User Profile mode: dict scores -> continuous point (but SAME Supervisor Guide visual styling) ---
+    m = build_comm_style_map(comm_input if isinstance(comm_input, dict) else {})
+    x, y = m["x"], m["y"]
+    label = dominant_label or m.get("quadrant") or "—"
+    color = coords.get(label, {}).get("color", BRAND_COLORS.get("gray", "gray"))
 
     fig = go.Figure()
 
@@ -298,15 +363,20 @@ def create_comm_quadrant_chart(comm_style: str):
     fig.add_vline(x=0, line_width=1, line_color="gray")
     fig.add_hline(y=0, line_width=1, line_color="gray")
 
-    # Point + label
     fig.add_trace(go.Scatter(
-        x=[data["x"]], y=[data["y"]],
+        x=[x], y=[y],
         mode="markers+text",
-        marker=dict(size=25, color=data["color"], line=dict(width=2, color="white")),
-        text=[comm_style or "—"],
+        marker=dict(size=25, color=color, line=dict(width=2, color="white")),
+        text=[label],
         textposition="bottom center",
         textfont=dict(size=14, family="Arial", weight="bold"),
-        hovertemplate="<b>%{text}</b><extra></extra>",
+        hovertemplate=(
+            "<b>%{text}</b><br>"
+            "People ↔ Task: %{x:.2f}<br>"
+            "Fast ↔ Slow: %{y:.2f}<br>"
+            f"Intensity: {m.get('intensity', 0)*100:.0f}%"
+            "<extra></extra>"
+        ),
     ))
 
     # Axis labels
@@ -316,7 +386,7 @@ def create_comm_quadrant_chart(comm_style: str):
     fig.add_annotation(x=1.1, y=0, text="PEOPLE", showarrow=False, textangle=90, font=dict(size=10, color="gray"))
 
     fig.update_layout(
-        title=dict(text=f"Style Map: {comm_style}", x=0.0),
+        title=dict(text=f"Style Map: {label}", x=0.0),
         xaxis=dict(range=[-1.2, 1.2], showgrid=False, zeroline=False, visible=False),
         yaxis=dict(range=[-1.2, 1.2], showgrid=False, zeroline=False, visible=False),
         margin=dict(l=20, r=20, t=45, b=20),
@@ -327,6 +397,7 @@ def create_comm_quadrant_chart(comm_style: str):
     )
     fig.update_yaxes(scaleanchor="x", scaleratio=1)
     return fig
+
 
 
 # --- Communication Style Map (Quadrant) ---
