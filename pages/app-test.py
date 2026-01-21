@@ -1156,15 +1156,25 @@ def clean_text(text):
     return text.replace('\u2018', "'").replace('\u2019', "'").replace('\u201c', '"').replace('\u201d', '"').replace('\u2013', '-').replace('—', '-').encode('latin-1', 'replace').decode('latin-1')
 
 def submit_to_google_sheets(data, action="save"):
-    # Sends data to Google Scripts
+    """POST JSON payload to Google Apps Script. Returns (ok, message)."""
     url = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
-    data["action"] = action
+    payload = dict(data or {})
+    payload["action"] = action
     try:
-        requests.post(url, json=data)
-        return True
+        r = requests.post(url, json=payload, timeout=15)
+        if r.status_code != 200:
+            return False, f"HTTP {r.status_code}"
+        # Try parse JSON response
+        try:
+            j = r.json()
+            if isinstance(j, dict) and j.get("status") == "ok":
+                return True, j.get("message", "Saved")
+            # Some deployments return text; fall back to OK if 200
+            return True, j.get("message", "Saved") if isinstance(j, dict) else "Saved"
+        except Exception:
+            return True, "Saved"
     except Exception as e:
-        st.error(f"Connection Error: {e}")
-        return False
+        return False, f"{e}"
 
 def fetch_user_data(email):
     # Attempts to fetch data from Google Scripts
@@ -1869,14 +1879,44 @@ if st.session_state.step == 'assessment':
             if st.button("Complete & View Profile →", disabled=not valid):
                 # Compute results from this run (ipsative scoring)
                 computed = compute_results_from_ipsative(st.session_state.blocks, st.session_state.answers_ipsative)
+
+                # Build per-block answer columns for Google Sheets
+                answers_cols = {}
+                section_by_id = {b.get("id"): b.get("section") for b in st.session_state.blocks}
+                for _bid, picks in (st.session_state.answers_ipsative or {}).items():
+                    if not isinstance(picks, dict):
+                        continue
+                    sec = section_by_id.get(_bid)
+                    prefix = "COMM" if sec == "comm" else ("MOT" if sec == "motiv" else "ANS")
+                    most = picks.get("most")
+                    least = picks.get("least")
+                    if most is not None:
+                        answers_cols[f"{prefix}_{_bid}_MOST"] = most
+                    if least is not None:
+                        answers_cols[f"{prefix}_{_bid}_LEAST"] = least
+
+                # Payload aligned to your Code.gs (name/email/role/cottage + scores + dynamic columns)
+                payload = {
+                    "name": st.session_state.user_info.get("name",""),
+                    "email": st.session_state.user_info.get("email",""),
+                    "role": st.session_state.user_info.get("role",""),
+                    "cottage": st.session_state.user_info.get("cottage",""),
+                    "scores": computed,
+                    "answers": answers_cols,
+                }
+
+                ok, msg = submit_to_google_sheets(payload, action="save")
+                if not ok:
+                    st.error(f"Couldn’t save to Google Sheets: {msg}")
+                    st.info("You can still view results below, but they may not be recorded.")
+
                 st.session_state.results = computed
-                st.session_state.step = 'results'
+                st.session_state.step = "results"
                 st.rerun()
 
 
 if st.session_state.step == 'results':
     scroll_to_top()
-    print_page_button()
     st.progress(100)
     
     # [FIX] Enhanced Guard clause for missing or corrupted data
