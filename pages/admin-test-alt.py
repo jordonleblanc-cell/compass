@@ -3167,9 +3167,35 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         if bullets:
             for b in bullets: st.markdown(f"- {b}")
 
-    # --- SECTION 1 & 2: COMMUNICATION ---
+    
+    # --- Jump Table of Contents ---
+    with st.container(border=True):
+        st.markdown("### 🔎 Jump to Section")
+        st.caption("Click a section to jump. (Tip: open sections in a new tab if your browser supports it.)")
+        tcol1, tcol2 = st.columns(2)
+        with tcol1:
+            st.markdown(
+                "- [1. Communication](#sec1)\n"
+                "- [2. Supervising Strategies](#sec2)\n"
+                "- [3. Motivation](#sec3)\n"
+                "- [4. How to Motivate](#sec4)\n"
+                "- [6. Supervisor’s HUD](#sec6)",
+                unsafe_allow_html=True
+            )
+        with tcol2:
+            st.markdown(
+                "- [9. IPDP](#sec9)\n"
+                "- [10. What To Celebrate](#sec10)\n"
+                "- [11. Coaching Questions](#sec11)\n"
+                "- [12. Preparing for Advancement](#sec12)",
+                unsafe_allow_html=True
+            )
+    st.markdown("<div style='height: 0.25rem;'></div>", unsafe_allow_html=True)
+
+# --- SECTION 1 & 2: COMMUNICATION ---
     c1, c2 = st.columns([2, 1])
     with c1:
+        st.markdown("<div id='sec1'></div>", unsafe_allow_html=True)
         st.subheader(f"1. Communication: {p_comm}")
         show_list(data['s1_b'])
 
@@ -3180,6 +3206,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 st.markdown(data["comm_language"])
 
         st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<div id='sec2'></div>", unsafe_allow_html=True)
         st.subheader("2. Supervising Strategies")
         show_list(data['s2_b'])
     
@@ -3199,9 +3226,11 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             fig_g = create_motiv_gauge(p_mot)
             st.plotly_chart(fig_g, width="stretch", config={'displayModeBar': False})
     with c4:
+        st.markdown("<div id='sec3'></div>", unsafe_allow_html=True)
         st.subheader(f"3. Motivation: {p_mot}")
         show_list(data['s3_b'])
         st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<div id='sec4'></div>", unsafe_allow_html=True)
         st.subheader("4. How to Motivate")
         show_list(data['s4_b'])
 
@@ -3234,7 +3263,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             st.caption("The compass plots your bias: Task vs. People (X-Axis) and Change vs. Stability (Y-Axis).")
     
     # --- SECTION 6: THE SUPERVISOR'S HUD (REWORKED) ---
-    st.subheader("6. The Supervisor's HUD (Heads-Up Display)")
+    st.markdown("<div id='sec6'></div>", unsafe_allow_html=True)
+        st.subheader("6. The Supervisor's HUD (Heads-Up Display)")
     st.caption("A real-time dashboard for maintaining this staff member's engagement and preventing burnout. Use it as an early-warning system—not a report card.")
 
     with st.expander("How to use the HUD (Training)", expanded=False):
@@ -3576,7 +3606,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.divider()
 
     # --- SECTION 9: INDIVIDUAL PROFESSIONAL DEVELOPMENT PLAN (IPDP) - DYNAMIC ---
-    st.subheader("9. Individual Professional Development Plan (IPDP)")
+    st.markdown("<div id='sec9'></div>", unsafe_allow_html=True)
+        st.subheader("9. Individual Professional Development Plan (IPDP)")
     st.caption("A development-first framework for coaching growth, alignment, and performance over time.")
 
     # Snapshot: remind the supervisor who they are coaching (primary + secondary)
@@ -4030,7 +4061,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
 
 # --- SECTION 10: CELEBRATION (TROPHY CASE) ---
-    st.subheader("10. What To Celebrate")
+    st.markdown("<div id='sec10'></div>", unsafe_allow_html=True)
+        st.subheader("10. What To Celebrate")
     st.caption("Use celebration as a *training tool*: you are reinforcing the behaviors you want repeated under pressure.")
 
     # 1) Three quick trophies (headline-only)
@@ -4069,7 +4101,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.divider()
 
     # --- SECTION 11: COACHING QUESTIONS ---
-    st.subheader("11. Coaching Questions")
+    st.markdown("<div id='sec11'></div>", unsafe_allow_html=True)
+        st.subheader("11. Coaching Questions")
     with st.container(border=True):
         if data['coaching']:
             for i, q in enumerate(data['coaching']):
@@ -4080,7 +4113,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.markdown("<br>", unsafe_allow_html=True)
     
     # --- SECTION 12: ADVANCEMENT (NEXT LEVEL) ---
-    st.subheader("12. Preparing for Advancement")
+    st.markdown("<div id='sec12'></div>", unsafe_allow_html=True)
+        st.subheader("12. Preparing for Advancement")
     st.caption("This section helps you translate **potential** into **readiness**. We’re not just asking “could they do more?” — we’re building the habits that make promotion safe for the team, the youth, and the staff member.")
 
     def _build_advancement_plan(comm_p, comm_s, mot_p, mot_s):
