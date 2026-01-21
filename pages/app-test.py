@@ -448,14 +448,31 @@ IPSATIVE_BLOCKS = [
 
 # --- SCORING (IPSATIVE) ---
 def compute_results_from_ipsative(blocks, answers_by_block_id):
-    """Compute style/driver scores from ipsative MOST(+3) / LEAST(-1) picks."""
-    comm_styles = ['Director', 'Encourager', 'Facilitator', 'Tracker']
-    motiv_drivers = ['Growth', 'Purpose', 'Connection', 'Achievement']
-    comm_scores = {k: 0 for k in comm_styles}
-    motiv_scores = {k: 0 for k in motiv_drivers}
+    """
+    Compute style/driver scores from ipsative MOST(+3) / LEAST(-1) picks, and derive:
+      - primary + secondary (dominant + secondary) for Communication and Motivation
+      - confidence labels (Clear / Moderate / Blend)
 
-    # Block id -> section mapping
-    section_by_id = {b.get('id'): b.get('section') for b in blocks}
+    Notes:
+      - Ipsative results are *within-person* preferences (not norm-referenced).
+      - Tie-breaks:
+          1) Higher total score
+          2) More MOST selections
+          3) Fewer LEAST selections
+          4) Preferred order (deterministic)
+          5) Alphabetical
+    """
+    comm_order = ['Director', 'Encourager', 'Facilitator', 'Tracker']
+    motiv_order = ['Growth', 'Purpose', 'Connection', 'Achievement']
+
+    comm_scores = {k: 0 for k in comm_order}
+    motiv_scores = {k: 0 for k in motiv_order}
+    comm_most = {k: 0 for k in comm_order}
+    comm_least = {k: 0 for k in comm_order}
+    motiv_most = {k: 0 for k in motiv_order}
+    motiv_least = {k: 0 for k in motiv_order}
+
+    section_by_id = {b.get('id'): b.get('section') for b in (blocks or [])}
 
     for bid, picks in (answers_by_block_id or {}).items():
         if not isinstance(picks, dict):
@@ -463,38 +480,79 @@ def compute_results_from_ipsative(blocks, answers_by_block_id):
         section = section_by_id.get(bid)
         most = picks.get('most')
         least = picks.get('least')
-        if most is None or least is None or most == least:
+        if not most or not least or most == least:
             continue
 
         if section == 'comm':
-            if most in comm_scores: comm_scores[most] += 3
-            if least in comm_scores: comm_scores[least] -= 1
+            if most in comm_scores:
+                comm_scores[most] += MOST_POINTS
+                comm_most[most] += 1
+            if least in comm_scores:
+                comm_scores[least] += LEAST_POINTS
+                comm_least[least] += 1
         elif section == 'motiv':
-            if most in motiv_scores: motiv_scores[most] += 3
-            if least in motiv_scores: motiv_scores[least] -= 1
+            if most in motiv_scores:
+                motiv_scores[most] += MOST_POINTS
+                motiv_most[most] += 1
+            if least in motiv_scores:
+                motiv_scores[least] += LEAST_POINTS
+                motiv_least[least] += 1
 
-    def _pick_primary(score_dict, preferred_order):
-        # Deterministic tie-break: preferred_order then alpha.
-        items = list(score_dict.items())
-        max_score = max([v for _, v in items], default=None)
-        if max_score is None:
+    def _rank_keys(score_dict, most_dict, least_dict, preferred_order):
+        pref_index = {k: i for i, k in enumerate(preferred_order)}
+        def sort_key(k):
+            return (
+                score_dict.get(k, 0),
+                most_dict.get(k, 0),
+                -least_dict.get(k, 0),      # fewer least is better
+                -pref_index.get(k, 9999),   # earlier in preferred order is better
+                -ord(k[0].lower())          # placeholder; will not be used for final ties
+            )
+        # We want descending by first fields, so we sort with reverse=True and a tuple that is naturally ascending.
+        # Instead, build a tuple where "better" values are larger, then reverse=True.
+        def sort_key2(k):
+            return (
+                score_dict.get(k, 0),
+                most_dict.get(k, 0),
+                -least_dict.get(k, 0),
+                -pref_index.get(k, 9999),
+            )
+        ranked = sorted(score_dict.keys(), key=lambda k: (sort_key2(k), k), reverse=True)
+        return ranked
+
+    def _primary_secondary(score_dict, most_dict, least_dict, preferred_order):
+        ranked = _rank_keys(score_dict, most_dict, least_dict, preferred_order)
+        primary = ranked[0] if ranked else None
+        secondary = ranked[1] if len(ranked) > 1 else None
+        return primary, secondary
+
+    def _confidence_label(score_dict, primary, secondary):
+        if not primary or not secondary:
             return None
-        tied = [k for k, v in items if v == max_score]
-        for k in preferred_order:
-            if k in tied:
-                return k
-        return sorted(tied)[0] if tied else None
+        diff = (score_dict.get(primary, 0) - score_dict.get(secondary, 0))
+        if diff >= 2:
+            return "Clear"
+        if diff == 1:
+            return "Moderate"
+        return "Blend"
 
-    primary_comm = _pick_primary(comm_scores, comm_styles)
-    primary_motiv = _pick_primary(motiv_scores, motiv_drivers)
+    primary_comm, secondary_comm = _primary_secondary(comm_scores, comm_most, comm_least, comm_order)
+    primary_motiv, secondary_motiv = _primary_secondary(motiv_scores, motiv_most, motiv_least, motiv_order)
 
     return {
-        'primaryComm': primary_comm,
-        'primaryMotiv': primary_motiv,
-        'commScores': comm_scores,
-        'motivScores': motiv_scores,
+        "primaryComm": primary_comm,
+        "secondaryComm": secondary_comm,
+        "commConfidence": _confidence_label(comm_scores, primary_comm, secondary_comm),
+        "primaryMotiv": primary_motiv,
+        "secondaryMotiv": secondary_motiv,
+        "motivConfidence": _confidence_label(motiv_scores, primary_motiv, secondary_motiv),
+        "commScores": comm_scores,
+        "motivScores": motiv_scores,
+        "commMostCounts": comm_most,
+        "commLeastCounts": comm_least,
+        "motivMostCounts": motiv_most,
+        "motivLeastCounts": motiv_least,
     }
-
 
 
 # --- DATA DICTIONARIES (Updated with new content) ---
@@ -1394,6 +1452,11 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
     pdf.set_font("Arial", '', 12)
     pdf.set_text_color(*black)
     pdf.cell(0, 8, clean_text(f"Prepared for: {user_info['name']} | Role: {user_info['role']}"), ln=True, align='C')
+    pdf.set_font("Arial", '', 11)
+    comm_line = f"Communication: {results.get('primaryComm','')} (Secondary: {results.get('secondaryComm','')})"
+    motiv_line = f"Motivation: {results.get('primaryMotiv','')} (Secondary: {results.get('secondaryMotiv','')})"
+    pdf.cell(0, 7, clean_text(comm_line), ln=True, align='C')
+    pdf.cell(0, 7, clean_text(motiv_line), ln=True, align='C')
     pdf.ln(5)
     
     # --- [CHANGE] Cheat Sheet Section Added ---
@@ -1941,6 +2004,21 @@ if st.session_state.step == 'results':
     role_labels = ROLE_RELATIONSHIP_LABELS[role_key]
     
     show_brand_header(f"Profile for {user['name']}")
+
+    # Dominant + Secondary (within-person preferences)
+    comm_conf = res.get("commConfidence")
+    motiv_conf = res.get("motivConfidence")
+    st.markdown(
+        f"""<div class='info-card'>
+        <div style='font-size:1.05rem; font-weight:700; margin-bottom:6px;'>Your top patterns</div>
+        <div><strong>Communication:</strong> {res.get('primaryComm','')} <span style='color:var(--text-sub);'>(Secondary: {res.get('secondaryComm','')})</span>{(' <span style="color:var(--text-sub);">· ' + comm_conf + ' clarity</span>') if comm_conf else ''}</div>
+        <div style='margin-top:4px;'><strong>Motivation:</strong> {res.get('primaryMotiv','')} <span style='color:var(--text-sub);'>(Secondary: {res.get('secondaryMotiv','')})</span>{(' <span style="color:var(--text-sub);">· ' + motiv_conf + ' clarity</span>') if motiv_conf else ''}</div>
+        <div style='margin-top:8px; color:var(--text-sub); font-size:0.9rem;'>
+            These results reflect <em>relative</em> preferences within you (not a comparison to other people).
+        </div>
+        </div>""",
+        unsafe_allow_html=True
+    )
     
     comm_prof = COMM_PROFILES[res['primaryComm']]
     mot_prof = MOTIVATION_PROFILES[res['primaryMotiv']]
