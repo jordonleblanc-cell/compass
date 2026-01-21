@@ -2377,6 +2377,182 @@ def get_leadership_mechanics(comm, motiv):
     return mech
 
 # 5c. INTEGRATED PROFILES (Expanded & 10 Coaching Questions Logic)
+# --- Celebration Teaching Builder (Profile-Integrated) ---
+def _praise_language_by_comm(comm_style: str):
+    """Return quick praise templates based on how this person best receives feedback."""
+    comm_style = (comm_style or "").strip()
+    return {
+        "Director": {
+            "tone": "direct + specific + outcome-focused",
+            "openers": [
+                "Good call on {behavior}. That protected {outcome}.",
+                "I appreciate how you {behavior}. It moved us toward {outcome}.",
+            ],
+            "closers": [
+                "Keep doing that—it's a leadership move.",
+                "Do that again next shift; it raises the standard."
+            ],
+            "avoid": "Overly long praise, vague compliments, or emotional over-explaining."
+        },
+        "Encourager": {
+            "tone": "warm + relational + impact-on-people",
+            "openers": [
+                "I saw how you {behavior}. That helped {who} feel {emotion}.",
+                "Thank you for bringing {behavior}—it changed the energy in the unit."
+            ],
+            "closers": [
+                "I'm glad you're on this team.",
+                "That matters more than you know."
+            ],
+            "avoid": "Praise that feels transactional or only about metrics."
+        },
+        "Facilitator": {
+            "tone": "calm + reflective + process-aware",
+            "openers": [
+                "I noticed you {behavior}. That created space for {outcome}.",
+                "You slowed things down in the right way when you {behavior}."
+            ],
+            "closers": [
+                "That's the kind of steady leadership that prevents escalation.",
+                "Keep modeling that—others learn from it."
+            ],
+            "avoid": "Overhyping or putting them on the spot publicly."
+        },
+        "Tracker": {
+            "tone": "precise + integrity + safety/continuity",
+            "openers": [
+                "Great job on {behavior}. That reduced risk and kept us in compliance.",
+                "I appreciate the way you {behavior}—it protected continuity for the youth."
+            ],
+            "closers": [
+                "That level of precision builds trust.",
+                "Keep that up; it's what keeps the unit safe."
+            ],
+            "avoid": "Vague praise like 'good job' with no specifics."
+        }
+    }.get(comm_style, {
+        "tone": "specific + sincere",
+        "openers": ["I noticed you {behavior}. That helped {outcome}."],
+        "closers": ["Keep it up."],
+        "avoid": "Vagueness."
+    })
+
+def build_celebration_teaching(p_comm: str, p_mot: str, celebrate_bullets):
+    """Create 3 'celebrate' cards with teaching tailored to motivation + how they hear praise."""
+    p_mot = (p_mot or "").strip()
+    celebrate_bullets = celebrate_bullets or []
+
+    # Provide stable defaults when the dictionary doesn't specify bullets yet.
+    defaults = {
+        "Growth": [
+            "Skill-building momentum (they got better at something real).",
+            "Healthy risk-taking in leadership (stretch without recklessness).",
+            "Reflection after a hard moment (they learned, not just survived).",
+        ],
+        "Purpose": [
+            "Values-aligned judgment calls (dignity + safety together).",
+            "Advocacy that improves youth outcomes (not just opinions).",
+            "Consistency under pressure (they held the line for what's right).",
+        ],
+        "Connection": [
+            "Repair and relational leadership (they restored trust).",
+            "Team climate protection (they lowered tension and kept people engaged).",
+            "Presence in hard moments (they stayed with youth/staff instead of checking out).",
+        ],
+        "Achievement": [
+            "Clear outcomes delivered (they finished what mattered).",
+            "Reliable follow-through (they closed loops).",
+            "Measurable improvement (documentation, routines, ratios, safety checks).",
+        ],
+    }
+    if not celebrate_bullets:
+        celebrate_bullets = defaults.get(p_mot, defaults.get("Achievement"))
+
+    praise = _praise_language_by_comm(p_comm)
+
+    sample_template = praise.get("openers", ["I noticed you <behavior>. That helped <outcome>."])[0]
+    sample_script = (str(sample_template)
+        .replace("{behavior}", "<behavior>")
+        .replace("{outcome}", "<outcome>")
+        .replace("{who}", "<who>")
+        .replace("{emotion}", "<emotion>")
+    )
+
+    # Motivation-specific WHY + WHAT TO LOOK FOR anchors
+    mot_frames = {
+        "Growth": {
+            "why": "Celebrating growth tells them: 'effort + learning is the path to trust here.' It increases coachability and reduces shame after mistakes.",
+            "look_for": [
+                "They ask for feedback or clarification instead of hiding.",
+                "They try a new skill (de-escalation tool, documentation habit, coaching script).",
+                "They reflect: 'Next time I'd…' without spiraling into self-criticism."
+            ],
+            "avoid": "Only celebrating talent or speed. Praise the learning loop, not just the outcome."
+        },
+        "Purpose": {
+            "why": "Celebrating purpose keeps them engaged when the work is messy. It anchors decision-making in dignity + safety and prevents cynical burnout.",
+            "look_for": [
+                "They connect a policy decision to youth safety/clinical continuity.",
+                "They advocate with solutions (not just objections).",
+                "They hold boundaries compassionately."
+            ],
+            "avoid": "Shaming them for caring 'too much' or dismissing values talk as 'extra'."
+        },
+        "Connection": {
+            "why": "Celebrating connection builds loyalty and stability. It reduces staff conflict, increases retention, and keeps the unit emotionally regulated.",
+            "look_for": [
+                "They repair after tension (apology, reset, reconnect).",
+                "They notice someone struggling and respond with support + structure.",
+                "They stabilize the room (tone, pacing, teamwork)."
+            ],
+            "avoid": "Praising only crisis-hero moments. Celebrate steady relationship maintenance too."
+        },
+        "Achievement": {
+            "why": "Celebrating achievement reduces chaos because it reinforces clarity, follow-through, and visible standards. It prevents burnout caused by 'never knowing if I'm winning.'",
+            "look_for": [
+                "They define success and hit it (ratios, routines, documentation).",
+                "They close the loop (handoff notes, follow-ups, audit fixes).",
+                "They make progress visible (simple tracking, checklists, dashboards)."
+            ],
+            "avoid": "Moving the goalposts after they succeed or praising only huge wins."
+        }
+    }
+    frame = mot_frames.get(p_mot, mot_frames["Achievement"])
+
+    # Build 3 teaching cards aligned to the 3 bullets.
+    cards = []
+    for b in celebrate_bullets[:3]:
+        title = str(b).replace("**", "").strip()
+        cards.append({
+            "title": title,
+            "what_to_look_for": frame["look_for"],
+            "why_it_matters": frame["why"],
+            "how_to_celebrate": [
+                f"**Tone:** {praise['tone']}",
+                f"**Try:** “{sample_script}”",
+                f"**Close:** “{praise['closers'][0]}”",
+                "Praise it within 24 hours when possible (the brain links cause/effect).",
+                "Be concrete: name the behavior, the impact, and the standard it reinforces."
+            ],
+            "avoid": f"{praise['avoid']} Also: {frame['avoid']}",
+        })
+
+    # Ensure exactly 3 cards for layout stability.
+    while len(cards) < 3:
+        cards.append({
+            "title": "Consistent progress under pressure",
+            "what_to_look_for": frame["look_for"],
+            "why_it_matters": frame["why"],
+            "how_to_celebrate": [
+                f"**Tone:** {praise['tone']}",
+                "Name the specific behavior you want repeated next shift.",
+                "Connect it to youth safety, team stability, or continuity."
+            ],
+            "avoid": f"{praise['avoid']} Also: {frame['avoid']}",
+        })
+
+    return cards
+
 def generate_profile_content(comm, motiv):
     combo_key = f"{comm}-{motiv}"
     c_data = COMM_PROFILES.get(comm, {})
@@ -2419,6 +2595,8 @@ def generate_profile_content(comm, motiv):
         "s9_b": i_data.get('interventions', []),
         "s10_b": m_data.get('celebrate_bullets'),
         "s10_deep": m_data.get('celebrate_deep_dive', ''),
+        "comm_language": m_data.get('celebrate_deep_dive', ''),
+        "s10_teach": build_celebration_teaching(comm, motiv, m_data.get('celebrate_bullets')),
         "coaching": i_data.get('questions', []),
         "advancement": i_data.get('advancement', ''),
         "cheat_do": c_data.get('supervising_bullets'),
@@ -2509,7 +2687,11 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         pdf.ln(4)
 
     # Sections 1-10
-    add_section(f"1. Communication Profile: {p_comm}", None, data['s1_b']) 
+    add_section(f"1. Communication Profile: {p_comm}", None, data['s1_b'])
+    # Moved from Section 10 (online): helps supervisors tailor direction/feedback to this communication style
+    if data.get("comm_language"):
+        add_section("1A. How to Speak Their Language", data["comm_language"])
+ 
     add_section("2. Supervising Their Communication", None, data['s2_b'])
     add_section(f"3. Motivation Profile: {p_mot}", None, data['s3_b'])
     add_section("4. Motivating This Staff Member", None, data['s4_b'])
@@ -2518,7 +2700,23 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     add_section("7. What They Look Like When Thriving", data['s7'])
     add_section("8. What They Look Like When Struggling", data['s8'])
     add_section("9. Individual Professional Development Plan (IPDP)", None, data['s9_b'])
-    add_section("10. What You Should Celebrate", None, data['s10_b'])
+    # Build an expanded celebration section (bullets + teaching) for the PDF
+    celebrate_pdf = []
+    for card in (data.get("s10_teach") or [])[:3]:
+        title = card.get("title", "Celebrate This")
+        celebrate_pdf.append(f"**Celebrate:** {title}")
+        for w in card.get("what_to_look_for", [])[:4]:
+            celebrate_pdf.append(f"  - Look for: {w}")
+        if card.get("why_it_matters"):
+            celebrate_pdf.append(f"  - Why it matters: {card.get('why_it_matters')}")
+        for h in card.get("how_to_celebrate", [])[:4]:
+            celebrate_pdf.append(f"  - How: {h}")
+        if card.get("avoid"):
+            celebrate_pdf.append(f"  - Avoid: {card.get('avoid')}")
+        celebrate_pdf.append("")  # spacer
+
+    add_section("10. What You Should Celebrate", None, celebrate_pdf if celebrate_pdf else data['s10_b'])
+
 
     # 11. Coaching Questions
     pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
@@ -2692,6 +2890,13 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     with c1:
         st.subheader(f"1. Communication: {p_comm}")
         show_list(data['s1_b'])
+
+        # Moved here from Section 10: teaches the supervisor how this person best receives direction/feedback
+        if data.get("comm_language"):
+            with st.container(border=True):
+                st.markdown("### 💬 How to Speak Their Language")
+                st.markdown(data["comm_language"])
+
         st.markdown("<br>", unsafe_allow_html=True)
         st.subheader("2. Supervising Strategies")
         show_list(data['s2_b'])
@@ -3544,22 +3749,40 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
 # --- SECTION 10: CELEBRATION (TROPHY CASE) ---
     st.subheader("10. What To Celebrate")
-    
-    # 1. Primary Bullets
+    st.caption("Use celebration as a *training tool*: you are reinforcing the behaviors you want repeated under pressure.")
+
+    # 1) Three quick trophies (headline-only)
     cel_cols = st.columns(3)
-    if data['s10_b']:
-        for i, item in enumerate(data['s10_b']):
-            clean_item = item.replace("**", "")
+    bullets = data.get('s10_b') or []
+    if bullets:
+        for i, item in enumerate(bullets[:3]):
+            clean_item = str(item).replace("**", "")
             with cel_cols[i % 3]:
                 st.markdown(f"🏆 **{clean_item}**")
-    
-    st.markdown("")
-    
-    # 2. Deep Dive Box
-    with st.container(border=True):
-        st.markdown(f"### 💬 How to Speak Their Language")
-        st.markdown(data['s10_deep'])
+    else:
+        st.info("No celebration bullets configured for this profile yet.")
 
+    st.markdown("")
+
+    # 2) Teaching for each trophy (collapsible)
+    teach_cards = data.get("s10_teach") or []
+    for card in teach_cards[:3]:
+        title = card.get("title", "Celebrate This")
+        with st.expander(f"🏅 Celebrate: {title}", expanded=False):
+            tc1, tc2 = st.columns([1, 1])
+            with tc1:
+                st.markdown("#### 🔎 What to look for (in real life)")
+                for w in card.get("what_to_look_for", []):
+                    st.write(f"- {w}")
+                st.markdown("#### 🧠 Why this matters")
+                st.markdown(card.get("why_it_matters", ""))
+
+            with tc2:
+                st.markdown("#### 🎉 How to celebrate it (scripts + method)")
+                for h in card.get("how_to_celebrate", []):
+                    st.write(f"- {h}")
+                st.markdown("#### 🚫 What to avoid")
+                st.warning(card.get("avoid", "Avoid vague praise."))
 
     st.divider()
 
