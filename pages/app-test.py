@@ -12,6 +12,7 @@ import streamlit.components.v1 as components  # Required for scrolling
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import re
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
