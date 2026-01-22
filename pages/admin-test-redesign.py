@@ -7,28 +7,27 @@ from pathlib import Path
 import importlib.util
 
 # =========================
-# DYNAMIC IMPORT: load your existing file even if it has hyphens
+# DYNAMIC IMPORT: compass/pages/admin_test_alt.py
 # =========================
 def load_core_module():
     """
-    Loads your existing app file from the repo root:
-      - admin-test-alt.py   (GitHub filename you mentioned)
+    Loads your existing core app file located at:
+      compass/pages/admin_test_alt.py
     into a module called `core`.
     """
-    repo_root = Path(__file__).resolve().parents[1]  # pages/ -> repo root
-
+    # This file is also in compass/pages/, so:
+    pages_dir = Path(__file__).resolve().parent  # .../compass/pages
     candidate_paths = [
-        repo_root / "admin-test-alt.py",
-        repo_root / "admin-test-alt (1).py",
-        repo_root / "admin_test_alt.py",
+        pages_dir / "admin_test_alt.py",
+        pages_dir / "admin-test-alt.py",
+        pages_dir / "admin-test-alt (1).py",
     ]
 
     core_path = next((p for p in candidate_paths if p.exists()), None)
     if core_path is None:
         st.error(
-            "Could not find your existing app file in the repo root.\n\n"
-            "Tried:\n"
-            + "\n".join([f"- {p}" for p in candidate_paths])
+            "Could not find your existing core file in compass/pages.\n\n"
+            "Tried:\n" + "\n".join([f"- {p}" for p in candidate_paths])
         )
         st.stop()
 
@@ -205,7 +204,6 @@ def fetch_staff_df() -> pd.DataFrame:
     df_raw = pd.DataFrame(raw)
     return normalize_staff_df(df_raw)
 
-
 # =========================
 # AUTH STATE
 # =========================
@@ -371,7 +369,7 @@ with st.sidebar:
 df = get_filtered_dataframe()
 
 # =========================
-# PROFILE HELPERS (reuse your full dictionaries)
+# PROFILE HELPERS
 # =========================
 def render_bullets(title: str, bullets: list[str]):
     if bullets:
@@ -387,7 +385,6 @@ def motiv_profile(trait: str):
 
 def integrated_profile(key: str):
     return core.INTEGRATED_PROFILES.get(key, {}) if hasattr(core, "INTEGRATED_PROFILES") else {}
-
 
 # =========================
 # DASHBOARD
@@ -423,7 +420,6 @@ if view == "Dashboard":
         st.info("No staff records found for your access scope.")
     else:
         st.dataframe(df[preview_cols].head(15), use_container_width=True)
-
 
 # =========================
 # TEAM PROFILES
@@ -551,7 +547,6 @@ elif view == "Team Profiles":
             st.markdown("</div>", unsafe_allow_html=True)
             st.write("")
 
-
 # =========================
 # INSIGHTS
 # =========================
@@ -570,7 +565,6 @@ elif view == "Insights":
                 fig2 = px.histogram(df, x="primarymotiv", title="Primary Motivations")
                 st.plotly_chart(fig2, use_container_width=True)
 
-
 # =========================
 # COACHING PLAYBOOK
 # =========================
@@ -579,7 +573,6 @@ elif view == "Coaching":
     st.markdown("Use this when you want the framework without opening staff cards.")
 
     col1, col2 = st.columns(2)
-
     with col1:
         st.markdown("### Communication styles")
         comm_trait = st.selectbox("Choose a communication trait", sorted(list(core.COMM_PROFILES.keys())))
@@ -605,9 +598,8 @@ elif view == "Coaching":
                 st.markdown(deep)
         st.markdown("</div>", unsafe_allow_html=True)
 
-
 # =========================
-# REPORTS (hooks)
+# REPORTS
 # =========================
 elif view == "Reports":
     st.markdown("## Reports & Exports")
