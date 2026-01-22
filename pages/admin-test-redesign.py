@@ -3508,10 +3508,38 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             st.markdown(f"**3. Trust Builder:** {mech['trust']}")
 
         with i2:
-            st.markdown("**🧭 Leadership Signature**")
-            fig_sig = create_leadership_signature_radar(p_comm, p_mot)
-            st.plotly_chart(fig_sig, width="stretch", config={'displayModeBar': False})
-            st.caption("This signature translates their integrated profile into four dimensions: People, Task, Change, and Stability.")
+            st.markdown("**🧭 Leadership Operating Profile**")
+            integrated_key = f"{p_comm}-{p_mot}"
+            integrated = INTEGRATED_PROFILES.get(integrated_key, {})
+            title = integrated.get("title", "").strip()
+            synergy = integrated.get("synergy", "").strip()
+            support = integrated.get("support", "").strip()
+            thriving = integrated.get("thriving", "").strip()
+            struggling = integrated.get("struggling", "").strip()
+
+            def _split_paras(s: str):
+                return [p.strip() for p in re.split(r"\n\s*\n", s) if p and p.strip()]
+
+            with st.container(border=True):
+                if title:
+                    st.markdown(f"### {title}")
+                if synergy:
+                    st.info(synergy)
+
+                cols_op = st.columns(2)
+                with cols_op[0]:
+                    st.markdown("#### ✅ At their best")
+                    for p in _split_paras(thriving):
+                        st.markdown(f"- {p}")
+                with cols_op[1]:
+                    st.markdown("#### ⚠️ Under strain")
+                    for p in _split_paras(struggling):
+                        st.markdown(f"- {p}")
+
+                if support:
+                    st.divider()
+                    st.markdown("#### 🛠️ Support levers")
+                    st.markdown(support)
     
     # --- SECTION 6: THE SUPERVISOR'S HUD (REWORKED) ---    render_section_heading(6, "Supervisor's HUD", "The Supervisor's HUD (Heads-Up Display)", "sec6")
     st.caption("A real-time dashboard for maintaining this staff member's engagement and preventing burnout. Use it as an early-warning system—not a report card.")
