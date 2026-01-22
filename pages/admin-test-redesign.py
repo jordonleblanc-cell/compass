@@ -1,36 +1,34 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import requests
 import json
 import re
 from pathlib import Path
 import importlib.util
 
 # =========================
-# DYNAMIC IMPORT: admin-test-alt.py
+# DYNAMIC IMPORT: load your existing file even if it has hyphens
 # =========================
 def load_core_module():
     """
-    Loads your existing app code (admin-test-alt.py) as a module named `core`,
-    even though the filename contains a hyphen.
+    Loads your existing app file from the repo root:
+      - admin-test-alt.py   (GitHub filename you mentioned)
+    into a module called `core`.
     """
     repo_root = Path(__file__).resolve().parents[1]  # pages/ -> repo root
+
     candidate_paths = [
         repo_root / "admin-test-alt.py",
-        repo_root / admin_test_alt.py",
+        repo_root / "admin-test-alt (1).py",
+        repo_root / "admin_test_alt.py",
     ]
 
-    core_path = None
-    for p in candidate_paths:
-        if p.exists():
-            core_path = p
-            break
-
+    core_path = next((p for p in candidate_paths if p.exists()), None)
     if core_path is None:
         st.error(
-            "Could not find your existing file in the repo root.\n\n"
-            f"Tried:\n- {candidate_paths[0]}\n- {candidate_paths[1]}"
+            "Could not find your existing app file in the repo root.\n\n"
+            "Tried:\n"
+            + "\n".join([f"- {p}" for p in candidate_paths])
         )
         st.stop()
 
@@ -136,23 +134,6 @@ st.markdown("""
         margin-bottom: 8px;
     }
 
-    .action-grid button {
-        height: 112px !important;
-        border-radius: 18px !important;
-        border: 1px solid var(--border) !important;
-        background: #fff !important;
-        text-align: left !important;
-        padding: 16px 16px !important;
-        box-shadow: var(--shadow) !important;
-        transition: 0.15s ease-in-out;
-    }
-    .action-grid button:hover{
-        transform: translateY(-2px);
-        border-color: var(--primary) !important;
-        box-shadow: var(--shadow2) !important;
-        color: var(--primary) !important;
-    }
-
     [data-testid="stExpander"] {
         border-radius: 14px;
         border: 1px solid var(--border);
@@ -163,7 +144,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================
-# DATA NORMALIZATION (fixes your KeyError safely)
+# DATA NORMALIZATION
 # =========================
 def normalize_staff_df(df: pd.DataFrame) -> pd.DataFrame:
     if df is None or df.empty:
@@ -189,7 +170,6 @@ def normalize_staff_df(df: pd.DataFrame) -> pd.DataFrame:
         df = df.drop(columns=["scores"]).reset_index(drop=True)
         df = pd.concat([df, scores_df.reset_index(drop=True)], axis=1)
 
-    # Alias mapping (covers common variants)
     aliases = {
         "primarycomm": ["primarycomm", "primary_comm", "p_comm", "primarycommstyle", "primarycommunication"],
         "secondarycomm": ["secondarycomm", "secondary_comm", "s_comm", "secondarycommstyle", "secondarycommunication"],
@@ -227,7 +207,7 @@ def fetch_staff_df() -> pd.DataFrame:
 
 
 # =========================
-# AUTH STATE (same shape as your original)
+# AUTH STATE
 # =========================
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
@@ -274,7 +254,6 @@ def check_password():
         if input_pw == MASTER_PW:
             authorized = True
         else:
-            # Individual pw by last name key
             try:
                 last_name = selected_user.strip().split()[-1]
                 individual_pw = st.secrets.get(f"{last_name}_password")
@@ -373,7 +352,7 @@ if not st.session_state.authenticated:
 
 
 # =========================
-# SIDEBAR + NAV
+# SIDEBAR NAV
 # =========================
 with st.sidebar:
     st.markdown("### Session")
