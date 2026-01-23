@@ -2698,23 +2698,67 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf.ln(5)
 
     def add_section(title, body, bullets=None):
-        pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
-        pdf.cell(0, 8, title, ln=True, fill=True); pdf.ln(2)
-        pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
-        
+        # Section header
+        pdf.set_font("Arial", 'B', 12)
+        pdf.set_text_color(*blue)
+        pdf.set_fill_color(240, 245, 250)
+        pdf.cell(0, 8, clean_text(str(title)), ln=True, fill=True)
+        pdf.ln(2)
+
+        def write_labeled_block(text, line_height=5):
+            """If text starts with 'Label: rest', render Label in bold for scanability."""
+            if not text:
+                return
+            t = str(text).strip()
+            t = t.replace("**", "")
+            m = re.match(r"^([A-Za-z][A-Za-z /&\-]{0,30}):\s*(.+)$", t)
+            if m:
+                label, rest = m.group(1).strip(), m.group(2).strip()
+                pdf.set_font("Arial", 'B', 11)
+                pdf.set_text_color(*black)
+                pdf.multi_cell(0, line_height, clean_text(label + ":"))
+                pdf.set_font("Arial", '', 11)
+                pdf.multi_cell(0, line_height, clean_text(rest))
+            else:
+                pdf.set_font("Arial", '', 11)
+                pdf.set_text_color(*black)
+                pdf.multi_cell(0, line_height, clean_text(t))
+            pdf.ln(2)
+
+        # Body (supports paragraph breaks)
         if body:
-            clean_body = body.replace("**", "").replace("* ", "- ")
-            pdf.multi_cell(0, 5, clean_text(clean_body))
-        
+            clean_body = str(body).replace("* ", "- ").replace("**", "")
+            for para in [p.strip() for p in clean_body.split("\n\n") if p.strip()]:
+                write_labeled_block(para)
+
+        # Bullets
         if bullets:
             pdf.ln(1)
             for b in bullets:
+                btxt = str(b).replace("* ", "- ").strip().replace("**", "")
+                # Bullet marker
+                pdf.set_font("Arial", 'B', 11)
+                pdf.set_text_color(*black)
                 pdf.cell(5, 5, "-", 0, 0)
-                clean_b = b.replace("**", "") 
-                pdf.multi_cell(0, 5, clean_text(clean_b))
-        pdf.ln(4)
+                # Labeled bullet support
+                m = re.match(r"^([A-Za-z][A-Za-z /&\-]{0,30}):\s*(.+)$", btxt)
+                if m:
+                    label, rest = m.group(1).strip(), m.group(2).strip()
+                    pdf.set_font("Arial", 'B', 11)
+                    pdf.multi_cell(0, 5, clean_text(label + ":"))
+                    pdf.set_font("Arial", '', 11)
+                    pdf.multi_cell(0, 5, clean_text(rest))
+                else:
+                    pdf.set_font("Arial", '', 11)
+                    pdf.multi_cell(0, 5, clean_text(btxt))
+                pdf.ln(1)
 
-    # Sections 1-10
+        # Light divider to reduce "wall of text"
+        y = pdf.get_y()
+        pdf.set_draw_color(210, 210, 210)
+        pdf.line(10, y, 200, y)
+        pdf.ln(6)
+
     add_section(f"1. Communication Profile: {p_comm}", None, data['s1_b'])
     # Moved from Section 10 (online): helps supervisors tailor direction/feedback to this communication style
     if data.get("comm_language"):
