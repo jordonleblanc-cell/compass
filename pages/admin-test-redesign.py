@@ -1,302 +1,276 @@
-import tkinter as tk
-from tkinter import ttk, messagebox, font
-import urllib.request
 import json
-import threading
-from datetime import datetime
+from datetime import datetime, timezone
 
-# --- Configuration ---
+import pandas as pd
+import requests
+import streamlit as st
+
 DATA_URL = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
 
-class SupervisorApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Supervisor Profile Dashboard")
-        self.root.geometry("900x700")
-        self.root.configure(bg="#f0f2f5")
+# --- Lightweight interpretation dictionaries (edit to match your internal language) ---
+COMM_DESC = {
+    "Director": {
+        "summary": "Direct, decisive, action-oriented.",
+        "best_with": [
+            "Lead with the point first (what you need, by when).",
+            "Offer options, then recommend one.",
+            "Keep meetings focused; clarify ownership."
+        ],
+        "watch_for": ["Can sound blunt under stress.", "May move faster than others are ready for."]
+    },
+    "Tracker": {
+        "summary": "Detail-oriented, process-driven, consistent.",
+        "best_with": [
+            "Provide steps, expectations, and definitions of “done.”",
+            "Use checklists and timelines.",
+            "Confirm constraints (policy, compliance, safety)."
+        ],
+        "watch_for": ["May get stuck in details when urgency is high.", "Can feel frustrated by ambiguity."]
+    },
+    "Encourager": {
+        "summary": "Relational, supportive, morale-building.",
+        "best_with": [
+            "Start with people impact and appreciation.",
+            "Invite input and collaboration.",
+            "Address conflict gently but clearly."
+        ],
+        "watch_for": ["May avoid hard conversations too long.", "Can feel drained by constant negativity."]
+    },
+    "Facilitator": {
+        "summary": "Collaborative, consensus-seeking, thoughtful.",
+        "best_with": [
+            "Bring them in early to shape plans.",
+            "Ask for perspectives and tradeoffs.",
+            "Summarize decisions and next steps to avoid drift."
+        ],
+        "watch_for": ["Can slow decisions if alignment isn’t clear.", "May over-consult when time is tight."]
+    },
+}
 
-        # Styles
-        self.style = ttk.Style()
-        self.style.theme_use('clam')
-        self.configure_styles()
+MOT_DESC = {
+    "Connection": {
+        "summary": "Motivated by belonging, relationships, and being part of a team.",
+        "fuel": ["Team cohesion", "1:1 check-ins", "Shared wins", "Feeling seen and supported"],
+        "deplete": ["Isolation", "Cold/transactional leadership", "Unresolved interpersonal conflict"]
+    },
+    "Achievement": {
+        "summary": "Motivated by goals, progress, and measurable results.",
+        "fuel": ["Clear targets", "Dashboards/metrics", "Fast feedback loops", "Recognition for wins"],
+        "deplete": ["Vague priorities", "No closure", "Repeated fire drills without progress"]
+    },
+    "Purpose": {
+        "summary": "Motivated by meaning, mission, and impact.",
+        "fuel": ["Connecting tasks to resident outcomes", "Values clarity", "Story-based impact sharing"],
+        "deplete": ["Busywork", "Misalignment with mission", "Feeling like quality doesn’t matter"]
+    },
+    "Growth": {
+        "summary": "Motivated by learning, mastery, and development.",
+        "fuel": ["Coaching", "New challenges", "Training", "Constructive feedback"],
+        "deplete": ["Stagnation", "No pathway to improve", "Only being used for output"]
+    },
+}
 
-        # Data Store
-        self.raw_data = {}
-        
-        # UI Setup
-        self.create_header()
-        self.create_main_container()
-        self.create_status_bar()
+def burnout_label(value: float | None) -> str:
+    if value is None:
+        return "Not provided"
+    if value <= 1.5:
+        return "Low"
+    if value <= 3.0:
+        return "Moderate"
+    if value <= 4.0:
+        return "High"
+    return "Very High"
 
-        # Load Data immediately
-        self.load_data()
+def burnout_guidance(value: float | None) -> list[str]:
+    if value is None:
+        return ["Consider adding a burnout rating (1–5) for better insights."]
+    if value <= 1.5:
+        return ["Keep routines that are working.", "Protect time for recovery to prevent creep."]
+    if value <= 3.0:
+        return ["Add 1–2 boundary protections this week.", "Clarify top priorities; reduce ‘maybe’ tasks."]
+    if value <= 4.0:
+        return ["Reduce load or redistribute where possible.", "Increase support (coverage, coaching, check-ins)."]
+    return [
+        "Treat as urgent: reduce load immediately if possible.",
+        "Escalate support needs and coverage plans.",
+        "Prioritize rest, safety, and sustainability."
+    ]
 
-    def configure_styles(self):
-        # Color Palette
-        self.colors = {
-            "primary": "#1a73e8",   # Google Blue
-            "secondary": "#5f6368", # Grey
-            "success": "#1e8e3e",   # Green
-            "warning": "#f9ab00",   # Yellow
-            "danger": "#d93025",    # Red
-            "bg": "#f0f2f5",
-            "card": "#ffffff"
-        }
-        
-        # Configure Ttk Styles
-        self.style.configure("Card.TFrame", background=self.colors["card"], relief="flat", borderwidth=0)
-        self.style.configure("Header.TLabel", background=self.colors["primary"], foreground="white", font=("Helvetica", 16, "bold"))
-        self.style.configure("Subheader.TLabel", background=self.colors["card"], foreground=self.colors["secondary"], font=("Helvetica", 12))
-        self.style.configure("Metric.TLabel", background=self.colors["card"], foreground="#202124", font=("Helvetica", 24, "bold"))
-        self.style.configure("MetricTitle.TLabel", background=self.colors["card"], foreground=self.colors["secondary"], font=("Helvetica", 10))
-        
-        # Progress Bar
-        self.style.configure("Green.Horizontal.TProgressbar", background=self.colors["success"])
-        self.style.configure("Yellow.Horizontal.TProgressbar", background=self.colors["warning"])
-        self.style.configure("Red.Horizontal.TProgressbar", background=self.colors["danger"])
+@st.cache_data(ttl=60)
+def fetch_data(url: str) -> pd.DataFrame:
+    r = requests.get(url, timeout=20)
+    r.raise_for_status()
+    data = r.json()
+    df = pd.DataFrame(data)
 
-    def create_header(self):
-        header_frame = tk.Frame(self.root, bg=self.colors["primary"], height=60)
-        header_frame.pack(fill="x", side="top")
-        header_frame.pack_propagate(False)
+    # Normalize columns that might vary
+    for col in ["cottage", "burnout"]:
+        if col in df.columns:
+            df[col] = df[col].replace("", pd.NA)
 
-        title = tk.Label(header_frame, text="Supervisor Performance Analytics", 
-                         bg=self.colors["primary"], fg="white", 
-                         font=("Segoe UI", 18, "bold"))
-        title.pack(side="left", padx=20, pady=10)
+    # Parse timestamps
+    if "timestamp" in df.columns:
+        df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce", utc=True)
 
-        refresh_btn = tk.Button(header_frame, text="↻ Refresh Data", 
-                                bg="#1557b0", fg="white", relief="flat",
-                                command=self.load_data, font=("Segoe UI", 10))
-        refresh_btn.pack(side="right", padx=20, pady=10)
+    # Burnout numeric
+    if "burnout" in df.columns:
+        df["burnout_num"] = pd.to_numeric(df["burnout"], errors="coerce")
 
-    def create_main_container(self):
-        # Scrollable Main Canvas
-        self.canvas = tk.Canvas(self.root, bg=self.colors["bg"], highlightthickness=0)
-        self.scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=self.canvas.yview)
-        self.scrollable_frame = ttk.Frame(self.canvas, style="Card.TFrame")
-        self.scrollable_frame.configure(style="TFrame") # Reset to transparent-ish if needed or match bg
+    # Clean cottage to string for display but keep a sortable helper
+    if "cottage" in df.columns:
+        df["cottage_str"] = df["cottage"].astype(str)
+    else:
+        df["cottage_str"] = "Unknown"
 
-        self.scrollable_frame.bind(
-            "<Configure>",
-            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-        )
+    return df
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw", width=880) # Slightly less than window width
-        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+def latest_profile_per_email(df: pd.DataFrame) -> pd.DataFrame:
+    if "email" not in df.columns:
+        return df.copy()
+    # keep latest timestamp row per email
+    d = df.copy()
+    if "timestamp" in d.columns:
+        d = d.sort_values("timestamp")
+    return d.groupby("email", as_index=False).tail(1).reset_index(drop=True)
 
-        self.canvas.pack(side="left", fill="both", expand=True, padx=0, pady=0)
-        self.scrollbar.pack(side="right", fill="y")
+def render_style_block(title: str, key: str, desc_map: dict):
+    st.subheader(title)
+    if not key or key not in desc_map:
+        st.info("No data available.")
+        return
+    info = desc_map[key]
+    st.markdown(f"**{key}** — {info['summary']}")
+    cols = st.columns(2)
+    with cols[0]:
+        st.markdown("**Works best when you:**")
+        for item in info.get("best_with", info.get("fuel", [])):
+            st.write(f"- {item}")
+    with cols[1]:
+        st.markdown("**Watch-outs:**")
+        for item in info.get("watch_for", info.get("deplete", [])):
+            st.write(f"- {item}")
 
-    def create_status_bar(self):
-        self.status_var = tk.StringVar()
-        self.status_var.set("Ready")
-        status_bar = tk.Label(self.root, textvariable=self.status_var, bd=1, relief=tk.SUNKEN, anchor="w", bg="#e0e0e0")
-        status_bar.pack(side="bottom", fill="x")
+# -------------------- UI --------------------
+st.set_page_config(page_title="Supervisor Profile Dashboard", layout="wide")
+st.title("Supervisor Profile Dashboard")
 
-    def load_data(self):
-        self.status_var.set("Fetching data from API...")
-        # Run in thread to prevent UI freezing
-        thread = threading.Thread(target=self.fetch_data_thread)
-        thread.daemon = True
-        thread.start()
+with st.sidebar:
+    st.header("Data")
+    if st.button("Refresh now"):
+        st.cache_data.clear()
 
-    def fetch_data_thread(self):
-        try:
-            req = urllib.request.Request(DATA_URL)
-            req.add_header('User-Agent', 'Python-Supervisor-App')
-            with urllib.request.urlopen(req) as response:
-                data = response.read()
-                json_data = json.loads(data)
-                self.root.after(0, lambda: self.render_dashboard(json_data))
-        except Exception as e:
-            self.root.after(0, lambda: self.show_error(f"Failed to fetch data: {str(e)}"))
+    st.caption("Source: Google Apps Script JSON endpoint")
+    st.code(DATA_URL, language="text")
 
-    def show_error(self, message):
-        self.status_var.set("Error")
-        messagebox.showerror("Connection Error", message)
+df_raw = fetch_data(DATA_URL)
 
-    def clear_dashboard(self):
-        for widget in self.scrollable_frame.winfo_children():
-            widget.destroy()
+if df_raw.empty:
+    st.error("No data returned from the endpoint.")
+    st.stop()
 
-    def render_dashboard(self, data):
-        self.clear_dashboard()
-        self.raw_data = data
-        self.status_var.set(f"Data updated: {datetime.now().strftime('%H:%M:%S')}")
+df = latest_profile_per_email(df_raw)
 
-        # --- 1. Profile Header Card ---
-        profile_frame = self.create_card(self.scrollable_frame)
-        profile_frame.pack(fill="x", padx=20, pady=(20, 10))
-        
-        # Try to find name/role fields dynamically
-        name = data.get("name") or data.get("Supervisor") or data.get("fullName") or "Unknown Supervisor"
-        role = data.get("role") or data.get("Title") or data.get("position") or "Supervisor"
-        dept = data.get("department") or data.get("Department") or "General Operations"
-        
-        tk.Label(profile_frame, text=name, bg=self.colors["card"], font=("Segoe UI", 20, "bold"), fg="#202124").pack(anchor="w", padx=20, pady=(15, 0))
-        tk.Label(profile_frame, text=f"{role} | {dept}", bg=self.colors["card"], font=("Segoe UI", 12), fg=self.colors["secondary"]).pack(anchor="w", padx=20, pady=(0, 15))
+# Make a stable selector label
+df["selector_label"] = df.apply(
+    lambda r: f"{r.get('name','Unknown')}  •  {r.get('email','(no email)')}", axis=1
+)
 
-        # --- 2. Interpretation / AI Summary ---
-        summary_frame = self.create_card(self.scrollable_frame)
-        summary_frame.pack(fill="x", padx=20, pady=10)
-        
-        tk.Label(summary_frame, text="Performance Interpretation", bg=self.colors["card"], font=("Segoe UI", 12, "bold"), fg=self.colors["primary"]).pack(anchor="w", padx=20, pady=(15, 10))
-        
-        interpretation_text = self.generate_interpretation(data)
-        interp_label = tk.Label(summary_frame, text=interpretation_text, bg=self.colors["card"], font=("Segoe UI", 11), justify="left", wraplength=800)
-        interp_label.pack(anchor="w", padx=20, pady=(0, 15))
+# Sidebar selection
+with st.sidebar:
+    st.header("Select supervisor")
+    # Optional: filter by role first
+    roles = sorted([r for r in df["role"].dropna().unique().tolist()]) if "role" in df.columns else []
+    role_filter = st.multiselect("Role filter (optional)", roles, default=[])
+    dff = df.copy()
+    if role_filter:
+        dff = dff[dff["role"].isin(role_filter)]
 
-        # --- 3. Key Metrics Grid ---
-        metrics_container = tk.Frame(self.scrollable_frame, bg=self.colors["bg"])
-        metrics_container.pack(fill="x", padx=20, pady=10)
-        
-        # Identify numeric metrics
-        metrics = self.extract_metrics(data)
-        
-        # Create a grid layout for metrics
-        row = 0
-        col = 0
-        MAX_COLS = 3
-        
-        for key, value in metrics.items():
-            self.create_metric_card(metrics_container, key, value, row, col)
-            col += 1
-            if col >= MAX_COLS:
-                col = 0
-                row += 1
+    # Fallback if filter eliminates all
+    if dff.empty:
+        st.warning("No records match that role filter. Showing all.")
+        dff = df.copy()
 
-        # --- 4. Team / Subordinate List (if available) ---
-        # Look for lists in the JSON
-        list_key = None
-        for k, v in data.items():
-            if isinstance(v, list) and len(v) > 0:
-                list_key = k
-                break
-        
-        if list_key:
-            list_frame = self.create_card(self.scrollable_frame)
-            list_frame.pack(fill="x", padx=20, pady=10)
-            
-            tk.Label(list_frame, text=f"{list_key.title()}", bg=self.colors["card"], font=("Segoe UI", 12, "bold"), fg=self.colors["primary"]).pack(anchor="w", padx=20, pady=(15, 10))
-            
-            # Simple table for list items
-            tree_columns = list(data[list_key][0].keys()) if isinstance(data[list_key][0], dict) else ["Value"]
-            tree = ttk.Treeview(list_frame, columns=tree_columns, show="headings", height=5)
-            
-            for col_name in tree_columns:
-                tree.heading(col_name, text=col_name.title())
-                tree.column(col_name, width=100)
-            
-            for item in data[list_key]:
-                if isinstance(item, dict):
-                    values = [item.get(c, "") for c in tree_columns]
-                    tree.insert("", "end", values=values)
-                else:
-                    tree.insert("", "end", values=[item])
-            
-            tree.pack(fill="x", padx=20, pady=(0, 20))
+    selected_label = st.selectbox("Profile", dff["selector_label"].tolist(), index=0)
+    selected = dff[dff["selector_label"] == selected_label].iloc[0].to_dict()
 
-        # --- 5. Raw Data Dump (Collapsible) ---
-        raw_frame = self.create_card(self.scrollable_frame)
-        raw_frame.pack(fill="x", padx=20, pady=20)
-        
-        tk.Label(raw_frame, text="Raw Database Output", bg=self.colors["card"], font=("Segoe UI", 10, "bold"), fg=self.colors["secondary"]).pack(anchor="w", padx=20, pady=(10, 5))
-        
-        raw_text = tk.Text(raw_frame, height=5, width=80, font=("Consolas", 9), relief="flat", bg="#f8f9fa")
-        raw_text.insert("1.0", json.dumps(data, indent=2))
-        raw_text.config(state="disabled")
-        raw_text.pack(padx=20, pady=(0, 20), fill="x")
+# Layout
+left, right = st.columns([1, 1])
 
-    def create_card(self, parent):
-        frame = ttk.Frame(parent, style="Card.TFrame")
-        # Add a subtle shadow or border effect simply by nesting or using padding
-        return frame
+with left:
+    st.subheader("Supervisor snapshot")
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Name", selected.get("name", "—"))
+    c2.metric("Role", selected.get("role", "—"))
+    c3.metric("Cottage", str(selected.get("cottage", selected.get("cottage_str", "—"))))
 
-    def create_metric_card(self, parent, title, value, row, col):
-        card = tk.Frame(parent, bg="white", padx=15, pady=15)
-        card.grid(row=row, column=col, padx=5, pady=5, sticky="nsew")
-        parent.grid_columnconfigure(col, weight=1)
+    burnout_val = selected.get("burnout_num", None)
+    st.markdown("### Burnout")
+    st.markdown(f"**Rating:** {'' if burnout_val is None else burnout_val}  \n**Level:** {burnout_label(burnout_val)}")
+    for tip in burnout_guidance(burnout_val):
+        st.write(f"- {tip}")
 
-        tk.Label(card, text=title.replace("_", " ").upper(), bg="white", fg="#5f6368", font=("Segoe UI", 9, "bold")).pack(anchor="w")
-        
-        # Value Display
-        val_display = str(value)
-        if isinstance(value, float):
-            val_display = f"{value:.1f}"
-        
-        tk.Label(card, text=val_display, bg="white", fg="#202124", font=("Segoe UI", 24)).pack(anchor="w", pady=(5, 10))
+    # Timestamp
+    ts = selected.get("timestamp", None)
+    if pd.notna(ts):
+        local = ts.tz_convert("America/New_York")
+        st.caption(f"Last updated: {local.strftime('%Y-%m-%d %I:%M %p %Z')}")
 
-        # Visual Indicator (Progress Bar)
-        # Normalize value to 0-100 if possible
-        normalized = 0
-        is_percentage = False
-        
-        if isinstance(value, (int, float)):
-            if value <= 1.0 and value > 0: # Likely 0.85 format
-                normalized = value * 100
-                is_percentage = True
-            elif value <= 100 and value >= 0: # Likely 85 format
-                normalized = value
-                is_percentage = True
-        
-        if is_percentage:
-            style_color = "Green.Horizontal.TProgressbar"
-            if normalized < 50: style_color = "Red.Horizontal.TProgressbar"
-            elif normalized < 75: style_color = "Yellow.Horizontal.TProgressbar"
-            
-            pb = ttk.Progressbar(card, orient="horizontal", length=100, mode="determinate", style=style_color)
-            pb['value'] = normalized
-            pb.pack(fill="x")
-            
-            # Suffix
-            suffix = "%" if normalized > 1 else "" 
-            tk.Label(card, text=f"Target: 100{suffix}", bg="white", fg="#aaa", font=("Segoe UI", 8)).pack(anchor="e", pady=(5,0))
+with right:
+    st.subheader("Profile interpretation")
+    render_style_block("Primary communication style", selected.get("p_comm", ""), COMM_DESC)
+    render_style_block("Secondary communication style", selected.get("s_comm", ""), COMM_DESC)
+    render_style_block("Primary motivator", selected.get("p_mot", ""), MOT_DESC)
+    render_style_block("Secondary motivator", selected.get("s_mot", ""), MOT_DESC)
 
-    def extract_metrics(self, data):
-        """Recursively find numeric values to display as metrics."""
-        metrics = {}
-        ignore_keys = ["id", "uid", "phone", "zip", "year"]
-        
-        for k, v in data.items():
-            if isinstance(v, (int, float)) and not isinstance(v, bool):
-                if k.lower() not in ignore_keys:
-                    metrics[k] = v
-            elif isinstance(v, dict):
-                # Flatten nested dicts slightly
-                for sub_k, sub_v in v.items():
-                    if isinstance(sub_v, (int, float)):
-                         metrics[f"{k} {sub_k}"] = sub_v
-        return metrics
+st.divider()
 
-    def generate_interpretation(self, data):
-        """Generates a text summary of the data."""
-        lines = []
-        metrics = self.extract_metrics(data)
-        
-        # Sort metrics to find highs and lows
-        highs = []
-        lows = []
-        
-        for k, v in metrics.items():
-            # Basic normalization logic
-            score = v
-            if v <= 1: score = v * 100
-            
-            if score > 80: highs.append(k)
-            if score < 60: lows.append(k)
-            
-        if highs:
-            lines.append(f"✓ Strengths: The supervisor is performing exceptionally well in {', '.join(highs)}.")
-        if lows:
-            lines.append(f"⚠ Attention Needed: Immediate improvement plans are recommended for {', '.join(lows)}.")
-            
-        if not lines:
-            lines.append("Data loaded successfully. Review the detailed metrics below.")
-            
-        return "\n".join(lines)
+# Team views
+st.header("Team / cohort view")
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = SupervisorApp(root)
-    root.mainloop()
+colA, colB, colC = st.columns(3)
+with colA:
+    same_cottage = st.checkbox("Show same cottage", value=True)
+with colB:
+    same_role = st.checkbox("Show same role", value=False)
+with colC:
+    include_history = st.checkbox("Include historical submissions (all rows)", value=False)
+
+base = df_raw if include_history else df
+
+team = base.copy()
+if same_cottage and "cottage" in base.columns:
+    team = team[team["cottage"].astype(str) == str(selected.get("cottage"))]
+if same_role and "role" in base.columns:
+    team = team[team["role"] == selected.get("role")]
+
+# Clean display columns
+display_cols = [c for c in ["timestamp","name","email","role","cottage","p_comm","s_comm","p_mot","s_mot","burnout"] if c in team.columns]
+team_disp = team[display_cols].copy()
+
+# Sort latest first if timestamp exists
+if "timestamp" in team_disp.columns:
+    team_disp = team_disp.sort_values("timestamp", ascending=False)
+
+st.dataframe(team_disp, use_container_width=True)
+
+# Simple cohort summaries
+st.subheader("Quick summaries")
+sum_cols = st.columns(3)
+
+with sum_cols[0]:
+    if "p_comm" in team.columns:
+        st.markdown("**Primary comm styles**")
+        st.write(team["p_comm"].value_counts(dropna=True))
+
+with sum_cols[1]:
+    if "p_mot" in team.columns:
+        st.markdown("**Primary motivators**")
+        st.write(team["p_mot"].value_counts(dropna=True))
+
+with sum_cols[2]:
+    if "burnout_num" in team.columns:
+        st.markdown("**Burnout (avg)**")
+        avg = team["burnout_num"].dropna().mean()
+        st.write("—" if pd.isna(avg) else round(float(avg), 2))
+
+st.caption("Tip: Edit the COMM_DESC and MOT_DESC dictionaries to match your organization’s language and coaching guidance.")
