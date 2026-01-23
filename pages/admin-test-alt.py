@@ -2698,8 +2698,32 @@ def generate_profile_content(comm, motiv):
     }
 
 def clean_text(text):
-    if not text: return ""
-    return str(text).replace('\u2018', "'").replace('\u2019', "'").encode('latin-1', 'replace').decode('latin-1')
+    """Make text safe for legacy FPDF (latin-1) output.
+    - Normalizes smart quotes/dashes/bullets
+    - Replaces unsupported chars rather than crashing
+    """
+    if text is None:
+        return ""
+    s = str(text)
+
+    # Smart quotes
+    s = s.replace("\u2018", "'").replace("\u2019", "'").replace("‘", "'").replace("’", "'")
+    s = s.replace("\u201c", '"').replace("\u201d", '"').replace("“", '"').replace("”", '"')
+
+    # Dashes
+    s = s.replace("\u2013", "-").replace("\u2014", "-").replace("–", "-").replace("—", "-")
+
+    # Bullets / middots
+    s = s.replace("•", "-").replace("·", "-").replace("‣", "-").replace("▪", "-")
+
+    # Ellipsis
+    s = s.replace("…", "...")
+
+    # Non-breaking spaces / tabs
+    s = s.replace("\u00a0", " ").replace("\xa0", " ").replace("\t", " ")
+
+    # Encode to latin-1 with replacement to avoid UnicodeEncodeError in FPDF
+    return s.encode("latin-1", "replace").decode("latin-1")
 
 def send_pdf_via_email(to_email, subject, body, pdf_bytes, filename="Guide.pdf"):
     try:
@@ -2789,23 +2813,94 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf.ln(5)
     pdf.line(10, pdf.get_y(), 200, pdf.get_y()) # Horizontal line
     pdf.ln(5)
+def _write_wrapped_mixed(label, rest, font_size=11, line_height=5):
+    """Write 'Label: rest...' with a bold label and wrapped normal text."""
+    label = clean_text(label)
+    rest = clean_text(rest)
 
-    def add_section(title, body, bullets=None):
-        pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
-        pdf.cell(0, 8, title, ln=True, fill=True); pdf.ln(2)
-        pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
-        
-        if body:
-            clean_body = body.replace("**", "").replace("* ", "- ")
-            pdf.multi_cell(0, 5, clean_text(clean_body))
-        
-        if bullets:
-            pdf.ln(1)
-            for b in bullets:
-                pdf.cell(5, 5, "-", 0, 0)
-                clean_b = b.replace("**", "") 
-                pdf.multi_cell(0, 5, clean_text(clean_b))
-        pdf.ln(4)
+    left = pdf.l_margin
+    right = pdf.w - pdf.r_margin
+
+    pdf.set_x(left)
+    pdf.set_font("Arial", "B", font_size)
+    prefix = f"{label}: "
+    prefix_w = pdf.get_string_width(prefix)
+    max_w = right - left
+
+    # If label is too wide, fall back to two lines
+    if prefix_w > max_w * 0.9:
+        pdf.multi_cell(0, line_height, clean_text(f"{label}:"))
+        pdf.set_font("Arial", "", font_size)
+        pdf.multi_cell(0, line_height, rest)
+        pdf.ln(1)
+        return
+
+    pdf.write(line_height, prefix)
+    pdf.set_font("Arial", "", font_size)
+
+    words = rest.split()
+    cur_x = pdf.get_x()
+    for w in words:
+        token = w + " "
+        token_w = pdf.get_string_width(token)
+        if (cur_x + token_w) > right:
+            pdf.ln(line_height)
+            pdf.set_x(left)
+            cur_x = pdf.get_x()
+        pdf.write(line_height, token)
+        cur_x = pdf.get_x()
+
+    pdf.ln(line_height)
+
+def _hline():
+    y = pdf.get_y()
+    pdf.set_draw_color(210, 210, 210)
+    pdf.line(10, y, 200, y)
+    pdf.ln(4)
+
+def add_section(title, body, bullets=None):
+    # Section header (mirrors the online "boxed" style)
+    pdf.set_font("Arial", "B", 12)
+    pdf.set_text_color(*blue)
+    pdf.set_fill_color(240, 245, 250)
+    pdf.cell(0, 8, clean_text(title), ln=True, fill=True)
+    pdf.ln(2)
+
+    pdf.set_font("Arial", "", 11)
+    pdf.set_text_color(*black)
+
+    # Body
+    if body:
+        clean_body = body.replace("**", "").replace("* ", "- ")
+        # Split paragraphs to avoid giant walls of text
+        for para in [p.strip() for p in clean_body.split("\n\n") if p.strip()]:
+            # If it starts with a short 'Label: ...', bold the label to improve scanning
+            if ":" in para and len(para.split(":", 1)[0]) <= 18:
+                lbl, rst = para.split(":", 1)
+                _write_wrapped_mixed(lbl.strip(), rst.strip())
+            else:
+                pdf.multi_cell(0, 5, clean_text(para))
+                pdf.ln(1)
+
+    # Bullets
+    if bullets:
+        pdf.ln(1)
+        for b in bullets:
+            raw = (b or "").replace("**", "").strip()
+            # Indent bullets slightly
+            pdf.set_x(pdf.l_margin + 2)
+            pdf.set_font("Arial", "", 11)
+            pdf.cell(3, 5, "-", 0, 0)
+            pdf.set_x(pdf.l_margin + 6)
+
+            if ":" in raw and len(raw.split(":", 1)[0]) <= 18:
+                lbl, rst = raw.split(":", 1)
+                _write_wrapped_mixed(lbl.strip(), rst.strip())
+            else:
+                pdf.multi_cell(0, 5, clean_text(raw))
+
+    pdf.ln(2)
+    _hline()
 
     # Sections 1-10
     add_section(f"1. Communication Profile: {p_comm}", None, data['s1_b'])
