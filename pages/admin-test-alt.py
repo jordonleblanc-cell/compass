@@ -2331,46 +2331,94 @@ def create_integrated_compass(comm, motiv):
     return fig
 
 def create_leadership_signature_radar(comm, motiv):
-    """A radar-style 'signature' chart so the Leadership Compass doesn't visually duplicate the Comm Style Map."""
-    # reuse same coordinate logic as the 2D compass
-    comm_map = {
-        "Director": {"x": -6, "y": 6}, "Encourager": {"x": 6, "y": 6},
-        "Facilitator": {"x": 6, "y": -6}, "Tracker": {"x": -6, "y": -6}
-    }
-    mot_map = {
-        "Achievement": {"x": -3, "y": 4}, "Growth": {"x": 2, "y": 7},
-        "Purpose": {"x": 5, "y": 3}, "Connection": {"x": 7, "y": -2}
-    }
+    """Leadership Signature (2D) — People↔Task and Stability↔Change.
 
-    c_pt = comm_map.get(comm, {"x": 0, "y": 0})
-    m_pt = mot_map.get(motiv, {"x": 0, "y": 0})
-    final_x = (c_pt["x"] + m_pt["x"]) / 2
-    final_y = (c_pt["y"] + m_pt["y"]) / 2
+    This is intentionally *not* the same as the Communication Style Map.
+    It blends:
+      - Communication = how they lead *in the room* (people vs task emphasis)
+      - Motivation    = what they optimize for over time (stability vs change)
 
-    # Convert X/Y to 4 readable dimensions (0-10)
-    max_axis = 7.0  # keeps scale consistent across mappings
-    people = min(10, max(0, final_x) / max_axis * 10)
-    task = min(10, max(0, -final_x) / max_axis * 10)
-    change = min(10, max(0, final_y) / max_axis * 10)
-    stability = min(10, max(0, -final_y) / max_axis * 10)
+    Output:
+      A quadrant chart with an integrated point + simple labels that supervisors can read quickly.
+    """
+    # X axis: People (+) vs Task (-)
+    comm_x = {
+        "Encourager": 0.9,
+        "Facilitator": 0.6,
+        "Tracker": -0.6,
+        "Director": -0.9,
+    }.get(comm, 0.0)
 
-    categories = ["People", "Task", "Change", "Stability"]
-    values = [people, task, change, stability]
+    # Y axis: Change (+) vs Stability (-)
+    motiv_y = {
+        "Growth": 0.9,
+        "Purpose": 0.5,
+        "Achievement": 0.1,
+        "Connection": -0.7,
+    }.get(motiv, 0.0)
+
+    # Scale to a readable -10..10 plane
+    x = comm_x * 10
+    y = motiv_y * 10
+
+    # Quadrant label (for hover + supervisor teaching)
+    quadrant = None
+    if x >= 0 and y >= 0:
+        quadrant = "People + Change: energize others through growth, morale, and forward motion."
+    elif x >= 0 and y < 0:
+        quadrant = "People + Stability: protect belonging, predictability, and team cohesion."
+    elif x < 0 and y >= 0:
+        quadrant = "Task + Change: drive outcomes fast; optimize systems; push improvement."
+    else:
+        quadrant = "Task + Stability: protect standards, consistency, and safe execution."
 
     fig = go.Figure()
-    fig.add_trace(go.Scatterpolar(
-        r=values + [values[0]],
-        theta=categories + [categories[0]],
-        fill='toself',
-        name="Leadership Signature"
+
+    # Background quadrants (kept very light so the dot is the star)
+    fig.add_shape(type="rect", x0=-10, x1=0, y0=0, y1=10, line=dict(width=0), fillcolor="rgba(26,115,232,0.06)")
+    fig.add_shape(type="rect", x0=0, x1=10, y0=0, y1=10, line=dict(width=0), fillcolor="rgba(15,157,88,0.06)")
+    fig.add_shape(type="rect", x0=-10, x1=0, y0=-10, y1=0, line=dict(width=0), fillcolor="rgba(95,99,104,0.06)")
+    fig.add_shape(type="rect", x0=0, x1=10, y0=-10, y1=0, line=dict(width=0), fillcolor="rgba(0,172,193,0.06)")
+
+    # Crosshairs
+    fig.add_shape(type="line", x0=-10, x1=10, y0=0, y1=0, line=dict(width=1, color="rgba(0,0,0,0.15)"))
+    fig.add_shape(type="line", x0=0, x1=0, y0=-10, y1=10, line=dict(width=1, color="rgba(0,0,0,0.15)"))
+
+    # Integrated point
+    fig.add_trace(go.Scatter(
+        x=[x], y=[y],
+        mode="markers+text",
+        text=["Signature"],
+        textposition="top center",
+        marker=dict(size=16, symbol="circle", line=dict(width=2, color="white")),
+        hovertemplate=(
+            "<b>Leadership Signature</b><br>"
+            "Communication: %{customdata[0]}<br>"
+            "Motivation: %{customdata[1]}<br>"
+            "<br><i>%{customdata[2]}</i><extra></extra>"
+        ),
+        customdata=[[comm, motiv, quadrant]],
+        showlegend=False
     ))
 
+    # Axis labels + corner callouts
+    fig.add_annotation(x=0, y=10.6, text="<b>Change / Growth</b>", showarrow=False, font=dict(size=11, color="rgba(0,0,0,0.65)"))
+    fig.add_annotation(x=0, y=-10.8, text="<b>Stability / Consistency</b>", showarrow=False, font=dict(size=11, color="rgba(0,0,0,0.65)"))
+    fig.add_annotation(x=-10.9, y=0, text="<b>Task</b>", showarrow=False, textangle=-90, font=dict(size=11, color="rgba(0,0,0,0.65)"))
+    fig.add_annotation(x=10.9, y=0, text="<b>People</b>", showarrow=False, textangle=90, font=dict(size=11, color="rgba(0,0,0,0.65)"))
+
+    # Quadrant titles (short so they don't clutter)
+    fig.add_annotation(x=-5, y=8.5, text="Task + Change", showarrow=False, font=dict(size=10, color="rgba(0,0,0,0.55)"))
+    fig.add_annotation(x=5, y=8.5, text="People + Change", showarrow=False, font=dict(size=10, color="rgba(0,0,0,0.55)"))
+    fig.add_annotation(x=-5, y=-8.5, text="Task + Stability", showarrow=False, font=dict(size=10, color="rgba(0,0,0,0.55)"))
+    fig.add_annotation(x=5, y=-8.5, text="People + Stability", showarrow=False, font=dict(size=10, color="rgba(0,0,0,0.55)"))
+
     fig.update_layout(
-        showlegend=False,
-        margin=dict(l=20, r=20, t=30, b=20),
-        polar=dict(
-            radialaxis=dict(visible=True, range=[0, 10])
-        )
+        height=260,
+        margin=dict(l=10, r=10, t=10, b=10),
+        xaxis=dict(range=[-10, 10], visible=False, fixedrange=True),
+        yaxis=dict(range=[-10, 10], visible=False, fixedrange=True),
+        plot_bgcolor="white",
     )
     return fig
 
@@ -3323,7 +3371,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             st.markdown("**🧭 Leadership Signature**")
             fig_sig = create_leadership_signature_radar(p_comm, p_mot)
             st.plotly_chart(fig_sig, width="stretch", config={'displayModeBar': False})
-            st.caption("This signature translates their integrated profile into four dimensions: People, Task, Change, and Stability.")
+            st.caption("How to read this: left = Task emphasis, right = People emphasis; bottom = Stability/consistency, top = Change/growth. This is an integrated 'how they lead + what they optimize for' snapshot—not a second Communication map.")
     
     # --- SECTION 6: THE SUPERVISOR'S HUD (REWORKED) ---    render_section_heading(6, "Supervisor's HUD", "The Supervisor's HUD (Heads-Up Display)", "sec6")
     st.caption("A real-time dashboard for maintaining this staff member's engagement and preventing burnout. Use it as an early-warning system—not a report card.")
