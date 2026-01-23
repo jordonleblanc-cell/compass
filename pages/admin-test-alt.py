@@ -2330,99 +2330,6 @@ def create_integrated_compass(comm, motiv):
     )
     return fig
 
-def create_leadership_signature_radar(comm, motiv):
-    """Leadership Signature (2D) — People↔Task and Stability↔Change.
-
-    This is intentionally *not* the same as the Communication Style Map.
-    It blends:
-      - Communication = how they lead *in the room* (people vs task emphasis)
-      - Motivation    = what they optimize for over time (stability vs change)
-
-    Output:
-      A quadrant chart with an integrated point + simple labels that supervisors can read quickly.
-    """
-    # X axis: People (+) vs Task (-)
-    comm_x = {
-        "Encourager": 0.9,
-        "Facilitator": 0.6,
-        "Tracker": -0.6,
-        "Director": -0.9,
-    }.get(comm, 0.0)
-
-    # Y axis: Change (+) vs Stability (-)
-    motiv_y = {
-        "Growth": 0.9,
-        "Purpose": 0.5,
-        "Achievement": 0.1,
-        "Connection": -0.7,
-    }.get(motiv, 0.0)
-
-    # Scale to a readable -10..10 plane
-    x = comm_x * 10
-    y = motiv_y * 10
-
-    # Quadrant label (for hover + supervisor teaching)
-    quadrant = None
-    if x >= 0 and y >= 0:
-        quadrant = "People + Change: energize others through growth, morale, and forward motion."
-    elif x >= 0 and y < 0:
-        quadrant = "People + Stability: protect belonging, predictability, and team cohesion."
-    elif x < 0 and y >= 0:
-        quadrant = "Task + Change: drive outcomes fast; optimize systems; push improvement."
-    else:
-        quadrant = "Task + Stability: protect standards, consistency, and safe execution."
-
-    fig = go.Figure()
-
-    # Background quadrants (kept very light so the dot is the star)
-    fig.add_shape(type="rect", x0=-10, x1=0, y0=0, y1=10, line=dict(width=0), fillcolor="rgba(26,115,232,0.06)")
-    fig.add_shape(type="rect", x0=0, x1=10, y0=0, y1=10, line=dict(width=0), fillcolor="rgba(15,157,88,0.06)")
-    fig.add_shape(type="rect", x0=-10, x1=0, y0=-10, y1=0, line=dict(width=0), fillcolor="rgba(95,99,104,0.06)")
-    fig.add_shape(type="rect", x0=0, x1=10, y0=-10, y1=0, line=dict(width=0), fillcolor="rgba(0,172,193,0.06)")
-
-    # Crosshairs
-    fig.add_shape(type="line", x0=-10, x1=10, y0=0, y1=0, line=dict(width=1, color="rgba(0,0,0,0.15)"))
-    fig.add_shape(type="line", x0=0, x1=0, y0=-10, y1=10, line=dict(width=1, color="rgba(0,0,0,0.15)"))
-
-    # Integrated point
-    fig.add_trace(go.Scatter(
-        x=[x], y=[y],
-        mode="markers+text",
-        text=["Signature"],
-        textposition="top center",
-        marker=dict(size=16, symbol="circle", line=dict(width=2, color="white")),
-        hovertemplate=(
-            "<b>Leadership Signature</b><br>"
-            "Communication: %{customdata[0]}<br>"
-            "Motivation: %{customdata[1]}<br>"
-            "<br><i>%{customdata[2]}</i><extra></extra>"
-        ),
-        customdata=[[comm, motiv, quadrant]],
-        showlegend=False
-    ))
-
-    # Axis labels + corner callouts
-    fig.add_annotation(x=0, y=10.6, text="<b>Change / Growth</b>", showarrow=False, font=dict(size=11, color="rgba(0,0,0,0.65)"))
-    fig.add_annotation(x=0, y=-10.8, text="<b>Stability / Consistency</b>", showarrow=False, font=dict(size=11, color="rgba(0,0,0,0.65)"))
-    fig.add_annotation(x=-10.9, y=0, text="<b>Task</b>", showarrow=False, textangle=-90, font=dict(size=11, color="rgba(0,0,0,0.65)"))
-    fig.add_annotation(x=10.9, y=0, text="<b>People</b>", showarrow=False, textangle=90, font=dict(size=11, color="rgba(0,0,0,0.65)"))
-
-    # Quadrant titles (short so they don't clutter)
-    fig.add_annotation(x=-5, y=8.5, text="Task + Change", showarrow=False, font=dict(size=10, color="rgba(0,0,0,0.55)"))
-    fig.add_annotation(x=5, y=8.5, text="People + Change", showarrow=False, font=dict(size=10, color="rgba(0,0,0,0.55)"))
-    fig.add_annotation(x=-5, y=-8.5, text="Task + Stability", showarrow=False, font=dict(size=10, color="rgba(0,0,0,0.55)"))
-    fig.add_annotation(x=5, y=-8.5, text="People + Stability", showarrow=False, font=dict(size=10, color="rgba(0,0,0,0.55)"))
-
-    fig.update_layout(
-        height=260,
-        margin=dict(l=10, r=10, t=10, b=10),
-        xaxis=dict(range=[-10, 10], visible=False, fixedrange=True),
-        yaxis=dict(range=[-10, 10], visible=False, fixedrange=True),
-        plot_bgcolor="white",
-    )
-    return fig
-
-
 # --- LOGIC HELPER FOR SECTION 5 EXPANSION ---
 def get_leadership_mechanics(comm, motiv):
     """
@@ -2698,32 +2605,8 @@ def generate_profile_content(comm, motiv):
     }
 
 def clean_text(text):
-    """Make text safe for legacy FPDF (latin-1) output.
-    - Normalizes smart quotes/dashes/bullets
-    - Replaces unsupported chars rather than crashing
-    """
-    if text is None:
-        return ""
-    s = str(text)
-
-    # Smart quotes
-    s = s.replace("\u2018", "'").replace("\u2019", "'").replace("‘", "'").replace("’", "'")
-    s = s.replace("\u201c", '"').replace("\u201d", '"').replace("“", '"').replace("”", '"')
-
-    # Dashes
-    s = s.replace("\u2013", "-").replace("\u2014", "-").replace("–", "-").replace("—", "-")
-
-    # Bullets / middots
-    s = s.replace("•", "-").replace("·", "-").replace("‣", "-").replace("▪", "-")
-
-    # Ellipsis
-    s = s.replace("…", "...")
-
-    # Non-breaking spaces / tabs
-    s = s.replace("\u00a0", " ").replace("\xa0", " ").replace("\t", " ")
-
-    # Encode to latin-1 with replacement to avoid UnicodeEncodeError in FPDF
-    return s.encode("latin-1", "replace").decode("latin-1")
+    if not text: return ""
+    return str(text).replace('\u2018', "'").replace('\u2019', "'").encode('latin-1', 'replace').decode('latin-1')
 
 def send_pdf_via_email(to_email, subject, body, pdf_bytes, filename="Guide.pdf"):
     try:
@@ -2813,94 +2696,23 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf.ln(5)
     pdf.line(10, pdf.get_y(), 200, pdf.get_y()) # Horizontal line
     pdf.ln(5)
-def _write_wrapped_mixed(label, rest, font_size=11, line_height=5):
-    """Write 'Label: rest...' with a bold label and wrapped normal text."""
-    label = clean_text(label)
-    rest = clean_text(rest)
 
-    left = pdf.l_margin
-    right = pdf.w - pdf.r_margin
-
-    pdf.set_x(left)
-    pdf.set_font("Arial", "B", font_size)
-    prefix = f"{label}: "
-    prefix_w = pdf.get_string_width(prefix)
-    max_w = right - left
-
-    # If label is too wide, fall back to two lines
-    if prefix_w > max_w * 0.9:
-        pdf.multi_cell(0, line_height, clean_text(f"{label}:"))
-        pdf.set_font("Arial", "", font_size)
-        pdf.multi_cell(0, line_height, rest)
-        pdf.ln(1)
-        return
-
-    pdf.write(line_height, prefix)
-    pdf.set_font("Arial", "", font_size)
-
-    words = rest.split()
-    cur_x = pdf.get_x()
-    for w in words:
-        token = w + " "
-        token_w = pdf.get_string_width(token)
-        if (cur_x + token_w) > right:
-            pdf.ln(line_height)
-            pdf.set_x(left)
-            cur_x = pdf.get_x()
-        pdf.write(line_height, token)
-        cur_x = pdf.get_x()
-
-    pdf.ln(line_height)
-
-def _hline():
-    y = pdf.get_y()
-    pdf.set_draw_color(210, 210, 210)
-    pdf.line(10, y, 200, y)
-    pdf.ln(4)
-
-def add_section(title, body, bullets=None):
-    # Section header (mirrors the online "boxed" style)
-    pdf.set_font("Arial", "B", 12)
-    pdf.set_text_color(*blue)
-    pdf.set_fill_color(240, 245, 250)
-    pdf.cell(0, 8, clean_text(title), ln=True, fill=True)
-    pdf.ln(2)
-
-    pdf.set_font("Arial", "", 11)
-    pdf.set_text_color(*black)
-
-    # Body
-    if body:
-        clean_body = body.replace("**", "").replace("* ", "- ")
-        # Split paragraphs to avoid giant walls of text
-        for para in [p.strip() for p in clean_body.split("\n\n") if p.strip()]:
-            # If it starts with a short 'Label: ...', bold the label to improve scanning
-            if ":" in para and len(para.split(":", 1)[0]) <= 18:
-                lbl, rst = para.split(":", 1)
-                _write_wrapped_mixed(lbl.strip(), rst.strip())
-            else:
-                pdf.multi_cell(0, 5, clean_text(para))
-                pdf.ln(1)
-
-    # Bullets
-    if bullets:
-        pdf.ln(1)
-        for b in bullets:
-            raw = (b or "").replace("**", "").strip()
-            # Indent bullets slightly
-            pdf.set_x(pdf.l_margin + 2)
-            pdf.set_font("Arial", "", 11)
-            pdf.cell(3, 5, "-", 0, 0)
-            pdf.set_x(pdf.l_margin + 6)
-
-            if ":" in raw and len(raw.split(":", 1)[0]) <= 18:
-                lbl, rst = raw.split(":", 1)
-                _write_wrapped_mixed(lbl.strip(), rst.strip())
-            else:
-                pdf.multi_cell(0, 5, clean_text(raw))
-
-    pdf.ln(2)
-    _hline()
+    def add_section(title, body, bullets=None):
+        pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
+        pdf.cell(0, 8, title, ln=True, fill=True); pdf.ln(2)
+        pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
+        
+        if body:
+            clean_body = body.replace("**", "").replace("* ", "- ")
+            pdf.multi_cell(0, 5, clean_text(clean_body))
+        
+        if bullets:
+            pdf.ln(1)
+            for b in bullets:
+                pdf.cell(5, 5, "-", 0, 0)
+                clean_b = b.replace("**", "") 
+                pdf.multi_cell(0, 5, clean_text(clean_b))
+        pdf.ln(4)
 
     # Sections 1-10
     add_section(f"1. Communication Profile: {p_comm}", None, data['s1_b'])
@@ -3356,29 +3168,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             for b in bullets: st.markdown(f"- {b}")
 
     
-    
-    # --- Section Heading Helper (matches Section 5 styling) ---
-    def render_section_heading(sec_num: int, label: str, title: str, anchor_id: str | None = None):
-        """Renders a centered section label + title in the same visual style as Section 5."""
-        if anchor_id:
-            st.markdown(f"<div id='{anchor_id}'></div>", unsafe_allow_html=True)
-
-        st.markdown(
-            f"""<div style='text-align:center; margin-bottom: .25rem;'>
-                    <span style='font-size: .85rem; letter-spacing: .12em; font-weight: 700; color: #6b7280;'>
-                        SECTION {sec_num}: {label.upper()}
-                    </span>
-                  </div>""",
-            unsafe_allow_html=True
-        )
-        st.markdown(
-            f"""<h2 style='text-align:center; color:#202124; margin-top:0; margin-bottom:.75rem;'>
-                    {title}
-                  </h2>""",
-            unsafe_allow_html=True
-        )
-
-# --- Jump Table of Contents ---
+    # --- Jump Table of Contents ---
     with st.container(border=True):
         st.markdown("### 🔎 Jump to Section")
         st.caption("Click a section to jump. (Tip: open sections in a new tab if your browser supports it.)")
@@ -3405,7 +3195,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 # --- SECTION 1 & 2: COMMUNICATION ---
     c1, c2 = st.columns([2, 1])
     with c1:
-        render_section_heading(1, "Communication", f"Communication: {p_comm}", "sec1")
+        st.markdown("<div id='sec1'></div>", unsafe_allow_html=True)
+        st.subheader(f"1. Communication: {p_comm}")
         show_list(data['s1_b'])
 
         # Moved here from Section 10: teaches the supervisor how this person best receives direction/feedback
@@ -3415,7 +3206,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 st.markdown(data["comm_language"])
 
         st.markdown("<br>", unsafe_allow_html=True)
-        render_section_heading(2, "Supervising Strategies", "Supervising Strategies", "sec2")
+        st.markdown("<div id='sec2'></div>", unsafe_allow_html=True)
+        st.subheader("2. Supervising Strategies")
         show_list(data['s2_b'])
     
     with c2:
@@ -3434,10 +3226,12 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             fig_g = create_motiv_gauge(p_mot)
             st.plotly_chart(fig_g, width="stretch", config={'displayModeBar': False})
     with c4:
-        render_section_heading(3, "Motivation", f"Motivation: {p_mot}", "sec3")
+        st.markdown("<div id='sec3'></div>", unsafe_allow_html=True)
+        st.subheader(f"3. Motivation: {p_mot}")
         show_list(data['s3_b'])
         st.markdown("<br>", unsafe_allow_html=True)
-        render_section_heading(4, "How to Motivate", "How to Motivate", "sec4")
+        st.markdown("<div id='sec4'></div>", unsafe_allow_html=True)
+        st.subheader("4. How to Motivate")
         show_list(data['s4_b'])
 
     st.markdown("<br>", unsafe_allow_html=True)
@@ -3463,12 +3257,14 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             st.markdown(f"**3. Trust Builder:** {mech['trust']}")
 
         with i2:
-            st.markdown("**🧭 Leadership Signature**")
-            fig_sig = create_leadership_signature_radar(p_comm, p_mot)
-            st.plotly_chart(fig_sig, width="stretch", config={'displayModeBar': False})
-            st.caption("How to read this: left = Task emphasis, right = People emphasis; bottom = Stability/consistency, top = Change/growth. This is an integrated 'how they lead + what they optimize for' snapshot—not a second Communication map.")
+            st.markdown(f"**🧭 Leadership Compass**")
+            fig_compass = create_integrated_compass(p_comm, p_mot)
+            st.plotly_chart(fig_compass, width="stretch", config={'displayModeBar': False})
+            st.caption("The compass plots your bias: Task vs. People (X-Axis) and Change vs. Stability (Y-Axis).")
     
-    # --- SECTION 6: THE SUPERVISOR'S HUD (REWORKED) ---    render_section_heading(6, "Supervisor's HUD", "The Supervisor's HUD (Heads-Up Display)", "sec6")
+    # --- SECTION 6: THE SUPERVISOR'S HUD (REWORKED) ---
+    st.markdown("<div id='sec6'></div>", unsafe_allow_html=True)
+    st.subheader("6. The Supervisor's HUD (Heads-Up Display)")
     st.caption("A real-time dashboard for maintaining this staff member's engagement and preventing burnout. Use it as an early-warning system—not a report card.")
 
     with st.expander("How to use the HUD (Training)", expanded=False):
@@ -3800,16 +3596,18 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     col_t, col_s = st.columns(2)
     with col_t:
         with st.container(border=True):
-            render_section_heading(7, "When Thriving", "✅ When Thriving")
+            st.subheader("✅ 7. When Thriving")
             st.write(data['s7'])
     with col_s:
         with st.container(border=True):
-            render_section_heading(8, "When Struggling", "⚠️ When Struggling")
+            st.subheader("⚠️ 8. When Struggling")
             st.write(data['s8'])
 
     st.divider()
 
-    # --- SECTION 9: INDIVIDUAL PROFESSIONAL DEVELOPMENT PLAN (IPDP) - DYNAMIC ---    render_section_heading(9, "Individual Professional Development Plan", "Individual Professional Development Plan (IPDP)", "sec9")
+    # --- SECTION 9: INDIVIDUAL PROFESSIONAL DEVELOPMENT PLAN (IPDP) - DYNAMIC ---
+    st.markdown("<div id='sec9'></div>", unsafe_allow_html=True)
+    st.subheader("9. Individual Professional Development Plan (IPDP)")
     st.caption("A development-first framework for coaching growth, alignment, and performance over time.")
 
     # Snapshot: remind the supervisor who they are coaching (primary + secondary)
@@ -4262,7 +4060,9 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 st.error(f"⚠️ Phase {_phase} encountered an error (isolated): {e}")
 
 
-# --- SECTION 10: CELEBRATION (TROPHY CASE) ---    render_section_heading(10, "What To Celebrate", "What To Celebrate", "sec10")
+# --- SECTION 10: CELEBRATION (TROPHY CASE) ---
+    st.markdown("<div id='sec10'></div>", unsafe_allow_html=True)
+    st.subheader("10. What To Celebrate")
     st.caption("Use celebration as a *training tool*: you are reinforcing the behaviors you want repeated under pressure.")
 
     # 1) Three quick trophies (headline-only)
@@ -4300,7 +4100,9 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
     st.divider()
 
-    # --- SECTION 11: COACHING QUESTIONS ---    render_section_heading(11, "Coaching Questions", "Coaching Questions", "sec11")
+    # --- SECTION 11: COACHING QUESTIONS ---
+    st.markdown("<div id='sec11'></div>", unsafe_allow_html=True)
+    st.subheader("11. Coaching Questions")
     with st.container(border=True):
         if data['coaching']:
             for i, q in enumerate(data['coaching']):
@@ -4310,7 +4112,9 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # --- SECTION 12: ADVANCEMENT (NEXT LEVEL) ---    render_section_heading(12, "Preparing for Advancement", "Preparing for Advancement", "sec12")
+    # --- SECTION 12: ADVANCEMENT (NEXT LEVEL) ---
+    st.markdown("<div id='sec12'></div>", unsafe_allow_html=True)
+    st.subheader("12. Preparing for Advancement")
     st.caption("This section helps you translate **potential** into **readiness**. We’re not just asking “could they do more?” — we’re building the habits that make promotion safe for the team, the youth, and the staff member.")
 
     def _build_advancement_plan(comm_p, comm_s, mot_p, mot_s):
