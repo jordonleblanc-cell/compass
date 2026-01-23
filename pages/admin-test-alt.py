@@ -2248,6 +2248,45 @@ def create_comm_quadrant_chart(comm_style):
     )
     return fig
 
+
+def create_comm_dials_chart(primary_style, secondary_style=None):
+    """Non-redundant visual for Section 1: 'Communication Dials' (what to turn up/down)."""
+    # Baseline dial settings by style (0-10)
+    base = {
+        "Director":     {"Clarity": 9, "Warmth": 4, "Structure": 6, "Pace": 9},
+        "Encourager":   {"Clarity": 6, "Warmth": 9, "Structure": 4, "Pace": 7},
+        "Facilitator": {"Clarity": 6, "Warmth": 7, "Structure": 5, "Pace": 5},
+        "Tracker":     {"Clarity": 7, "Warmth": 4, "Structure": 9, "Pace": 4},
+    }
+    # If secondary exists, blend it in at 35% weight for nuance
+    p = base.get(primary_style, base["Facilitator"]).copy()
+    if secondary_style and secondary_style in base:
+        s = base[secondary_style]
+        for k in p:
+            p[k] = round((p[k] * 0.65) + (s.get(k, p[k]) * 0.35), 1)
+
+    labels = list(p.keys())
+    values = [p[k] for k in labels]
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=values,
+        y=labels,
+        orientation='h',
+        text=[str(v) for v in values],
+        textposition='auto'
+    ))
+    fig.update_layout(
+        xaxis=dict(range=[0, 10], title="Dial strength (0–10)"),
+        yaxis=dict(title=""),
+        margin=dict(l=20, r=20, t=25, b=20),
+        height=260,
+        title="Communication Dials (what to turn up/down)"
+    )
+    return fig
+
+
+
 def create_motiv_gauge(motiv_style):
     """Creates a simple gauge chart indicating the primary 'fuel' source."""
     
@@ -2644,6 +2683,72 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     
     data = generate_profile_content(p_comm, p_mot)
 
+
+# --- PDF formatting helpers (readability) ---
+def pdf_hr():
+    # subtle divider line
+    try:
+        y = pdf.get_y()
+        pdf.set_draw_color(210, 210, 210)
+        pdf.line(10, y, 200, y)
+        pdf.ln(5)
+    except Exception:
+        pdf.ln(4)
+
+def pdf_section_title(title):
+    pdf.set_fill_color(240, 240, 240)
+    pdf.set_font("Arial", 'B', 14)
+    pdf.set_text_color(*black)
+    pdf.cell(0, 10, clean_text(title), ln=True, fill=True, align='C')
+    pdf.ln(2)
+
+def pdf_label_block(label, body, indent=6):
+    # Bold label on its own line, then body below (easy scanning)
+    pdf.set_font("Arial", 'B', 11)
+    pdf.multi_cell(0, 5, clean_text(label))
+    pdf.set_font("Arial", '', 11)
+    # Indent body slightly to visually nest it
+    if body:
+        pdf.set_x(indent)
+        pdf.multi_cell(0, 5, clean_text(body))
+        pdf.set_x(10)
+    pdf.ln(2)
+
+def pdf_bullet(line, bullet_char="•"):
+    # Bullet line with optional bold "Label:" lead-in.
+    if not line:
+        return
+    raw = str(line).strip()
+    raw = raw.lstrip("•").lstrip("-").strip()
+
+    # Detect "Label: body" where label is short
+    parts = raw.split(":", 1)
+    if len(parts) == 2 and 1 <= len(parts[0].strip()) <= 28:
+        label = parts[0].strip()
+        body = parts[1].strip()
+        # Bullet + bold label
+        pdf.set_font("Arial", '', 11)
+        pdf.multi_cell(0, 5, clean_text(f"{bullet_char} {label}"))
+        # Body indented
+        pdf.set_x(14)
+        pdf.set_font("Arial", '', 11)
+        pdf.multi_cell(0, 5, clean_text(body))
+        pdf.set_x(10)
+        pdf.ln(1)
+    else:
+        pdf.set_font("Arial", '', 11)
+        pdf.multi_cell(0, 5, clean_text(f"{bullet_char} {raw}"))
+        pdf.ln(1)
+
+def pdf_callout(title, text):
+    # Light shaded box for key supervisor insights
+    pdf.set_fill_color(245, 247, 250)
+    pdf.set_font("Arial", 'B', 11)
+    pdf.multi_cell(0, 6, clean_text(title), fill=True)
+    pdf.set_font("Arial", '', 11)
+    pdf.multi_cell(0, 5, clean_text(text), fill=True)
+    pdf.ln(3)
+
     # --- TABLE OF CONTENTS ---
     # (Short, printable overview — the PDF itself includes all sections expanded.)
     pdf.set_fill_color(240, 245, 250)
@@ -2669,7 +2774,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         "Stress Signature + Support Prescription",
     ]
     for line in toc_lines:
-        pdf.multi_cell(0, 5, clean_text(f"• {line}"))
+                pdf_bullet(line.replace("?", ""), bullet_char="")
     pdf.ln(3)
 
     # --- CHEAT SHEET SECTION ---
@@ -2677,6 +2782,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(0, 10, "Rapid Interaction Cheat Sheet", ln=True, fill=True, align='C')
     pdf.ln(2)
+    pdf_hr()
 
     def print_cheat_column(title, items, color_rgb):
         pdf.set_font("Arial", 'B', 12)
@@ -2686,7 +2792,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         pdf.set_font("Arial", '', 10)
         for item in items:
             clean_item = item.replace("**", "")
-            pdf.multi_cell(0, 5, clean_text(f"- {clean_item}"))
+            pdf_bullet(clean_item, bullet_char="•")
         pdf.ln(2)
 
     print_cheat_column("DO THIS (Communication):", data['cheat_do'], green)
@@ -2698,67 +2804,23 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf.ln(5)
 
     def add_section(title, body, bullets=None):
-        # Section header
-        pdf.set_font("Arial", 'B', 12)
-        pdf.set_text_color(*blue)
-        pdf.set_fill_color(240, 245, 250)
-        pdf.cell(0, 8, clean_text(str(title)), ln=True, fill=True)
-        pdf.ln(2)
-
-        def write_labeled_block(text, line_height=5):
-            """If text starts with 'Label: rest', render Label in bold for scanability."""
-            if not text:
-                return
-            t = str(text).strip()
-            t = t.replace("**", "")
-            m = re.match(r"^([A-Za-z][A-Za-z /&\-]{0,30}):\s*(.+)$", t)
-            if m:
-                label, rest = m.group(1).strip(), m.group(2).strip()
-                pdf.set_font("Arial", 'B', 11)
-                pdf.set_text_color(*black)
-                pdf.multi_cell(0, line_height, clean_text(label + ":"))
-                pdf.set_font("Arial", '', 11)
-                pdf.multi_cell(0, line_height, clean_text(rest))
-            else:
-                pdf.set_font("Arial", '', 11)
-                pdf.set_text_color(*black)
-                pdf.multi_cell(0, line_height, clean_text(t))
-            pdf.ln(2)
-
-        # Body (supports paragraph breaks)
+        pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
+        pdf.cell(0, 8, title, ln=True, fill=True); pdf.ln(2)
+        pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
+        
         if body:
-            clean_body = str(body).replace("* ", "- ").replace("**", "")
-            for para in [p.strip() for p in clean_body.split("\n\n") if p.strip()]:
-                write_labeled_block(para)
-
-        # Bullets
+            clean_body = body.replace("**", "").replace("* ", "- ")
+            pdf_bullet(clean_body, bullet_char="•")
+        
         if bullets:
             pdf.ln(1)
             for b in bullets:
-                btxt = str(b).replace("* ", "- ").strip().replace("**", "")
-                # Bullet marker
-                pdf.set_font("Arial", 'B', 11)
-                pdf.set_text_color(*black)
                 pdf.cell(5, 5, "-", 0, 0)
-                # Labeled bullet support
-                m = re.match(r"^([A-Za-z][A-Za-z /&\-]{0,30}):\s*(.+)$", btxt)
-                if m:
-                    label, rest = m.group(1).strip(), m.group(2).strip()
-                    pdf.set_font("Arial", 'B', 11)
-                    pdf.multi_cell(0, 5, clean_text(label + ":"))
-                    pdf.set_font("Arial", '', 11)
-                    pdf.multi_cell(0, 5, clean_text(rest))
-                else:
-                    pdf.set_font("Arial", '', 11)
-                    pdf.multi_cell(0, 5, clean_text(btxt))
-                pdf.ln(1)
+                clean_b = b.replace("**", "") 
+                pdf_bullet(clean_b, bullet_char="•")
+        pdf.ln(4)
 
-        # Light divider to reduce "wall of text"
-        y = pdf.get_y()
-        pdf.set_draw_color(210, 210, 210)
-        pdf.line(10, y, 200, y)
-        pdf.ln(6)
-
+    # Sections 1-10
     add_section(f"1. Communication Profile: {p_comm}", None, data['s1_b'])
     # Moved from Section 10 (online): helps supervisors tailor direction/feedback to this communication style
     if data.get("comm_language"):
@@ -2997,12 +3059,12 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
         pdf.cell(0, 8, "13. Stress Signature & Support Prescription", ln=True, fill=True); pdf.ln(2)
         pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
-        pdf.multi_cell(0, 5, clean_text(f"Stress Signature: {stress_sig}"))
+        pdf_label_block("Stress Signature", stress_sig)
         if support_rx:
             pdf.ln(1)
-            pdf.multi_cell(0, 5, clean_text("Support Prescription:"))
+            pdf_label_block("Support Prescription", "")
             for s in support_rx:
-                pdf.multi_cell(0, 5, clean_text(f"- {s}"))
+                pdf_bullet(s, bullet_char="•")
         pdf.ln(4)
     except Exception:
         pass
@@ -3098,28 +3160,28 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             pdf.multi_cell(0, 6, clean_text(f"{card.get('title','Phase')}"))
             pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
             if card.get("aim"):
-                pdf.multi_cell(0, 5, clean_text(f"Aim: {card.get('aim','')}"))
+                pdf_label_block("Aim", card.get("aim",""))
             if card.get("supervisor_role"):
-                pdf.multi_cell(0, 5, clean_text(f"Supervisor Role: {card.get('supervisor_role','')}"))
+                pdf_label_block("Supervisor Role", card.get("supervisor_role",""))
             if card.get("common_pitfall"):
-                pdf.multi_cell(0, 5, clean_text(f"Common Pitfall: {card.get('common_pitfall','')}"))
+                pdf_label_block("Common Pitfall", card.get("common_pitfall",""))
             pdf.ln(1)
 
             pdf.set_font("Arial", 'B', 11)
-            pdf.multi_cell(0, 5, clean_text("Coaching Matrix (6 High-Impact Moves):"))
+            pdf_label_block("Coaching Matrix (6 High-Impact Moves)", "")
             pdf.set_font("Arial", '', 11)
             moves = _pdf_dynamic_moves(p_comm or "Director", p_mot or "Achievement", int(phase_num))
             for i, mv in enumerate(moves, start=1):
-                pdf.multi_cell(0, 5, clean_text(f"{i}) {mv}"))
+                pdf_bullet(f"{i}) {mv}", bullet_char="•")
 
             pdf.ln(1)
             pdf.set_font("Arial", 'B', 11)
-            pdf.multi_cell(0, 5, clean_text("Teaching Deep Dive (Profile-Integrated):"))
+            pdf_label_block("Teaching Deep Dive (Profile-Integrated)", "")
             pdf.set_font("Arial", '', 11)
             deep = build_teaching_deep_dive(name, p_comm, s_comm, p_mot, s_mot, phase_num)
             deep_clean = re.sub(r"[*_`#>]", "", deep)
             deep_clean = re.sub(r"\n{3,}", "\n\n", deep_clean).strip()
-            pdf.multi_cell(0, 5, clean_text(deep_clean))
+            pdf_bullet(deep_clean, bullet_char="•")
             pdf.ln(4)
     except Exception:
         pass
@@ -3256,8 +3318,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     
     with c2:
         with st.container(border=True):
-            st.markdown(f"**Style Map: {p_comm}**")
-            fig = create_comm_quadrant_chart(p_comm)
+            st.markdown(f"**Communication Dials: {p_comm}/{s_comm}**")
+            fig = create_comm_dials_chart(p_comm, s_comm)
             st.plotly_chart(fig, width="stretch", config={'displayModeBar': False})
 
     st.divider()
