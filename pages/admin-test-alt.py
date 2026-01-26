@@ -2196,7 +2196,7 @@ def _build_ipdp_summary_pdf(name, role, phase_num, p_comm=None, p_mot=None):
     if pedagogy:
         pdf.multi_cell(0, 5, clean_text(pedagogy.replace("**", "")))
 
-    return pdf.output(dest='S').encode('latin-1')
+    return pdf.output(dest='S').encode('latin-1', errors='replace')
 
 # --- HELPER FUNCTIONS FOR VISUALS ---
 
@@ -3187,7 +3187,7 @@ def pdf_callout(title, text):
         pass
 
 
-    return pdf.output(dest='S').encode('latin-1')
+    return pdf.output(dest='S').encode('latin-1', errors='replace')
 
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # Derived helper for friendlier copy
@@ -3221,6 +3221,19 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         safe_staff = st.session_state.get("generated_name") or st.session_state.get("manual_name") or name or "Staff"
         pdf_fname_top = f"Guide_{str(safe_staff).replace(' ', '_')}.pdf"
 
+    
+    # If we still don't have a PDF (e.g., supervisor navigated here without clicking Generate),
+    # generate it on-demand so the download button always works.
+    if not pdf_bytes_top:
+        try:
+            pdf_bytes_top = create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot)
+            safe_staff = name or "Staff"
+            pdf_fname_top = f"Guide_{str(safe_staff).replace(' ', '_')}.pdf"
+            st.session_state.manual_pdf = pdf_bytes_top
+            st.session_state.manual_fname = pdf_fname_top
+            st.session_state.manual_name = safe_staff
+        except Exception as e:
+            st.session_state.manual_pdf_error = str(e)
     with st.container(border=True):
         st.markdown("#### 📤 Actions")
         ac1, ac2 = st.columns([1, 2])
@@ -3237,6 +3250,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 )
             else:
                 st.button("📥 Download PDF", disabled=True, width="stretch", help="Generate the guide to enable the PDF download.")
+                if st.session_state.get("manual_pdf_error"):
+                    st.error(f"PDF generation failed: {st.session_state.get('manual_pdf_error')}")
 
         with ac2:
             if pdf_bytes_top:
