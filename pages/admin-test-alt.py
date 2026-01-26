@@ -5145,3 +5145,148 @@ elif st.session_state.current_view == "Org Pulse":
                 else:
                     st.warning("Role data missing. Cannot analyze pipeline.")
     else: st.warning("No data available.")
+
+
+# =====================================================
+# SUPERVISOR GUIDE EXPORTS (PDF + EMAIL)
+# =====================================================
+
+def build_supervisors_guide_payload(staff_name, primary_comm, primary_motiv):
+    comm_profile = COMM_PROFILES.get(primary_comm, {})
+    motiv_profile = MOTIV_PROFILES.get(primary_motiv, {})
+
+    return {
+        "title": f"Supervisor Guide for {staff_name}",
+        "sections": [
+            {
+                "header": f"Primary Communication Style: {primary_comm}",
+                "bullets": comm_profile.get("bullets", []),
+                "subsections": [
+                    {
+                        "header": "How to Supervise",
+                        "bullets": comm_profile.get("supervising_bullets", [])
+                    }
+                ]
+            },
+            {
+                "header": f"Primary Motivation: {primary_motiv}",
+                "bullets": motiv_profile.get("bullets", []),
+                "subsections": [
+                    {
+                        "header": "Leadership Strategies",
+                        "bullets": motiv_profile.get("strategies_bullets", [])
+                    },
+                    {
+                        "header": "How to Celebrate Them",
+                        "bullets": motiv_profile.get("celebrate_bullets", [])
+                    }
+                ]
+            }
+        ]
+    }
+
+
+def generate_supervisor_pdf(payload):
+    pdf = SafeFPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(0, 10, payload["title"], ln=True)
+    pdf.ln(5)
+
+    for section in payload["sections"]:
+        pdf.set_font("Arial", "B", 13)
+        pdf.cell(0, 8, section["header"], ln=True)
+        pdf.set_font("Arial", size=11)
+
+        for bullet in section.get("bullets", []):
+            pdf.multi_cell(0, 6, f"- {bullet}")
+
+        for sub in section.get("subsections", []):
+            pdf.ln(2)
+            pdf.set_font("Arial", "B", 12)
+            pdf.cell(0, 7, sub["header"], ln=True)
+            pdf.set_font("Arial", size=11)
+            for bullet in sub.get("bullets", []):
+                pdf.multi_cell(0, 6, f"- {bullet}")
+
+        pdf.ln(4)
+
+    return pdf.output(dest="S").encode("latin-1")
+
+
+def build_supervisor_email_html(payload):
+    html = f"""<html><body style='font-family:Arial'>
+    <h2>{payload['title']}</h2>
+    """
+    for section in payload["sections"]:
+        html += f"<h3>{section['header']}</h3><ul>"
+        for bullet in section.get("bullets", []):
+            html += f"<li>{bullet}</li>"
+        html += "</ul>"
+
+        for sub in section.get("subsections", []):
+            html += f"<h4>{sub['header']}</h4><ul>"
+            for bullet in sub.get("bullets", []):
+                html += f"<li>{bullet}</li>"
+            html += "</ul>"
+
+    html += "</body></html>"
+    return html
+
+
+def send_supervisor_email(to_email, subject, html_body):
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"] = st.secrets["SMTP_USER"]
+    msg["To"] = to_email
+
+    msg.attach(MIMEText(html_body, "html"))
+
+    with smtplib.SMTP(st.secrets["SMTP_SERVER"], st.secrets["SMTP_PORT"]) as server:
+        server.starttls()
+        server.login(st.secrets["SMTP_USER"], st.secrets["SMTP_PASSWORD"])
+        server.send_message(msg)
+
+
+# --- UI HOOK (place inside Supervisor Guide view) ---
+if "export_pdf" not in st.session_state:
+    st.session_state.export_pdf = False
+if "export_email" not in st.session_state:
+    st.session_state.export_email = False
+
+st.divider()
+c1, c2 = st.columns(2)
+with c1:
+    if st.button("📄 Save as PDF"):
+        st.session_state.export_pdf = True
+with c2:
+    if st.button("✉️ Email Me This Report"):
+        st.session_state.export_email = True
+
+if st.session_state.export_pdf or st.session_state.export_email:
+    payload = build_supervisors_guide_payload(
+        staff_name=selected_staff,
+        primary_comm=primary_comm,
+        primary_motiv=primary_motiv
+    )
+
+    if st.session_state.export_pdf:
+        pdf_bytes = generate_supervisor_pdf(payload)
+        st.download_button(
+            "⬇️ Download Supervisor Guide PDF",
+            pdf_bytes,
+            file_name=f"{selected_staff}_Supervisor_Guide.pdf",
+            mime="application/pdf"
+        )
+        st.session_state.export_pdf = False
+
+    if st.session_state.export_email:
+        html = build_supervisor_email_html(payload)
+        send_supervisor_email(
+            st.session_state.current_user_email,
+            "Your Elmcrest Supervisor Guide",
+            html
+        )
+        st.success("📬 Supervisor Guide emailed successfully.")
+        st.session_state.export_email = False
