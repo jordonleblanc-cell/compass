@@ -3198,63 +3198,6 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.markdown("---")
     st.markdown(f"### 📘 Supervisory Guide: {name}")
     st.caption(f"Role: {role} | Profile: {p_comm} ({s_comm}) • {p_mot} ({s_mot})")
-
-
-    
-    # --- Actions (moved to top under header) ---
-    # PDF download + email are placed here so supervisors always see them immediately.
-    pdf_bytes_top = None
-    pdf_fname_top = None
-
-    # Prefer the latest generated PDF (from the Generate Guide button).
-    if st.session_state.get("generated_pdf"):
-        pdf_bytes_top = st.session_state.get("generated_pdf")
-        pdf_fname_top = st.session_state.get("generated_filename")
-
-    # Fallback to manual PDF if present.
-    if not pdf_bytes_top and st.session_state.get("manual_pdf"):
-        pdf_bytes_top = st.session_state.get("manual_pdf")
-        pdf_fname_top = st.session_state.get("manual_fname")
-
-    # Final filename fallback (never reference a non-existent variable).
-    if pdf_bytes_top and not pdf_fname_top:
-        safe_staff = st.session_state.get("generated_name") or st.session_state.get("manual_name") or name or "Staff"
-        pdf_fname_top = f"Guide_{str(safe_staff).replace(' ', '_')}.pdf"
-
-    with st.container(border=True):
-        st.markdown("#### 📤 Actions")
-        ac1, ac2 = st.columns([1, 2])
-
-        with ac1:
-            if pdf_bytes_top:
-                st.download_button(
-                    "📥 Download PDF",
-                    pdf_bytes_top,
-                    pdf_fname_top,
-                    "application/pdf",
-                    key=f"dl_top_{str(name)}",
-                    width="stretch",
-                )
-            else:
-                st.button("📥 Download PDF", disabled=True, width="stretch", help="Generate the guide to enable the PDF download.")
-
-        with ac2:
-            if pdf_bytes_top:
-                with st.popover("📧 Email to Me"):
-                    email_input = st.text_input("Recipient Email", placeholder="name@elmcrest.org", key=f"email_to_me_{str(name)}")
-                    if st.button("Send Email", key=f"send_email_{str(name)}"):
-                        if email_input:
-                            with st.spinner("Sending..."):
-                                success, msg = send_pdf_via_email(pdf_bytes_top, pdf_fname_top, email_input)
-                                if success:
-                                    st.success(msg)
-                                else:
-                                    st.error(msg)
-                        else:
-                            st.warning("Please enter a recipient email address.")
-            else:
-                st.info("Generate the guide to enable emailing the PDF.")
-
     with st.expander("⚡ Rapid Interaction Cheat Sheet", expanded=True):
         cc1, cc2, cc3 = st.columns(3)
         with cc1:
@@ -4434,6 +4377,74 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 for r in plan["red_flags"]:
                     st.warning(r)
 
+
+    # --- Actions (moved back to bottom for stability) ---
+    # The PDF is always generated (or reused) once the guide is displayed so:
+    # - Download PDF never rebuilds/reset the UI
+    # - Email to Me always has a PDF available
+    st.markdown("---")
+    with st.container(border=True):
+        st.markdown("## 📤 Actions")
+
+        # Ensure a PDF exists for THIS staff member
+        pdf_bytes = None
+        pdf_fname = None
+        pdf_error = None
+
+        try:
+            current_name = st.session_state.get("generated_name")
+            if st.session_state.get("generated_pdf") and current_name == name:
+                pdf_bytes = st.session_state.get("generated_pdf")
+                pdf_fname = st.session_state.get("generated_filename")
+            else:
+                pdf_bytes = create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot)
+                st.session_state.generated_pdf = pdf_bytes
+                st.session_state.generated_filename = f"Guide_{str(name).replace(' ', '_')}.pdf"
+                st.session_state.generated_name = name
+                pdf_fname = st.session_state.generated_filename
+        except Exception as e:
+            pdf_error = str(e)
+
+        if pdf_error:
+            st.error(f"PDF generation error: {pdf_error}")
+
+        ac1, ac2 = st.columns([1, 2])
+
+        with ac1:
+            if pdf_bytes:
+                st.download_button(
+                    "📥 Download PDF",
+                    pdf_bytes,
+                    pdf_fname or f"Guide_{str(name).replace(' ', '_')}.pdf",
+                    "application/pdf",
+                    key=f"dl_bottom_{str(name)}",
+                    width="stretch",
+                )
+            else:
+                st.button("📥 Download PDF", disabled=True, width="stretch")
+
+        with ac2:
+            if pdf_bytes:
+                with st.popover("📧 Email to Me"):
+                    email_input = st.text_input(
+                        "Recipient Email",
+                        placeholder="name@elmcrest.org",
+                        key=f"email_to_me_bottom_{str(name)}",
+                    )
+                    if st.button("Send Email", key=f"send_email_bottom_{str(name)}"):
+                        if email_input:
+                            with st.spinner("Sending..."):
+                                success, msg = send_pdf_via_email(pdf_bytes, pdf_fname, email_input)
+                                if success:
+                                    st.success(msg)
+                                else:
+                                    st.error(msg)
+                        else:
+                            st.warning("Please enter a recipient email address.")
+            else:
+                st.info("PDF is not available yet. (If this persists, check the PDF generation error above.)")
+
+
 # --- 6. MAIN APP LOGIC ---
 # Reset Helpers
 def reset_t1(): st.session_state.t1_staff_select = None
@@ -4500,72 +4511,12 @@ if st.session_state.current_view == "Supervisor's Guide":
                     c1,c2,c3 = st.columns(3)
                     c1.metric("Role", d['role']); c2.metric("Style", d['p_comm']); c3.metric("Drive", d['p_mot'])
                     
-                    
+                    if st.button("Generate Guide", type="primary", width="stretch"):
+                        st.session_state.generated_pdf = create_supervisor_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
+                        st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
+                        st.session_state.generated_name = d['name']
+                        display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
 
-                    # Auto-generate (or reuse) the PDF for this staff so Actions always work
-                    current_key = (d['name'], d['role'], d['p_comm'], d.get('s_comm'), d['p_mot'], d.get('s_mot'))
-                    if st.session_state.get("generated_key") != current_key or not st.session_state.get("generated_pdf"):
-                        try:
-                            st.session_state.generated_pdf = create_supervisor_guide(
-                                d['name'], d['role'], d['p_comm'], d.get('s_comm'), d['p_mot'], d.get('s_mot')
-                            )
-                            st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
-                            st.session_state.generated_name = d['name']
-                            st.session_state.generated_key = current_key
-                            st.session_state.generated_pdf_error = None
-                        except Exception as e:
-                            st.session_state.generated_pdf = None
-                            st.session_state.generated_pdf_error = f"{type(e).__name__}: {e}"
-
-                    # Always render the guide (online view)
-                    display_guide(d['name'], d['role'], d['p_comm'], d.get('s_comm'), d['p_mot'], d.get('s_mot'))
-
-                    st.divider()
-                    st.markdown("#### 📤 Actions")
-
-                    if st.session_state.get("generated_pdf"):
-                        ac1, ac2 = st.columns([1, 2])
-                        with ac1:
-                            st.download_button(
-                                label="📥 Download PDF",
-                                data=st.session_state.generated_pdf,
-                                file_name=st.session_state.get(
-                                    "generated_filename",
-                                    f"Guide_{d['name'].replace(' ', '_')}.pdf"
-                                ),
-                                mime="application/pdf",
-                                key=f"dl_pdf_{d['name']}"
-                            )
-                        with ac2:
-                            with st.popover("📧 Email to Me"):
-                                email_input = st.text_input(
-                                    "Recipient Email",
-                                    placeholder="name@elmcrest.org",
-                                    key=f"email_to_{d['name']}"
-                                )
-                                if st.button("Send Email", key=f"btn_email_pdf_{d['name']}"):
-                                    if email_input:
-                                        with st.spinner("Sending..."):
-                                            success, msg = send_pdf_via_email(
-                                                to_email=email_input,
-                                                subject=f"Supervisor Guide: {d['name']}",
-                                                body=f"Attached is the Compass Supervisor Guide for {d['name']}.",
-                                                pdf_bytes=st.session_state.generated_pdf,
-                                                filename=st.session_state.get(
-                                                    "generated_filename",
-                                                    f"Guide_{d['name'].replace(' ', '_')}.pdf"
-                                                )
-                                            )
-                                            if success:
-                                                st.success(msg)
-                                            else:
-                                                st.error(msg)
-                                    else:
-                                        st.warning("Please enter a recipient email address.")
-                    elif st.session_state.get("generated_pdf_error"):
-                        st.error("PDF generation failed: " + st.session_state.get("generated_pdf_error"))
-                    else:
-                        st.info("PDF is not available yet. Please reload and try again.")
     st.button("Reset", key="reset_t1", on_click=reset_t1)
 
     # --- MANUAL TAB ---
