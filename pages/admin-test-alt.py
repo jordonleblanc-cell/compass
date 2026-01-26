@@ -2196,7 +2196,7 @@ def _build_ipdp_summary_pdf(name, role, phase_num, p_comm=None, p_mot=None):
     if pedagogy:
         pdf.multi_cell(0, 5, clean_text(pedagogy.replace("**", "")))
 
-    return pdf.output(dest='S').encode('latin-1', errors='replace')
+    return pdf.output(dest='S').encode('latin-1')
 
 # --- HELPER FUNCTIONS FOR VISUALS ---
 
@@ -3187,7 +3187,7 @@ def pdf_callout(title, text):
         pass
 
 
-    return pdf.output(dest='S').encode('latin-1', errors='replace')
+    return pdf.output(dest='S').encode('latin-1')
 
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # Derived helper for friendlier copy
@@ -3221,19 +3221,6 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         safe_staff = st.session_state.get("generated_name") or st.session_state.get("manual_name") or name or "Staff"
         pdf_fname_top = f"Guide_{str(safe_staff).replace(' ', '_')}.pdf"
 
-    
-    # If we still don't have a PDF (e.g., supervisor navigated here without clicking Generate),
-    # generate it on-demand so the download button always works.
-    if not pdf_bytes_top:
-        try:
-            pdf_bytes_top = create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot)
-            safe_staff = name or "Staff"
-            pdf_fname_top = f"Guide_{str(safe_staff).replace(' ', '_')}.pdf"
-            st.session_state.manual_pdf = pdf_bytes_top
-            st.session_state.manual_fname = pdf_fname_top
-            st.session_state.manual_name = safe_staff
-        except Exception as e:
-            st.session_state.manual_pdf_error = str(e)
     with st.container(border=True):
         st.markdown("#### 📤 Actions")
         ac1, ac2 = st.columns([1, 2])
@@ -3249,9 +3236,19 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                     width="stretch",
                 )
             else:
-                st.button("📥 Download PDF", disabled=True, width="stretch", help="Generate the guide to enable the PDF download.")
-                if st.session_state.get("manual_pdf_error"):
-                    st.error(f"PDF generation failed: {st.session_state.get('manual_pdf_error')}")
+                # If the on-screen guide is visible but no PDF has been generated yet,
+                # allow supervisors to build the PDF on-demand (without requiring a separate "Generate Guide" click).
+                if st.button("🧾 Build PDF", key=f"build_pdf_top_{str(name)}", width="stretch"):
+                    try:
+                        built = create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot)
+                        st.session_state.manual_pdf = built
+                        st.session_state.manual_fname = f"Guide_{str(name).replace(' ', '_')}.pdf"
+                        st.session_state.manual_name = name
+                        st.success("✅ PDF ready. Use Download PDF.")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"⚠️ Could not generate PDF: {e}")
+                st.caption("Tip: Build the PDF to enable downloading and emailing.")
 
         with ac2:
             if pdf_bytes_top:
@@ -3268,7 +3265,19 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                         else:
                             st.warning("Please enter a recipient email address.")
             else:
-                st.info("Generate the guide to enable emailing the PDF.")
+                # Allow on-demand PDF build for emailing as well.
+                with st.popover("📧 Email to Me"):
+                    st.caption("Build the PDF first, then send it to your email.")
+                    if st.button("🧾 Build PDF for Email", key=f"build_pdf_email_{str(name)}"):
+                        try:
+                            built = create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot)
+                            st.session_state.manual_pdf = built
+                            st.session_state.manual_fname = f"Guide_{str(name).replace(' ', '_')}.pdf"
+                            st.session_state.manual_name = name
+                            st.success("✅ PDF ready. Re-open this popover to send.")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"⚠️ Could not generate PDF: {e}")
 
     with st.expander("⚡ Rapid Interaction Cheat Sheet", expanded=True):
         cc1, cc2, cc3 = st.columns(3)
