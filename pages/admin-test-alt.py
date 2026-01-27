@@ -5225,3 +5225,124 @@ elif st.session_state.current_view == "Org Pulse":
                 else:
                     st.warning("Role data missing. Cannot analyze pipeline.")
     else: st.warning("No data available.")
+
+
+
+# =====================================================
+# PDF EXPORT OVERRIDE (FIXED): ensure create_supervisor_guide returns PDF bytes
+# =====================================================
+def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
+    """
+    Generate a printable PDF version of the Supervisor Guide.
+    Returns: bytes (application/pdf)
+    """
+    pdf = SafeFPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+
+    # Palette
+    blue = (26, 115, 232)
+    black = (0, 0, 0)
+
+    def hr():
+        y = pdf.get_y()
+        pdf.set_draw_color(210, 210, 210)
+        pdf.line(10, y, 200, y)
+        pdf.ln(5)
+
+    def section_title(title):
+        pdf.set_fill_color(240, 240, 240)
+        pdf.set_font("Arial", "B", 14)
+        pdf.set_text_color(*black)
+        pdf.cell(0, 10, clean_text(title), ln=True, fill=True, align="C")
+        pdf.ln(2)
+
+    def subtitle(title):
+        pdf.set_font("Arial", "B", 12)
+        pdf.set_text_color(*black)
+        pdf.multi_cell(0, 6, clean_text(title))
+        pdf.ln(1)
+
+    def bullet(line, bullet_char="•"):
+        if not line:
+            return
+        raw = str(line).strip()
+        raw = raw.lstrip("•").lstrip("-").strip()
+        pdf.set_font("Arial", "", 11)
+        pdf.set_text_color(*black)
+        pdf.multi_cell(0, 5, clean_text(f"{bullet_char} {raw}"))
+        pdf.ln(1)
+
+    def bullets(lines):
+        if not lines:
+            return
+        for ln in lines:
+            bullet(ln)
+
+    def paragraph(text_):
+        if not text_:
+            return
+        pdf.set_font("Arial", "", 11)
+        pdf.set_text_color(*black)
+        pdf.multi_cell(0, 5, clean_text(text_))
+        pdf.ln(2)
+
+    # Header
+    pdf.set_font("Arial", "B", 20)
+    pdf.set_text_color(*blue)
+    pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align="C")
+    pdf.set_font("Arial", "", 12)
+    pdf.set_text_color(*black)
+    pdf.cell(0, 7, clean_text(f"For: {name} ({role})"), ln=True, align="C")
+    pdf.cell(0, 7, clean_text(f"Profile: {p_comm} ({s_comm}) • {p_mot} ({s_mot})"), ln=True, align="C")
+    pdf.ln(6)
+
+    data = generate_profile_content(p_comm, p_mot)
+
+    # Quick cheat sheet
+    section_title("Rapid Interaction Cheat Sheet")
+    subtitle("✅ Do This")
+    bullets(data.get("cheat_do") or [])
+    subtitle("⛔ Avoid This")
+    bullets(data.get("cheat_avoid") or [])
+    subtitle("⛽ What Fuels Them (Motivation)")
+    bullets(data.get("cheat_fuel") or [])
+    hr()
+
+    # Communication profile
+    section_title("1. Communication Profile")
+    paragraph("What this means in practice for supervision and day-to-day collaboration.")
+    bullets(data.get("s1_b") or [])
+    subtitle("1A. How to Speak Their Language")
+    bullets(data.get("s2_b") or [])
+    hr()
+
+    # Motivation profile
+    section_title("2. Motivation Profile")
+    bullets(data.get("s3_b") or [])
+    subtitle("Leadership Strategies")
+    bullets(data.get("s4_b") or [])
+    subtitle("How to Celebrate Them")
+    bullets(data.get("s10_b") or [])
+    hr()
+
+    # Integrated profile / coaching
+    section_title("3. Integrated Profile")
+    title = data.get("s5_title") or ""
+    synergy = data.get("s5_synergy") or ""
+    if title:
+        subtitle(title)
+    if synergy:
+        paragraph(f"Synergy: {synergy}")
+    paragraph(data.get("s6") or "")
+    paragraph(data.get("s7") or "")
+    paragraph(data.get("s8") or "")
+    bullets(data.get("s9_b") or [])
+    hr()
+
+    section_title("4. Coaching Questions")
+    bullets(data.get("coaching") or [])
+    paragraph(data.get("advancement") or "")
+
+    # Return bytes
+    return pdf.output(dest="S").encode("latin-1")
