@@ -2672,6 +2672,15 @@ def send_pdf_via_email(to_email, subject, body, pdf_bytes, filename="Guide.pdf")
     except Exception as e:
         return False, f"Email Error: {str(e)}"
 
+def validate_email(email: str) -> bool:
+    """Simple email validation: must contain '@' and a domain like '.com'."""
+    if not email:
+        return False
+    email = email.strip()
+    return bool(re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email))
+
+
+
 def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf = SafeFPDF()
     pdf.add_page()
@@ -3189,27 +3198,6 @@ def pdf_callout(title, text):
 
     return pdf.output(dest='S').encode('latin-1')
 
-
-
-def validate_email(email: str) -> bool:
-    """Basic email validation (format-only): must contain '@' and a domain with a dot."""
-    if not isinstance(email, str):
-        return False
-    email = email.strip()
-    if not email or '@' not in email or ' ' in email:
-        return False
-    local, domain = email.rsplit('@', 1)
-    if not local or not domain:
-        return False
-    if '.' not in domain:
-        return False
-    if domain.startswith('.') or domain.endswith('.'):
-        return False
-    parts = domain.split('.')
-    if any(not p for p in parts):
-        return False
-    return True
-
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # Derived helper for friendlier copy
     first_name = (name.split()[0] if isinstance(name, str) and name.strip() else "this staff member")
@@ -3220,60 +3208,60 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.markdown(f"### 📘 Supervisory Guide: {name}")
     st.caption(f"Role: {role} | Profile: {p_comm} ({s_comm}) • {p_mot} ({s_mot})")
 
-    # --- Export (PDF + Email) ---
-    # NOTE: Streamlit reruns the script on every interaction. If PDF generation fails once,
-    # we do NOT want to cache an empty value forever. We retry automatically on future reruns.
-    guide_key = f"{name}|{role}|{p_comm}|{s_comm}|{p_mot}|{s_mot}"
-    cache = st.session_state.setdefault('guide_pdf_cache', {})
-    pdf_bytes = cache.get(guide_key)
+    # --- Exports (available immediately after clicking Generate Guide) ---
+    ex1, ex2 = st.columns([1, 2])
 
-    if not isinstance(pdf_bytes, (bytes, bytearray)) or len(pdf_bytes) == 0:
-        try:
-            with st.spinner("Preparing PDF..."):
-                pdf_bytes = create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot)
-            # Only cache if we got real bytes back
-            if isinstance(pdf_bytes, (bytes, bytearray)) and len(pdf_bytes) > 0:
-                cache[guide_key] = pdf_bytes
-            else:
-                pdf_bytes = b''
-        except Exception as e:
-            # Do not permanently cache failure; allow retry on next rerun.
-            pdf_bytes = b''
-            st.caption(f"PDF generation is retrying (last error: {e}).")
+    with ex1:
+        pdf_bytes = st.session_state.get("generated_pdf", b"")
+        pdf_name = st.session_state.get("generated_name")
+        pdf_filename = st.session_state.get("generated_filename", f"Guide_{name.replace(' ', '_')}.pdf")
 
-    pdf_filename = f"Guide_{name.replace(' ', '_')}.pdf"
+        pdf_ready = isinstance(pdf_bytes, (bytes, bytearray)) and len(pdf_bytes) > 0 and (pdf_name == name)
 
-    ec1, ec2 = st.columns([1, 2])
-    with ec1:
         st.download_button(
-            '📄 Download PDF',
-            data=pdf_bytes if isinstance(pdf_bytes, (bytes, bytearray)) else b'',
+            "📄 Download PDF",
+            data=pdf_bytes if pdf_ready else b"",
             file_name=pdf_filename,
-            mime='application/pdf',
-            key=f'pdf_{guide_key}',
-            disabled=not bool(pdf_bytes)
+            mime="application/pdf",
+            key=f"download_pdf_{name}",
+            disabled=not pdf_ready,
         )
-        if not pdf_bytes:
-            st.caption('PDF will appear once the guide content loads.')
-    with ec2:
-        email_to = st.text_input('Email address', key=f'email_{guide_key}', placeholder='name@domain.com')
+        if st.session_state.get("pdf_error") and (pdf_name == name):
+            st.error(f"PDF generation failed: {st.session_state.pdf_error}")
+
+    with ex2:
+        email_to = st.text_input(
+            "Email address",
+            key=f"email_to_{name}",
+            placeholder="name@domain.com",
+        )
         is_valid = validate_email(email_to)
         if email_to and not is_valid:
-            st.warning('Please enter a valid email (must include @ and a domain).')
-        send = st.button('Email me the report', key=f'send_{guide_key}', disabled=not is_valid)
+            st.warning("Please enter a valid email (must include @ and a domain).")
+
+        send = st.button("✉️ Email me the report", key=f"email_report_{name}", disabled=(not is_valid))
         if send:
-            with st.spinner('Sending...'):
-                success, msg = send_pdf_via_email(
-                    email_to,
-                    f'Supervisor Guide: {name}',
-                    f'Attached is the Elmcrest Compass Supervisory Guide for {name}.',
-                    pdf_bytes,
-                    pdf_filename
-                )
-            if success:
-                st.success(msg)
+            pdf_bytes = st.session_state.get("generated_pdf", b"")
+            pdf_name = st.session_state.get("generated_name")
+            pdf_ready = isinstance(pdf_bytes, (bytes, bytearray)) and len(pdf_bytes) > 0 and (pdf_name == name)
+
+            if not pdf_ready:
+                st.error("Please click 'Generate Guide' first so the PDF can be created.")
             else:
-                st.error(msg)
+                with st.spinner("Sending..."):
+                    success, msg = send_pdf_via_email(
+                        email_to,
+                        f"Supervisor Guide: {name}",
+                        f"Attached is the Elmcrest Compass Supervisory Guide for {name}.",
+                        pdf_bytes,
+                        st.session_state.get("generated_filename", f"Guide_{name.replace(' ', '_')}.pdf"),
+                    )
+                if success:
+                    st.success(msg)
+                else:
+                    st.error(msg)
+
+    st.divider()
 
     with st.expander("⚡ Rapid Interaction Cheat Sheet", expanded=True):
         cc1, cc2, cc3 = st.columns(3)
@@ -4521,10 +4509,36 @@ if st.session_state.current_view == "Supervisor's Guide":
                     c1.metric("Role", d['role']); c2.metric("Style", d['p_comm']); c3.metric("Drive", d['p_mot'])
                     
                     if st.button("Generate Guide", type="primary", width="stretch"):
-                        st.session_state.generated_pdf = create_supervisor_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
-                        st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
-                        st.session_state.generated_name = d['name']
-                        display_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
+                        # Persist the selected guide so it remains visible after any Streamlit rerun
+                        st.session_state.current_guide = {
+                            "name": d["name"],
+                            "role": d["role"],
+                            "p_comm": d["p_comm"],
+                            "s_comm": d["s_comm"],
+                            "p_mot": d["p_mot"],
+                            "s_mot": d["s_mot"],
+                        }
+                        st.session_state.pdf_error = None
+
+                        # Generate PDF once, right here, so Download/Email are immediately available
+                        try:
+                            with st.spinner("Generating guide..."):
+                                pdf_bytes = create_supervisor_guide(d['name'], d['role'], d['p_comm'], d['s_comm'], d['p_mot'], d['s_mot'])
+                            if not isinstance(pdf_bytes, (bytes, bytearray)) or len(pdf_bytes) == 0:
+                                raise ValueError("PDF generator returned no data.")
+                            st.session_state.generated_pdf = pdf_bytes
+                            st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
+                            st.session_state.generated_name = d['name']
+                        except Exception as e:
+                            st.session_state.generated_pdf = b""
+                            st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
+                            st.session_state.generated_name = d['name']
+                            st.session_state.pdf_error = str(e)
+
+                    # Always render the current guide (if one has been generated/selected) so the page doesn't "reset"
+                    if st.session_state.get("current_guide"):
+                        g = st.session_state.current_guide
+                        display_guide(g["name"], g["role"], g["p_comm"], g["s_comm"], g["p_mot"], g["s_mot"])
 
     st.button("Reset", key="reset_t1", on_click=reset_t1)
 
@@ -4550,11 +4564,8 @@ if st.session_state.current_view == "Supervisor's Guide":
             with ac1:
                 st.caption("PDF download is available at the top of the guide.")
             with ac2:
-                    email_input_m = st.text_input("Email address", key="manual_email", placeholder="name@domain.com")
-                    is_valid_m = validate_email(email_input_m)
-                    if email_input_m and not is_valid_m:
-                        st.warning("Please enter a valid email (must include @ and a domain).")
-                    if st.button("Email me the report", key="btn_manual_email", disabled=not is_valid_m):
+                    email_input_m = st.text_input("Recipient Email", key="manual_email")
+                    if st.button("Send Email", key="btn_manual_email"):
                         if email_input_m:
                             with st.spinner("Sending..."):
                                 success, msg = send_pdf_via_email(
@@ -5225,124 +5236,3 @@ elif st.session_state.current_view == "Org Pulse":
                 else:
                     st.warning("Role data missing. Cannot analyze pipeline.")
     else: st.warning("No data available.")
-
-
-
-# =====================================================
-# PDF EXPORT OVERRIDE (FIXED): ensure create_supervisor_guide returns PDF bytes
-# =====================================================
-def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
-    """
-    Generate a printable PDF version of the Supervisor Guide.
-    Returns: bytes (application/pdf)
-    """
-    pdf = SafeFPDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_page()
-
-    # Palette
-    blue = (26, 115, 232)
-    black = (0, 0, 0)
-
-    def hr():
-        y = pdf.get_y()
-        pdf.set_draw_color(210, 210, 210)
-        pdf.line(10, y, 200, y)
-        pdf.ln(5)
-
-    def section_title(title):
-        pdf.set_fill_color(240, 240, 240)
-        pdf.set_font("Arial", "B", 14)
-        pdf.set_text_color(*black)
-        pdf.cell(0, 10, clean_text(title), ln=True, fill=True, align="C")
-        pdf.ln(2)
-
-    def subtitle(title):
-        pdf.set_font("Arial", "B", 12)
-        pdf.set_text_color(*black)
-        pdf.multi_cell(0, 6, clean_text(title))
-        pdf.ln(1)
-
-    def bullet(line, bullet_char="•"):
-        if not line:
-            return
-        raw = str(line).strip()
-        raw = raw.lstrip("•").lstrip("-").strip()
-        pdf.set_font("Arial", "", 11)
-        pdf.set_text_color(*black)
-        pdf.multi_cell(0, 5, clean_text(f"{bullet_char} {raw}"))
-        pdf.ln(1)
-
-    def bullets(lines):
-        if not lines:
-            return
-        for ln in lines:
-            bullet(ln)
-
-    def paragraph(text_):
-        if not text_:
-            return
-        pdf.set_font("Arial", "", 11)
-        pdf.set_text_color(*black)
-        pdf.multi_cell(0, 5, clean_text(text_))
-        pdf.ln(2)
-
-    # Header
-    pdf.set_font("Arial", "B", 20)
-    pdf.set_text_color(*blue)
-    pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align="C")
-    pdf.set_font("Arial", "", 12)
-    pdf.set_text_color(*black)
-    pdf.cell(0, 7, clean_text(f"For: {name} ({role})"), ln=True, align="C")
-    pdf.cell(0, 7, clean_text(f"Profile: {p_comm} ({s_comm}) • {p_mot} ({s_mot})"), ln=True, align="C")
-    pdf.ln(6)
-
-    data = generate_profile_content(p_comm, p_mot)
-
-    # Quick cheat sheet
-    section_title("Rapid Interaction Cheat Sheet")
-    subtitle("✅ Do This")
-    bullets(data.get("cheat_do") or [])
-    subtitle("⛔ Avoid This")
-    bullets(data.get("cheat_avoid") or [])
-    subtitle("⛽ What Fuels Them (Motivation)")
-    bullets(data.get("cheat_fuel") or [])
-    hr()
-
-    # Communication profile
-    section_title("1. Communication Profile")
-    paragraph("What this means in practice for supervision and day-to-day collaboration.")
-    bullets(data.get("s1_b") or [])
-    subtitle("1A. How to Speak Their Language")
-    bullets(data.get("s2_b") or [])
-    hr()
-
-    # Motivation profile
-    section_title("2. Motivation Profile")
-    bullets(data.get("s3_b") or [])
-    subtitle("Leadership Strategies")
-    bullets(data.get("s4_b") or [])
-    subtitle("How to Celebrate Them")
-    bullets(data.get("s10_b") or [])
-    hr()
-
-    # Integrated profile / coaching
-    section_title("3. Integrated Profile")
-    title = data.get("s5_title") or ""
-    synergy = data.get("s5_synergy") or ""
-    if title:
-        subtitle(title)
-    if synergy:
-        paragraph(f"Synergy: {synergy}")
-    paragraph(data.get("s6") or "")
-    paragraph(data.get("s7") or "")
-    paragraph(data.get("s8") or "")
-    bullets(data.get("s9_b") or [])
-    hr()
-
-    section_title("4. Coaching Questions")
-    bullets(data.get("coaching") or [])
-    paragraph(data.get("advancement") or "")
-
-    # Return bytes
-    return pdf.output(dest="S").encode("latin-1")
