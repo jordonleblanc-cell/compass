@@ -5236,3 +5236,108 @@ elif st.session_state.current_view == "Org Pulse":
                 else:
                     st.warning("Role data missing. Cannot analyze pipeline.")
     else: st.warning("No data available.")
+
+
+
+# =====================================================
+# REPORTLAB_PDF_SUPERVISOR_GUIDE_V1
+# Fixes earlier indentation issue by redefining create_supervisor_guide
+# so it ALWAYS returns PDF bytes.
+# =====================================================
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem
+from reportlab.lib import colors
+
+def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
+    """Return PDF bytes for the Supervisor Guide (ReportLab implementation)."""
+    data = generate_profile_content(p_comm, p_mot)
+
+    buf = BytesIO()
+    doc = SimpleDocTemplate(
+        buf,
+        pagesize=letter,
+        leftMargin=0.75*inch,
+        rightMargin=0.75*inch,
+        topMargin=0.75*inch,
+        bottomMargin=0.75*inch,
+        title=f"Supervisor Guide - {name}",
+    )
+
+    styles = getSampleStyleSheet()
+    H1 = ParagraphStyle("H1", parent=styles["Title"], fontName="Helvetica-Bold", fontSize=18, spaceAfter=12)
+    H2 = ParagraphStyle("H2", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=13, spaceBefore=10, spaceAfter=6)
+    H3 = ParagraphStyle("H3", parent=styles["Heading3"], fontName="Helvetica-Bold", fontSize=11, spaceBefore=8, spaceAfter=4)
+    Body = ParagraphStyle("Body", parent=styles["BodyText"], fontName="Helvetica", fontSize=10, leading=13, spaceAfter=6)
+
+    def p(txt, style=Body):
+        return Paragraph(clean_text(str(txt)), style)
+
+    def bullets(items, level=0):
+        if not items:
+            return []
+        flow = ListFlowable(
+            [ListItem(p(clean_text(str(it))), leftIndent=12 + level*10) for it in items if str(it).strip()],
+            bulletType="bullet",
+            bulletFontName="Helvetica",
+            bulletFontSize=9,
+            bulletIndent=0,
+            leftIndent=16 + level*10,
+            bulletColor=colors.black,
+        )
+        return [flow, Spacer(1, 6)]
+
+    story = []
+    story.append(p("Elmcrest Supervisory Guide", H1))
+    story.append(p(f"For: <b>{name}</b> ({role})", Body))
+    story.append(p(f"Profile: <b>{p_comm}</b> ({s_comm}) • <b>{p_mot}</b> ({s_mot})", Body))
+    story.append(Spacer(1, 10))
+
+    # Rapid Cheat Sheet
+    story.append(p("Rapid Interaction Cheat Sheet", H2))
+    story.append(p("✅ Do This", H3))
+    story += bullets(data.get("cheat_do") or [])
+    story.append(p("⛔ Avoid This", H3))
+    story += bullets(data.get("cheat_avoid") or [])
+    story.append(p("⛽ What Fuels Them (Motivation)", H3))
+    story += bullets(data.get("cheat_fuel") or [])
+    story.append(Spacer(1, 8))
+
+    # Communication
+    story.append(p("Communication Profile", H2))
+    story += bullets(data.get("s1_b") or [])
+    story.append(p("How to Speak Their Language", H3))
+    story += bullets(data.get("s2_b") or [])
+    story.append(Spacer(1, 8))
+
+    # Motivation
+    story.append(p("Motivation Profile", H2))
+    story += bullets(data.get("s3_b") or [])
+    story.append(p("Leadership Strategies", H3))
+    story += bullets(data.get("s4_b") or [])
+    story.append(p("How to Celebrate Them", H3))
+    story += bullets(data.get("s10_b") or [])
+    story.append(Spacer(1, 8))
+
+    # Integrated
+    story.append(p("Integrated Profile", H2))
+    if data.get("s5_title"):
+        story.append(p(str(data.get("s5_title")), H3))
+    if data.get("s5_synergy"):
+        story.append(p(f"<b>Synergy:</b> {data.get('s5_synergy')}", Body))
+    for k in ["s6", "s7", "s8"]:
+        if data.get(k):
+            story.append(p(data.get(k), Body))
+    story += bullets(data.get("s9_b") or [])
+    story.append(Spacer(1, 8))
+
+    # Coaching + advancement
+    story.append(p("Coaching Questions", H2))
+    story += bullets(data.get("coaching") or [])
+    if data.get("advancement"):
+        story.append(p(data.get("advancement"), Body))
+
+    doc.build(story)
+    return buf.getvalue()
