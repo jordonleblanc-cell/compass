@@ -3221,14 +3221,26 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     st.caption(f"Role: {role} | Profile: {p_comm} ({s_comm}) • {p_mot} ({s_mot})")
 
     # --- Export (PDF + Email) ---
+    # NOTE: Streamlit reruns the script on every interaction. If PDF generation fails once,
+    # we do NOT want to cache an empty value forever. We retry automatically on future reruns.
     guide_key = f"{name}|{role}|{p_comm}|{s_comm}|{p_mot}|{s_mot}"
     cache = st.session_state.setdefault('guide_pdf_cache', {})
-    if guide_key not in cache:
+    pdf_bytes = cache.get(guide_key)
+
+    if not isinstance(pdf_bytes, (bytes, bytearray)) or len(pdf_bytes) == 0:
         try:
-            cache[guide_key] = create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot)
-        except Exception:
-            cache[guide_key] = b''
-    pdf_bytes = cache.get(guide_key, b'')
+            with st.spinner("Preparing PDF..."):
+                pdf_bytes = create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot)
+            # Only cache if we got real bytes back
+            if isinstance(pdf_bytes, (bytes, bytearray)) and len(pdf_bytes) > 0:
+                cache[guide_key] = pdf_bytes
+            else:
+                pdf_bytes = b''
+        except Exception as e:
+            # Do not permanently cache failure; allow retry on next rerun.
+            pdf_bytes = b''
+            st.caption(f"PDF generation is retrying (last error: {e}).")
+
     pdf_filename = f"Guide_{name.replace(' ', '_')}.pdf"
 
     ec1, ec2 = st.columns([1, 2])
