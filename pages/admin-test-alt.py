@@ -2628,6 +2628,7 @@ def generate_profile_content(comm, motiv):
         "s4_b": m_data.get('strategies_bullets'),
         "s5_title": i_data.get('title', f"The {comm}-{motiv}"),
         "s5_synergy": i_data.get('synergy', 'Balanced Approach'),
+        "s5": "{}\n\nSynergy: {}".format(i_data.get("title", "The {}-{}".format(comm, motiv)), i_data.get("synergy", "Balanced Approach")),
         "s6": i_data.get('support', ''),
         "s7": i_data.get('thriving', ''),
         "s8": i_data.get('struggling', ''),
@@ -2682,7 +2683,7 @@ def validate_email(email: str) -> bool:
 
 
 def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
-    pdf = SafeFPDF()
+    pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
     
@@ -2769,6 +2770,8 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
     return pdf.output(dest='S').encode('latin-1')
 
+
+# --- PDF formatting helpers (readability) ---
 def pdf_hr():
     # subtle divider line
     try:
@@ -5314,3 +5317,9 @@ elif st.session_state.current_view == "Org Pulse":
 
 
 
+# =====================================================
+# REPORTLAB_PDF_SUPERVISOR_GUIDE_V1
+# Fixes earlier indentation issue by redefining create_supervisor_guide
+# so it ALWAYS returns PDF bytes.
+# =====================================================
+from io import BytesIO
