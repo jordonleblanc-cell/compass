@@ -2685,15 +2685,90 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     pdf = SafeFPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
-    blue = (26, 115, 232); green = (52, 168, 83); red = (234, 67, 53); black = (0, 0, 0)
+    
+    # Colors
+    blue = (26, 115, 232)
+    green = (52, 168, 83)
+    red = (234, 67, 53)
+    black = (0, 0, 0)
+    gray = (128, 128, 128)
+    
+    # Header
     pdf.set_font("Arial", 'B', 20); pdf.set_text_color(*blue); pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align='C')
     pdf.set_font("Arial", '', 12); pdf.set_text_color(*black); pdf.cell(0, 8, clean_text(f"For: {name} ({role})"), ln=True, align='C')
     pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C'); pdf.ln(5)
     
+    # Generate Data
     data = generate_profile_content(p_comm, p_mot)
 
+    # --- CHEAT SHEET SECTION (NEW) ---
+    pdf.set_fill_color(240, 240, 240)
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(0, 10, "Rapid Interaction Cheat Sheet", ln=True, fill=True, align='C')
+    pdf.ln(2)
 
-# --- PDF formatting helpers (readability) ---
+    def print_cheat_column(title, items, color_rgb):
+        pdf.set_font("Arial", 'B', 12)
+        pdf.set_text_color(*color_rgb)
+        pdf.cell(0, 8, title, ln=True)
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_font("Arial", '', 10)
+        for item in items:
+            # Clean up bold markdown for PDF
+            clean_item = item.replace("**", "")
+            pdf.multi_cell(0, 5, clean_text(f"- {clean_item}"))
+        pdf.ln(2)
+
+    print_cheat_column("DO THIS (Communication):", data['cheat_do'], green)
+    print_cheat_column("AVOID THIS (Triggers):", data['cheat_avoid'], red)
+    print_cheat_column("FUEL (Motivation):", data['cheat_fuel'], blue)
+    
+    pdf.ln(5)
+    pdf.line(10, pdf.get_y(), 200, pdf.get_y()) # Horizontal line
+    pdf.ln(5)
+
+    def add_section(title, body, bullets=None):
+        pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
+        pdf.cell(0, 8, title, ln=True, fill=True); pdf.ln(2)
+        pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
+        
+        if body:
+            clean_body = body.replace("**", "").replace("* ", "- ")
+            pdf.multi_cell(0, 5, clean_text(clean_body))
+        
+        if bullets:
+            pdf.ln(1)
+            for b in bullets:
+                pdf.cell(5, 5, "-", 0, 0)
+                clean_b = b.replace("**", "") 
+                pdf.multi_cell(0, 5, clean_text(clean_b))
+        pdf.ln(4)
+
+    # Sections 1-10
+    add_section(f"1. Communication Profile: {p_comm}", None, data['s1_b']) 
+    add_section("2. Supervising Their Communication", None, data['s2_b'])
+    add_section(f"3. Motivation Profile: {p_mot}", None, data['s3_b'])
+    add_section("4. Motivating This Staff Member", None, data['s4_b'])
+    add_section("5. Integrated Leadership Profile", data['s5']) 
+    add_section("6. How You Can Best Support Them", data['s6'])
+    add_section("7. What They Look Like When Thriving", data['s7'])
+    add_section("8. What They Look Like When Struggling", data['s8'])
+    add_section("9. Supervisory Interventions (Roadmap)", None, data['s9_b'])
+    add_section("10. What You Should Celebrate", None, data['s10_b'])
+
+    # 11. Coaching Questions (10 questions)
+    pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
+    pdf.cell(0, 8, "11. Coaching Questions", ln=True, fill=True); pdf.ln(2)
+    pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
+    for i, q in enumerate(data['coaching']):
+        pdf.multi_cell(0, 5, clean_text(f"{i+1}. {q}"))
+    pdf.ln(4)
+
+    # 12. Advancement
+    add_section("12. Helping Them Prepare for Advancement", data['advancement'])
+
+    return pdf.output(dest='S').encode('latin-1')
+
 def pdf_hr():
     # subtle divider line
     try:
@@ -3205,52 +3280,45 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     data = generate_profile_content(p_comm, p_mot)
 
     st.markdown("---")
-    st.markdown(f"### 📘 Supervisory Guide: {safe_name}")
+    st.markdown(f"### 📘 Supervisory Guide: {name}")
     st.caption(f"Role: {role} | Profile: {p_comm} ({s_comm}) • {p_mot} ({s_mot})")
 
     # --- Exports (available immediately after clicking Generate Guide) ---
     ex1, ex2 = st.columns([1, 2])
 
-    # Streamlit keys & filenames must be string-safe; some upstream data can be lists.
-    safe_name = (
-        (name[0] if len(name)==1 else ", ".join([str(x) for x in name]))
-        if isinstance(name, list)
-        else ("" if name is None else str(name))
-    )
-
     with ex1:
         pdf_bytes = st.session_state.get("generated_pdf", b"")
         pdf_name = st.session_state.get("generated_name")
-        pdf_filename = st.session_state.get("generated_filename", f"Guide_{safe_name.replace(' ', '_')}.pdf")
+        pdf_filename = st.session_state.get("generated_filename", f"Guide_{name.replace(' ', '_')}.pdf")
 
-        pdf_ready = isinstance(pdf_bytes, (bytes, bytearray)) and len(pdf_bytes) > 0 and (pdf_name == safe_name)
+        pdf_ready = isinstance(pdf_bytes, (bytes, bytearray)) and len(pdf_bytes) > 0 and (pdf_name == name)
 
         st.download_button(
             "📄 Download PDF",
             data=pdf_bytes if pdf_ready else b"",
             file_name=pdf_filename,
             mime="application/pdf",
-            key=f"download_pdf_{safe_name}",
+            key=f"download_pdf_{name}",
             disabled=not pdf_ready,
         )
-        if st.session_state.get("pdf_error") and (pdf_name == safe_name):
+        if st.session_state.get("pdf_error") and (pdf_name == name):
             st.error(f"PDF generation failed: {st.session_state.pdf_error}")
 
     with ex2:
         email_to = st.text_input(
             "Email address",
-            key=f"email_to_{safe_name}",
+            key=f"email_to_{name}",
             placeholder="name@domain.com",
         )
         is_valid = validate_email(email_to)
         if email_to and not is_valid:
             st.warning("Please enter a valid email (must include @ and a domain).")
 
-        send = st.button("✉️ Email me the report", key=f"email_report_{safe_name}", disabled=(not is_valid))
+        send = st.button("✉️ Email me the report", key=f"email_report_{name}", disabled=(not is_valid))
         if send:
             pdf_bytes = st.session_state.get("generated_pdf", b"")
             pdf_name = st.session_state.get("generated_name")
-            pdf_ready = isinstance(pdf_bytes, (bytes, bytearray)) and len(pdf_bytes) > 0 and (pdf_name == safe_name)
+            pdf_ready = isinstance(pdf_bytes, (bytes, bytearray)) and len(pdf_bytes) > 0 and (pdf_name == name)
 
             if not pdf_ready:
                 st.error("Please click 'Generate Guide' first so the PDF can be created.")
@@ -3258,10 +3326,10 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 with st.spinner("Sending..."):
                     success, msg = send_pdf_via_email(
                         email_to,
-                        f"Supervisor Guide: {safe_name}",
+                        f"Supervisor Guide: {name}",
                         f"Attached is the Elmcrest Compass Supervisory Guide for {name}.",
                         pdf_bytes,
-                        st.session_state.get("generated_filename", f"Guide_{safe_name.replace(' ', '_')}.pdf"),
+                        st.session_state.get("generated_filename", f"Guide_{name.replace(' ', '_')}.pdf"),
                     )
                 if success:
                     st.success(msg)
@@ -4512,16 +4580,6 @@ if st.session_state.current_view == "Supervisor's Guide":
                 
                 if sel:
                     d = options[sel]
-                    # --- Robust normalization (admin.py uses strings; some data sources may yield lists) ---
-                    def _norm_name(v):
-                        if isinstance(v, list):
-                            if len(v) == 0:
-                                return ""
-                            if len(v) == 1:
-                                return str(v[0])
-                            return ", ".join([str(x) for x in v])
-                        return "" if v is None else str(v)
-                    d["name"] = _norm_name(d.get("name"))
                     c1,c2,c3 = st.columns(3)
                     c1.metric("Role", d['role']); c2.metric("Style", d['p_comm']); c3.metric("Drive", d['p_mot'])
                     
@@ -4544,11 +4602,11 @@ if st.session_state.current_view == "Supervisor's Guide":
                             if not isinstance(pdf_bytes, (bytes, bytearray)) or len(pdf_bytes) == 0:
                                 raise ValueError("PDF generator returned no data.")
                             st.session_state.generated_pdf = pdf_bytes
-                            st.session_state.generated_filename = f"Guide_{str(d['name']).replace(' ', '_')}.pdf"
+                            st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
                             st.session_state.generated_name = d['name']
                         except Exception as e:
                             st.session_state.generated_pdf = b""
-                            st.session_state.generated_filename = f"Guide_{str(d['name']).replace(' ', '_')}.pdf"
+                            st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
                             st.session_state.generated_name = d['name']
                             st.session_state.pdf_error = str(e)
 
@@ -5256,105 +5314,3 @@ elif st.session_state.current_view == "Org Pulse":
 
 
 
-# =====================================================
-# REPORTLAB_PDF_SUPERVISOR_GUIDE_V1
-# Fixes earlier indentation issue by redefining create_supervisor_guide
-# so it ALWAYS returns PDF bytes.
-# =====================================================
-from io import BytesIO
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem
-from reportlab.lib import colors
-
-def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
-    """Return PDF bytes for the Supervisor Guide (ReportLab implementation)."""
-    data = generate_profile_content(p_comm, p_mot)
-
-    buf = BytesIO()
-    doc = SimpleDocTemplate(
-        buf,
-        pagesize=letter,
-        leftMargin=0.75*inch,
-        rightMargin=0.75*inch,
-        topMargin=0.75*inch,
-        bottomMargin=0.75*inch,
-        title=f"Supervisor Guide - {name}",
-    )
-
-    styles = getSampleStyleSheet()
-    H1 = ParagraphStyle("H1", parent=styles["Title"], fontName="Helvetica-Bold", fontSize=18, spaceAfter=12)
-    H2 = ParagraphStyle("H2", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=13, spaceBefore=10, spaceAfter=6)
-    H3 = ParagraphStyle("H3", parent=styles["Heading3"], fontName="Helvetica-Bold", fontSize=11, spaceBefore=8, spaceAfter=4)
-    Body = ParagraphStyle("Body", parent=styles["BodyText"], fontName="Helvetica", fontSize=10, leading=13, spaceAfter=6)
-
-    def p(txt, style=Body):
-        return Paragraph(clean_text(str(txt)), style)
-
-    def bullets(items, level=0):
-        if not items:
-            return []
-        flow = ListFlowable(
-            [ListItem(p(clean_text(str(it))), leftIndent=12 + level*10) for it in items if str(it).strip()],
-            bulletType="bullet",
-            bulletFontName="Helvetica",
-            bulletFontSize=9,
-            bulletIndent=0,
-            leftIndent=16 + level*10,
-            bulletColor=colors.black,
-        )
-        return [flow, Spacer(1, 6)]
-
-    story = []
-    story.append(p("Elmcrest Supervisory Guide", H1))
-    story.append(p(f"For: <b>{name}</b> ({role})", Body))
-    story.append(p(f"Profile: <b>{p_comm}</b> ({s_comm}) • <b>{p_mot}</b> ({s_mot})", Body))
-    story.append(Spacer(1, 10))
-
-    # Rapid Cheat Sheet
-    story.append(p("Rapid Interaction Cheat Sheet", H2))
-    story.append(p("✅ Do This", H3))
-    story += bullets(data.get("cheat_do") or [])
-    story.append(p("⛔ Avoid This", H3))
-    story += bullets(data.get("cheat_avoid") or [])
-    story.append(p("⛽ What Fuels Them (Motivation)", H3))
-    story += bullets(data.get("cheat_fuel") or [])
-    story.append(Spacer(1, 8))
-
-    # Communication
-    story.append(p("Communication Profile", H2))
-    story += bullets(data.get("s1_b") or [])
-    story.append(p("How to Speak Their Language", H3))
-    story += bullets(data.get("s2_b") or [])
-    story.append(Spacer(1, 8))
-
-    # Motivation
-    story.append(p("Motivation Profile", H2))
-    story += bullets(data.get("s3_b") or [])
-    story.append(p("Leadership Strategies", H3))
-    story += bullets(data.get("s4_b") or [])
-    story.append(p("How to Celebrate Them", H3))
-    story += bullets(data.get("s10_b") or [])
-    story.append(Spacer(1, 8))
-
-    # Integrated
-    story.append(p("Integrated Profile", H2))
-    if data.get("s5_title"):
-        story.append(p(str(data.get("s5_title")), H3))
-    if data.get("s5_synergy"):
-        story.append(p(f"<b>Synergy:</b> {data.get('s5_synergy')}", Body))
-    for k in ["s6", "s7", "s8"]:
-        if data.get(k):
-            story.append(p(data.get(k), Body))
-    story += bullets(data.get("s9_b") or [])
-    story.append(Spacer(1, 8))
-
-    # Coaching + advancement
-    story.append(p("Coaching Questions", H2))
-    story += bullets(data.get("coaching") or [])
-    if data.get("advancement"):
-        story.append(p(data.get("advancement"), Body))
-
-    doc.build(story)
-    return buf.getvalue()
