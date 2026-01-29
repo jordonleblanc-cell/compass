@@ -7,7 +7,7 @@ import re
 from fpdf import FPDF
 
 # --- PDF sanitization for FPDF (latin-1) ---
-# FPDF (fpdf==1.x) cannot encode many Unicode punctuation marks (e.g., en dash “–”).
+# FPDF (fpdf==1.x) cannot encode many Unicode punctuation marks (e.g., en dash “-”).
 # We sanitize all text written into PDFs to avoid UnicodeEncodeError.
 _PDF_REPLACEMENTS = {
     "\u2013": "-",   # en dash
@@ -1011,7 +1011,7 @@ def make_default_clash(sup_style: str, staff_style: str) -> dict:
     psychology = (
         f"When pressure rises, a **{sup_style}** tends to default to **{sup_focus.lower()} clarity** at a **{sup_tempo.lower()} pace**, "
         f"while a **{staff_style}** defaults to **{stf_focus.lower()} safety** at a **{stf_tempo.lower()} pace**. "
-        f"This can create a loop where one side experiences the other as **too much / too fast / too vague / too slow**—even when both are trying to do the right thing."
+        f"This can create a loop where one side experiences the other as **too much / too fast / too vague / too slow**-even when both are trying to do the right thing."
     )
 
     watch_fors = [
@@ -1024,13 +1024,13 @@ def make_default_clash(sup_style: str, staff_style: str) -> dict:
     intervention_steps = [
         "1. **Name the mismatch without blame:** “I think we’re reacting differently under stress.”",
         "2. **Align on the shared goal + minimum safe standard:** “What does ‘safe and good-enough’ look like for this shift?”",
-        "3. **Choose one lane for 24 hours:** either tempo (slow down/speed up) *or* focus (task/people) — not both at once.",
+        "3. **Choose one lane for 24 hours:** either tempo (slow down/speed up) *or* focus (task/people) - not both at once.",
         "4. **Close with roles + next check-in:** “You own X, I own Y. We regroup at (time).”",
     ]
 
     scripts = {
         "Start": (
-            f"I want us on the same team. I think our {sup_style}/{staff_style} styles are colliding a bit—can we name what we each need to succeed right now?"
+            f"I want us on the same team. I think our {sup_style}/{staff_style} styles are colliding a bit-can we name what we each need to succeed right now?"
         ),
         "In-the-moment reset": "Let’s pause. One sentence each: what’s the goal, and what’s the next safest step?",
         "Repair": "I’m not questioning your intentions. I want to repair how that landed. Next time, I’ll (adjust). What adjustment would help you too?",
@@ -1071,7 +1071,7 @@ CAREER_PATHWAYS = {
         "Program Supervisor": {
             "shift": "From *command* to *systems*: build repeatable routines that make the unit run without you.",
             "why": "Directors win by decisive action, but Program Supervisors win by predictable systems and coaching. The block is letting go of ‘hero mode.’",
-            "conversation": "Your job isn’t to solve every problem—it’s to build a system where staff solve it the same way every time. We’re moving you from responder to architect.",
+            "conversation": "Your job isn’t to solve every problem-it’s to build a system where staff solve it the same way every time. We’re moving you from responder to architect.",
             "supervisor_focus": "Watch for over-functioning and doing tasks you should delegate.",
             "assignment_setup": "Pick one recurring pain point (med pass accuracy, documentation timeliness, shift change).",
             "assignment_task": "Write a 1-page ‘minimum standard’ checklist + teach it in a 15-minute micro-training. Then audit it twice in one week.",
@@ -1100,15 +1100,15 @@ CAREER_PATHWAYS = {
         },
         "Director": {
             "shift": "From *doing leadership* to *setting direction*: align stakeholders, manage risk, and build culture intentionally.",
-            "why": "The biggest block is slowing down enough to bring people with you—especially admin peers and external partners.",
-            "conversation": "Your clarity is an asset—now we pair it with coalition-building. You’ll win by aligning people, not outpacing them.",
+            "why": "The biggest block is slowing down enough to bring people with you-especially admin peers and external partners.",
+            "conversation": "Your clarity is an asset-now we pair it with coalition-building. You’ll win by aligning people, not outpacing them.",
             "supervisor_focus": "Watch for lone-wolf execution without stakeholder buy-in.",
             "assignment_setup": "Choose one cross-department initiative (training, scheduling, quality, safety).",
             "assignment_task": "Create a 1-page strategy brief: problem, risks, stakeholders, decision date, and first 3 actions. Present it to two stakeholders and revise based on feedback.",
             "success_indicators": "Stakeholders feel consulted, clearer roles, fewer last-minute surprises.",
             "red_flags": "Pushing through resistance without listening; ‘It’s obvious’ explanations.",
             "debrief_questions": [
-                "Who did you involve early—and how did it change the plan?",
+                "Who did you involve early-and how did it change the plan?",
                 "What resistance was actually useful information?",
                 "What will you communicate weekly?",
             ],
@@ -1119,7 +1119,7 @@ CAREER_PATHWAYS = {
         "Shift Supervisor": {
             "shift": "From *energy* to *follow-through*: stabilize routines and close loops.",
             "why": "Encouragers inspire, but Shift Supervisors must enforce the boring baseline. The block is staying firm when it risks the vibe.",
-            "conversation": "Your warmth stays—but we add structure. We’ll pair encouragement with clear expectations and written follow-up.",
+            "conversation": "Your warmth stays-but we add structure. We’ll pair encouragement with clear expectations and written follow-up.",
             "supervisor_focus": "Watch for avoiding hard feedback and overpromising.",
             "assignment_setup": "Pick one recurring issue (late tasks, missing notes, shift change gaps).",
             "assignment_task": "Give one direct correction using a 3-part script: behavior → impact → expectation. Then send a recap message in writing.",
@@ -1134,7 +1134,7 @@ CAREER_PATHWAYS = {
         "Program Supervisor": {
             "shift": "From *inspiration* to *training systems*: turn culture into repeatable habits.",
             "why": "The block is translating vision into process (checklists, training, audits).",
-            "conversation": "You’re not losing your spark—you’re building a system so the spark becomes a standard.",
+            "conversation": "You’re not losing your spark-you’re building a system so the spark becomes a standard.",
             "supervisor_focus": "Watch for ‘shiny object’ initiatives without completion.",
             "assignment_setup": "Choose one onboarding or coaching topic the unit struggles with.",
             "assignment_task": "Build a 20-minute training + a 5-question check for understanding. Deliver it twice and refine.",
@@ -1144,7 +1144,7 @@ CAREER_PATHWAYS = {
         "Manager": {
             "shift": "From *relationship influence* to *accountability culture*: keep morale while holding standards.",
             "why": "Encouragers can fear being disliked. Managers must sometimes be the ‘bad news’ person.",
-            "conversation": "Kindness is clarity. Accountability is part of care—especially in residential work.",
+            "conversation": "Kindness is clarity. Accountability is part of care-especially in residential work.",
             "supervisor_focus": "Watch for favoritism and protecting underperformance.",
             "assignment_setup": "Identify one performance issue you’ve been ‘hoping improves.’",
             "assignment_task": "Hold a documented coaching conversation with a clear metric and a check-in date.",
@@ -1157,7 +1157,7 @@ CAREER_PATHWAYS = {
             "conversation": "We’ll keep your relational strength but add disciplined execution and decision-making structures.",
             "supervisor_focus": "Watch for avoiding conflict with peers and delaying hard calls.",
             "assignment_setup": "Choose one cross-team priority that needs alignment.",
-            "assignment_task": "Run a structured stakeholder meeting with agenda, decision points, and action owners—send minutes within 24 hours.",
+            "assignment_task": "Run a structured stakeholder meeting with agenda, decision points, and action owners-send minutes within 24 hours.",
             "success_indicators": "Clear decisions, fewer misunderstandings, consistent follow-up.",
             "red_flags": "Great meeting vibes, no decisions or owners.",
         },
@@ -1240,7 +1240,7 @@ CAREER_PATHWAYS = {
         "Director": {
             "shift": "From *precision* to *strategic clarity*: simplify standards so the whole organization can execute.",
             "why": "The block is tolerating imperfection and focusing on the vital few metrics.",
-            "conversation": "At this level, your job is to define the 3-5 standards that protect safety and quality—and build systems to sustain them.",
+            "conversation": "At this level, your job is to define the 3-5 standards that protect safety and quality-and build systems to sustain them.",
             "supervisor_focus": "Watch for over-engineering and drowning stakeholders in detail.",
             "assignment_setup": "Choose one org-wide quality or compliance objective.",
             "assignment_task": "Create a simple dashboard (even manual) with owners, definitions, and review cadence; present it to leadership.",
@@ -1479,7 +1479,7 @@ def _expand_psychology(old_why: str, style: str, role: str) -> dict:
 
     fear = (
         "Being blamed for outcomes you can’t fully control, especially when policy doesn’t provide a clean answer. "
-        "At this level, decisions don’t fail fast—they echo across shifts, staff morale, and documentation."
+        "At this level, decisions don’t fail fast-they echo across shifts, staff morale, and documentation."
     )
 
     shows_up_now = (
@@ -1727,7 +1727,7 @@ TEAM_CULTURE_GUIDE = {
         "title": "Director Culture",
         "impact_analysis": (
             "Fast, decisive, outcome-first. The team moves quickly and hates wasted time. "
-            "This can be a superpower in crisis—but can also feel sharp to more relational styles."
+            "This can be a superpower in crisis-but can also feel sharp to more relational styles."
         ),
         "management_strategy": """**How to lead it:**
 - Lead with the goal, the standard, and the deadline.
@@ -1735,7 +1735,7 @@ TEAM_CULTURE_GUIDE = {
 - Add a deliberate ‘people check’ so relational safety doesn’t lag behind speed.
 """,
         "meeting_protocol": (
-            "Start with outcomes (1 min), then decisions needed (2–3 bullets). "
+            "Start with outcomes (1 min), then decisions needed (2-3 bullets). "
             "Use timeboxes. End with owners + due times."
         ),
         "team_building": "Run a 15-minute ‘wins + blockers’ huddle: one win, one obstacle, one ask for help.",
@@ -1810,7 +1810,7 @@ TEAM_CULTURE_GUIDE = {
 MISSING_VOICE_GUIDE = {
     "Director": {
         "risk": "Decisions drift, urgency drops, and accountability can feel optional.",
-        "fix": "Assign a clear decider each shift and set 2–3 measurable outcomes with timeboxes.",
+        "fix": "Assign a clear decider each shift and set 2-3 measurable outcomes with timeboxes.",
     },
     "Encourager": {
         "risk": "Morale and buy-in may sag; feedback can feel cold or purely corrective.",
@@ -1828,28 +1828,28 @@ MISSING_VOICE_GUIDE = {
 
 MOTIVATION_GAP_GUIDE = {
     "Achievement": {
-        "warning": "This team is strongly Achievement-driven—if goals are unclear, frustration spikes fast.",
-        "coaching": """- Post a visible scoreboard (2–3 metrics).
+        "warning": "This team is strongly Achievement-driven-if goals are unclear, frustration spikes fast.",
+        "coaching": """- Post a visible scoreboard (2-3 metrics).
 - Celebrate finished tasks (closed loops).
 - Give autonomy on *how* to hit the goal, but define the goal precisely.
 """,
     },
     "Growth": {
-        "warning": "This team is strongly Growth-driven—if work feels repetitive or stagnant, engagement drops.",
+        "warning": "This team is strongly Growth-driven-if work feels repetitive or stagnant, engagement drops.",
         "coaching": """- Offer stretch roles (training, leading a debrief, mentoring).
 - Provide frequent developmental feedback (1 thing to sharpen).
 - Map today’s work to a skill they’ll need for the next level.
 """,
     },
     "Purpose": {
-        "warning": "This team is strongly Purpose-driven—if the ‘why’ is missing, they resist or burn out.",
+        "warning": "This team is strongly Purpose-driven-if the ‘why’ is missing, they resist or burn out.",
         "coaching": """- Tie every mandate to client safety and dignity.
 - Use stories (impact moments) to renew meaning after hard shifts.
 - Invite ethical questions, then translate them into actionable next steps.
 """,
     },
     "Connection": {
-        "warning": "This team is strongly Connection-driven—if relationships fray, performance usually follows.",
+        "warning": "This team is strongly Connection-driven-if relationships fray, performance usually follows.",
         "coaching": """- Increase face-time check-ins and small rituals (huddles, debriefs, shared wins).
 - Address tension early (repair fast) to prevent avoidance and resentment.
 - Use buddy systems so support is built into the shift, not added on top.
@@ -1909,7 +1909,7 @@ def build_teaching_deep_dive(name: str, p_comm: str, s_comm: str, p_mot: str, s_
                 "Praise judgment calls, not just compliance."
             ],
             "micro_drills": [
-                "Risk list in 3 minutes: identify 3–6 concrete risks (no 'vibes').",
+                "Risk list in 3 minutes: identify 3-6 concrete risks (no 'vibes').",
                 "Trigger practice: 'If __ happens, I escalate to __ within __ minutes.'"
             ],
         },
@@ -1955,17 +1955,17 @@ def build_teaching_deep_dive(name: str, p_comm: str, s_comm: str, p_mot: str, s_
     nuance = ""
     if p_comm and s_comm and p_comm != s_comm:
         if p_comm == "Director" and s_comm == "Facilitator":
-            nuance = "Secondary Facilitator softens the Director edge — you can use collaboration to increase buy‑in without losing clarity."
+            nuance = "Secondary Facilitator softens the Director edge - you can use collaboration to increase buy‑in without losing clarity."
         elif p_comm == "Director" and s_comm == "Encourager":
-            nuance = "Secondary Encourager helps you lead with warmth — use it to repair after hard calls."
+            nuance = "Secondary Encourager helps you lead with warmth - use it to repair after hard calls."
         elif p_comm == "Tracker" and s_comm == "Encourager":
-            nuance = "Secondary Encourager helps the Tracker communicate care — use it to deliver standards without sounding punitive."
+            nuance = "Secondary Encourager helps the Tracker communicate care - use it to deliver standards without sounding punitive."
         elif p_comm == "Encourager" and s_comm == "Tracker":
-            nuance = "Secondary Tracker adds structure — use checklists and clear deadlines to prevent over-helping."
+            nuance = "Secondary Tracker adds structure - use checklists and clear deadlines to prevent over-helping."
         elif p_comm == "Facilitator" and s_comm == "Director":
-            nuance = "Secondary Director helps you decide — lean on it when time is short."
+            nuance = "Secondary Director helps you decide - lean on it when time is short."
         elif p_comm == "Facilitator" and s_comm == "Tracker":
-            nuance = "Secondary Tracker adds stability — document decisions and set triggers so collaboration stays safe."
+            nuance = "Secondary Tracker adds stability - document decisions and set triggers so collaboration stays safe."
 
     primary = comm_lens.get(p_comm, {
         "optimizes": "clarity and safety",
@@ -2277,7 +2277,7 @@ def create_comm_dials_chart(primary_style, secondary_style=None):
         textposition='auto'
     ))
     fig.update_layout(
-        xaxis=dict(range=[0, 10], title="Dial strength (0–10)"),
+        xaxis=dict(range=[0, 10], title="Dial strength (0-10)"),
         yaxis=dict(title=""),
         margin=dict(l=20, r=20, t=25, b=20),
         height=260,
@@ -2428,7 +2428,7 @@ def _praise_language_by_comm(comm_style: str):
                 "I appreciate how you {behavior}. It moved us toward {outcome}.",
             ],
             "closers": [
-                "Keep doing that—it's a leadership move.",
+                "Keep doing that-it's a leadership move.",
                 "Do that again next shift; it raises the standard."
             ],
             "avoid": "Overly long praise, vague compliments, or emotional over-explaining."
@@ -2437,7 +2437,7 @@ def _praise_language_by_comm(comm_style: str):
             "tone": "warm + relational + impact-on-people",
             "openers": [
                 "I saw how you {behavior}. That helped {who} feel {emotion}.",
-                "Thank you for bringing {behavior}—it changed the energy in the unit."
+                "Thank you for bringing {behavior}-it changed the energy in the unit."
             ],
             "closers": [
                 "I'm glad you're on this team.",
@@ -2453,7 +2453,7 @@ def _praise_language_by_comm(comm_style: str):
             ],
             "closers": [
                 "That's the kind of steady leadership that prevents escalation.",
-                "Keep modeling that—others learn from it."
+                "Keep modeling that-others learn from it."
             ],
             "avoid": "Overhyping or putting them on the spot publicly."
         },
@@ -2461,7 +2461,7 @@ def _praise_language_by_comm(comm_style: str):
             "tone": "precise + integrity + safety/continuity",
             "openers": [
                 "Great job on {behavior}. That reduced risk and kept us in compliance.",
-                "I appreciate the way you {behavior}—it protected continuity for the youth."
+                "I appreciate the way you {behavior}-it protected continuity for the youth."
             ],
             "closers": [
                 "That level of precision builds trust.",
@@ -2814,7 +2814,7 @@ def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     hr()
 
     # =====================================================
-    # COLLAPSED SECTIONS (ONLINE) — INCLUDE IN PDF TOO
+    # COLLAPSED SECTIONS (ONLINE) - INCLUDE IN PDF TOO
     # =====================================================
 
     # --- HUD Training text (collapsed online) ---
@@ -2825,7 +2825,7 @@ What this is: A Heads-Up Display is the supervisor's live dashboard. It helps yo
 Why it matters: Most supervisory mistakes happen when stress signals are misread as attitude, defiance, or incompetence. The HUD reframes stress as data so you can respond with precision.
 
 How to use it:
-1) Scan weekly (2–3 minutes): look for early stress signals and environmental friction.
+1) Scan weekly (2-3 minutes): look for early stress signals and environmental friction.
 2) Act early (small adjustments): remove friction, add fuel, use the person's prescription.
 3) Escalate only when needed: if safety/operations are impacted, shift to the Crisis Protocol.
 4) Debrief after recovery: do coaching after regulation returns.
@@ -2910,6 +2910,204 @@ How to use it (Supervisor steps):
             paragraph("Teaching deep dive not available for this phase in the current configuration.")
         hr()
 
+
+    # --- IPDP PHASE PLANS (collapsed online) ---
+    # Include Phase 1-3 with Phase Overview + Coaching Matrix + Teaching Deep Dive.
+    def _ipdp_phase_overview(phase:int):
+        cards = {
+            1: {
+                "title": "Stabilize & Clarify",
+                "aim": "Create clear expectations and immediate wins so the staff member feels competent and contained.",
+                "supervisor_role": "Be the translator: turn big goals into a clear next play and protect focus from chaos.",
+                "pitfall": "Coaching too abstract (values talk) without translating it into next-step behaviors.",
+                "look_fors": [
+                    "They can repeat expectations back accurately.",
+                    "They complete core routines without reminders.",
+                    "They recover faster after stressful moments."
+                ],
+            },
+            2: {
+                "title": "Build Judgment & Ownership",
+                "aim": "Move from compliance to decision-making-help them own choices with reasoning and risk awareness.",
+                "supervisor_role": "Be the coach: ask for recommendations, require rationale, and strengthen decision muscles.",
+                "pitfall": "You solving it for them (they stay dependent) or over-correcting (they stop taking initiative).",
+                "look_fors": [
+                    "They bring solutions, not only problems.",
+                    "They can name tradeoffs and risks.",
+                    "They take responsibility for follow-through."
+                ],
+            },
+            3: {
+                "title": "Lead Others (Informal → Formal)",
+                "aim": "Prepare them to influence peers: set tone, coach in the moment, and model standards.",
+                "supervisor_role": "Be the sponsor: give safe leadership reps and debrief them into a stronger leadership identity.",
+                "pitfall": "Promoting them to 'mini-supervisor' without training, which creates peer conflict.",
+                "look_fors": [
+                    "Peers seek them out for guidance.",
+                    "They can correct respectfully without escalation.",
+                    "They maintain standards under pressure."
+                ],
+            },
+        }
+        return cards.get(int(phase), cards[1])
+
+    def _ipdp_matrix_moves(comm:str, motiv:str, phase:int):
+        """
+        Return 6 moves (title + why + how + avoid). Kept local so PDF always renders
+        even if the on-screen IPDP expanders are collapsed.
+        """
+        # Two moves keyed by comm + two keyed by motiv + two tuned by phase.
+        comm = comm or "Director"
+        motiv = motiv or "Achievement"
+
+        c_moves = {
+            "Director": [
+                ("Bottom-Line Opener",
+                 "Direct styles regulate through clarity. Starting with the goal reduces friction and prevents circular debate.",
+                 "Open with: the objective, the deadline, and the constraint. Then invite input on execution.",
+                 "Leading with backstory that buries the ask."),
+                ("Autonomy Check",
+                 "Direct styles stay engaged when they can own a lane. Autonomy prevents micromanagement spirals.",
+                 "Ask: “What do you need to own this?” Then grant a bounded decision space.",
+                 "Giving responsibility without authority (sets them up to fail)."),
+            ],
+            "Encourager": [
+                ("Relational Buffer",
+                 "Relational styles regulate through connection. Two minutes of 'us' increases receptivity and reduces shame.",
+                 "Name effort + belonging, then pivot to the ask: “Here’s what we need next.”",
+                 "Jumping straight into critique without relational safety."),
+                ("Vision Connect",
+                 "Encouragers commit when they can see meaning and people-impact.",
+                 "Link task → youth outcome → team wellbeing in one sentence before assigning.",
+                 "Treating motivation as 'just do it' without purpose."),
+            ],
+            "Facilitator": [
+                ("Advance Warning",
+                 "Facilitators regulate through predictability. Surprise demands increase anxiety and indecision.",
+                 "Give the agenda early and state the decision-point: “We will decide by X.”",
+                 "Dragging them into urgent decisions without runway."),
+                ("Process Map",
+                 "Facilitators perform when they can shape the process and ensure fairness.",
+                 "Ask them to design the steps: who, when, and how feedback flows.",
+                 "Only evaluating outcomes while ignoring process health."),
+            ],
+            "Tracker": [
+                ("Data Dive",
+                 "Trackers regulate through specificity. Examples reduce ambiguity and defensiveness.",
+                 "Bring 2-3 concrete examples and ask for a corrective plan.",
+                 "General feedback (“be more responsible”) without specifics."),
+                ("Risk Scan",
+                 "Trackers protect the system by seeing risk early. Use it as an asset, not a brake.",
+                 "Ask: “What’s the highest risk here-and what mitigation makes it safe enough?”",
+                 "Letting risk talk become endless without a decision."),
+            ],
+        }
+
+        m_moves = {
+            "Achievement": [
+                ("Scoreboard",
+                 "Achievement-driven staff stay engaged when success is measurable and visible.",
+                 "Define 1-3 metrics for the week and review them on a predictable cadence.",
+                 "Moving goalposts or vague success criteria."),
+                ("Sprint",
+                 "Short, high-focus sprints create momentum and reduce overwhelm.",
+                 "Set a 3-7 day target with a single priority and a quick check-in.",
+                 "Assigning too many priorities at once."),
+            ],
+            "Growth": [
+                ("Stretch Assignment",
+                 "Growth-driven staff stay engaged when challenged with support.",
+                 "Give a slightly-above-level task + a safety net + a debrief time.",
+                 "Throwing them into the deep end with no coaching."),
+                ("Learning Debrief",
+                 "Growth requires reflection, not just output.",
+                 "Ask: “What did you learn? What will you do differently next time?”",
+                 "Only correcting mistakes without extracting learning."),
+            ],
+            "Purpose": [
+                ("Mission Anchor",
+                 "Purpose-driven staff need to know why the policy matters for youth safety/dignity.",
+                 "Connect the standard to harm reduction and values in plain language.",
+                 "Framing compliance as 'because I said so'."),
+                ("Ethics Check",
+                 "Purpose-driven staff thrive when they can name the 'right' action under ambiguity.",
+                 "Ask for a recommendation + values rationale + risk mitigation.",
+                 "Letting moral urgency become rule-breaking."),
+            ],
+            "Connection": [
+                ("Team Bond",
+                 "Connection-driven staff regulate through belonging and shared ownership.",
+                 "Create brief peer support rituals (handoff huddles, shout-outs, buddy systems).",
+                 "Isolating them or only engaging when there’s a problem."),
+                ("Repair Move",
+                 "Connection requires repair after conflict; without it, performance drops.",
+                 "Teach a short repair script and require a closure step after tension.",
+                 "Avoiding conflict conversations indefinitely."),
+            ],
+        }
+
+        # Phase tuned moves (2 extras)
+        phase_moves = {
+            1: [
+                ("Clarity Contract",
+                 "Phase 1 is about containment. Clear expectations prevent stress from turning into discipline.",
+                 "Write the '3 Non-Negotiables' + '2 Flex Areas' and review at shift start.",
+                 "Adding expectations without confirming understanding."),
+                ("Early Win",
+                 "A quick win builds confidence and reduces defensiveness.",
+                 "Assign a task with a high success probability and praise specifically.",
+                 "Waiting weeks to acknowledge progress."),
+            ],
+            2: [
+                ("Recommendation Rule",
+                 "Phase 2 builds judgment. Requiring a recommendation creates ownership.",
+                 "When they bring a problem, ask: “What do you recommend and why?”",
+                 "Solving it for them in the moment."),
+                ("Tradeoff Talk",
+                 "Phase 2 requires learning to hold risk, revenue, safety, and team factors at once.",
+                 "Ask them to name: risks, mitigations, and the decision threshold.",
+                 "Letting perfectionism block decisions."),
+            ],
+            3: [
+                ("Micro-Leadership Reps",
+                 "Phase 3 requires safe practice leading peers without positional authority.",
+                 "Give a small leadership lane (huddle lead, checklist captain) and debrief.",
+                 "Putting them in charge without boundaries."),
+                ("Coaching Script",
+                 "Peer correction fails when it’s vague or shaming. Scripts keep tone stable.",
+                 "Teach: 'Name the standard → impact → next step' in 30 seconds.",
+                 "Allowing indirect complaints instead of direct coaching."),
+            ],
+        }
+
+        base = c_moves.get(comm, c_moves["Director"])[:2] + m_moves.get(motiv, m_moves["Achievement"])[:2] + phase_moves.get(int(phase), phase_moves[1])[:2]
+        moves = []
+        for (title, why, how, avoid) in base:
+            moves.append({"title": title, "why": why, "how": how, "avoid": avoid})
+        return moves
+
+    title_block("IPDP (Individual Professional Development Plan): Phases 1-3")
+    paragraph("This section is fully included in the PDF even if the on-screen expanders are collapsed.")
+    for _phase in [1, 2, 3]:
+        card = _ipdp_phase_overview(_phase)
+        section_header(f"IPDP Phase {_phase}: {card.get('title','')}")
+        paragraph(f"**Aim:** {card.get('aim','')}")
+        paragraph(f"**Supervisor role:** {card.get('supervisor_role','')}")
+        paragraph(f"**Common pitfall:** {card.get('pitfall','')}")
+        bullets([f"Look-fors: {x}" for x in card.get("look_fors", [])])
+
+        section_header("Coaching Matrix (6 High-Impact Moves)")
+        mv = _ipdp_matrix_moves(p_comm, p_mot, _phase)
+        for i, mvv in enumerate(mv, 1):
+            paragraph(f"**{i}. {mvv['title']}:** {mvv['why']}")
+            bullets([f"How: {mvv['how']}", f"Avoid: {mvv['avoid']}"])
+
+        section_header("Teaching Deep Dive")
+        try:
+            paragraph(build_teaching_deep_dive(name, p_comm, s_comm, p_mot, s_mot, int(_phase)))
+        except Exception:
+            paragraph("Teaching deep dive not available for this phase in the current configuration.")
+        hr()
     return pdf.output(dest="S").encode("latin-1")
 
 
@@ -2981,7 +3179,7 @@ def pdf_callout(title, text):
     pdf.ln(3)
 
     # --- TABLE OF CONTENTS ---
-    # (Short, printable overview — the PDF itself includes all sections expanded.)
+    # (Short, printable overview - the PDF itself includes all sections expanded.)
     pdf.set_fill_color(240, 245, 250)
     pdf.set_font("Arial", 'B', 13)
     pdf.set_text_color(*blue)
@@ -3000,7 +3198,7 @@ def pdf_callout(title, text):
         "8. Repair & Reset Scripts",
         "9. Coaching Questions",
         "10. What To Celebrate",
-        "11. Individual Professional Development Plan (Phases 1–3)",
+        "11. Individual Professional Development Plan (Phases 1-3)",
         "12. Preparing for Advancement",
         "Stress Signature + Support Prescription",
     ]
@@ -3120,13 +3318,13 @@ def pdf_callout(title, text):
                 ],
                 "stretch": [
                     "Run a weekly huddle with agenda + outcomes.",
-                    "Own one quality metric and improve it 10–15% over 30–60 days.",
+                    "Own one quality metric and improve it 10-15% over 30-60 days.",
                     "Deliver corrective feedback using: Impact → Expectation → Support → Check-back."
                 ],
             },
             "Encourager": {
                 "shift": "From being the emotional engine → to holding warm accountability and clear standards.",
-                "critical": "Encouragers stabilize teams, but advancement requires firmness without losing warmth—support and standards at the same time.",
+                "critical": "Encouragers stabilize teams, but advancement requires firmness without losing warmth-support and standards at the same time.",
                 "empower": [
                     "Teach ‘Warm + Clear’ scripts (relationship AND expectation in one sentence).",
                     "Practice boundaries: what you can support vs what you must require.",
@@ -3150,7 +3348,7 @@ def pdf_callout(title, text):
             },
             "Facilitator": {
                 "shift": "From building agreement → to closing decisions with timelines and ownership.",
-                "critical": "Facilitators prevent conflict, but advancement requires containment: decide, assign, then debrief—especially under pressure.",
+                "critical": "Facilitators prevent conflict, but advancement requires containment: decide, assign, then debrief-especially under pressure.",
                 "empower": [
                     "Teach ‘contain then collaborate’: decision first, processing second.",
                     "Give decision authority with guardrails (deadline + non-negotiables).",
@@ -3174,7 +3372,7 @@ def pdf_callout(title, text):
             },
             "Tracker": {
                 "shift": "From protecting compliance → to influencing behavior and building systems people can follow.",
-                "critical": "Trackers keep programs safe, but advancement requires translating ‘policy’ into coaching and engagement—without becoming punitive.",
+                "critical": "Trackers keep programs safe, but advancement requires translating ‘policy’ into coaching and engagement-without becoming punitive.",
                 "empower": [
                     "Give system-building scope: simplify tools, standardize routines.",
                     "Coach them to translate compliance into ‘why it protects youth/staff.’",
@@ -3220,7 +3418,7 @@ def pdf_callout(title, text):
                 "moves": [
                     "Teach warm accountability scripts; practice them weekly.",
                     "Give visible leadership roles with support.",
-                    "Normalize tension as part of leadership—equip instead of protect."
+                    "Normalize tension as part of leadership-equip instead of protect."
                 ],
             },
             "Achievement": {
@@ -3268,7 +3466,7 @@ def pdf_callout(title, text):
             "Director": [
                 "Give a clear objective + the minimum non‑negotiables.",
                 "Limit scope: define what ‘good enough’ looks like.",
-                "Use short check‑ins (5–10 mins) focused on decisions + owners."
+                "Use short check‑ins (5-10 mins) focused on decisions + owners."
             ],
             "Encourager": [
                 "Name safety and belonging first; then address performance.",
@@ -3277,7 +3475,7 @@ def pdf_callout(title, text):
             ],
             "Facilitator": [
                 "Reduce ambiguity: define decision owner and deadline.",
-                "Offer a menu of 2–3 viable options (bounded choice).",
+                "Offer a menu of 2-3 viable options (bounded choice).",
                 "Confirm next step in writing (who/what/when)."
             ],
             "Tracker": [
@@ -3300,13 +3498,13 @@ def pdf_callout(title, text):
     except Exception:
         pass
 
-    # --- NEW: IPDP Roadmap (Phase 1–3) including Coaching Matrix + Teaching Deep Dive ---
+    # --- NEW: IPDP Roadmap (Phase 1-3) including Coaching Matrix + Teaching Deep Dive ---
     # IMPORTANT: The on-screen IPDP matrix helpers live inside the Streamlit view.
     # For PDF reliability, we generate a parallel (pure) roadmap here so the phases
     # always render (and we don't silently skip due to scope errors).
     try:
         pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
-        pdf.cell(0, 8, "14. IPDP Roadmap (Phases 1–3)", ln=True, fill=True); pdf.ln(2)
+        pdf.cell(0, 8, "14. IPDP Roadmap (Phases 1-3)", ln=True, fill=True); pdf.ln(2)
         pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
 
         def _pdf_phase_overview(phase_num: int):
@@ -3320,7 +3518,7 @@ def pdf_callout(title, text):
                 2: {
                     "title": "Phase 2: Judgment + Pattern Recognition",
                     "aim": "Move from task completion to decision quality: spot patterns, anticipate needs, prevent repeats.",
-                    "supervisor_role": "Don’t rescue—require a recommendation + rationale and coach the thinking.",
+                    "supervisor_role": "Don’t rescue-require a recommendation + rationale and coach the thinking.",
                     "common_pitfall": "They defer upward (‘you decide’) or get rigid to avoid ambiguity.",
                 },
                 3: {
@@ -3601,7 +3799,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # --- SECTION 6: THE SUPERVISOR'S HUD (REWORKED) ---
     st.markdown("<div id='sec6'></div>", unsafe_allow_html=True)
     st.subheader("6. The Supervisor's HUD (Heads-Up Display)")
-    st.caption("A real-time dashboard for maintaining this staff member's engagement and preventing burnout. Use it as an early-warning system—not a report card.")
+    st.caption("A real-time dashboard for maintaining this staff member's engagement and preventing burnout. Use it as an early-warning system-not a report card.")
 
     with st.expander("How to use the HUD (Training)", expanded=False):
         st.markdown("""
@@ -3610,7 +3808,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 **Why it matters:** Most supervisory mistakes happen when stress signals are misread as attitude, defiance, or incompetence. The HUD reframes stress as *data* so you can respond with precision.
 
 **How to use it:**
-1. **Scan weekly** (2–3 minutes): look for early stress signals and environmental friction.
+1. **Scan weekly** (2-3 minutes): look for early stress signals and environmental friction.
 2. **Act early** (small adjustments): remove friction, add fuel, use the person's prescription.
 3. **Escalate only when needed:** if safety/operations are impacted, shift to the Crisis Protocol.
 4. **Debrief after recovery:** do coaching *after* regulation returns.
@@ -3645,11 +3843,11 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 - If you treat stress as data, you intervene earlier and keep performance intact.
 
 **How to use it (Supervisor moves):**
-- **Name the pattern early** (low-stakes, non-accusatory): *"I'm noticing you are quieter and moving fast—are you overloaded?"*
-- **Ask for the first signal**: *"What usually changes first when you are nearing burnout—tone, sleep, patience, or focus?"*
+- **Name the pattern early** (low-stakes, non-accusatory): *"I'm noticing you are quieter and moving fast-are you overloaded?"*
+- **Ask for the first signal**: *"What usually changes first when you are nearing burnout-tone, sleep, patience, or focus?"*
 - **Separate person from behavior**: you are not judging character; you are reading a dashboard.
 
-**Red flag rule:** If the stress signature is showing up **for 2+ shifts**, assume the environment and workload need adjustment—not just coaching.
+**Red flag rule:** If the stress signature is showing up **for 2+ shifts**, assume the environment and workload need adjustment-not just coaching.
 """)
 
         with st.expander("The Prescription (What it is / why it matters / how to use it)", expanded=False):
@@ -3665,7 +3863,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
 
 **Two scripts to keep handy:**
 - *"When things pile up, do you reset better with space or a quick check-in?"*
-- *"What helps you get back to your best self fastest—clarity, autonomy, a written plan, or connection?"*
+- *"What helps you get back to your best self fastest-clarity, autonomy, a written plan, or connection?"*
 """)
 
         sc1, sc2 = st.columns(2)
@@ -4020,11 +4218,11 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 },
                 "assignment": {
                     "title": "2) The Ownership Transfer",
-                    "why": "Direct styles grow when they are trusted with authority—but bounded by safety and review.",
+                    "why": "Direct styles grow when they are trusted with authority-but bounded by safety and review.",
                     "how": "Give ownership plus guardrails: minimum safe standard, deadline, escalation triggers.",
                     "scripts": [
                         "“I want your recommendation by 3pm with a risk plan. If X happens, escalate immediately.”",
-                        "“You own this decision—my job is to verify it meets the minimum safe standard.”",
+                        "“You own this decision-my job is to verify it meets the minimum safe standard.”",
                     ],
                     "avoid": "Rescuing by taking it back or giving them the answer.",
                 },
@@ -4036,7 +4234,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                     "how": "Affirm intent, then name the impact, then set the boundary.",
                     "scripts": [
                         "“I see how much you care. And we still need the standard to be ____ because ____.”",
-                        "“This isn’t about your intentions—it’s about outcomes and safety. Let’s tighten ____.”",
+                        "“This isn’t about your intentions-it’s about outcomes and safety. Let’s tighten ____.”",
                     ],
                     "avoid": "Over-softening to the point that the standard becomes optional.",
                 },
@@ -4046,7 +4244,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                     "how": "Give them a clear boundary statement + a repair statement to use afterward.",
                     "scripts": [
                         "“Try this line: ‘I care about you, and I’m not able to approve that because ____.’”",
-                        "“After the hard call, repair with: ‘I’m with you—let’s reset and move forward.’”",
+                        "“After the hard call, repair with: ‘I’m with you-let’s reset and move forward.’”",
                     ],
                     "avoid": "Avoiding conflict until it becomes a crisis.",
                 },
@@ -4065,7 +4263,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 "assignment": {
                     "title": "2) The Process Ownership",
                     "why": "They grow when they design the “how” and then commit to it.",
-                    "how": "Ask them to draft the workflow and accountability steps—then lock it in.",
+                    "how": "Ask them to draft the workflow and accountability steps-then lock it in.",
                     "scripts": [
                         "“Draft the process: who does what, by when, and how we’ll verify it’s done.”",
                         "“Pick a plan and write the steps. We’ll review after the shift.”",
@@ -4077,7 +4275,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 "opener": {
                     "title": "1) The Data-First Clarity",
                     "why": "Detail-oriented styles feel safest when the feedback is specific and evidence-based.",
-                    "how": "Bring 2–3 concrete examples, then connect them to policy/safety, then define the correction.",
+                    "how": "Bring 2-3 concrete examples, then connect them to policy/safety, then define the correction.",
                     "scripts": [
                         "“Here are the specifics I saw: ____. Here’s the risk: ____. The expectation is ____.”",
                         "“Let’s tighten documentation: by end of shift we need ____ completed.”",
@@ -4102,7 +4300,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             "Achievement": {
                 "title": "3) The Scoreboard",
                 "why": "Achievement drivers stay engaged when success is defined and measurable.",
-                "how": "Define 2–3 concrete outcomes and a short time horizon.",
+                "how": "Define 2-3 concrete outcomes and a short time horizon.",
                 "scripts": [
                     "“Success looks like: (1) ____, (2) ____, (3) ____ by end of week.”",
                     "“Let’s set a 7‑day sprint and review results next Friday.”",
@@ -4125,7 +4323,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 "how": "Connect the task to youth outcomes, safety, and dignity.",
                 "scripts": [
                     "“This matters because it protects youth and builds trust on the unit.”",
-                    "“Documentation isn’t paperwork—it's continuity of care.”",
+                    "“Documentation isn’t paperwork-it's continuity of care.”",
                 ],
                 "avoid": "Reducing everything to compliance without meaning.",
             },
@@ -4135,7 +4333,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 "how": "Tie the goal to team stability and peer support.",
                 "scripts": [
                     "“This helps the whole team feel safe and consistent.”",
-                    "“Teach a peer your process—make the unit stronger.”",
+                    "“Teach a peer your process-make the unit stronger.”",
                 ],
                 "avoid": "Isolating them or making it purely transactional.",
             },
@@ -4171,7 +4369,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                     "how": "Run 2-minute “what would you do if…?” drills and require a recommendation.",
                     "scripts": [
                         "“What would you do if a youth escalates during meds pass? Give me your first 3 moves.”",
-                        "“What’s your recommendation—and what risk plan supports it?”",
+                        "“What’s your recommendation-and what risk plan supports it?”",
                     ],
                     "avoid": "Letting them answer with “I’d get a supervisor” as the whole plan.",
                 },
@@ -4221,8 +4419,8 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 "why": "It prevents power struggles by moving the conversation to shared standards.",
                 "how": "Ask a question that forces the standard + plan to be spoken out loud.",
                 "scripts": [
-                    "“What does ‘good’ look like here—and what’s your plan to get us there?”",
-                    "“What’s the safest workable option—and what mitigation makes it safe enough?”",
+                    "“What does ‘good’ look like here-and what’s your plan to get us there?”",
+                    "“What’s the safest workable option-and what mitigation makes it safe enough?”",
                 ],
                 "avoid": "Debating opinions without returning to standards.",
             },
@@ -4231,7 +4429,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 "why": "It keeps warmth while still landing the standard.",
                 "how": "Ask for the standard + the repair language they’ll use.",
                 "scripts": [
-                    "“How will you hold the limit—and how will you repair after?”",
+                    "“How will you hold the limit-and how will you repair after?”",
                     "“What’s the boundary, and what will you say to keep the relationship intact?”",
                 ],
                 "avoid": "Only focusing on feelings without a plan.",
@@ -4329,7 +4527,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         _sh("Teaching Deep Dive")
         if not teaching_text:
             teaching_text = build_teaching_deep_dive(name, p_comm, "", p_mot, "", int(phase))
-        _p(teaching_text or "—")
+        _p(teaching_text or "-")
         out = pdf.output(dest="S")
         if isinstance(out, (bytes, bytearray)):
             return bytes(out)
@@ -4451,7 +4649,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # --- SECTION 12: ADVANCEMENT (NEXT LEVEL) ---
     st.markdown("<div id='sec12'></div>", unsafe_allow_html=True)
     st.subheader("12. Preparing for Advancement")
-    st.caption("This section helps you translate **potential** into **readiness**. We’re not just asking “could they do more?” — we’re building the habits that make promotion safe for the team, the youth, and the staff member.")
+    st.caption("This section helps you translate **potential** into **readiness**. We’re not just asking “could they do more?” - we’re building the habits that make promotion safe for the team, the youth, and the staff member.")
 
     def _build_advancement_plan(comm_p, comm_s, mot_p, mot_s):
         # Core "next-level" growth edges by primary communication style
@@ -4462,7 +4660,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                     "Delegates with clarity (defines outcomes + guardrails, not every step).",
                     "Uses authority to create **calm**, not pressure (tone stays steady in chaos).",
                     "Checks impact: can name how decisions affect youth safety, staff morale, and compliance.",
-                    "Moves from “tell” to “coach”: asks 2–3 questions before giving the answer.",
+                    "Moves from “tell” to “coach”: asks 2-3 questions before giving the answer.",
                 ],
                 "stretch": [
                     "Run a 2-week micro-project where they must delegate tasks to peers and track progress (you only observe).",
@@ -4560,7 +4758,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 "fuel": "They advance best with **clear success criteria**, metrics, and visible wins.",
                 "risk": "Ambiguity in leadership roles can create anxiety or overcontrol.",
                 "supervisor_moves": [
-                    "Define 2–3 measurable outcomes for the stretch assignment.",
+                    "Define 2-3 measurable outcomes for the stretch assignment.",
                     "Use simple dashboards/checklists to show progress.",
                 ],
             },
@@ -4587,13 +4785,13 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             "why_critical": [
                 "Advancement changes the *surface area* of impact: one person’s habits shape the whole unit.",
                 "The next level requires **systems thinking** (youth safety + staffing + documentation + culture), not just personal competence.",
-                "If you promote without training the shift, you amplify stress signatures — and turnover follows.",
+                "If you promote without training the shift, you amplify stress signatures - and turnover follows.",
             ],
             "readiness_signals": comm_block["readiness"],
             "stretch_assignments": comm_block["stretch"],
             "supervisor_playbook": mot_block["supervisor_moves"] + [
                 "Name the new identity: “You’re practicing *leadership*, not just ‘helping out.’”",
-                "Protect learning time: debrief within 24–48 hours (short, specific).",
+                "Protect learning time: debrief within 24-48 hours (short, specific).",
                 "Let them struggle *safely*: ask questions before you rescue the outcome.",
             ],
             "red_flags": comm_block["watch"] + [mot_block["risk"]],
@@ -4660,7 +4858,7 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
         with c2:
             with st.container(border=True):
                 st.markdown("### 🚩 Red flags to coach early")
-                st.caption("Red flags aren’t disqualifiers — they’re **training targets**.")
+                st.caption("Red flags aren’t disqualifiers - they’re **training targets**.")
                 for r in plan["red_flags"]:
                     st.warning(r)
 
@@ -5101,7 +5299,7 @@ Your job is to:
 
                 cA, cB, cC = st.columns(3)
                 with cA:
-                    st.markdown("#### 1) Prepare (5–10 min)")
+                    st.markdown("#### 1) Prepare (5-10 min)")
                     st.markdown("- Identify the **non‑negotiables** (youth safety, policy, ratios).")
                     st.markdown("- Define the **decision needed** (what must change).")
                     st.markdown("- Choose a **neutral opening** and timebox the meeting.")
@@ -5111,7 +5309,7 @@ Your job is to:
                     st.markdown("- Set **rules**: no interrupting, speak for self, stay specific.")
                     st.markdown("- Confirm **psychological safety**: 'We’re solving, not shaming.'")
                 with cC:
-                    st.markdown("#### 3) Make it specific (10–15 min)")
+                    st.markdown("#### 3) Make it specific (10-15 min)")
                     st.markdown("- Each person gives **one example** (date/shift/what happened).")
                     st.markdown("- Supervisor summarizes: *facts + impact + pattern*.")
                     st.markdown("- Name what *both* are trying to protect (values).")
@@ -5120,13 +5318,13 @@ Your job is to:
 
                 dA, dB = st.columns(2)
                 with dA:
-                    st.markdown("#### 4) Build a working agreement (10–15 min)")
+                    st.markdown("#### 4) Build a working agreement (10-15 min)")
                     st.markdown("- Define **roles**: who owns what.")
                     st.markdown("- Define **standards**: what 'good' looks like.")
                     st.markdown("- Define **checkpoints**: how we verify follow‑through.")
                     st.markdown("- Define **repair**: what to do when it slips.")
                 with dB:
-                    st.markdown("#### 5) Close and follow up (2–5 min)")
+                    st.markdown("#### 5) Close and follow up (2-5 min)")
                     st.markdown("- Confirm agreement in one sentence each.")
                     st.markdown("- Set follow‑up: date/time, what will be reviewed.")
                     st.markdown("- End with dignity: appreciation + confidence + clarity.")
@@ -5146,10 +5344,10 @@ Your job is to:
                     st.success("“What are we each committing to on the next shift, and how will we know it’s happening?”")
 
                 # Guided notes template (optional)
-                with st.expander("📝 Mediation Notes (optional — helps you stay structured)", expanded=False):
+                with st.expander("📝 Mediation Notes (optional - helps you stay structured)", expanded=False):
                     template = f"""Conflict Type: {conflict_type}
 
-Facts (what happened; 2–4 bullets):
+Facts (what happened; 2-4 bullets):
 - 
 - 
 
