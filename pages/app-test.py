@@ -1,18 +1,15 @@
 import streamlit as st
 import random
-import copy
 import requests
 import time
 from fpdf import FPDF
 import smtplib
 import json
-import re
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import streamlit.components.v1 as components  # Required for scrolling
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 
 # --- 1. CONFIGURATION ---
 st.set_page_config(
@@ -190,80 +187,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-
-# --- EXTRA UI / ACCESSIBILITY / PRINT STYLES ---
-st.markdown(r'''
-<style>
-/* Statement rows */
-.statement-card{
-    padding: 14px 14px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    background: rgba(255,255,255,0.04);
-    margin-bottom: 8px;
-}
-
-/* Smooth transitions */
-.block-transition{
-    animation: slideFade 260ms ease-out;
-}
-@keyframes slideFade{
-    from{opacity:0; transform: translateY(10px);}
-    to{opacity:1; transform: translateY(0);}
-}
-
-/* Accessibility: visible focus */
-:focus-visible{
-    outline: 3px solid var(--primary) !important;
-    outline-offset: 2px;
-    border-radius: 8px;
-}
-
-/* Make checkboxes look more like radio dots (best-effort) */
-div[data-testid="stCheckbox"] input[type="checkbox"]{
-    width: 18px;
-    height: 18px;
-    border-radius: 999px;
-    border: 2px solid var(--text-sub);
-}
-div[data-testid="stCheckbox"] input[type="checkbox"]:checked{
-    background-color: var(--primary);
-    border-color: var(--primary);
-}
-
-/* Print-friendly (browser print / Save as PDF) */
-@media print{
-    header, footer, .stButton, section[data-testid="stSidebar"]{display:none !important;}
-    html, body, .stApp{
-        background: #ffffff !important;
-        color: #000000 !important;
-    }
-    .statement-card{
-        background: #ffffff !important;
-        border: 1px solid #999999 !important;
-    }
-}
-</style>
-''', unsafe_allow_html=True)
-
-def print_page_button(label="Print / Save as PDF"):
-    # Streamlit doesn't expose a reliable DOM hook for a specific button; use a small HTML button.
-    components.html(f'''
-        <div style="margin: 8px 0 16px 0;">
-          <button onclick="window.parent.print()" style="
-            width:100%;
-            padding:10px 14px;
-            border-radius:999px;
-            border:1px solid rgba(0,0,0,0.18);
-            background: var(--card-bg);
-            color: var(--text-main);
-            font-family: 'Google Sans', sans-serif;
-            font-weight: 600;
-            cursor: pointer;
-          ">{label}</button>
-        </div>
-    ''', height=58)
-
 # --- 3. CONSTANTS & DATA ---
 
 BRAND_COLORS = {
@@ -275,515 +198,129 @@ BRAND_COLORS = {
     "yellow": "#fbbc04"
 }
 
-# --- HELPER: Supervisor Guide Style Map ---
-
-def create_comm_quadrant_chart(comm_style: str):
-    """Supervisor Guide Style Map: fixed quadrant placement by dominant communication style."""
-    coords = {
-        "Director": {"x": -0.5, "y": 0.5, "color": BRAND_COLORS["red"]},
-        "Encourager": {"x": 0.5, "y": 0.5, "color": BRAND_COLORS["yellow"]},
-        "Tracker": {"x": -0.5, "y": -0.5, "color": BRAND_COLORS["blue"]},
-        "Facilitator": {"x": 0.5, "y": -0.5, "color": BRAND_COLORS["green"]},
-    }
-    data = coords.get(comm_style, {"x": 0, "y": 0, "color": BRAND_COLORS.get("gray", "gray")})
-
-    fig = go.Figure()
-
-    # Quadrant backgrounds (match Supervisor Guide)
-    fig.add_shape(type="rect", x0=-1, y0=0, x1=0, y1=1, fillcolor="rgba(234, 67, 53, 0.1)", line_width=0, layer="below")   # Director
-    fig.add_shape(type="rect", x0=0, y0=0, x1=1, y1=1, fillcolor="rgba(251, 188, 4, 0.1)", line_width=0, layer="below")      # Encourager
-    fig.add_shape(type="rect", x0=-1, y0=-1, x1=0, y1=0, fillcolor="rgba(26, 115, 232, 0.1)", line_width=0, layer="below")   # Tracker
-    fig.add_shape(type="rect", x0=0, y0=-1, x1=1, y1=0, fillcolor="rgba(52, 168, 83, 0.1)", line_width=0, layer="below")     # Facilitator
-
-    # Center lines
-    fig.add_vline(x=0, line_width=1, line_color="gray")
-    fig.add_hline(y=0, line_width=1, line_color="gray")
-
-    # Point + label
-    fig.add_trace(go.Scatter(
-        x=[data["x"]], y=[data["y"]],
-        mode="markers+text",
-        marker=dict(size=25, color=data["color"], line=dict(width=2, color="white")),
-        text=[comm_style or "—"],
-        textposition="bottom center",
-        textfont=dict(size=14, family="Arial", weight="bold"),
-        hovertemplate="<b>%{text}</b><extra></extra>",
-    ))
-
-    # Axis labels
-    fig.add_annotation(x=0, y=1.1, text="FAST / ACTION", showarrow=False, font=dict(size=10, color="gray"))
-    fig.add_annotation(x=0, y=-1.1, text="SLOW / PROCESS", showarrow=False, font=dict(size=10, color="gray"))
-    fig.add_annotation(x=-1.1, y=0, text="TASK", showarrow=False, textangle=-90, font=dict(size=10, color="gray"))
-    fig.add_annotation(x=1.1, y=0, text="PEOPLE", showarrow=False, textangle=90, font=dict(size=10, color="gray"))
-
-    fig.update_layout(
-        title=dict(text=f"Style Map: {comm_style}", x=0.0),
-        xaxis=dict(range=[-1.2, 1.2], showgrid=False, zeroline=False, visible=False),
-        yaxis=dict(range=[-1.2, 1.2], showgrid=False, zeroline=False, visible=False),
-        margin=dict(l=20, r=20, t=45, b=20),
-        height=320,
-        plot_bgcolor="rgba(0,0,0,0)",
-        paper_bgcolor="rgba(0,0,0,0)",
-        showlegend=False,
-    )
-    fig.update_yaxes(scaleanchor="x", scaleratio=1)
-    return fig
-
-
-# --- Communication Style Map (Quadrant) ---
-# Axes:
-#   X: Task (-1)  <->  People (+1)
-#   Y: Slow/Process (-1)  <->  Fast/Action (+1)
-# Quadrants (typical mapping):
-#   Director      = Task + Fast
-#   Encourager    = People + Fast
-#   Facilitator   = People + Slow
-#   Tracker       = Task + Slow
-def build_comm_style_map(comm_scores: dict):
-    # Defensive defaults
-    scores = {k: float(v) for k, v in (comm_scores or {}).items()}
-    d = scores.get("Director", 0.0)
-    e = scores.get("Encourager", 0.0)
-    f = scores.get("Facilitator", 0.0)
-    t = scores.get("Tracker", 0.0)
-
-    people = e + f
-    task = d + t
-    fast = d + e
-    slow = t + f
-
-    x_raw = people - task
-    y_raw = fast - slow
-
-    # Theoretical max abs difference with MOST=+3 / LEAST=-1 and balanced design
-    # (Used only for scaling the visual to a stable range)
-    denom = 48.0
-    x = max(-1.0, min(1.0, x_raw / denom))
-    y = max(-1.0, min(1.0, y_raw / denom))
-
-    intensity = min(1.0, (x*x + y*y) ** 0.5)  # 0..1
-    return {
-        "x": x,
-        "y": y,
-        "x_raw": x_raw,
-        "y_raw": y_raw,
-        "intensity": intensity,
-        "quadrant": comm_primary_from_point(x, y),
-    }
-
-def comm_primary_from_point(x: float, y: float) -> str:
-    # If on an axis, fall back to "Blend"
-    if abs(x) < 1e-9 and abs(y) < 1e-9:
-        return "Blend"
-    if x >= 0 and y >= 0:
-        return "Encourager"
-    if x < 0 and y >= 0:
-        return "Director"
-    if x >= 0 and y < 0:
-        return "Facilitator"
-    return "Tracker"
-
-def plot_comm_style_map(comm_scores: dict, dominant_label: str = None):
-    m = build_comm_style_map(comm_scores)
-    x, y = m["x"], m["y"]
-
-    # Background quadrants (subtle)
-    quad_opacity = 0.18
-    shapes = [
-        # Top-left (Director)
-        dict(type="rect", x0=-1, x1=0, y0=0, y1=1, line=dict(width=0), fillcolor="rgba(234,67,53,{})".format(quad_opacity)),
-        # Top-right (Encourager)
-        dict(type="rect", x0=0, x1=1, y0=0, y1=1, line=dict(width=0), fillcolor="rgba(251,188,4,{})".format(quad_opacity)),
-        # Bottom-left (Tracker)
-        dict(type="rect", x0=-1, x1=0, y0=-1, y1=0, line=dict(width=0), fillcolor="rgba(26,115,232,{})".format(quad_opacity)),
-        # Bottom-right (Facilitator)
-        dict(type="rect", x0=0, x1=1, y0=-1, y1=0, line=dict(width=0), fillcolor="rgba(52,168,83,{})".format(quad_opacity)),
-        # Crosshairs
-        dict(type="line", x0=-1, x1=1, y0=0, y1=0, line=dict(color="rgba(255,255,255,0.35)", width=2)),
-        dict(type="line", x0=0, x1=0, y0=-1, y1=1, line=dict(color="rgba(255,255,255,0.35)", width=2)),
-    ]
-
-    fig = go.Figure()
-
-    # Point + label
-    label = dominant_label or m["quadrant"]
-    fig.add_trace(go.Scatter(
-        x=[x],
-        y=[y],
-        mode="markers+text",
-        text=[label],
-        textposition="bottom center",
-        marker=dict(size=22, line=dict(width=2, color="white")),
-        hovertemplate=(
-            "<b>%{text}</b><br>"
-            "People ↔ Task: %{x:.2f}<br>"
-            "Fast ↔ Slow: %{y:.2f}<br>"
-            "Intensity: " + f"{m['intensity']*100:.0f}%" + "<extra></extra>"
-        ),
-    ))
-
-    fig.update_layout(
-        title=dict(text=f"Style Map: {label}", x=0.0),
-        height=320,
-        margin=dict(t=50, b=40, l=40, r=40),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        xaxis=dict(range=[-1, 1], showgrid=False, zeroline=False, showticklabels=False, title=""),
-        yaxis=dict(range=[-1, 1], showgrid=False, zeroline=False, showticklabels=False, title=""),
-        shapes=shapes,
-        annotations=[
-            dict(x=0, y=1.05, xref="x", yref="y", text="FAST / ACTION", showarrow=False, font=dict(size=10, color="rgba(255,255,255,0.7)")),
-            dict(x=0, y=-1.10, xref="x", yref="y", text="SLOW / PROCESS", showarrow=False, font=dict(size=10, color="rgba(255,255,255,0.7)")),
-            dict(x=-1.05, y=0, xref="x", yref="y", text="TASK", showarrow=False, textangle=-90, font=dict(size=10, color="rgba(255,255,255,0.7)")),
-            dict(x=1.05, y=0, xref="x", yref="y", text="PEOPLE", showarrow=False, textangle=90, font=dict(size=10, color="rgba(255,255,255,0.7)")),
-        ],
-        showlegend=False,
-    )
-    fig.update_yaxes(scaleanchor="x", scaleratio=1)
-    return fig, m
-
-
 ROLE_RELATIONSHIP_LABELS = {
     "Program Supervisor": {"directReportsLabel": "Shift Supervisors", "youthLabel": "youth on your units", "supervisorLabel": "Residential Programs Manager", "leadershipLabel": "agency leadership"},
     "Shift Supervisor": {"directReportsLabel": "YDPs", "youthLabel": "youth you support", "supervisorLabel": "Program Supervisor", "leadershipLabel": "agency leadership"},
     "YDP": {"directReportsLabel": "peers", "youthLabel": "youth in your care", "supervisorLabel": "Shift Supervisor", "leadershipLabel": "Program Supervisor"}
 }
 
-
-# --- ASSESSMENT QUESTIONS (IPSATIVE / FORCED-CHOICE BLOCKS) ---
-# Methodology:
-# - 24 blocks total
-# - For each block, participant selects:
-#     * MOST like me  -> +3 points to that style/driver
-#     * LEAST like me -> -1 point (penalty) to that style/driver
-# - Blocks are randomized, and the order of statements within each block is randomized once per session.
+# --- ASSESSMENT QUESTIONS (OPTIMIZED HYBRID FORMAT) ---
+# Format types:
+#   - likert: 1–5 scale (behavior frequency / "most days")
+#   - forced: pick ONE of two statements (tradeoff / priority check)
 #
-# Section 1 (Blocks 1–12): Communication Style
-#   - Director, Encourager, Facilitator, Tracker
-# Section 2 (Blocks 13–24): Motivation Drivers
-#   - Growth, Purpose, Connection, Achievement
+# Notes:
+#   - This hybrid format improves discrimination and reduces "agree with everything" inflation.
+#   - Forced-choice items are used as tie-breakers and to reduce response bias.
 
-MOST_POINTS = 3
-LEAST_POINTS = -1
+LIKERT_OPTIONS = [1, 2, 3, 4, 5]
+LIKERT_LABELS = {
+    1: "Strongly Disagree",
+    2: "Disagree",
+    3: "Neutral",
+    4: "Agree",
+    5: "Strongly Agree",
+}
 
-IPSATIVE_BLOCKS = [
-    # --- SECTION 1: COMMUNICATION (1–12) ---
-    {"id":"B01","section":"comm","title":"Crisis Response","intro":"In a crisis, my natural response is to...","statements":[
-        {"code":"Director","text":"I naturally take charge and issue clear directives to stabilize the situation."},
-        {"code":"Encourager","text":"I focus on keeping the emotional energy of the team positive and calm."},
-        {"code":"Facilitator","text":"I pause to ensure we are hearing all perspectives before acting."},
-        {"code":"Tracker","text":"I immediately check the protocols to ensure we are following the correct procedure."},
-    ]},
-    {"id":"B02","section":"comm","title":"Feedback Style","intro":"When giving feedback, I'm most likely to...","statements":[
-        {"code":"Encourager","text":"I frame feedback with encouragement so the person feels supported."},
-        {"code":"Tracker","text":"I refer to the specific rule or standard that was missed."},
-        {"code":"Director","text":"I give direct, blunt feedback to correct the behavior quickly."},
-        {"code":"Facilitator","text":"I ask questions to understand their perspective before giving my opinion."},
-    ]},
-    {"id":"B03","section":"comm","title":"Decision Making","intro":"When a decision needs to be made, I tend to...","statements":[
-        {"code":"Facilitator","text":"I prefer to wait until the group has reached a consensus."},
-        {"code":"Director","text":"I prefer to make the decision myself to ensure it happens fast."},
-        {"code":"Tracker","text":"I rely on data and past records to guide my choice."},
-        {"code":"Encourager","text":"I consider how the decision will impact the team’s morale first."},
-    ]},
-    {"id":"B04","section":"comm","title":"Managing Conflict","intro":"When conflict shows up, I usually...","statements":[
-        {"code":"Director","text":"I step in and define the solution to stop the argument."},
-        {"code":"Facilitator","text":"I try to mediate and help both sides understand each other."},
-        {"code":"Encourager","text":"I listen to vent emotions and help them feel better."},
-        {"code":"Tracker","text":"I look for the policy that clarifies who is right."},
-    ]},
-    {"id":"B05","section":"comm","title":"Team Meetings","intro":"In team meetings, I typically focus on...","statements":[
-        {"code":"Tracker","text":"I ensure there is an agenda and we stick to the timeline."},
-        {"code":"Director","text":"I focus on the goals and action items we need to hit."},
-        {"code":"Facilitator","text":"I ensure everyone has a chance to speak and contribute."},
-        {"code":"Encourager","text":"I start or end with something fun to build connection."},
-    ]},
-    {"id":"B06","section":"comm","title":"Under Stress","intro":"When I'm under stress, I'm most likely to...","statements":[
-        {"code":"Director","text":"I become impatient if things are moving too slowly."},
-        {"code":"Encourager","text":"I worry that I might have offended someone."},
-        {"code":"Facilitator","text":"I struggle to make a decision because I want to be fair."},
-        {"code":"Tracker","text":"I get anxious if the plan changes at the last minute."},
-    ]},
-    {"id":"B07","section":"comm","title":"Communication Preference","intro":"I prefer communication that is...","statements":[
-        {"code":"Director","text":"Brief, bulleted points. Tell me the bottom line."},
-        {"code":"Tracker","text":"Detailed, written instructions so I don’t miss anything."},
-        {"code":"Facilitator","text":"A conversation where we can explore ideas together."},
-        {"code":"Encourager","text":"A warm, personal interaction where we connect first."},
-    ]},
-    {"id":"B08","section":"comm","title":"Leadership Superpower","intro":"At my best, my leadership strength is that...","statements":[
-        {"code":"Tracker","text":"People trust me to notice the details they missed."},
-        {"code":"Director","text":"People look to me when a hard call needs to be made."},
-        {"code":"Facilitator","text":"People feel safe and heard when they talk to me."},
-        {"code":"Encourager","text":"People feel energized and appreciated around me."},
-    ]},
-    {"id":"B09","section":"comm","title":"Handling Change","intro":"When things change, I usually...","statements":[
-        {"code":"Encourager","text":"I help the team process how they feel about the change."},
-        {"code":"Tracker","text":"I ask, “Does this change align with our established processes?”"},
-        {"code":"Director","text":"I drive the change forward and overcome resistance."},
-        {"code":"Facilitator","text":"I facilitate a discussion on how to implement it fairly."},
-    ]},
-    {"id":"B10","section":"comm","title":"Prioritization","intro":"When priorities compete, I default toward...","statements":[
-        {"code":"Director","text":"Efficiency and results are my top priorities."},
-        {"code":"Encourager","text":"Harmony and team cohesion are my top priorities."},
-        {"code":"Tracker","text":"Accuracy and compliance are my top priorities."},
-        {"code":"Facilitator","text":"Inclusion and consensus are my top priorities."},
-    ]},
-    {"id":"B11","section":"comm","title":"The “Shadow” Side (What trips you up?)","intro":"If I'm not careful, I can trip myself up by...","statements":[
-        {"code":"Director","text":"I can be too blunt and hurt feelings."},
-        {"code":"Encourager","text":"I can be too lenient and avoid hard conversations."},
-        {"code":"Tracker","text":"I can be too rigid and resist necessary changes."},
-        {"code":"Facilitator","text":"I can be too indecisive and delay action."},
-    ]},
-    {"id":"B12","section":"comm","title":"Final Communication Check","intro":"In a team, I most naturally function as...","statements":[
-        {"code":"Director","text":"I am the accelerator; I make things go."},
-        {"code":"Tracker","text":"I am the brake; I ensure we are safe."},
-        {"code":"Encourager","text":"I am the glue; I hold us together."},
-        {"code":"Facilitator","text":"I am the bridge; I connect the sides."},
-    ]},
+# Weights (keep simple + stable)
+LIKERT_WEIGHT = 1.0
+FORCED_WEIGHT = 3.0          # chosen option adds 3 points to its mapped style/driver
+STRESS_WEIGHT = 1.2          # small boost so stress-pattern items shape the primary/secondary more
 
-    # --- SECTION 2: MOTIVATION (13–24) ---
-    {"id":"B13","section":"motiv","title":"What Energizes You?","intro":"I feel most energized at work when...","statements":[
-        {"code":"Growth","text":"Learning a new skill or mastering a complex task."},
-        {"code":"Purpose","text":"Knowing my work aligns with my deep personal values."},
-        {"code":"Connection","text":"Feeling a deep sense of belonging with my team."},
-        {"code":"Achievement","text":"Checking items off a list and seeing concrete progress."},
-    ]},
-    {"id":"B14","section":"motiv","title":"What Drains You?","intro":"Work drains me most when...","statements":[
-        {"code":"Growth","text":"Stagnation; doing the same thing without improving."},
-        {"code":"Purpose","text":"Moral distress; doing something that feels unethical."},
-        {"code":"Connection","text":"Isolation; working alone or in a toxic team environment."},
-        {"code":"Achievement","text":"Ambiguity; not knowing if I am succeeding or failing."},
-    ]},
-    {"id":"B15","section":"motiv","title":"Ideal Recognition","intro":"The kind of recognition that lands best for me is...","statements":[
-        {"code":"Achievement","text":"“You did a great job hitting that goal on time.”"},
-        {"code":"Connection","text":"“I really value you as a person and a friend.”"},
-        {"code":"Growth","text":"“You have grown so much in your leadership skills.”"},
-        {"code":"Purpose","text":"“Your work made a real difference in that child’s life.”"},
-    ]},
-    {"id":"B16","section":"motiv","title":"Definition of Success","intro":"To me, success looks like...","statements":[
-        {"code":"Growth","text":"Success is becoming the best version of myself."},
-        {"code":"Purpose","text":"Success is making the world a more just place."},
-        {"code":"Connection","text":"Success is having a team that loves working together."},
-        {"code":"Achievement","text":"Success is hitting the target numbers efficiently."},
-    ]},
-    {"id":"B17","section":"motiv","title":"Project Preference","intro":"Given a choice, I'd rather work on...","statements":[
-        {"code":"Growth","text":"A project where I can design a new system or strategy."},
-        {"code":"Purpose","text":"A project that directly advocates for the youth."},
-        {"code":"Connection","text":"A project where we collaborate closely as a group."},
-        {"code":"Achievement","text":"A project with a clear deadline and measurable outcome."},
-    ]},
-    {"id":"B18","section":"motiv","title":"Dealing with Failure","intro":"When something goes wrong, my first instinct is to...","statements":[
-        {"code":"Achievement","text":"I analyze the data to see where the process broke down."},
-        {"code":"Connection","text":"I worry I let the team down relationally."},
-        {"code":"Growth","text":"I treat it as a learning opportunity to get better."},
-        {"code":"Purpose","text":"I question if we lost sight of the mission."},
-    ]},
-    {"id":"B19","section":"motiv","title":"Coaching Needs","intro":"The coaching/support that helps me most is...","statements":[
-        {"code":"Growth","text":"Challenge me to reach the next level of my career."},
-        {"code":"Purpose","text":"Remind me why this work matters in the big picture."},
-        {"code":"Connection","text":"Check in on me personally and how I am doing."},
-        {"code":"Achievement","text":"Give me clear metrics on where I stand."},
-    ]},
-    {"id":"B20","section":"motiv","title":"Values Check","intro":"The value I tend to prioritize most is...","statements":[
-        {"code":"Growth","text":"Competence: Being highly skilled at what I do."},
-        {"code":"Purpose","text":"Integrity: Doing what is right, even when it is hard."},
-        {"code":"Connection","text":"Community: Being part of a supportive tribe."},
-        {"code":"Achievement","text":"Excellence: Delivering high-quality results."},
-    ]},
-    {"id":"B21","section":"motiv","title":"Burnout Trigger","intro":"Under stress, I am more likely to burn out if...","statements":[
-        {"code":"Purpose","text":"Feeling like a cog in a machine with no meaning."},
-        {"code":"Growth","text":"Feeling incompetent or undertrained for the task."},
-        {"code":"Connection","text":"Feeling lonely or excluded by my peers."},
-        {"code":"Achievement","text":"Feeling like we are spinning our wheels with no results."},
-    ]},
-    {"id":"B22","section":"motiv","title":"Motivation in Crisis","intro":"In a crisis, I'm most motivated by...","statements":[
-        {"code":"Achievement","text":"I am motivated to solve the problem and fix the mess."},
-        {"code":"Connection","text":"I am motivated to protect the people involved."},
-        {"code":"Growth","text":"I am motivated to learn from this so it doesn’t happen again."},
-        {"code":"Purpose","text":"I am motivated to ensure justice is done."},
-    ]},
-    {"id":"B23","section":"motiv","title":"The “Why”","intro":"My deeper reason for doing this work is...","statements":[
-        {"code":"Growth","text":"I work here to build a career and skills."},
-        {"code":"Purpose","text":"I work here because I believe in the cause."},
-        {"code":"Connection","text":"I work here because I love the team culture."},
-        {"code":"Achievement","text":"I work here to get things done and achieve goals."},
-    ]},
-    {"id":"B24","section":"motiv","title":"Final Motivation Check","intro":"I most want to be known as...","statements":[
-        {"code":"Growth","text":"I want to be known as an Expert."},
-        {"code":"Purpose","text":"I want to be known as an Advocate."},
-        {"code":"Connection","text":"I want to be known as a Friend."},
-        {"code":"Achievement","text":"I want to be known as a High-Performer."},
-    ]},
+# --- Part 1: Communication Style (Day-to-day + Under Stress + Priority Check) ---
+# NOTE: These items are intentionally written to be value-neutral (no “best” style) and parallel across styles.
+# The goal is to measure your *default contribution* under normal conditions + your *automatic shift* under stress.
+COMM_QUESTIONS = [
+    # Director (Day-to-day) — The Clarity Builder
+    {"id":"cL1","type":"likert","style":"Director","text":"When priorities compete, I help define the next clear decision so the team can move forward."},
+    {"id":"cL2","type":"likert","style":"Director","text":"In group settings, I naturally summarize what needs to happen next."},
+    {"id":"cL3","type":"likert","style":"Director","text":"I’m comfortable setting direction when time is limited and the team needs a call."},
+    {"id":"cL4","type":"likert","style":"Director","text":"I focus on outcomes, timelines, and accountability so work stays on track."},
+    {"id":"cL5","type":"likert","style":"Director","text":"I’m comfortable naming expectations clearly, even when it’s an uncomfortable conversation."},
+
+    # Encourager (Day-to-day) — The Morale Builder
+    {"id":"cL6","type":"likert","style":"Encourager","text":"I pay attention to team energy and help restore steadiness when morale dips."},
+    {"id":"cL7","type":"likert","style":"Encourager","text":"I name effort and progress to reinforce what’s working and keep people engaged."},
+    {"id":"cL8","type":"likert","style":"Encourager","text":"Before correcting performance, I try to understand what’s going on for the person."},
+    {"id":"cL9","type":"likert","style":"Encourager","text":"I build rapport in a way that helps people stay motivated through hard shifts."},
+    {"id":"cL10","type":"likert","style":"Encourager","text":"I communicate in a way that protects dignity and helps people feel supported."},
+
+    # Facilitator (Day-to-day) — The Alignment Builder
+    {"id":"cL11","type":"likert","style":"Facilitator","text":"I create space for different perspectives before the team locks into a plan."},
+    {"id":"cL12","type":"likert","style":"Facilitator","text":"I restate or summarize what I’m hearing to reduce misunderstanding."},
+    {"id":"cL13","type":"likert","style":"Facilitator","text":"I help groups move from disagreement to workable alignment and shared buy-in."},
+    {"id":"cL14","type":"likert","style":"Facilitator","text":"I stay grounded and help de-escalate emotional intensity when things get heated."},
+    {"id":"cL15","type":"likert","style":"Facilitator","text":"I pay attention to the process of decision-making so outcomes are owned and durable."},
+
+    # Tracker (Day-to-day) — The Quality Guardian
+    {"id":"cL16","type":"likert","style":"Tracker","text":"I notice gaps in follow-through, documentation, routines, or handoffs that others miss."},
+    {"id":"cL17","type":"likert","style":"Tracker","text":"I clarify expectations so tasks are completed correctly and consistently."},
+    {"id":"cL18","type":"likert","style":"Tracker","text":"I create structure (checklists, schedules, simple systems) to prevent preventable errors."},
+    {"id":"cL19","type":"likert","style":"Tracker","text":"I focus on standards and consistency because quality and safety depend on it."},
+    {"id":"cL20","type":"likert","style":"Tracker","text":"I’m comfortable verifying key details before moving forward, especially when stakes are high."},
+
+    # Under stress (weighted)
+    {"id":"cS1","type":"likert","style":"Director","weight":STRESS_WEIGHT,"text":"Under pressure, I narrow focus to priorities and decisions so the team doesn’t drift."},
+    {"id":"cS2","type":"likert","style":"Encourager","weight":STRESS_WEIGHT,"text":"When stressed, I increase support and check-ins to keep people steady."},
+    {"id":"cS3","type":"likert","style":"Facilitator","weight":STRESS_WEIGHT,"text":"In conflict, I slow the pace and reframe what’s happening to reduce escalation."},
+    {"id":"cS4","type":"likert","style":"Tracker","weight":STRESS_WEIGHT,"text":"When anxious, I double-check details and procedures to reduce risk and surprises."},
+
+    # Priority check (forced choice) — value-neutral tradeoffs
+    {"id":"cF1","type":"forced","prompt":"In a difficult shift, I’m more focused on…","a_text":"Creating a clear decision and forward motion.","a_style":"Director","b_text":"Stabilizing people so they can keep functioning.","b_style":"Encourager"},
+    {"id":"cF2","type":"forced","prompt":"When plans are unclear, I’m more likely to…","a_text":"Set direction quickly so the team can act.","a_style":"Director","b_text":"Ask questions to build alignment before acting.","b_style":"Facilitator"},
+    {"id":"cF3","type":"forced","prompt":"When something feels off, my first instinct is to…","a_text":"Check the details, expectations, and process gaps.","a_style":"Tracker","b_text":"Check the human dynamics and emotional temperature.","b_style":"Encourager"},
+    {"id":"cF4","type":"forced","prompt":"When disagreement starts escalating, I’m more likely to…","a_text":"Set a boundary and close the loop so we can proceed.","a_style":"Director","b_text":"Slow down, reflect back, and de-escalate first.","b_style":"Facilitator"},
 ]
 
-# --- Text normalization: make statements read as a complete sentence with the intro ---
-def _normalize_statement_text(intro: str, text: str) -> str:
-    """Ensure each option can follow the intro smoothly (e.g., '... if I feel ...')."""
-    if not text:
-        return text
-    t = str(text).strip()
+# --- Part 2: Motivation Drivers (Day-to-day + Priority Check + Burnout Context) ---
+MOTIVATION_QUESTIONS = [
+    # Growth
+    {"id":"mL1","type":"likert","style":"Growth","text":"I feel energized when I’m learning or being stretched."},
+    {"id":"mL2","type":"likert","style":"Growth","text":"I’m motivated by opportunities to improve my skills."},
+    {"id":"mL3","type":"likert","style":"Growth","text":"Doing the same work repeatedly drains my energy."},
+    {"id":"mL4","type":"likert","style":"Growth","text":"Feedback that helps me grow matters to me."},
+    {"id":"mL5","type":"likert","style":"Growth","text":"Development opportunities influence whether I stay engaged."},
 
-    # Remove leading bullets/dashes if present
-    t = re.sub(r"^[\-•\u2022\s]+", "", t)
+    # Purpose
+    {"id":"mL6","type":"likert","style":"Purpose","text":"I need to feel my work aligns with values about youth and dignity."},
+    {"id":"mL7","type":"likert","style":"Purpose","text":"Decisions that don’t make sense for youth bother me deeply."},
+    {"id":"mL8","type":"likert","style":"Purpose","text":"Meaning matters more to me than efficiency alone."},
+    {"id":"mL9","type":"likert","style":"Purpose","text":"I feel proud when I can see real impact."},
+    {"id":"mL10","type":"likert","style":"Purpose","text":"I question policies that feel disconnected from care."},
 
-    # Common gerund-to-first-person rewrites for cohesion
-    replacements = [
-        (r"^Feeling\b", "I feel"),
-        (r"^Being\b", "I am"),
-        (r"^Having\b", "I have"),
-        (r"^Needing\b", "I need"),
-        (r"^Getting\b", "I get"),
-        (r"^Lacking\b", "I lack"),
-        (r"^Missing\b", "I miss"),
-        (r"^Not\s+having\b", "I don't have"),
-        (r"^Not\s+feeling\b", "I don't feel"),
-        (r"^Not\s+being\b", "I'm not"),
-    ]
-    for pattern, repl in replacements:
-        if re.match(pattern, t, flags=re.IGNORECASE):
-            t = re.sub(pattern, repl, t, flags=re.IGNORECASE)
-            break
+    # Connection
+    {"id":"mL11","type":"likert","style":"Connection","text":"Feeling connected to coworkers affects my motivation."},
+    {"id":"mL12","type":"likert","style":"Connection","text":"Team tension drains my energy quickly."},
+    {"id":"mL13","type":"likert","style":"Connection","text":"I value being known and supported by my supervisor."},
+    {"id":"mL14","type":"likert","style":"Connection","text":"Belonging influences how much effort I give."},
+    {"id":"mL15","type":"likert","style":"Connection","text":"Emotional climate matters to me."},
 
-    # If the intro ends with "if" or "if..." and the statement doesn't start with a connector, prefix "I"
-    intro_l = (intro or "").strip().lower()
-    needs_prefix = (" if" in intro_l) or intro_l.endswith("if...") or intro_l.endswith("if") or intro_l.endswith("if:")
-    starts_ok = bool(re.match(r"^(I\b|I'm\b|I\s|My\b|When\b|If\b|Because\b|That\b|To\b|In\b|On\b|At\b)", t))
-    if needs_prefix and not starts_ok:
-        # Lowercase first letter for smoother read (unless it's an acronym)
-        t2 = t[0].lower() + t[1:] if (len(t) > 1 and t[0].isalpha() and not (len(t) > 2 and t[:2].isupper())) else t
-        t = f"I {t2}"
+    # Achievement
+    {"id":"mL16","type":"likert","style":"Achievement","text":"Clear goals help me feel effective."},
+    {"id":"mL17","type":"likert","style":"Achievement","text":"I like knowing exactly what success looks like."},
+    {"id":"mL18","type":"likert","style":"Achievement","text":"I’m motivated by measurable progress."},
+    {"id":"mL19","type":"likert","style":"Achievement","text":"Tracking outcomes helps me stay focused."},
+    {"id":"mL20","type":"likert","style":"Achievement","text":"Ambiguous expectations frustrate me."},
 
-    # Ensure it ends with a period for consistent readability
-    if not re.search(r"[\.!?]\s*$", t):
-        t = t + "."
+    # Priority check (forced choice)
+    {"id":"mF1","type":"forced","prompt":"What drains me faster?","a_text":"Lack of progress / unclear outcomes.","a_style":"Achievement","b_text":"Lack of connection / tension on the team.","b_style":"Connection"},
+    {"id":"mF2","type":"forced","prompt":"What restores me faster?","a_text":"Seeing improvement, mastery, or learning.","a_style":"Growth","b_text":"Seeing real positive impact on youth/people.","b_style":"Purpose"},
+    {"id":"mF3","type":"forced","prompt":"If I’m frustrated at work, it’s usually because…","a_text":"The system isn’t matching the mission for youth.","a_style":"Purpose","b_text":"Expectations and targets aren’t clear or stable.","b_style":"Achievement"},
+    {"id":"mF4","type":"forced","prompt":"If I’m offered a new opportunity, I’m more likely to say yes when…","a_text":"It builds my skills and stretches me.","a_style":"Growth","b_text":"It deepens relationships and team connection.","b_style":"Connection"},
 
-    return t
-
-def normalize_ipsative_blocks_(blocks):
-    for b in blocks:
-        intro = b.get("intro", "")
-        for s in b.get("statements", []):
-            s["text"] = _normalize_statement_text(intro, s.get("text", ""))
-    return blocks
-
-# Normalize the hardcoded block text once at import time
-IPSATIVE_BLOCKS = normalize_ipsative_blocks_(IPSATIVE_BLOCKS)
-
-# --- SCORING (IPSATIVE) ---
-def compute_results_from_ipsative(blocks, answers_by_block_id):
-    """
-    Compute style/driver scores from ipsative MOST(+3) / LEAST(-1) picks, and derive:
-      - primary + secondary (dominant + secondary) for Communication and Motivation
-      - confidence labels (Clear / Moderate / Blend)
-
-    Notes:
-      - Ipsative results are *within-person* preferences (not norm-referenced).
-      - Tie-breaks:
-          1) Higher total score
-          2) More MOST selections
-          3) Fewer LEAST selections
-          4) Preferred order (deterministic)
-          5) Alphabetical
-    """
-    comm_order = ['Director', 'Encourager', 'Facilitator', 'Tracker']
-    motiv_order = ['Growth', 'Purpose', 'Connection', 'Achievement']
-
-    comm_scores = {k: 0 for k in comm_order}
-    motiv_scores = {k: 0 for k in motiv_order}
-    comm_most = {k: 0 for k in comm_order}
-    comm_least = {k: 0 for k in comm_order}
-    motiv_most = {k: 0 for k in motiv_order}
-    motiv_least = {k: 0 for k in motiv_order}
-
-    section_by_id = {b.get('id'): b.get('section') for b in (blocks or [])}
-
-    for bid, picks in (answers_by_block_id or {}).items():
-        if not isinstance(picks, dict):
-            continue
-        section = section_by_id.get(bid)
-        most = picks.get('most')
-        least = picks.get('least')
-        if not most or not least or most == least:
-            continue
-
-        if section == 'comm':
-            if most in comm_scores:
-                comm_scores[most] += MOST_POINTS
-                comm_most[most] += 1
-            if least in comm_scores:
-                comm_scores[least] += LEAST_POINTS
-                comm_least[least] += 1
-        elif section == 'motiv':
-            if most in motiv_scores:
-                motiv_scores[most] += MOST_POINTS
-                motiv_most[most] += 1
-            if least in motiv_scores:
-                motiv_scores[least] += LEAST_POINTS
-                motiv_least[least] += 1
-
-    def _rank_keys(score_dict, most_dict, least_dict, preferred_order):
-        pref_index = {k: i for i, k in enumerate(preferred_order)}
-        def sort_key(k):
-            return (
-                score_dict.get(k, 0),
-                most_dict.get(k, 0),
-                -least_dict.get(k, 0),      # fewer least is better
-                -pref_index.get(k, 9999),   # earlier in preferred order is better
-                -ord(k[0].lower())          # placeholder; will not be used for final ties
-            )
-        # We want descending by first fields, so we sort with reverse=True and a tuple that is naturally ascending.
-        # Instead, build a tuple where "better" values are larger, then reverse=True.
-        def sort_key2(k):
-            return (
-                score_dict.get(k, 0),
-                most_dict.get(k, 0),
-                -least_dict.get(k, 0),
-                -pref_index.get(k, 9999),
-            )
-        ranked = sorted(score_dict.keys(), key=lambda k: (sort_key2(k), k), reverse=True)
-        return ranked
-
-    def _primary_secondary(score_dict, most_dict, least_dict, preferred_order):
-        ranked = _rank_keys(score_dict, most_dict, least_dict, preferred_order)
-        primary = ranked[0] if ranked else None
-        secondary = ranked[1] if len(ranked) > 1 else None
-        return primary, secondary
-
-    def _confidence_label(score_dict, primary, secondary):
-        if not primary or not secondary:
-            return None
-        diff = (score_dict.get(primary, 0) - score_dict.get(secondary, 0))
-        if diff >= 2:
-            return "Clear"
-        if diff == 1:
-            return "Moderate"
-        return "Blend"
-
-    primary_comm, secondary_comm = _primary_secondary(comm_scores, comm_most, comm_least, comm_order)
-    primary_motiv, secondary_motiv = _primary_secondary(motiv_scores, motiv_most, motiv_least, motiv_order)
-
-    return {
-        "primaryComm": primary_comm,
-        "secondaryComm": secondary_comm,
-        "commConfidence": _confidence_label(comm_scores, primary_comm, secondary_comm),
-        "primaryMotiv": primary_motiv,
-        "secondaryMotiv": secondary_motiv,
-        "motivConfidence": _confidence_label(motiv_scores, primary_motiv, secondary_motiv),
-        "commScores": comm_scores,
-        "motivScores": motiv_scores,
-        "commMostCounts": comm_most,
-        "commLeastCounts": comm_least,
-        "motivMostCounts": motiv_most,
-        "motivLeastCounts": motiv_least,
-    }
+    # Burnout context (stored separately; not used to select primary/secondary)
+    {"id":"mB1","type":"likert","style":"Context","text":"When I feel emotionally exhausted, even work I care about becomes hard to engage with."},
+    {"id":"mB2","type":"likert","style":"Context","text":"When I’m burned out, I become more detached or numb during the shift."},
+    {"id":"mB3","type":"likert","style":"Context","text":"When I’m burned out, small problems feel bigger than they should."},
+]
 
 
 # --- DATA DICTIONARIES (Updated with new content) ---
 
 COMM_PROFILES = {
     "Director": {
-        "name": "Director Communicator",
-        "tagline": "The Decisive Driver",
+        "name": "Director — The Clarity Builder",
+        "tagline": "Clarity Builder",
         "overview": "<strong>Core Style:</strong> You blend decisive, crisis-ready leadership with a bias for action. You are likely to set direction quickly and then rally people to move with you. You prioritize efficiency and competence, often serving as the 'adult in the room' who keeps things calm while making necessary calls. You rarely suffer from 'analysis paralysis,' preferring to make a wrong decision that can be fixed rather than no decision at all.<br><br><strong>Your Superpower:</strong> In high-pressure moments, you step in and organize. Staff see you as fair and decisive—they know you will act, so they aren't stuck in limbo. When everyone else is panicking, your clarity acts as an anchor.",
         "conflictImpact": "Under stress, you may move faster than staff can realistically integrate, making them feel like they are always 'behind' or incompetent. You might default to control before curiosity, issuing orders rather than asking questions.",
         "traumaStrategy": "Your consistency and clear boundaries can be regulating for youth who need predictability, though some may find your intensity intimidating. Traumatized brains often crave structure to feel safe.",
@@ -814,8 +351,8 @@ COMM_PROFILES = {
         }
     },
     "Encourager": {
-        "name": "Encourager Communicator",
-        "tagline": "The Relational Energizer",
+        "name": "Encourager — The Morale Builder",
+        "tagline": "Morale Builder",
         "overview": "<strong>Core Style:</strong> You lead with enthusiasm, vision, and warmth. You act as the emotional glue of the team, paying attention to how people feel and ensuring they feel seen and supported. You help change feel both human and organized. You are likely the person others come to when they are discouraged.<br><br><strong>Your Superpower:</strong> You keep the 'why' of the work alive when others are exhausted. You are often the one who notices and names growth in youth or staff.",
         "conflictImpact": "You may avoid giving sharp feedback because you don't want to discourage someone or damage the relationship. You might also overcommit your emotional energy when many people need you, leading to 'empathy fatigue'.",
         "traumaStrategy": "Your ability to foster belonging helps youth feel that adults are approachable, kind, and on their side. For youth who expect rejection or harshness, your consistent warmth disrupts their negative worldview.",
@@ -846,8 +383,8 @@ COMM_PROFILES = {
         }
     },
     "Facilitator": {
-        "name": "Facilitator Communicator",
-        "tagline": "The Calm Bridge",
+        "name": "Facilitator — The Alignment Builder",
+        "tagline": "Alignment Builder",
         "overview": "<strong>Core Style:</strong> You prefer to listen first and build consensus. You blend a calm, listening posture with a genuine desire to keep relationships steady. You create calmer, more predictable environments. You operate on the belief that the collective wisdom of the group is stronger than any single directive.<br><br><strong>Your Superpower:</strong> You de-escalate tension by staying steady and non-threatening. People feel safe bringing mistakes or worries to you without fear of shame.",
         "conflictImpact": "You might stay neutral too long when a strong stance is needed, hoping the group will self-correct. You may quietly carry moral distress or frustration without voicing it.",
         "traumaStrategy": "Your steady presence helps youth feel safe enough to open up, especially when they aren't ready for intensity. Hyper-vigilant youth often scan for aggression; your low-affect, calm demeanor signals 'no threat'.",
@@ -878,8 +415,8 @@ COMM_PROFILES = {
         }
     },
     "Tracker": {
-        "name": "Tracker Communicator",
-        "tagline": "The Structured Guardian",
+        "name": "Tracker — The Quality Guardian",
+        "tagline": "Quality Guardian",
         "overview": "<strong>Core Style:</strong> You lead with structure, detail, and a strong respect for procedure. You want plans to be sound and aligned before you move. You believe the path to success is through good systems and accurate work.<br><br><strong>Your Superpower:</strong> You protect youth and staff by ensuring documentation and procedures support ethical, safe care. You notice small patterns that could become big risks. You check the smoke detectors to ensure the fire doesn't happen.",
         "conflictImpact": "You may feel intolerant of what looks like carelessness in others, interpreting a missed checkbox as a lack of care. You can focus so much on accurate reporting that you under-communicate empathy.",
         "traumaStrategy": "Your consistency creates a predictable environment that feels safe for youth with trauma histories. Chaos is a trigger for trauma; your ability to create order acts as a soothing balm for dysregulated nervous systems.",
@@ -1436,26 +973,71 @@ def clean_text(text):
     if not text: return ""
     return text.replace('\u2018', "'").replace('\u2019', "'").replace('\u201c', '"').replace('\u201d', '"').replace('\u2013', '-').replace('—', '-').encode('latin-1', 'replace').decode('latin-1')
 
+def build_flat_answers_payload():
+    """Flatten all assessment answers into a single dict suitable for Google Sheets.
+
+    Keys are stable question IDs (e.g., cL1, cF1, mL1, mB1).
+    Values are human-readable:
+      - Likert items: integer 1-5
+      - Forced-choice items: the chosen statement text (A or B)
+
+    This pairs well with an Apps Script that creates one column per question ID.
+    """
+    flat = {}
+
+    # Communication answers
+    comm_ans = st.session_state.get('answers_comm', {}) or {}
+    for q in COMM_QUESTIONS:
+        qid = q.get('id')
+        if not qid:
+            continue
+        raw = comm_ans.get(qid)
+        if raw is None:
+            continue
+        if q.get('type') == 'forced':
+            flat[qid] = q.get('a_text') if raw == 'A' else q.get('b_text')
+        else:
+            try:
+                flat[qid] = int(raw)
+            except Exception:
+                flat[qid] = raw
+
+    # Motivation answers (including burnout context)
+    mot_ans = st.session_state.get('answers_motiv', {}) or {}
+    for q in MOTIVATION_QUESTIONS:
+        qid = q.get('id')
+        if not qid:
+            continue
+        raw = mot_ans.get(qid)
+        if raw is None:
+            continue
+        if q.get('type') == 'forced':
+            flat[qid] = q.get('a_text') if raw == 'A' else q.get('b_text')
+        else:
+            try:
+                flat[qid] = int(raw)
+            except Exception:
+                flat[qid] = raw
+
+    return flat
+
 def submit_to_google_sheets(data, action="save"):
-    """POST JSON payload to Google Apps Script. Returns (ok, message)."""
+    """Send payload to Google Apps Script.
+
+    The backend can store both summary scores and, if provided, an `answers` dict
+    for per-question columns.
+    """
     url = "https://script.google.com/macros/s/AKfycbymKxV156gkuGKI_eyKb483W4cGORMMcWqKsFcmgHAif51xQHyOCDO4KeXPJdK4gHpD/exec"
-    payload = dict(data or {})
-    payload["action"] = action
+    data["action"] = action
     try:
-        r = requests.post(url, json=payload, timeout=15)
-        if r.status_code != 200:
-            return False, f"HTTP {r.status_code}"
-        # Try parse JSON response
-        try:
-            j = r.json()
-            if isinstance(j, dict) and j.get("status") == "ok":
-                return True, j.get("message", "Saved")
-            # Some deployments return text; fall back to OK if 200
-            return True, j.get("message", "Saved") if isinstance(j, dict) else "Saved"
-        except Exception:
-            return True, "Saved"
+        resp = requests.post(url, json=data, timeout=15)
+        if resp.status_code != 200:
+            st.error(f"Google Sheets Error ({resp.status_code}): {resp.text}")
+            return False
+        return True
     except Exception as e:
-        return False, f"{e}"
+        st.error(f"Connection Error: {e}")
+        return False
 
 def fetch_user_data(email):
     # Attempts to fetch data from Google Scripts
@@ -1675,11 +1257,6 @@ def create_pdf(user_info, results, comm_prof, mot_prof, int_prof, role_key, role
     pdf.set_font("Arial", '', 12)
     pdf.set_text_color(*black)
     pdf.cell(0, 8, clean_text(f"Prepared for: {user_info['name']} | Role: {user_info['role']}"), ln=True, align='C')
-    pdf.set_font("Arial", '', 11)
-    comm_line = f"Communication: {results.get('primaryComm','')} (Secondary: {results.get('secondaryComm','')})"
-    motiv_line = f"Motivation: {results.get('primaryMotiv','')} (Secondary: {results.get('secondaryMotiv','')})"
-    pdf.cell(0, 7, clean_text(comm_line), ln=True, align='C')
-    pdf.cell(0, 7, clean_text(motiv_line), ln=True, align='C')
     pdf.ln(5)
     
     # --- [CHANGE] Cheat Sheet Section Added ---
@@ -1846,102 +1423,15 @@ def scroll_to_top():
     """
     components.html(js, height=0)
 
-
-def enable_enter_to_advance(next_labels=None):
-    """Allow Enter/Return to activate the Next/Complete button on assessment pages."""
-    if next_labels is None:
-        next_labels = ["Next Block →", "Complete & View Profile →"]
-
-    # JS: if Enter pressed (and not in a text input), click the first enabled matching button.
-    labels_js = json.dumps(next_labels)
-    js = f"""
-    <script>
-      (function() {{
-        const NEXT_LABELS = {labels_js};
-        const isTypingContext = (el) => {{
-          if (!el) return false;
-          const tag = (el.tagName || '').toLowerCase();
-          if (tag === 'textarea') return true;
-          if (tag === 'input') {{
-            const t = (el.getAttribute('type') || '').toLowerCase();
-            // allow Enter to advance even when focus is on radios/checkboxes/buttons
-            return !(t === 'radio' || t === 'checkbox' || t === 'button' || t === 'submit');
-          }}
-          return el.isContentEditable === true;
-        }};
-
-        // Avoid attaching multiple listeners across reruns
-        if (window.__elmcrest_enter_listener_attached__) return;
-        window.__elmcrest_enter_listener_attached__ = true;
-
-        window.parent.document.addEventListener('keydown', function(e) {{
-          if (e.key !== 'Enter') return;
-          if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
-
-          const active = window.parent.document.activeElement;
-          if (isTypingContext(active)) return;
-
-          // Find Streamlit buttons and click the first enabled one with a matching label
-          const buttons = Array.from(window.parent.document.querySelectorAll('button'));
-          for (const b of buttons) {{
-            const label = (b.innerText || '').trim();
-            const disabled = b.disabled || b.getAttribute('aria-disabled') === 'true';
-            if (!disabled && NEXT_LABELS.includes(label)) {{
-              b.click();
-              e.preventDefault();
-              return false;
-            }}
-          }}
-        }}, true);
-      }})();
-    </script>
-    """
-    components.html(js, height=0)
-
 if 'step' not in st.session_state:
     st.session_state.step = 'intro'
-
-# --- ADMIN / CONFIG ---
-# Admin toggle: randomized vs fixed order
-if 'randomize_blocks' not in st.session_state:
-    st.session_state.randomize_blocks = True
-if 'shuffle_seed' not in st.session_state:
-    st.session_state.shuffle_seed = random.randrange(1, 10**9)
-
-def _build_blocks(randomize: bool, seed: int):
-    blocks = copy.deepcopy(IPSATIVE_BLOCKS)
-    rng = random.Random(seed)
-    if randomize:
-        rng.shuffle(blocks)
-        for b in blocks:
-            rng.shuffle(b["statements"])
-    return blocks
-
-def _reset_assessment_state():
-    st.session_state.blocks = _build_blocks(st.session_state.randomize_blocks, st.session_state.shuffle_seed)
-    st.session_state.answers_ipsative = {}
+    comm_q, motiv_q = COMM_QUESTIONS.copy(), MOTIVATION_QUESTIONS.copy()
+    random.shuffle(comm_q); random.shuffle(motiv_q)
+    st.session_state.shuffled_comm = comm_q
+    st.session_state.shuffled_motiv = motiv_q
+    st.session_state.answers_comm = {}
+    st.session_state.answers_motiv = {}
     st.session_state.user_info = {}
-    st.session_state.block_idx = 0
-
-# Initialize assessment state once
-if 'blocks' not in st.session_state:
-    _reset_assessment_state()
-
-# Sidebar admin controls (simple toggle; keep it unobtrusive)
-with st.sidebar:
-    st.markdown("### Admin Settings")
-    randomize_choice = st.checkbox("Randomize blocks & answers", value=st.session_state.randomize_blocks)
-    if randomize_choice != st.session_state.randomize_blocks:
-        st.session_state.randomize_blocks = randomize_choice
-        # New seed for a fresh shuffle when turning randomization on
-        st.session_state.shuffle_seed = random.randrange(1, 10**9)
-        _reset_assessment_state()
-        st.rerun()
-
-    if st.button("Reset assessment (new session order)"):
-        st.session_state.shuffle_seed = random.randrange(1, 10**9)
-        _reset_assessment_state()
-        st.rerun()
 
 # --- INTRO ---
 if st.session_state.step == 'intro':
@@ -1999,7 +1489,7 @@ if st.session_state.step == 'intro':
                         st.stop()
 
                 st.session_state.user_info = {"name": name, "email": email, "role": final_role, "cottage": cottage}
-                st.session_state.step = 'assessment'
+                st.session_state.step = 'comm'
                 st.rerun()
     
     st.markdown("<br>", unsafe_allow_html=True)
@@ -2074,187 +1564,242 @@ if st.session_state.step == 'intro':
             st.switch_page("pages/admin.py")
 
 # --- COMM ---
-
-# --- ASSESSMENT (IPSATIVE, ONE BLOCK AT A TIME) ---
-if st.session_state.step == 'assessment':
+elif st.session_state.step == 'comm':
     scroll_to_top()
+    show_brand_header("Part 1: Communication")
+    st.progress(33)
+    st.markdown("**Instructions:** Choose how strongly each statement fits you most days.")
+    
+    with st.form("comm_form"):
+        answers = {}
+        for i, q in enumerate(st.session_state.shuffled_comm):
+            with st.container(border=True):
+                qtype = q.get("type", "likert")
 
-    blocks = st.session_state.blocks
-    total_blocks = len(blocks)
-    idx = int(st.session_state.get('block_idx', 0))
-    idx = max(0, min(idx, total_blocks - 1))
-    block = blocks[idx]
+                # --- Forced-choice (tradeoff / priority check) ---
+                if qtype == "forced":
+                    st.markdown(f"<div class='question-text'>{i+1}. {q.get('prompt','Which is more like you most days?')}</div>", unsafe_allow_html=True)
+                    answers[q["id"]] = st.radio(
+                        f"c_{q['id']}",
+                        options=["A", "B"],
+                        index=None,
+                        key=f"c_{q['id']}",
+                        format_func=lambda x: q["a_text"] if x == "A" else q["b_text"],
+                        label_visibility="collapsed",
+                    )
 
-    bid = block["id"]
-    # ensure answer structure exists
-    if bid not in st.session_state.answers_ipsative:
-        st.session_state.answers_ipsative[bid] = {"most": None, "least": None}
+                # --- Likert (behavior frequency / most days) ---
+                else:
+                    col_q, col_a = st.columns([0.45, 0.55], gap="medium")
+                    with col_q:
+                        st.markdown(
+                            f"<div class='question-text' style='height:100%;'>{i+1}. {q['text']}</div>",
+                            unsafe_allow_html=True,
+                        )
 
-    def why_this_matters(b):
-        title = (b.get("title") or "").strip()
-        section = b.get("section")
-        # Title-specific microcopy (kept short on purpose)
-        if section == "comm":
-            return f"This pattern shapes how you lead conversations in **{title.lower()}**—which affects safety, teamwork, and how quickly a unit stabilizes."
-        if section == "motiv":
-            return f"This clarifies what fuels you during **{title.lower()}**—so supervision and supports can match what actually keeps you steady and effective."
-        return "This highlights a pattern that influences how you lead and work with others."
-
-    st.markdown(f"## Assessment Question: Block {idx+1} of {total_blocks}")
-    st.progress((idx + 1) / total_blocks)
-    st.markdown("---")
-
-    # Transition wrapper (fade/slide on rerun)
-    st.markdown(f"""<div class="block-transition" id="block-{idx}">""", unsafe_allow_html=True)
-
-    st.markdown(f"### {block['title']}")
-    st.markdown(f"*{block.get('intro','')}*")
-    st.caption(f"Why this matters: {why_this_matters(block)}")
-
-    st.markdown(
-        "**Instructions:** From the four statements below, select the one that is **MOST** like you and the one that is **LEAST** like you."
-    )
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # Header row
-    h1, h2, h3 = st.columns([6, 1.2, 1.2])
-    h1.markdown("**STATEMENT**")
-    h2.markdown("**MOST**")
-    h3.markdown("**LEAST**")
-
-    statements = block["statements"]
-
-    def _set_most(bid, i, code, n):
-        st.session_state.answers_ipsative[bid]["most"] = code
-        # enforce single selection in MOST column
-        for j in range(n):
-            st.session_state[f"{bid}_most_{j}"] = (j == i)
-        # if conflicts with least, clear least
-        if st.session_state.answers_ipsative[bid].get("least") == code:
-            st.session_state.answers_ipsative[bid]["least"] = None
-            for j in range(n):
-                st.session_state[f"{bid}_least_{j}"] = False
-
-    def _set_least(bid, i, code, n):
-        st.session_state.answers_ipsative[bid]["least"] = code
-        # enforce single selection in LEAST column
-        for j in range(n):
-            st.session_state[f"{bid}_least_{j}"] = (j == i)
-        # if conflicts with most, clear most
-        if st.session_state.answers_ipsative[bid].get("most") == code:
-            st.session_state.answers_ipsative[bid]["most"] = None
-            for j in range(n):
-                st.session_state[f"{bid}_most_{j}"] = False
-
-    n = len(statements)
-
-    for i, stmt in enumerate(statements):
-        code = stmt["code"]
-        text_stmt = stmt["text"]
-
-        # initialize checkbox states from stored answers
-        most_checked = st.session_state.answers_ipsative[bid].get("most") == code
-        least_checked = st.session_state.answers_ipsative[bid].get("least") == code
-
-        if f"{bid}_most_{i}" not in st.session_state:
-            st.session_state[f"{bid}_most_{i}"] = most_checked
-        if f"{bid}_least_{i}" not in st.session_state:
-            st.session_state[f"{bid}_least_{i}"] = least_checked
-
-        c1, c2, c3 = st.columns([6, 1.2, 1.2])
-
-        c1.markdown(
-            f"""<div class="statement-card">{text_stmt}</div>""",
-            unsafe_allow_html=True
-        )
-
-        # We keep a minimal label for accessibility (screen readers), visually hidden by CSS
-        c2.checkbox(
-            "MOST",
-            key=f"{bid}_most_{i}",
-            value=most_checked,
-            on_change=_set_most,
-            args=(bid, i, code, n),
-            label_visibility="collapsed",
-        )
-        c3.checkbox(
-            "LEAST",
-            key=f"{bid}_least_{i}",
-            value=least_checked,
-            on_change=_set_least,
-            args=(bid, i, code, n),
-            label_visibility="collapsed",
-        )
-
-    st.markdown("</div>", unsafe_allow_html=True)  # end transition wrapper
-
-    # Validation
-    most_code = st.session_state.answers_ipsative[bid].get("most")
-    least_code = st.session_state.answers_ipsative[bid].get("least")
-
-    valid = (most_code is not None) and (least_code is not None) and (most_code != least_code)
-
-    if not valid:
-        st.warning("Select **one MOST** and **one LEAST** statement (they must be different) to continue.", icon="⚠️")
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    enable_enter_to_advance()
-
-    back_col, next_col = st.columns([1, 1])
-
-    with back_col:
-        if st.button("← Back", disabled=(idx == 0)):
-            st.session_state.block_idx = max(0, idx - 1)
-            st.rerun()
-
-    with next_col:
-        if idx < total_blocks - 1:
-            if st.button("Next Block →", disabled=not valid):
-                st.session_state.block_idx = idx + 1
-                st.rerun()
-        else:
-            if st.button("Complete & View Profile →", disabled=not valid):
-                # Compute results from this run (ipsative scoring)
-                computed = compute_results_from_ipsative(st.session_state.blocks, st.session_state.answers_ipsative)
-
-                # Build per-block answer columns for Google Sheets
-                answers_cols = {}
-                section_by_id = {b.get("id"): b.get("section") for b in st.session_state.blocks}
-                for _bid, picks in (st.session_state.answers_ipsative or {}).items():
-                    if not isinstance(picks, dict):
-                        continue
-                    sec = section_by_id.get(_bid)
-                    prefix = "COMM" if sec == "comm" else ("MOT" if sec == "motiv" else "ANS")
-                    most = picks.get("most")
-                    least = picks.get("least")
-                    if most is not None:
-                        answers_cols[f"{prefix}_{_bid}_MOST"] = most
-                    if least is not None:
-                        answers_cols[f"{prefix}_{_bid}_LEAST"] = least
-
-                # Payload aligned to your Code.gs (name/email/role/cottage + scores + dynamic columns)
-                payload = {
-                    "name": st.session_state.user_info.get("name",""),
-                    "email": st.session_state.user_info.get("email",""),
-                    "role": st.session_state.user_info.get("role",""),
-                    "cottage": st.session_state.user_info.get("cottage",""),
-                    "scores": computed,
-                    "answers": answers_cols,
-                }
-
-                ok, msg = submit_to_google_sheets(payload, action="save")
-                if not ok:
-                    st.error(f"Couldn’t save to Google Sheets: {msg}")
-                    st.info("You can still view results below, but they may not be recorded.")
-
-                st.session_state.results = computed
-                st.session_state.step = "results"
+                    with col_a:
+                        st.markdown(
+                            """
+                            <div class="scale-labels">
+                                <span>Strongly Disagree</span>
+                                <span>Strongly Agree</span>
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
+                        answers[q["id"]] = st.radio(
+                            f"c_{q['id']}",
+                            options=LIKERT_OPTIONS,
+                            horizontal=True,
+                            index=None,
+                            key=f"c_{q['id']}",
+                            label_visibility="collapsed",
+                        )
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Validation Logic
+        if st.form_submit_button("Continue to Motivation →"):
+            missed = [q['id'] for q in st.session_state.shuffled_comm if answers.get(q['id']) is None]
+            if missed:
+                st.error(f"Please answer all questions. You missed {len(missed)} questions.")
+            else:
+                st.session_state.answers_comm = answers
+                st.session_state.step = 'motiv'
                 st.rerun()
 
+# --- MOTIV ---
+elif st.session_state.step == 'motiv':
+    scroll_to_top()
+    show_brand_header("Part 2: Motivation")
+    st.progress(66)
+    st.markdown("**Instructions:** Focus on what keeps you engaged or drains you.")
 
-if st.session_state.step == 'results':
+    with st.form("motiv_form"):
+        answers = {}
+        for i, q in enumerate(st.session_state.shuffled_motiv):
+            with st.container(border=True):
+                qtype = q.get("type", "likert")
+
+                # Burnout context items: keep them visually distinct
+                if q.get("style") == "Context":
+                    st.markdown(f"<div class='question-text'>{i+1}. {q['text']}</div>", unsafe_allow_html=True)
+                    st.caption("Context check: this does not change your style/driver; it helps supervisors interpret support needs.")
+                    answers[q["id"]] = st.radio(
+                        f"m_{q['id']}",
+                        options=LIKERT_OPTIONS,
+                        horizontal=True,
+                        index=None,
+                        key=f"m_{q['id']}",
+                        label_visibility="collapsed",
+                    )
+                    continue
+
+                # --- Forced-choice (priority check) ---
+                if qtype == "forced":
+                    st.markdown(f"<div class='question-text'>{i+1}. {q.get('prompt','Pick what fits best.')}</div>", unsafe_allow_html=True)
+                    answers[q["id"]] = st.radio(
+                        f"m_{q['id']}",
+                        options=["A", "B"],
+                        index=None,
+                        key=f"m_{q['id']}",
+                        format_func=lambda x: q["a_text"] if x == "A" else q["b_text"],
+                        label_visibility="collapsed",
+                    )
+
+                # --- Likert ---
+                else:
+                    col_q, col_a = st.columns([0.45, 0.55], gap="medium")
+                    with col_q:
+                        st.markdown(
+                            f"<div class='question-text' style='height:100%;'>{i+1}. {q['text']}</div>",
+                            unsafe_allow_html=True,
+                        )
+
+                    with col_a:
+                        st.markdown(
+                            """
+                            <div class="scale-labels">
+                                <span>Strongly Disagree</span>
+                                <span>Strongly Agree</span>
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
+                        answers[q["id"]] = st.radio(
+                            f"m_{q['id']}",
+                            options=LIKERT_OPTIONS,
+                            horizontal=True,
+                            index=None,
+                            key=f"m_{q['id']}",
+                            label_visibility="collapsed",
+                        )
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Validation Logic
+        if st.form_submit_button("Complete & View Profile →"):
+            missed = [q['id'] for q in st.session_state.shuffled_motiv if answers.get(q['id']) is None]
+            if missed:
+                st.error(f"Please answer all questions. You missed {len(missed)} questions.")
+            else:
+                st.session_state.answers_motiv = answers
+                st.session_state.step = 'processing'
+                st.rerun()
+
+# --- PROCESSING ---
+elif st.session_state.step == 'processing':
+    scroll_to_top()
+    
+        # Calculate Scores (Hybrid: Likert + Forced-choice)
+    def calculate_points(raw_score, is_reverse=False):
+        # kept for backward-compatibility; optimized items are mostly positively keyed
+        if is_reverse:
+            return 6 - raw_score
+        return raw_score
+
+    c_scores = {k: 0.0 for k in COMM_PROFILES}
+    m_scores = {k: 0.0 for k in MOTIVATION_PROFILES}
+    burnout_items = []
+
+    # --- Communication scoring ---
+    for q in COMM_QUESTIONS:
+        raw_val = st.session_state.answers_comm.get(q["id"])
+        qtype = q.get("type", "likert")
+        weight = float(q.get("weight", LIKERT_WEIGHT))
+
+        if qtype == "forced":
+            # raw_val is "A" or "B"
+            if raw_val == "A":
+                c_scores[q["a_style"]] += FORCED_WEIGHT
+            elif raw_val == "B":
+                c_scores[q["b_style"]] += FORCED_WEIGHT
+            continue
+
+        # Likert
+        points = calculate_points(int(raw_val), q.get("reverse", False)) * weight
+        c_scores[q["style"]] += points
+
+    # --- Motivation scoring ---
+    for q in MOTIVATION_QUESTIONS:
+        raw_val = st.session_state.answers_motiv.get(q["id"])
+        qtype = q.get("type", "likert")
+
+        # Burnout context is stored separately
+        if q.get("style") == "Context":
+            if raw_val is not None:
+                burnout_items.append(int(raw_val))
+            continue
+
+        if qtype == "forced":
+            if raw_val == "A":
+                m_scores[q["a_style"]] += FORCED_WEIGHT
+            elif raw_val == "B":
+                m_scores[q["b_style"]] += FORCED_WEIGHT
+            continue
+
+        points = calculate_points(int(raw_val), q.get("reverse", False)) * float(q.get("weight", LIKERT_WEIGHT))
+        m_scores[q["style"]] += points
+
+    # Normalize burnout into a 1–5 average
+    burnout_score = round(sum(burnout_items) / len(burnout_items), 2) if burnout_items else None
+
+    p_comm, s_comm = get_top_two(c_scores)
+    p_mot, s_mot = get_top_two(m_scores)
+
+    st.session_state.results = {
+        "primaryComm": p_comm,
+        "secondaryComm": s_comm,
+        "primaryMotiv": p_mot,
+        "secondaryMotiv": s_mot,
+        "commScores": c_scores,
+        "motivScores": m_scores,
+        "burnoutScore": burnout_score,
+    }
+    
+    # Logic to clean cottage name (remove "Cottage " prefix)
+    raw_cottage = st.session_state.user_info['cottage']
+    clean_cottage = raw_cottage.replace("Cottage ", "")
+
+    # Option A: store each question response as its own column (Apps Script side)
+    flat_answers = build_flat_answers_payload()
+
+    payload = {
+        "name": st.session_state.user_info['name'],
+        "email": st.session_state.user_info['email'],
+        "role": st.session_state.user_info['role'],
+        "cottage": clean_cottage,  # Use cleaned version
+        "scores": st.session_state.results,
+        "answers": flat_answers,
+    }
+    
+    with st.spinner("Analyzing results..."):
+        submit_to_google_sheets(payload, action="save")
+        time.sleep(1.0)
+    
+    st.session_state.step = 'results'
+    st.rerun()
+
+# --- RESULTS ---
+elif st.session_state.step == 'results':
     scroll_to_top()
     st.progress(100)
     
@@ -2266,35 +1811,12 @@ if st.session_state.step == 'results':
             st.rerun()
         st.stop()
 
-    # Ensure scoring produced usable primaries
-    if not st.session_state.results.get("primaryComm") or not st.session_state.results.get("primaryMotiv"):
-        st.error("Your responses were saved, but we couldn’t calculate a profile. Please retake the assessment.")
-        if st.button("Restart Assessment"):
-            st.session_state.clear()
-            st.rerun()
-        st.stop()
-
     res = st.session_state.results
     user = st.session_state.user_info
     role_key = normalize_role_key(user['role'])
     role_labels = ROLE_RELATIONSHIP_LABELS[role_key]
     
     show_brand_header(f"Profile for {user['name']}")
-
-    # Dominant + Secondary (within-person preferences)
-    comm_conf = res.get("commConfidence")
-    motiv_conf = res.get("motivConfidence")
-    st.markdown(
-        f"""<div class='info-card'>
-        <div style='font-size:1.05rem; font-weight:700; margin-bottom:6px;'>Your top patterns</div>
-        <div><strong>Communication:</strong> {res.get('primaryComm','')} <span style='color:var(--text-sub);'>(Secondary: {res.get('secondaryComm','')})</span>{(' <span style="color:var(--text-sub);">· ' + comm_conf + ' clarity</span>') if comm_conf else ''}</div>
-        <div style='margin-top:4px;'><strong>Motivation:</strong> {res.get('primaryMotiv','')} <span style='color:var(--text-sub);'>(Secondary: {res.get('secondaryMotiv','')})</span>{(' <span style="color:var(--text-sub);">· ' + motiv_conf + ' clarity</span>') if motiv_conf else ''}</div>
-        <div style='margin-top:8px; color:var(--text-sub); font-size:0.9rem;'>
-            These results reflect <em>relative</em> preferences within you (not a comparison to other people).
-        </div>
-        </div>""",
-        unsafe_allow_html=True
-    )
     
     comm_prof = COMM_PROFILES[res['primaryComm']]
     mot_prof = MOTIVATION_PROFILES[res['primaryMotiv']]
@@ -2330,15 +1852,19 @@ if st.session_state.step == 'results':
         vc1, vc2 = st.columns(2)
         
         with vc1:
-            # 1. COMMUNICATION STYLE MAP (QUADRANT)
-            fig_comm_map = create_comm_quadrant_chart(res.get('primaryComm', ''))
-            st.plotly_chart(fig_comm_map, use_container_width=True)
+            # 1. COMMUNICATION RADAR
+            # Use real scores from the assessment results
+            radar_df = pd.DataFrame(dict(r=list(res['commScores'].values()), theta=list(res['commScores'].keys())))
+            fig_comm = px.line_polar(radar_df, r='r', theta='theta', line_close=True, title="Communication Footprint", range_r=[0,30])
+            fig_comm.update_traces(fill='toself', line_color=BRAND_COLORS['blue'])
+            fig_comm.update_layout(height=300, margin=dict(t=30, b=30, l=30, r=30))
+            st.plotly_chart(fig_comm, use_container_width=True)
             
         with vc2:
             # 2. MOTIVATION BATTERY
             # Use real scores from the assessment results
             sorted_mot = dict(sorted(res['motivScores'].items(), key=lambda item: item[1], reverse=True))
-            mot_df = pd.DataFrame(dict(Driver=list(sorted_mot.keys()), Intensity=[max(v, 0) for v in sorted_mot.values()]))
+            mot_df = pd.DataFrame(dict(Driver=list(sorted_mot.keys()), Intensity=list(sorted_mot.values())))
             
             fig_mot = px.bar(mot_df, x="Intensity", y="Driver", orientation='h', title="Motivation Drivers", color="Intensity", color_continuous_scale=[BRAND_COLORS['gray'], BRAND_COLORS['blue']])
             fig_mot.update_layout(height=300, showlegend=False, margin=dict(t=30, b=30, l=30, r=30))
