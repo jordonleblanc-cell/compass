@@ -2682,149 +2682,521 @@ def validate_email(email: str) -> bool:
 
 
 def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
-    """Create a PDF (bytes) for the Supervisor's Guide using FPDF (no ReportLab dependency).
-
-    IMPORTANT:
-    - Uses SafeFPDF wrappers so latin-1 encoding won't crash.
-    - This function MUST always return bytes; if something goes wrong, it will raise.
-    """
     pdf = SafeFPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
-
-    blue = (26, 115, 232)
-    black = (0, 0, 0)
-
-    # Header
-    pdf.set_font("Arial", "B", 20)
-    pdf.set_text_color(*blue)
-    pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align="C")
-
-    pdf.set_font("Arial", "", 12)
-    pdf.set_text_color(*black)
-    pdf.cell(0, 8, clean_text(f"For: {name} ({role})"), ln=True, align="C")
-    pdf.cell(0, 8, clean_text(f"Profile: {p_comm} ({s_comm}) x {p_mot} ({s_mot})"), ln=True, align="C")
-    pdf.ln(4)
-
+    blue = (26, 115, 232); green = (52, 168, 83); red = (234, 67, 53); black = (0, 0, 0)
+    pdf.set_font("Arial", 'B', 20); pdf.set_text_color(*blue); pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align='C')
+    pdf.set_font("Arial", '', 12); pdf.set_text_color(*black); pdf.cell(0, 8, clean_text(f"For: {name} ({role})"), ln=True, align='C')
+    pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C'); pdf.ln(5)
+    
     data = generate_profile_content(p_comm, p_mot)
 
-    # -------- helpers (scoped) --------
-    def hr():
-        try:
-            y = pdf.get_y()
-            pdf.set_draw_color(210, 210, 210)
-            pdf.line(10, y, 200, y)
-            pdf.ln(5)
-        except Exception:
-            pdf.ln(4)
 
-    def section(title: str):
-        pdf.set_fill_color(240, 240, 240)
-        pdf.set_font("Arial", "B", 14)
-        pdf.set_text_color(*black)
-        pdf.cell(0, 9, clean_text(title), ln=True, fill=True, align="C")
+# --- PDF formatting helpers (readability) ---
+def pdf_hr():
+    # subtle divider line
+    try:
+        y = pdf.get_y()
+        pdf.set_draw_color(210, 210, 210)
+        pdf.line(10, y, 200, y)
+        pdf.ln(5)
+    except Exception:
+        pdf.ln(4)
+
+def pdf_section_title(title):
+    pdf.set_fill_color(240, 240, 240)
+    pdf.set_font("Arial", 'B', 14)
+    pdf.set_text_color(*black)
+    pdf.cell(0, 10, clean_text(title), ln=True, fill=True, align='C')
+    pdf.ln(2)
+
+def pdf_label_block(label, body, indent=6):
+    # Bold label on its own line, then body below (easy scanning)
+    pdf.set_font("Arial", 'B', 11)
+    pdf.multi_cell(0, 5, clean_text(label))
+    pdf.set_font("Arial", '', 11)
+    # Indent body slightly to visually nest it
+    if body:
+        pdf.set_x(indent)
+        pdf.multi_cell(0, 5, clean_text(body))
+        pdf.set_x(10)
+    pdf.ln(2)
+
+def pdf_bullet(line, bullet_char="•"):
+    # Bullet line with optional bold "Label:" lead-in.
+    if not line:
+        return
+    raw = str(line).strip()
+    raw = raw.lstrip("•").lstrip("-").strip()
+
+    # Detect "Label: body" where label is short
+    parts = raw.split(":", 1)
+    if len(parts) == 2 and 1 <= len(parts[0].strip()) <= 28:
+        label = parts[0].strip()
+        body = parts[1].strip()
+        # Bullet + bold label
+        pdf.set_font("Arial", '', 11)
+        pdf.multi_cell(0, 5, clean_text(f"{bullet_char} {label}"))
+        # Body indented
+        pdf.set_x(14)
+        pdf.set_font("Arial", '', 11)
+        pdf.multi_cell(0, 5, clean_text(body))
+        pdf.set_x(10)
+        pdf.ln(1)
+    else:
+        pdf.set_font("Arial", '', 11)
+        pdf.multi_cell(0, 5, clean_text(f"{bullet_char} {raw}"))
+        pdf.ln(1)
+
+def pdf_callout(title, text):
+    # Light shaded box for key supervisor insights
+    pdf.set_fill_color(245, 247, 250)
+    pdf.set_font("Arial", 'B', 11)
+    pdf.multi_cell(0, 6, clean_text(title), fill=True)
+    pdf.set_font("Arial", '', 11)
+    pdf.multi_cell(0, 5, clean_text(text), fill=True)
+    pdf.ln(3)
+
+    # --- TABLE OF CONTENTS ---
+    # (Short, printable overview — the PDF itself includes all sections expanded.)
+    pdf.set_fill_color(240, 245, 250)
+    pdf.set_font("Arial", 'B', 13)
+    pdf.set_text_color(*blue)
+    pdf.cell(0, 9, "Table of Contents", ln=True, fill=True)
+    pdf.set_font("Arial", '', 11)
+    pdf.set_text_color(*black)
+    toc_lines = [
+        "Rapid Interaction Cheat Sheet",
+        "1. Communication Profile + 1A. How to Speak Their Language",
+        "2. Motivation Profile",
+        "3. What They Need From You",
+        "4. How They Prefer Feedback",
+        "5. How To Set Expectations",
+        "6. Delegation & Follow-Through",
+        "7. Red Flags Under Stress",
+        "8. Repair & Reset Scripts",
+        "9. Coaching Questions",
+        "10. What To Celebrate",
+        "11. Individual Professional Development Plan (Phases 1–3)",
+        "12. Preparing for Advancement",
+        "Stress Signature + Support Prescription",
+    ]
+    for line in toc_lines:
+                pdf_bullet(line.replace("?", ""), bullet_char="")
+    pdf.ln(3)
+
+    # --- CHEAT SHEET SECTION ---
+    pdf.set_fill_color(240, 240, 240)
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(0, 10, "Rapid Interaction Cheat Sheet", ln=True, fill=True, align='C')
+    pdf.ln(2)
+    pdf_hr()
+
+    def print_cheat_column(title, items, color_rgb):
+        pdf.set_font("Arial", 'B', 12)
+        pdf.set_text_color(*color_rgb)
+        pdf.cell(0, 8, title, ln=True)
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_font("Arial", '', 10)
+        for item in items:
+            clean_item = item.replace("**", "")
+            pdf_bullet(clean_item, bullet_char="•")
         pdf.ln(2)
 
-    def label_block(label: str, body: str | None):
-        pdf.set_font("Arial", "B", 11)
-        pdf.multi_cell(0, 5, clean_text(label))
-        pdf.set_font("Arial", "", 11)
+    print_cheat_column("DO THIS (Communication):", data['cheat_do'], green)
+    print_cheat_column("AVOID THIS (Triggers):", data['cheat_avoid'], red)
+    print_cheat_column("FUEL (Motivation):", data['cheat_fuel'], blue)
+    
+    pdf.ln(5)
+    pdf.line(10, pdf.get_y(), 200, pdf.get_y()) # Horizontal line
+    pdf.ln(5)
+
+    def add_section(title, body, bullets=None):
+        pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
+        pdf.cell(0, 8, title, ln=True, fill=True); pdf.ln(2)
+        pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
+        
         if body:
-            pdf.set_x(12)
-            pdf.multi_cell(0, 5, clean_text(body))
-            pdf.set_x(10)
-        pdf.ln(1)
+            clean_body = body.replace("**", "").replace("* ", "- ")
+            pdf_bullet(clean_body, bullet_char="•")
+        
+        if bullets:
+            pdf.ln(1)
+            for b in bullets:
+                pdf.cell(5, 5, "-", 0, 0)
+                clean_b = b.replace("**", "") 
+                pdf_bullet(clean_b, bullet_char="•")
+        pdf.ln(4)
 
-    def bullet_lines(lines, bullet_char="•"):
-        if not lines:
-            return
-        for line in lines:
-            if not line:
-                continue
-            raw = str(line).strip()
-            raw = raw.lstrip("•").lstrip("-").strip()
+    # Sections 1-10
+    add_section(f"1. Communication Profile: {p_comm}", None, data['s1_b'])
+    # Moved from Section 10 (online): helps supervisors tailor direction/feedback to this communication style
+    if data.get("comm_language"):
+        add_section("1A. How to Speak Their Language", data["comm_language"])
+ 
+    add_section("2. Supervising Their Communication", None, data['s2_b'])
+    add_section(f"3. Motivation Profile: {p_mot}", None, data['s3_b'])
+    add_section("4. Motivating This Staff Member", None, data['s4_b'])
+    add_section("5. Integrated Leadership Profile", f"{data['s5_title']}\n\n{data['s5_synergy']}") 
+    add_section("6. How You Can Best Support Them", data['s6'])
+    add_section("7. What They Look Like When Thriving", data['s7'])
+    add_section("8. What They Look Like When Struggling", data['s8'])
+    add_section("9. Individual Professional Development Plan (IPDP)", None, data['s9_b'])
+    # Build an expanded celebration section (bullets + teaching) for the PDF
+    celebrate_pdf = []
+    for card in (data.get("s10_teach") or [])[:3]:
+        title = card.get("title", "Celebrate This")
+        celebrate_pdf.append(f"**Celebrate:** {title}")
+        for w in card.get("what_to_look_for", [])[:4]:
+            celebrate_pdf.append(f"  - Look for: {w}")
+        if card.get("why_it_matters"):
+            celebrate_pdf.append(f"  - Why it matters: {card.get('why_it_matters')}")
+        for h in card.get("how_to_celebrate", [])[:4]:
+            celebrate_pdf.append(f"  - How: {h}")
+        if card.get("avoid"):
+            celebrate_pdf.append(f"  - Avoid: {card.get('avoid')}")
+        celebrate_pdf.append("")  # spacer
 
-            # Bullet line (simple)
-            pdf.set_font("Arial", "", 11)
-            pdf.multi_cell(0, 5, clean_text(f"{bullet_char} {raw}"))
-        pdf.ln(1)
+    add_section("10. What You Should Celebrate", None, celebrate_pdf if celebrate_pdf else data['s10_b'])
 
-    # -------- content --------
-    section("Rapid Interaction Cheat Sheet")
-    label_block("✅ Do This", None)
-    bullet_lines(data.get("cheat_do") or [])
-    label_block("⛔ Avoid This", None)
-    bullet_lines(data.get("cheat_avoid") or [])
-    label_block("⛽ What Fuels Them (Motivation)", None)
-    bullet_lines(data.get("cheat_fuel") or [])
-    hr()
 
-    section("Communication Profile")
-    bullet_lines(data.get("s1_b") or [])
-    label_block("How to Speak Their Language", None)
-    bullet_lines(data.get("s2_b") or [])
-    hr()
+    # 11. Coaching Questions
+    pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
+    pdf.cell(0, 8, "11. Coaching Questions", ln=True, fill=True); pdf.ln(2)
+    pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
+    for i, q in enumerate(data['coaching']):
+        pdf.multi_cell(0, 5, clean_text(f"{i+1}. {q}"))
+    pdf.ln(4)
 
-    section("Motivation Profile")
-    bullet_lines(data.get("s3_b") or [])
-    label_block("How to Motivate & Sustain Them", None)
-    bullet_lines(data.get("s4_b") or [])
-    hr()
+    # 12. Preparing for Advancement (expanded, profile-specific)
+    try:
+        def _label(p, s):
+            return f"{p}/{s}" if s else f"{p}"
 
-    section("Synergy")
-    title = data.get("s5_title") or ""
-    synergy = data.get("s5_synergy") or ""
-    if title:
-        pdf.set_font("Arial", "B", 12)
-        pdf.multi_cell(0, 6, clean_text(title))
-        pdf.ln(1)
-    if synergy:
-        pdf.set_font("Arial", "", 11)
-        pdf.multi_cell(0, 5, clean_text(synergy))
-        pdf.ln(1)
+        staff_style = _label(p_comm, s_comm)
+        staff_driver = _label(p_mot, s_mot)
 
-    support = data.get("s6") or ""
-    thriving = data.get("s7") or ""
-    struggling = data.get("s8") or ""
-    if support:
-        label_block("How to Support Them", support)
-    if thriving:
-        label_block("When They’re Thriving", thriving)
-    if struggling:
-        label_block("When They’re Struggling", struggling)
-    hr()
+        ADV_STYLE = {
+            "Director": {
+                "shift": "From being the fastest problem-solver → to building clarity, delegation, and durable systems.",
+                "critical": "Directors can ‘win the shift’ through force of will. Advancement requires winning through people and repeatable structure.",
+                "empower": [
+                    "Give scope, not tasks: a problem area they must improve through others.",
+                    "Require a delegation plan: owners, cadence, definition of done.",
+                    "Coach ‘why before what’ so buy-in grows with clarity."
+                ],
+                "signals": [
+                    "Results improve even when they aren’t present.",
+                    "They bring options + a recommendation (not just urgency).",
+                    "They create calm by clarifying owners and timelines."
+                ],
+                "redflags": [
+                    "Micromanaging instead of delegating.",
+                    "Speed replaces judgment; buy-in collapses.",
+                    "Escalation through pressure instead of structure."
+                ],
+                "stretch": [
+                    "Run a weekly huddle with agenda + outcomes.",
+                    "Own one quality metric and improve it 10–15% over 30–60 days.",
+                    "Deliver corrective feedback using: Impact → Expectation → Support → Check-back."
+                ],
+            },
+            "Encourager": {
+                "shift": "From being the emotional engine → to holding warm accountability and clear standards.",
+                "critical": "Encouragers stabilize teams, but advancement requires firmness without losing warmth—support and standards at the same time.",
+                "empower": [
+                    "Teach ‘Warm + Clear’ scripts (relationship AND expectation in one sentence).",
+                    "Practice boundaries: what you can support vs what you must require.",
+                    "Give structured leadership reps (opening meetings, closing decisions)."
+                ],
+                "signals": [
+                    "They hold standards without guilt or overexplaining.",
+                    "Staff feel supported AND clear about expectations.",
+                    "They handle conflict without rescuing or triangulating."
+                ],
+                "redflags": [
+                    "Avoiding accountability to keep peace.",
+                    "Over-functioning emotionally; burnout risk.",
+                    "Softening messages until expectations blur."
+                ],
+                "stretch": [
+                    "Lead a ‘wins + standards’ huddle (2 wins + 1 expectation).",
+                    "Give one corrective feedback per week using a script.",
+                    "Own a morale + performance initiative (recognition + follow-through)."
+                ],
+            },
+            "Facilitator": {
+                "shift": "From building agreement → to closing decisions with timelines and ownership.",
+                "critical": "Facilitators prevent conflict, but advancement requires containment: decide, assign, then debrief—especially under pressure.",
+                "empower": [
+                    "Teach ‘contain then collaborate’: decision first, processing second.",
+                    "Give decision authority with guardrails (deadline + non-negotiables).",
+                    "Set escalation thresholds (when discussion ends and action begins)."
+                ],
+                "signals": [
+                    "They close decisions clearly and on time.",
+                    "Conflict resolves without endless meetings.",
+                    "They balance fairness with urgency."
+                ],
+                "redflags": [
+                    "Consensus-seeking delays action.",
+                    "Neutrality replaces leadership.",
+                    "Over-processing conflict instead of containing it."
+                ],
+                "stretch": [
+                    "Lead a timed case conference: discuss → decide → assign → confirm.",
+                    "Bring two options + a recommendation weekly.",
+                    "Run a post-incident debrief: facts, learning, next steps."
+                ],
+            },
+            "Tracker": {
+                "shift": "From protecting compliance → to influencing behavior and building systems people can follow.",
+                "critical": "Trackers keep programs safe, but advancement requires translating ‘policy’ into coaching and engagement—without becoming punitive.",
+                "empower": [
+                    "Give system-building scope: simplify tools, standardize routines.",
+                    "Coach them to translate compliance into ‘why it protects youth/staff.’",
+                    "Assign gray-zone recommendations: risk mitigation, not just risk listing."
+                ],
+                "signals": [
+                    "Routines improve without resentment.",
+                    "They decide in ambiguity using mitigation logic.",
+                    "They coach without sounding punitive."
+                ],
+                "redflags": [
+                    "Fixating on details at the expense of people.",
+                    "Rigidity in gray zones; avoidance of decisions.",
+                    "Correcting without teaching or follow-up."
+                ],
+                "stretch": [
+                    "Run a weekly audit + coaching loop (spot-check → teach → follow-up).",
+                    "Create a one-page SOP/checklist for a recurring pain point.",
+                    "Present a risk mitigation plan with a clear recommendation."
+                ],
+            },
+        }
 
-    section("Interventions & Coaching")
-    bullet_lines(data.get("s9_b") or [])
-    questions = data.get("coaching") or []
-    if questions:
-        label_block("Coaching Questions", None)
-        bullet_lines(questions, bullet_char="—")
-    hr()
+        ADV_MOT = {
+            "Growth": {
+                "need": "Skill targets, stretch reps with coaching, and feedback loops that show improvement.",
+                "moves": [
+                    "Co-create a 30/60/90 skill ladder (one skill per month).",
+                    "Give one stretch rep per week with a debrief.",
+                    "Celebrate learning signals: better questions, better framing, better follow-through."
+                ],
+            },
+            "Purpose": {
+                "need": "Connection between leadership tasks and youth outcomes; ability to shape practice, not just enforce it.",
+                "moves": [
+                    "Frame accountability as safety + dignity, not control.",
+                    "Invite policy translation: ‘how do we make this workable for kids?’",
+                    "Assign a mission-aligned improvement project (engagement routines, de-escalation)."
+                ],
+            },
+            "Connection": {
+                "need": "Relational safety plus scripts for holding standards so connection doesn’t become avoidance.",
+                "moves": [
+                    "Teach warm accountability scripts; practice them weekly.",
+                    "Give visible leadership roles with support.",
+                    "Normalize tension as part of leadership—equip instead of protect."
+                ],
+            },
+            "Achievement": {
+                "need": "Clear targets, a scoreboard, and stable definitions of success.",
+                "moves": [
+                    "Assign measurable outcomes (documentation %, training completion, engagement minutes).",
+                    "Use goal → plan → owner → check-back cadence weekly.",
+                    "Celebrate progress and quality of execution."
+                ],
+            },
+        }
 
-    section("Celebrate & Recognize Them")
-    bullet_lines(data.get("s10_b") or [])
-    deep = data.get("s10_deep") or ""
-    teach = data.get("s10_teach") or ""
-    if deep:
-        label_block("Deep Dive", deep.replace("**", ""))
-    if teach:
-        label_block("How to Teach Others to Celebrate Them", teach.replace("**", ""))
-    hr()
+        style_pack = ADV_STYLE.get(p_comm, ADV_STYLE["Director"])
+        mot_pack = ADV_MOT.get(p_mot, ADV_MOT["Growth"])
 
-    adv = data.get("advancement") or ""
-    if adv:
-        section("Advancement")
-        pdf.set_font("Arial", "", 11)
-        pdf.multi_cell(0, 5, clean_text(adv))
+        add_section("12. Preparing for Advancement", f"Profile: {staff_style} | Driver: {staff_driver}")
 
-    # Return bytes (fpdf==1.x expects latin-1)
-    out = pdf.output(dest="S")
-    if isinstance(out, str):
-        out = out.encode("latin-1", errors="ignore")
-    if not out:
-        raise ValueError("PDF generator returned no data.")
-    return out
+        add_section("12A. The Shift", style_pack["shift"])
+        add_section("12B. Why This Shift Is Critical", style_pack["critical"])
+        add_section("12C. How Supervisors Can Empower This Shift", None, style_pack["empower"])
+        add_section("12D. Proof They’re Ready", None, style_pack["signals"])
+        add_section("12E. Stretch Assignments", None, style_pack["stretch"])
+        add_section("12F. Red Flags", None, style_pack["redflags"])
+
+        add_section("12G. Motivation-Aware Coaching", f"What they need: {mot_pack['need']}", mot_pack["moves"])
+
+        # Preserve any legacy advancement copy if present
+        if data.get("advancement"):
+            add_section("12H. Notes (Legacy Guidance)", data["advancement"])
+
+    except Exception:
+        # Fallback to legacy text if anything unexpected happens
+        add_section("12. Helping Them Prepare for Advancement", data.get('advancement', ''))
+
+    # --- NEW: Stress Signature & Support Prescription (matches on-screen detail) ---
+    try:
+        stress_sig = {
+            "Director": "Becomes aggressive, micromanages, stops listening.",
+            "Encourager": "Becomes silent, withdrawn, or overly agreeable (martyrdom).",
+            "Facilitator": "Becomes paralyzed, asks for endless data, refuses to decide.",
+            "Tracker": "Becomes rigid, nitpicky, anxious, policy-obsessed."
+        }.get(p_comm, "Stress patterns vary by person.")
+
+        support_rx = {
+            "Director": [
+                "Give a clear objective + the minimum non‑negotiables.",
+                "Limit scope: define what ‘good enough’ looks like.",
+                "Use short check‑ins (5–10 mins) focused on decisions + owners."
+            ],
+            "Encourager": [
+                "Name safety and belonging first; then address performance.",
+                "Give one clear priority (not 5) and a ‘finish line’.",
+                "Ask directly what support they need; don’t assume they’ll request it."
+            ],
+            "Facilitator": [
+                "Reduce ambiguity: define decision owner and deadline.",
+                "Offer a menu of 2–3 viable options (bounded choice).",
+                "Confirm next step in writing (who/what/when)."
+            ],
+            "Tracker": [
+                "Clarify the standard + the reason (safety, licensing, continuity).",
+                "Convert ambiguity into a checklist + thresholds.",
+                "Reassure: ‘We are aiming for safe + workable, not perfect.’"
+            ]
+        }.get(p_comm, [])
+
+        pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
+        pdf.cell(0, 8, "13. Stress Signature & Support Prescription", ln=True, fill=True); pdf.ln(2)
+        pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
+        pdf_label_block("Stress Signature", stress_sig)
+        if support_rx:
+            pdf.ln(1)
+            pdf_label_block("Support Prescription", "")
+            for s in support_rx:
+                pdf_bullet(s, bullet_char="•")
+        pdf.ln(4)
+    except Exception:
+        pass
+
+    # --- NEW: IPDP Roadmap (Phase 1–3) including Coaching Matrix + Teaching Deep Dive ---
+    # IMPORTANT: The on-screen IPDP matrix helpers live inside the Streamlit view.
+    # For PDF reliability, we generate a parallel (pure) roadmap here so the phases
+    # always render (and we don't silently skip due to scope errors).
+    try:
+        pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
+        pdf.cell(0, 8, "14. IPDP Roadmap (Phases 1–3)", ln=True, fill=True); pdf.ln(2)
+        pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
+
+        def _pdf_phase_overview(phase_num: int):
+            return {
+                1: {
+                    "title": "Phase 1: Safety + Consistency",
+                    "aim": "Build a dependable baseline: routines, documentation habits, and the minimum safe standard.",
+                    "supervisor_role": "Coach in real time, keep scope small, verify quickly, and praise consistency.",
+                    "common_pitfall": "Overloading too early or letting expectations stay vague, creating avoidable chaos.",
+                },
+                2: {
+                    "title": "Phase 2: Judgment + Pattern Recognition",
+                    "aim": "Move from task completion to decision quality: spot patterns, anticipate needs, prevent repeats.",
+                    "supervisor_role": "Don’t rescue—require a recommendation + rationale and coach the thinking.",
+                    "common_pitfall": "They defer upward (‘you decide’) or get rigid to avoid ambiguity.",
+                },
+                3: {
+                    "title": "Phase 3: Ownership + Systems Thinking",
+                    "aim": "Shift from managing moments to improving systems: delegation, prevention, team standards.",
+                    "supervisor_role": "Delegate real ownership with guardrails and review outcomes over time.",
+                    "common_pitfall": "They over-control (do everything) or avoid hard calls that protect standards.",
+                },
+            }.get(int(phase_num), {"title": f"Phase {phase_num}", "aim": "", "supervisor_role": "", "common_pitfall": ""})
+
+        def _pdf_dynamic_moves(comm: str, motiv: str, phase: int):
+            # Keep it stable + aligned with the phase PDF helper.
+            c_moves = {
+                "Director": [
+                    "The 'Bottom Line' Opener: Start with the goal, not the background.",
+                    "The Autonomy Check: Ask 'What do you need to own this?'"
+                ],
+                "Encourager": [
+                    "The Relational Buffer: Spend 2 mins on 'us' before 'the work'.",
+                    "The Vision Connect: Link the boring task to the team vibe."
+                ],
+                "Facilitator": [
+                    "The Advance Warning: Send the agenda 24hrs early.",
+                    "The Process Map: Ask them to design the 'how'."
+                ],
+                "Tracker": [
+                    "The Data Dive: Bring specific examples/numbers.",
+                    "The Risk Assessment: Ask 'What risks do you see?'"
+                ]
+            }
+            m_moves = {
+                "Achievement": [
+                    "The Scoreboard: Define what 'winning' looks like.",
+                    "The Sprint: Set a short-term, high-intensity goal."
+                ],
+                "Growth": [
+                    "The Stretch: Give a task slightly above their pay grade.",
+                    "The Debrief: Ask 'What did you learn?' not just 'Did you do it?'"
+                ],
+                "Purpose": [
+                    "The Impact Story: Share a specific youth success story.",
+                    "The Why: Explain the mission value of the task."
+                ],
+                "Connection": [
+                    "The Peer Mentor: Have them teach a peer.",
+                    "The Team Check: Ask 'How is the team feeling?'"
+                ]
+            }
+            p_moves = {
+                1: [
+                    "The Safety Net: 'Call me if you get stuck.'",
+                    "The Binary Feedback: 'This was right/wrong.'"
+                ],
+                2: [
+                    "The Scenario Drill: 'What would you do if...?'",
+                    "The Pattern Spot: 'I see you doing X often.'"
+                ],
+                3: [
+                    "The Delegation: 'You run the meeting today.'",
+                    "The Systems Think: 'How do we fix this process?'"
+                ]
+            }
+            return c_moves.get(comm, []) + m_moves.get(motiv, []) + p_moves.get(int(phase), [])
+
+        for phase_num in (1, 2, 3):
+            card = _pdf_phase_overview(phase_num)
+            pdf.set_font("Arial", 'B', 11); pdf.set_text_color(*black)
+            pdf.multi_cell(0, 6, clean_text(f"{card.get('title','Phase')}"))
+            pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
+            if card.get("aim"):
+                pdf_label_block("Aim", card.get("aim",""))
+            if card.get("supervisor_role"):
+                pdf_label_block("Supervisor Role", card.get("supervisor_role",""))
+            if card.get("common_pitfall"):
+                pdf_label_block("Common Pitfall", card.get("common_pitfall",""))
+            pdf.ln(1)
+
+            pdf.set_font("Arial", 'B', 11)
+            pdf_label_block("Coaching Matrix (6 High-Impact Moves)", "")
+            pdf.set_font("Arial", '', 11)
+            moves = _pdf_dynamic_moves(p_comm or "Director", p_mot or "Achievement", int(phase_num))
+            for i, mv in enumerate(moves, start=1):
+                pdf_bullet(f"{i}) {mv}", bullet_char="•")
+
+            pdf.ln(1)
+            pdf.set_font("Arial", 'B', 11)
+            pdf_label_block("Teaching Deep Dive (Profile-Integrated)", "")
+            pdf.set_font("Arial", '', 11)
+            deep = build_teaching_deep_dive(name, p_comm, s_comm, p_mot, s_mot, phase_num)
+            deep_clean = re.sub(r"[*_`#>]", "", deep)
+            deep_clean = re.sub(r"\n{3,}", "\n\n", deep_clean).strip()
+            pdf_bullet(deep_clean, bullet_char="•")
+            pdf.ln(4)
+    except Exception:
+        pass
+
+
+    return pdf.output(dest='S').encode('latin-1')
 
 def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     # Derived helper for friendlier copy
@@ -2833,45 +3205,52 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
     data = generate_profile_content(p_comm, p_mot)
 
     st.markdown("---")
-    st.markdown(f"### 📘 Supervisory Guide: {name}")
+    st.markdown(f"### 📘 Supervisory Guide: {safe_name}")
     st.caption(f"Role: {role} | Profile: {p_comm} ({s_comm}) • {p_mot} ({s_mot})")
 
     # --- Exports (available immediately after clicking Generate Guide) ---
     ex1, ex2 = st.columns([1, 2])
 
+    # Streamlit keys & filenames must be string-safe; some upstream data can be lists.
+    safe_name = (
+        (name[0] if len(name)==1 else ", ".join([str(x) for x in name]))
+        if isinstance(name, list)
+        else ("" if name is None else str(name))
+    )
+
     with ex1:
         pdf_bytes = st.session_state.get("generated_pdf", b"")
         pdf_name = st.session_state.get("generated_name")
-        pdf_filename = st.session_state.get("generated_filename", f"Guide_{name.replace(' ', '_')}.pdf")
+        pdf_filename = st.session_state.get("generated_filename", f"Guide_{safe_name.replace(' ', '_')}.pdf")
 
-        pdf_ready = isinstance(pdf_bytes, (bytes, bytearray)) and len(pdf_bytes) > 0 and (pdf_name == name)
+        pdf_ready = isinstance(pdf_bytes, (bytes, bytearray)) and len(pdf_bytes) > 0 and (pdf_name == safe_name)
 
         st.download_button(
             "📄 Download PDF",
             data=pdf_bytes if pdf_ready else b"",
             file_name=pdf_filename,
             mime="application/pdf",
-            key=f"download_pdf_{name}",
+            key=f"download_pdf_{safe_name}",
             disabled=not pdf_ready,
         )
-        if st.session_state.get("pdf_error") and (pdf_name == name):
+        if st.session_state.get("pdf_error") and (pdf_name == safe_name):
             st.error(f"PDF generation failed: {st.session_state.pdf_error}")
 
     with ex2:
         email_to = st.text_input(
             "Email address",
-            key=f"email_to_{name}",
+            key=f"email_to_{safe_name}",
             placeholder="name@domain.com",
         )
         is_valid = validate_email(email_to)
         if email_to and not is_valid:
             st.warning("Please enter a valid email (must include @ and a domain).")
 
-        send = st.button("✉️ Email me the report", key=f"email_report_{name}", disabled=(not is_valid))
+        send = st.button("✉️ Email me the report", key=f"email_report_{safe_name}", disabled=(not is_valid))
         if send:
             pdf_bytes = st.session_state.get("generated_pdf", b"")
             pdf_name = st.session_state.get("generated_name")
-            pdf_ready = isinstance(pdf_bytes, (bytes, bytearray)) and len(pdf_bytes) > 0 and (pdf_name == name)
+            pdf_ready = isinstance(pdf_bytes, (bytes, bytearray)) and len(pdf_bytes) > 0 and (pdf_name == safe_name)
 
             if not pdf_ready:
                 st.error("Please click 'Generate Guide' first so the PDF can be created.")
@@ -2879,10 +3258,10 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
                 with st.spinner("Sending..."):
                     success, msg = send_pdf_via_email(
                         email_to,
-                        f"Supervisor Guide: {name}",
+                        f"Supervisor Guide: {safe_name}",
                         f"Attached is the Elmcrest Compass Supervisory Guide for {name}.",
                         pdf_bytes,
-                        st.session_state.get("generated_filename", f"Guide_{name.replace(' ', '_')}.pdf"),
+                        st.session_state.get("generated_filename", f"Guide_{safe_name.replace(' ', '_')}.pdf"),
                     )
                 if success:
                     st.success(msg)
@@ -4133,6 +4512,16 @@ if st.session_state.current_view == "Supervisor's Guide":
                 
                 if sel:
                     d = options[sel]
+                    # --- Robust normalization (admin.py uses strings; some data sources may yield lists) ---
+                    def _norm_name(v):
+                        if isinstance(v, list):
+                            if len(v) == 0:
+                                return ""
+                            if len(v) == 1:
+                                return str(v[0])
+                            return ", ".join([str(x) for x in v])
+                        return "" if v is None else str(v)
+                    d["name"] = _norm_name(d.get("name"))
                     c1,c2,c3 = st.columns(3)
                     c1.metric("Role", d['role']); c2.metric("Style", d['p_comm']); c3.metric("Drive", d['p_mot'])
                     
@@ -4155,11 +4544,11 @@ if st.session_state.current_view == "Supervisor's Guide":
                             if not isinstance(pdf_bytes, (bytes, bytearray)) or len(pdf_bytes) == 0:
                                 raise ValueError("PDF generator returned no data.")
                             st.session_state.generated_pdf = pdf_bytes
-                            st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
+                            st.session_state.generated_filename = f"Guide_{str(d['name']).replace(' ', '_')}.pdf"
                             st.session_state.generated_name = d['name']
                         except Exception as e:
                             st.session_state.generated_pdf = b""
-                            st.session_state.generated_filename = f"Guide_{d['name'].replace(' ', '_')}.pdf"
+                            st.session_state.generated_filename = f"Guide_{str(d['name']).replace(' ', '_')}.pdf"
                             st.session_state.generated_name = d['name']
                             st.session_state.pdf_error = str(e)
 
@@ -4867,3 +5256,105 @@ elif st.session_state.current_view == "Org Pulse":
 
 
 
+# =====================================================
+# REPORTLAB_PDF_SUPERVISOR_GUIDE_V1
+# Fixes earlier indentation issue by redefining create_supervisor_guide
+# so it ALWAYS returns PDF bytes.
+# =====================================================
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem
+from reportlab.lib import colors
+
+def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
+    """Return PDF bytes for the Supervisor Guide (ReportLab implementation)."""
+    data = generate_profile_content(p_comm, p_mot)
+
+    buf = BytesIO()
+    doc = SimpleDocTemplate(
+        buf,
+        pagesize=letter,
+        leftMargin=0.75*inch,
+        rightMargin=0.75*inch,
+        topMargin=0.75*inch,
+        bottomMargin=0.75*inch,
+        title=f"Supervisor Guide - {name}",
+    )
+
+    styles = getSampleStyleSheet()
+    H1 = ParagraphStyle("H1", parent=styles["Title"], fontName="Helvetica-Bold", fontSize=18, spaceAfter=12)
+    H2 = ParagraphStyle("H2", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=13, spaceBefore=10, spaceAfter=6)
+    H3 = ParagraphStyle("H3", parent=styles["Heading3"], fontName="Helvetica-Bold", fontSize=11, spaceBefore=8, spaceAfter=4)
+    Body = ParagraphStyle("Body", parent=styles["BodyText"], fontName="Helvetica", fontSize=10, leading=13, spaceAfter=6)
+
+    def p(txt, style=Body):
+        return Paragraph(clean_text(str(txt)), style)
+
+    def bullets(items, level=0):
+        if not items:
+            return []
+        flow = ListFlowable(
+            [ListItem(p(clean_text(str(it))), leftIndent=12 + level*10) for it in items if str(it).strip()],
+            bulletType="bullet",
+            bulletFontName="Helvetica",
+            bulletFontSize=9,
+            bulletIndent=0,
+            leftIndent=16 + level*10,
+            bulletColor=colors.black,
+        )
+        return [flow, Spacer(1, 6)]
+
+    story = []
+    story.append(p("Elmcrest Supervisory Guide", H1))
+    story.append(p(f"For: <b>{name}</b> ({role})", Body))
+    story.append(p(f"Profile: <b>{p_comm}</b> ({s_comm}) • <b>{p_mot}</b> ({s_mot})", Body))
+    story.append(Spacer(1, 10))
+
+    # Rapid Cheat Sheet
+    story.append(p("Rapid Interaction Cheat Sheet", H2))
+    story.append(p("✅ Do This", H3))
+    story += bullets(data.get("cheat_do") or [])
+    story.append(p("⛔ Avoid This", H3))
+    story += bullets(data.get("cheat_avoid") or [])
+    story.append(p("⛽ What Fuels Them (Motivation)", H3))
+    story += bullets(data.get("cheat_fuel") or [])
+    story.append(Spacer(1, 8))
+
+    # Communication
+    story.append(p("Communication Profile", H2))
+    story += bullets(data.get("s1_b") or [])
+    story.append(p("How to Speak Their Language", H3))
+    story += bullets(data.get("s2_b") or [])
+    story.append(Spacer(1, 8))
+
+    # Motivation
+    story.append(p("Motivation Profile", H2))
+    story += bullets(data.get("s3_b") or [])
+    story.append(p("Leadership Strategies", H3))
+    story += bullets(data.get("s4_b") or [])
+    story.append(p("How to Celebrate Them", H3))
+    story += bullets(data.get("s10_b") or [])
+    story.append(Spacer(1, 8))
+
+    # Integrated
+    story.append(p("Integrated Profile", H2))
+    if data.get("s5_title"):
+        story.append(p(str(data.get("s5_title")), H3))
+    if data.get("s5_synergy"):
+        story.append(p(f"<b>Synergy:</b> {data.get('s5_synergy')}", Body))
+    for k in ["s6", "s7", "s8"]:
+        if data.get(k):
+            story.append(p(data.get(k), Body))
+    story += bullets(data.get("s9_b") or [])
+    story.append(Spacer(1, 8))
+
+    # Coaching + advancement
+    story.append(p("Coaching Questions", H2))
+    story += bullets(data.get("coaching") or [])
+    if data.get("advancement"):
+        story.append(p(data.get("advancement"), Body))
+
+    doc.build(story)
+    return buf.getvalue()
