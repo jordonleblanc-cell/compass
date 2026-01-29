@@ -2682,93 +2682,237 @@ def validate_email(email: str) -> bool:
 
 
 
+
 def create_supervisor_guide(name, role, p_comm, s_comm, p_mot, s_mot):
-    pdf = FPDF()
-    pdf.add_page()
+    """Generate a full PDF of the Supervisor's Guide INCLUDING collapsed sections."""
+    pdf = SafeFPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
-    
-    # Colors
+    pdf.add_page()
+
     blue = (26, 115, 232)
     green = (52, 168, 83)
     red = (234, 67, 53)
     black = (0, 0, 0)
-    gray = (128, 128, 128)
-    
-    # Header
-    pdf.set_font("Arial", 'B', 20); pdf.set_text_color(*blue); pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align='C')
-    pdf.set_font("Arial", '', 12); pdf.set_text_color(*black); pdf.cell(0, 8, clean_text(f"For: {name} ({role})"), ln=True, align='C')
-    pdf.cell(0, 8, clean_text(f"Profile: {p_comm} x {p_mot}"), ln=True, align='C'); pdf.ln(5)
-    
-    # Generate Data
-    data = generate_profile_content(p_comm, p_mot)
 
-    # --- CHEAT SHEET SECTION (NEW) ---
-    pdf.set_fill_color(240, 240, 240)
-    pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, "Rapid Interaction Cheat Sheet", ln=True, fill=True, align='C')
-    pdf.ln(2)
+    def md_to_text(s: str) -> str:
+        if not s:
+            return ""
+        s = str(s)
+        # basic markdown cleanup for PDF
+        s = s.replace("**", "").replace("__", "")
+        s = s.replace("•", "-")
+        return s
 
-    def print_cheat_column(title, items, color_rgb):
-        pdf.set_font("Arial", 'B', 12)
-        pdf.set_text_color(*color_rgb)
-        pdf.cell(0, 8, title, ln=True)
-        pdf.set_text_color(0, 0, 0)
-        pdf.set_font("Arial", '', 10)
-        for item in items:
-            # Clean up bold markdown for PDF
-            clean_item = item.replace("**", "")
-            pdf.multi_cell(0, 5, clean_text(f"- {clean_item}"))
+    def hr():
+        y = pdf.get_y()
+        pdf.set_draw_color(210, 210, 210)
+        pdf.line(10, y, 200, y)
+        pdf.ln(5)
+
+    def title_block(t):
+        pdf.set_fill_color(240, 240, 240)
+        pdf.set_font("Arial", "B", 14)
+        pdf.set_text_color(*black)
+        pdf.cell(0, 10, clean_text(t), ln=True, fill=True, align="C")
         pdf.ln(2)
 
-    print_cheat_column("DO THIS (Communication):", data['cheat_do'], green)
-    print_cheat_column("AVOID THIS (Triggers):", data['cheat_avoid'], red)
-    print_cheat_column("FUEL (Motivation):", data['cheat_fuel'], blue)
-    
-    pdf.ln(5)
-    pdf.line(10, pdf.get_y(), 200, pdf.get_y()) # Horizontal line
-    pdf.ln(5)
+    def section_header(t):
+        pdf.set_font("Arial", "B", 12)
+        pdf.set_text_color(*blue)
+        pdf.set_fill_color(240, 245, 250)
+        pdf.cell(0, 8, clean_text(t), ln=True, fill=True)
+        pdf.ln(2)
+        pdf.set_font("Arial", "", 11)
+        pdf.set_text_color(*black)
 
-    def add_section(title, body, bullets=None):
-        pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
-        pdf.cell(0, 8, title, ln=True, fill=True); pdf.ln(2)
-        pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
-        
-        if body:
-            clean_body = body.replace("**", "").replace("* ", "- ")
-            pdf.multi_cell(0, 5, clean_text(clean_body))
-        
-        if bullets:
-            pdf.ln(1)
-            for b in bullets:
-                pdf.cell(5, 5, "-", 0, 0)
-                clean_b = b.replace("**", "") 
-                pdf.multi_cell(0, 5, clean_text(clean_b))
-        pdf.ln(4)
+    def paragraph(t):
+        if not t:
+            return
+        pdf.set_font("Arial", "", 11)
+        pdf.set_text_color(*black)
+        pdf.multi_cell(0, 5, clean_text(md_to_text(t)))
+        pdf.ln(2)
 
-    # Sections 1-10
-    add_section(f"1. Communication Profile: {p_comm}", None, data['s1_b']) 
-    add_section("2. Supervising Their Communication", None, data['s2_b'])
-    add_section(f"3. Motivation Profile: {p_mot}", None, data['s3_b'])
-    add_section("4. Motivating This Staff Member", None, data['s4_b'])
-    add_section("5. Integrated Leadership Profile", data['s5']) 
-    add_section("6. How You Can Best Support Them", data['s6'])
-    add_section("7. What They Look Like When Thriving", data['s7'])
-    add_section("8. What They Look Like When Struggling", data['s8'])
-    add_section("9. Supervisory Interventions (Roadmap)", None, data['s9_b'])
-    add_section("10. What You Should Celebrate", None, data['s10_b'])
+    def bullets(items):
+        if not items:
+            return
+        pdf.set_font("Arial", "", 11)
+        pdf.set_text_color(*black)
+        for b in items:
+            b = md_to_text(b)
+            b = str(b).strip()
+            if not b:
+                continue
+            if b.startswith("- "):
+                line = b
+            else:
+                line = f"- {b}"
+            pdf.multi_cell(0, 5, clean_text(line))
+        pdf.ln(2)
 
-    # 11. Coaching Questions (10 questions)
-    pdf.set_font("Arial", 'B', 12); pdf.set_text_color(*blue); pdf.set_fill_color(240, 245, 250)
-    pdf.cell(0, 8, "11. Coaching Questions", ln=True, fill=True); pdf.ln(2)
-    pdf.set_font("Arial", '', 11); pdf.set_text_color(*black)
-    for i, q in enumerate(data['coaching']):
-        pdf.multi_cell(0, 5, clean_text(f"{i+1}. {q}"))
-    pdf.ln(4)
+    # Header
+    pdf.set_font("Arial", "B", 20)
+    pdf.set_text_color(*blue)
+    pdf.cell(0, 10, "Elmcrest Supervisory Guide", ln=True, align="C")
+    pdf.set_font("Arial", "", 12)
+    pdf.set_text_color(*black)
+    pdf.cell(0, 8, clean_text(f"For: {name} ({role})"), ln=True, align="C")
+    pdf.cell(0, 8, clean_text(f"Profile: {p_comm} ({s_comm}) • {p_mot} ({s_mot})"), ln=True, align="C")
+    pdf.ln(6)
 
-    # 12. Advancement
-    add_section("12. Helping Them Prepare for Advancement", data['advancement'])
+    data = generate_profile_content(p_comm, p_mot)
 
-    return pdf.output(dest='S').encode('latin-1')
+    # === Rapid Interaction Cheat Sheet (Expanded online; include fully) ===
+    title_block("Rapid Interaction Cheat Sheet")
+    section_header("✅ Do This (Communication)")
+    bullets(data.get("cheat_do") or [])
+    section_header("⛔ Avoid This (Triggers)")
+    bullets(data.get("cheat_avoid") or [])
+    section_header("⛽ Fuel (Motivation)")
+    bullets(data.get("cheat_fuel") or [])
+    hr()
+
+    # === Core Guide Sections (these match the online guide sections) ===
+    section_header(f"1. Communication Profile: {p_comm}")
+    bullets(data.get("s1_b") or [])
+
+    section_header("2. Supervising Their Communication")
+    bullets(data.get("s2_b") or [])
+
+    section_header(f"3. Motivation Profile: {p_mot}")
+    bullets(data.get("s3_b") or [])
+
+    section_header("4. Motivating This Staff Member")
+    bullets(data.get("s4_b") or [])
+
+    section_header("5. Integrated Leadership Profile")
+    paragraph(data.get("s5") or "")
+
+    section_header("6. How You Can Best Support Them")
+    paragraph(data.get("s6") or "")
+
+    section_header("7. What They Look Like When Thriving")
+    paragraph(data.get("s7") or "")
+
+    section_header("8. What They Look Like When Struggling")
+    paragraph(data.get("s8") or "")
+
+    section_header("9. Supervisory Interventions (Roadmap)")
+    bullets(data.get("s9_b") or [])
+
+    section_header("10. What You Should Celebrate")
+    bullets(data.get("s10_b") or [])
+
+    section_header("11. Coaching Questions")
+    qs = data.get("coaching") or []
+    for i, q in enumerate(qs):
+        pdf.multi_cell(0, 5, clean_text(md_to_text(f"{i+1}. {q}")))
+    pdf.ln(2)
+
+    section_header("12. Helping Them Prepare for Advancement")
+    paragraph(data.get("advancement") or "")
+    hr()
+
+    # =====================================================
+    # COLLAPSED SECTIONS (ONLINE) — INCLUDE IN PDF TOO
+    # =====================================================
+
+    # --- HUD Training text (collapsed online) ---
+    title_block("How to Use the HUD (Training)")
+    paragraph("""
+What this is: A Heads-Up Display is the supervisor's live dashboard. It helps you see patterns early, intervene sooner, and avoid turning stress into discipline.
+
+Why it matters: Most supervisory mistakes happen when stress signals are misread as attitude, defiance, or incompetence. The HUD reframes stress as data so you can respond with precision.
+
+How to use it:
+1) Scan weekly (2–3 minutes): look for early stress signals and environmental friction.
+2) Act early (small adjustments): remove friction, add fuel, use the person's prescription.
+3) Escalate only when needed: if safety/operations are impacted, shift to the Crisis Protocol.
+4) Debrief after recovery: do coaching after regulation returns.
+""")
+    # Stress Signature + Prescription (collapsed online)
+    stress_sig = {
+        "Director": "Becomes aggressive, micromanages, stops listening.",
+        "Encourager": "Becomes silent, withdrawn, or overly agreeable (martyrdom).",
+        "Facilitator": "Becomes paralyzed, asks for endless data, refuses to decide.",
+        "Tracker": "Becomes rigid, quotes policy excessively, focuses on minor errors."
+    }
+    rx = {
+        "Director": ["Remove a barrier they can't move.", "Give them a 'win' to chase.", "Stop talking, start doing."],
+        "Encourager": ["Schedule face time (no agenda).", "Validate their emotional load.", "Publicly praise a specific contribution."],
+        "Facilitator": ["Give a clear deadline.", "Take the blame for a hard decision.", "Ask: 'What is the next smallest step?'"],
+        "Tracker": ["Clarify priorities.", "Confirm expectations in writing.", "Reduce chaos and interruptions."]
+    }
+    section_header("Stress Signature")
+    paragraph(stress_sig.get(p_comm, ""))
+    section_header("Support Prescription")
+    bullets(rx.get(p_comm, []))
+    hr()
+
+    # --- Environment Audit (collapsed online) ---
+    title_block("Environment Audit")
+    paragraph("""
+Definition: An Environment Audit is a quick review of how the unit's conditions are affecting performance and regulation.
+
+Why it matters: If the environment is chaotic, unclear, or unrealistic, you cannot coach someone out of it. Supervisors lead by building containment: clarity, predictability, and recovery rhythms.
+
+How to use it (Supervisor checklist):
+- Workload realism: Are we expecting superhuman output due to staffing gaps?
+- Role clarity: Does the person know what 'good' looks like right now?
+- Predictability: Are we changing plans mid-shift without warning?
+- Noise + chaos: Is the setting overstimulating (constant interruptions, no reset space)?
+- Recovery rhythms: Is there a built-in pause (micro-breaks, task rotation, huddle)?
+
+Rule of thumb:
+- If stress is rising across multiple staff, your issue is likely environmental, not individual.
+""")
+    fuel_map = {"Achievement": "Clear Goals", "Growth": "New Challenges", "Purpose": "Mission Connection", "Connection": "Team Time"}
+    friction_map = {"Director": "Red Tape", "Encourager": "Isolation", "Facilitator": "Conflict", "Tracker": "Chaos"}
+    section_header("Top Friction (Remove This)")
+    paragraph(friction_map.get(p_comm, ""))
+    section_header("Top Fuel (Add This)")
+    paragraph(fuel_map.get(p_mot, ""))
+    hr()
+
+    # --- Crisis Protocol (collapsed online) ---
+    title_block("Crisis Protocol (Break Glass)")
+    paragraph("""
+Definition: A Crisis Protocol is the pre-planned response when a staff member is dysregulated enough that logic, coaching, or problem-solving won't land.
+
+Why it matters: In crisis, reasoning goes offline. If you argue, over-explain, or threaten consequences too early, you escalate the moment and create a power struggle.
+
+How to use it (Supervisor steps):
+1) Lower the temperature: slow your voice, reduce words, give simple directions.
+2) Prioritize safety: reassign tasks, remove audience, reduce stimuli.
+3) Use a short script: one or two sentences, repeated if needed.
+4) End the debate: 'We will talk about this after the shift / after you reset.'
+5) Debrief after recovery: revisit what happened, what triggered it, and how to prevent it.
+""")
+    crisis_script = {
+        "Director": "I am giving you the ball. Run with it. I will block for you.",
+        "Encourager": "We are in this together. I have your back. Let's do this.",
+        "Facilitator": "I need you to trust my call on this one. We will debrief later.",
+        "Tracker": "Follow the protocol. I am responsible for the outcome."
+    }
+    section_header("Crisis Script (use during meltdown)")
+    paragraph(f"“{crisis_script.get(p_comm, '')}”")
+    hr()
+
+    # --- Coaching Context phases (collapsed online) ---
+    # Include Teaching Deep Dive output for each phase, since it is hidden under expanders online.
+    title_block("Coaching Context (Integrated Profile)")
+    for phase in [1, 2, 3, 4]:
+        section_header(f"Phase {phase}")
+        try:
+            teach_text = build_teaching_deep_dive(name, p_comm, s_comm, p_mot, s_mot, int(phase))
+            paragraph(teach_text)
+        except Exception:
+            paragraph("Teaching deep dive not available for this phase in the current configuration.")
+        hr()
+
+    return pdf.output(dest="S").encode("latin-1")
+
+
 
 
 # --- PDF formatting helpers (readability) ---
