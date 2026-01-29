@@ -4937,15 +4937,15 @@ elif st.session_state.current_view == "Conflict Mediator":
         with st.sidebar:
             # Try to get key from secrets (support both names)
             secret_key = st.secrets.get("GOOGLE_API_KEY") or st.secrets.get("GEMINI_API_KEY", "")
-            
+
             # Input field (defaults to secret if found)
             user_api_key = st.text_input(
-                "🔑 Gemini API Key", 
+                "🔑 Gemini API Key",
                 value=st.session_state.get("gemini_key_input", secret_key),
                 type="password",
                 help="Get a key at aistudio.google.com"
             )
-            
+
             # Persist input to session state
             if user_api_key:
                 st.session_state.gemini_key_input = user_api_key
@@ -4953,196 +4953,402 @@ elif st.session_state.current_view == "Conflict Mediator":
             else:
                 st.error("❌ No API Key Found")
 
+        # -----------------------------
+        # Teaching-first mediation flow
+        # -----------------------------
         with st.container(border=True):
             c1, c2 = st.columns(2)
             p1 = c1.selectbox("Select Yourself (Supervisor)", df['name'].unique(), index=None, key="p1")
-            p2 = c2.selectbox("Select Staff Member", df['name'].unique(), index=None, key="p2")
-        
+            p2 = c2.selectbox("Select Staff Member / Colleague", df['name'].unique(), index=None, key="p2")
+
+        # Lightweight coaching memory for this view only
+        if "cm_notes" not in st.session_state:
+            st.session_state.cm_notes = ""
+        if "cm_plan" not in st.session_state:
+            st.session_state.cm_plan = ""
+
         if p1 and p2 and p1 != p2:
-            d1 = df[df['name']==p1].iloc[0]; d2 = df[df['name']==p2].iloc[0]
-            
+            d1 = df[df['name'] == p1].iloc[0]
+            d2 = df[df['name'] == p2].iloc[0]
+
             # Extract Primary AND Secondary styles
             s1_p, s1_s = d1['p_comm'], d1['s_comm']
             m1_p, m1_s = d1['p_mot'], d1['s_mot']
-            
+
             s2_p, s2_s = d2['p_comm'], d2['s_comm']
             m2_p, m2_s = d2['p_mot'], d2['s_mot']
-            
+
             st.divider()
-            # Display full profile in header
             st.subheader(f"{s1_p}/{s1_s} (Sup) vs. {s2_p}/{s2_s} (Staff)")
-            
-            # Updated Logic to display BOTH Primary and Secondary clashes
+
+            # --- Helper: Profile insight snippets (teaching) ---
+            def _style_one_liner(style, default=""):
+                guide = COMM_PROFILES.get(style, {})
+                # Prefer a short "vibe" line if present; otherwise first bullet
+                if isinstance(guide, dict):
+                    vibe = guide.get("vibe") or guide.get("one_liner") or ""
+                    if vibe:
+                        return vibe
+                    bullets = guide.get("bullets", [])
+                    if bullets:
+                        return bullets[0]
+                return default
+
+            def _mot_one_liner(driver, default=""):
+                guide = MOTIV_PROFILES.get(driver, {})
+                if isinstance(guide, dict):
+                    vibe = guide.get("vibe") or guide.get("one_liner") or ""
+                    if vibe:
+                        return vibe
+                    bullets = guide.get("bullets", []) or guide.get("strategies_bullets", [])
+                    if bullets:
+                        return bullets[0]
+                return default
+
+            def _needs(style):
+                # Teaching-friendly "what they need to hear" by style
+                return {
+                    "Director": [
+                        "Be direct: name the problem in one sentence.",
+                        "Offer options, not open-ended debate.",
+                        "Define the decision and the timeline."
+                    ],
+                    "Encourager": [
+                        "Name impact on people and morale.",
+                        "Use warmth + clarity: 'I’m with you and we need a change.'",
+                        "Invite their read of team feelings and youth climate."
+                    ],
+                    "Facilitator": [
+                        "Slow down: reflect and summarize before solving.",
+                        "Ask for perspective and meaning (what they think is happening).",
+                        "Agree on process: 'Here’s how we’ll talk through this.'"
+                    ],
+                    "Tracker": [
+                        "Get specific: examples, dates, what was documented.",
+                        "Clarify expectations, roles, and steps.",
+                        "Define what 'done' looks like and how it will be checked."
+                    ],
+                }.get(style, ["Use clarity, specificity, and a respectful tone."])
+
+            def _triggers(style):
+                return {
+                    "Director": ["Vague talk without decisions", "Circular discussions", "Perceived incompetence or delay"],
+                    "Encourager": ["Cold tone", "Public criticism", "Feeling unseen or unappreciated"],
+                    "Facilitator": ["Escalation and interruption", "Being forced into false choices", "Dominating personalities"],
+                    "Tracker": ["Rule ambiguity", "Loose follow-through", "Repeated process breaks"],
+                }.get(style, ["Ambiguity, disrespect, and unclear expectations."])
+
+            # -----------------------------
+            # 1) Orientation / Teaching
+            # -----------------------------
+            with st.expander("🧠 Orientation: What conflict *is* (and what it isn’t)", expanded=False):
+                st.markdown(
+                    """
+**In residential care, conflict is often a *signal*, not a character flaw.**  
+Most clashes come from a mismatch in **needs** (clarity vs. context), **risk tolerance**, and **communication defaults under stress**.
+
+**Your job as supervisor is not to pick a winner.**  
+Your job is to:
+1. **Make the problem discussable** (reduce heat, increase clarity)
+2. **Protect youth and safety** (non‑negotiables)
+3. **Restore working agreements** (who does what, how, and when)
+4. **Follow up** so the agreement becomes real
+                    """
+                )
+
+            # Show profile cards for teaching / empathy building
+            with st.container(border=True):
+                a1, a2 = st.columns(2)
+                with a1:
+                    st.markdown("### 🧩 Supervisor Profile (your defaults)")
+                    st.write(f"**Communication:** {s1_p} / {s1_s}")
+                    st.write(f"**Motivation:** {m1_p} / {m1_s}")
+                    st.caption(_style_one_liner(s1_p, ""))
+                    st.caption(_mot_one_liner(m1_p, ""))
+                    st.markdown("**What you might overuse under stress:**")
+                    for t in _triggers(s1_p):
+                        st.markdown(f"- {t}")
+                with a2:
+                    st.markdown("### 🧩 Staff / Colleague Profile (their defaults)")
+                    st.write(f"**Communication:** {s2_p} / {s2_s}")
+                    st.write(f"**Motivation:** {m2_p} / {m2_s}")
+                    st.caption(_style_one_liner(s2_p, ""))
+                    st.caption(_mot_one_liner(m2_p, ""))
+                    st.markdown("**What they may interpret as 'threat' under stress:**")
+                    for t in _triggers(s2_p):
+                        st.markdown(f"- {t}")
+
+            # -----------------------------
+            # 2) Guided Mediation Roadmap
+            # -----------------------------
+            with st.expander("🧭 Conflict Mediation Roadmap (step-by-step)", expanded=True):
+                st.markdown("Use this as your **meeting agenda**. The goal is to move from **heat → clarity → agreement → follow‑through**.")
+
+                conflict_type = st.selectbox(
+                    "What kind of conflict are you mediating?",
+                    [
+                        "Tone / Communication breakdown",
+                        "Task ownership / follow-through",
+                        "Schedule / coverage / fairness",
+                        "Policy / documentation / compliance",
+                        "Safety incident / high-stakes disagreement",
+                        "Values mismatch (what 'good care' looks like)",
+                        "Other / mixed"
+                    ],
+                    index=0,
+                    key="cm_conflict_type"
+                )
+
+                cA, cB, cC = st.columns(3)
+                with cA:
+                    st.markdown("#### 1) Prepare (5–10 min)")
+                    st.markdown("- Identify the **non‑negotiables** (youth safety, policy, ratios).")
+                    st.markdown("- Define the **decision needed** (what must change).")
+                    st.markdown("- Choose a **neutral opening** and timebox the meeting.")
+                with cB:
+                    st.markdown("#### 2) Stabilize (first 2 min)")
+                    st.markdown("- Set **purpose**: restore teamwork + protect youth.")
+                    st.markdown("- Set **rules**: no interrupting, speak for self, stay specific.")
+                    st.markdown("- Confirm **psychological safety**: 'We’re solving, not shaming.'")
+                with cC:
+                    st.markdown("#### 3) Make it specific (10–15 min)")
+                    st.markdown("- Each person gives **one example** (date/shift/what happened).")
+                    st.markdown("- Supervisor summarizes: *facts + impact + pattern*.")
+                    st.markdown("- Name what *both* are trying to protect (values).")
+
+                st.divider()
+
+                dA, dB = st.columns(2)
+                with dA:
+                    st.markdown("#### 4) Build a working agreement (10–15 min)")
+                    st.markdown("- Define **roles**: who owns what.")
+                    st.markdown("- Define **standards**: what 'good' looks like.")
+                    st.markdown("- Define **checkpoints**: how we verify follow‑through.")
+                    st.markdown("- Define **repair**: what to do when it slips.")
+                with dB:
+                    st.markdown("#### 5) Close and follow up (2–5 min)")
+                    st.markdown("- Confirm agreement in one sentence each.")
+                    st.markdown("- Set follow‑up: date/time, what will be reviewed.")
+                    st.markdown("- End with dignity: appreciation + confidence + clarity.")
+
+                # Style-tuned supervisor prompts (teaching)
+                with st.expander("🗣️ Style‑tuned supervisor prompts (use these verbatim)", expanded=False):
+                    st.markdown("**Opening frame (neutral + accountable):**")
+                    st.success("“My goal today is to restore teamwork and protect youth care. We’re going to stay specific, listen fully, and leave with a clear plan.”")
+
+                    st.markdown("**Make it specific (prevent spirals):**")
+                    st.info("“Let’s each share one concrete moment: what happened, what you did, and what you needed instead.”")
+
+                    st.markdown("**Name impact without blame:**")
+                    st.warning("“When this happens, it creates risk for youth and stress for the team. We need a new working agreement.”")
+
+                    st.markdown("**Agreement checkpoint:**")
+                    st.success("“What are we each committing to on the next shift, and how will we know it’s happening?”")
+
+                # Guided notes template (optional)
+                with st.expander("📝 Mediation Notes (optional — helps you stay structured)", expanded=False):
+                    template = f"""Conflict Type: {conflict_type}
+
+Facts (what happened; 2–4 bullets):
+- 
+- 
+
+Impact (youth/team/safety):
+- 
+
+What each person is trying to protect:
+- {p1}: 
+- {p2}: 
+
+Working Agreement (who does what, by when):
+- 
+
+Checkpoints / Follow-up:
+- Date:
+- What we'll review:
+"""
+                    st.session_state.cm_notes = st.text_area(
+                        "Notes (copy/paste into supervision notes if needed)",
+                        value=st.session_state.cm_notes or template,
+                        height=220
+                    )
+
+            # -----------------------------
+            # 3) Your existing deep-dive matrix (kept) + better fallback
+            # -----------------------------
             if s1_p in SUPERVISOR_CLASH_MATRIX and s2_p in SUPERVISOR_CLASH_MATRIX[s1_p]:
                 clash_p = SUPERVISOR_CLASH_MATRIX[s1_p][s2_p]
-                
+
                 # Retrieve Secondary Clash if applicable
                 clash_s = None
                 if s1_s and s2_s and s1_s in SUPERVISOR_CLASH_MATRIX and s2_s in SUPERVISOR_CLASH_MATRIX.get(s1_s, {}):
                     clash_s = SUPERVISOR_CLASH_MATRIX[s1_s][s2_s]
 
-                with st.expander("🔍 **Psychological Deep Dive (Primary & Secondary)**", expanded=True):
-                    
-                    # Create Tabs for the two layers of conflict
-                    t_prime, t_sec = st.tabs([f"🔥 Major Tension ({s1_p} vs {s2_p})", f"🌊 Minor Tension ({s1_s} vs {s2_s})"])
-                    
+                with st.expander("🔍 Psychological Deep Dive (Primary & Secondary)", expanded=True):
+                    t_prime, t_sec = st.tabs(
+                        [f"🔥 Major Tension ({s1_p} vs {s2_p})", f"🌊 Minor Tension ({s1_s} vs {s2_s})"]
+                    )
+
                     # --- TAB 1: PRIMARY (STRESS) ---
                     with t_prime:
-                        st.caption(f"This dynamic dominates during **crises, deadlines, and high-pressure moments**.")
+                        st.caption("This layer dominates during **crises, deadlines, and high-pressure moments**.")
                         st.markdown(f"**The Core Tension:** {clash_p['tension']}")
                         st.markdown(f"{clash_p['psychology']}")
                         st.markdown("**🚩 Watch For (Stress Behaviors):**")
-                        for w in clash_p['watch_fors']: st.markdown(f"- {w}")
-                        
+                        for w in clash_p['watch_fors']:
+                            st.markdown(f"- {w}")
+
                         st.divider()
                         c_a, c_b = st.columns(2)
                         with c_a:
                             st.markdown("##### 🛠️ Coaching Protocol")
-                            for i in clash_p['intervention_steps']: st.info(i)
+                            for i in clash_p['intervention_steps']:
+                                st.info(i)
                         with c_b:
                             st.markdown("##### 🗣️ Conflict Scripts")
                             script_tabs = st.tabs(list(clash_p['scripts'].keys()))
-                            for i, (cat, text) in enumerate(clash_p['scripts'].items()):
+                            for i, (cat, text_) in enumerate(clash_p['scripts'].items()):
                                 with script_tabs[i]:
-                                    st.success(f"\"{text}\"")
+                                    st.success(f"\"{text_}\"")
 
                     # --- TAB 2: SECONDARY (ROUTINE) ---
                     with t_sec:
                         if clash_s:
-                            st.caption(f"This dynamic influences **routine planning, low-stress interactions, and daily workflow**.")
+                            st.caption("This layer influences **routine planning, low-stress interactions, and daily workflow**.")
                             st.markdown(f"**The Core Tension:** {clash_s['tension']}")
                             st.markdown(f"{clash_s['psychology']}")
                             st.markdown("**🚩 Watch For (Subtle Friction):**")
-                            for w in clash_s['watch_fors']: st.markdown(f"- {w}")
-                            
+                            for w in clash_s['watch_fors']:
+                                st.markdown(f"- {w}")
+
                             st.divider()
                             st.markdown("##### 🛠️ Routine Adjustments")
-                            for i in clash_s['intervention_steps']: 
-                                # Formatting slightly differently to distinguish from primary protocol
+                            for i in clash_s['intervention_steps']:
                                 clean_step = i.replace("**", "").replace("1. ", "").replace("2. ", "").replace("3. ", "")
                                 st.markdown(f"- {clean_step}")
                         else:
                             st.info("Secondary styles are undefined or identical. Focus on the Primary dynamic.")
 
             else:
-                st.info("No specific conflict protocol exists for this combination yet. They likely work well together!")
-            
-            # --- AI SUPERVISOR BOT ---
+                # Expanded teaching fallback: *every* combination can still have conflict
+                with st.expander("🧩 Compatibility Note (why you still might get friction)", expanded=True):
+                    st.markdown(
+                        f"""
+Even when two profiles are compatible, conflict can still happen. In residential care, friction is often caused by:
+- **Role pressure:** who is accountable vs who is carrying the emotional load
+- **Risk tolerance:** different thresholds for safety, policy, and youth behavior
+- **Expectation drift:** unclear standards or shifting priorities
+- **Stress signatures:** both people becoming more rigid under pressure
+
+**Translation move (use this):**  
+- {p1} is likely trying to protect **{m1_p}** through **{s1_p}** behaviors.  
+- {p2} is likely trying to protect **{m2_p}** through **{s2_p}** behaviors.
+
+When you name what each person is protecting, the room calms down and you can build agreement faster.
+                        """
+                    )
+
+            # -----------------------------
+            # 4) AI Supervisor Bot (kept)
+            # -----------------------------
             st.markdown("---")
             with st.container(border=True):
                 st.subheader("🤖 AI Supervisor Assistant (Enhanced Context)")
-                
-                # Determine active key from variable
+
                 active_key = user_api_key
-                
+
                 if active_key:
-                    st.caption(f"Powered by Gemini 2.5 Flash | analyzing full profile dynamics.")
+                    st.caption("Powered by Gemini 2.5 Flash | analyzing full profile dynamics.")
                 else:
                     st.caption("Basic Mode | Add an API Key in the sidebar to unlock full AI capabilities.")
-                
+
                 st.info("⬇️ **Type your question in the chat bar at the bottom of the screen.**")
-                
-                # Initialize history specifically for this view if not present
+
                 if "messages" not in st.session_state:
                     st.session_state.messages = []
 
-                # Display messages
                 for message in st.session_state.messages:
                     with st.chat_message(message["role"]):
                         st.markdown(message["content"])
 
-                # -------------------------------------------
-                # LOGIC ENGINE: HYBRID (Rule-Based + Gemini)
-                # -------------------------------------------
-                # Updated function to accept full profiles
                 def get_smart_response(query, p2_name, s2_p, s2_s, m2_p, m2_s, s1_p, s1_s, m1_p, m1_s, key):
-                    # Prepare Context Data (Primary)
                     comm_data = COMM_PROFILES.get(s2_p, {})
                     mot_data = MOTIV_PROFILES.get(m2_p, {})
-                    
-                    # If API Key exists, use Gemini
+
                     if key:
                         try:
-                            # Enhanced System Prompt with Secondary Styles
                             system_prompt = f"""
-                            You are an expert Leadership Coach for a youth care agency.
-                            You are advising a Supervisor on how to manage a staff member named {p2_name}.
-                            
-                            **Staff Member Profile ({p2_name}):**
-                            - **Communication:** Primary: {s2_p}, Secondary: {s2_s}
-                            - **Motivation:** Primary: {m2_p}, Secondary: {m2_s}
-                            - **Thriving Behaviors (Primary):** {comm_data.get('bullets', [])}
-                            
-                            **Supervisor Profile (You):**
-                            - **Communication:** Primary: {s1_p}, Secondary: {s1_s}
-                            - **Motivation:** Primary: {m1_p}, Secondary: {m1_s}
-                            
-                            **Your Goal:** Answer the user's question by analyzing the dynamic between these specific profiles.
-                            - Incorporate the *Secondary* styles to add nuance (e.g., A Director with a Facilitator secondary is softer than a pure Director).
-                            - Identify potential friction points between the Supervisor's style and the Staff's style.
-                            - Give concise, actionable advice suitable for a residential care environment.
-                            """
-                            
-                            # API Call to Gemini 2.5 Flash (Standard Endpoint)
+You are an expert Leadership Coach for a youth care agency.
+You are advising a Supervisor on how to manage a staff member named {p2_name}.
+
+**Staff Member Profile ({p2_name}):**
+- **Communication:** Primary: {s2_p}, Secondary: {s2_s}
+- **Motivation:** Primary: {m2_p}, Secondary: {m2_s}
+- **Thriving Behaviors (Primary):** {comm_data.get('bullets', [])}
+
+**Supervisor Profile (You):**
+- **Communication:** Primary: {s1_p}, Secondary: {s1_s}
+- **Motivation:** Primary: {m1_p}, Secondary: {m1_s}
+
+**Your Goal:** Answer the user's question by analyzing the dynamic between these specific profiles.
+- Incorporate the *Secondary* styles to add nuance.
+- Identify potential friction points between the Supervisor's style and the Staff's style.
+- Give concise, actionable advice suitable for a residential care environment.
+"""
                             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
-                            payload = {
-                                "contents": [{
-                                    "parts": [{"text": system_prompt + "\n\nUser Question: " + query}]
-                                }]
-                            }
+                            payload = {"contents": [{"parts": [{"text": system_prompt + "\n\nUser Question: " + query}]}]}
                             headers = {'Content-Type': 'application/json'}
-                            
-                            # Retry logic for 503 (Overloaded) errors
+
                             max_retries = 3
                             for attempt in range(max_retries):
                                 response = requests.post(url, headers=headers, data=json.dumps(payload))
-                                
                                 if response.status_code == 200:
                                     return response.json()['candidates'][0]['content']['parts'][0]['text']
-                                elif response.status_code == 503:
-                                    # Server overloaded, wait and retry
-                                    time.sleep(2 ** (attempt + 1)) # Exponential backoff: 2s, 4s, 8s
+                                if response.status_code == 503:
+                                    time.sleep(2 ** (attempt + 1))
                                     continue
-                                else:
-                                    return f"⚠️ **AI Error ({response.status_code}):** {response.text}. Falling back to basic database."
-                            
+                                return f"⚠️ **AI Error ({response.status_code}):** {response.text}. Falling back to basic database."
                             return "⚠️ **AI Service Busy:** The model is currently overloaded. Falling back to basic database."
-                        
                         except Exception as e:
                             return f"⚠️ **Connection Error:** {str(e)}. Falling back to basic database."
 
                     # FALLBACK: Rule-Based Logic (No API Key)
-                    query = query.lower()
+                    q = query.lower()
                     response = ""
-                    
-                    if "who is" in query or "tell me about" in query or "profile" in query:
-                         response += f"**Profile Overview:** {p2_name} is a **{s2_p}/{s2_s}** driven by **{m2_p}/{m2_s}**.\n\n"
-                         response += "**Primary Style:**\n"
-                         for b in comm_data.get('bullets', []):
-                             response += f"- {b}\n"
 
-                    elif "strengths" in query or "good at" in query:
-                        response += f"**Strengths:** As a {s2_p}, they excel at: \n"
+                    if "who is" in q or "tell me about" in q or "profile" in q:
+                        response += f"**Profile Overview:** {p2_name} is a **{s2_p}/{s2_s}** driven by **{m2_p}/{m2_s}**.\n\n"
+                        response += "**Primary Style:**\n"
                         for b in comm_data.get('bullets', []):
                             response += f"- {b}\n"
 
-                    elif "feedback" in query or "critical" in query or "correct" in query:
+                    elif "strengths" in q or "good at" in q:
+                        response += f"**Strengths:** As a {s2_p}, they excel at:\n"
+                        for b in comm_data.get('bullets', []):
+                            response += f"- {b}\n"
+
+                    elif "feedback" in q or "critical" in q or "correct" in q:
                         response += f"**On giving feedback to a {s2_p}:**\n"
                         for b in comm_data.get('supervising_bullets', []):
                             response += f"- {b}\n"
-                    
-                    elif "motivate" in query or "burnout" in query:
+
+                    elif "motivate" in q or "burnout" in q:
                         response += f"**To motivate a {m2_p} driver:**\n"
                         for b in mot_data.get('strategies_bullets', []):
                             response += f"- {b}\n"
-                    
+
                     else:
                         debug_key_info = f"Key detected: {key[:4]}..." if key else "No API Key detected"
-                        response = f"I can help you manage {p2_name}. Try asking about:\n- How to give **feedback**\n- How to **motivate** them\n- How to handle **conflict**\n\n*Note: {debug_key_info}. Please check the sidebar.*"
-                    
+                        response = (
+                            f"I can help you manage {p2_name}. Try asking about:\n"
+                            f"- How to give **feedback**\n"
+                            f"- How to **motivate** them\n"
+                            f"- How to handle **conflict**\n\n"
+                            f"*Note: {debug_key_info}. Please check the sidebar.*"
+                        )
+
                     return response
 
-                # Input
                 if prompt := st.chat_input(f"Ask about {p2}..."):
                     st.session_state.messages.append({"role": "user", "content": prompt})
                     with st.chat_message("user"):
@@ -5150,16 +5356,20 @@ elif st.session_state.current_view == "Conflict Mediator":
 
                     with st.chat_message("assistant"):
                         with st.spinner("Consulting the Compass Database..."):
-                            # Pass all profile data to the AI
-                            bot_reply = get_smart_response(prompt, p2, s2_p, s2_s, m2_p, m2_s, s1_p, s1_s, m1_p, m1_s, active_key)
+                            bot_reply = get_smart_response(
+                                prompt, p2, s2_p, s2_s, m2_p, m2_s, s1_p, s1_s, m1_p, m1_s, active_key
+                            )
                             st.markdown(bot_reply)
-                    
+
                     st.session_state.messages.append({"role": "assistant", "content": bot_reply})
-        
+
+            st.button("Reset", key="reset_t3", on_click=reset_t3)
+
         elif p1 and p2 and p1 == p2:
-             st.warning("⚠️ You selected the same person twice. Please select two **different** staff members to analyze a conflict.")
-             
-        st.button("Reset", key="reset_t3", on_click=reset_t3)
+            st.warning("⚠️ You selected the same person twice. Please select two **different** staff members to analyze a conflict.")
+            st.button("Reset", key="reset_t3_same", on_click=reset_t3)
+
+
 
 # 4. CAREER PATHFINDER
 elif st.session_state.current_view == "Career Pathfinder":
