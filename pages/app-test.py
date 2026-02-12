@@ -228,78 +228,76 @@ FORCED_WEIGHT = 3.0          # chosen option adds 3 points to its mapped style/d
 STRESS_WEIGHT = 1.2          # small boost so stress-pattern items shape the primary/secondary more
 
 # --- Part 1: Communication Style (Day-to-day + Under Stress + Priority Check) ---
-# NOTE: These items are intentionally written to be value-neutral (no “best” style) and parallel across styles.
-# The goal is to measure your *default contribution* under normal conditions + your *automatic shift* under stress.
 COMM_QUESTIONS = [
-    # Director (Day-to-day) — The Clarity Builder
-    {"id":"cL1","type":"likert","style":"Director","text":"When priorities compete, I help define the next clear decision so the team can move forward."},
-    {"id":"cL2","type":"likert","style":"Director","text":"In group settings, I naturally summarize what needs to happen next."},
-    {"id":"cL3","type":"likert","style":"Director","text":"I’m comfortable setting direction when time is limited and the team needs a call."},
-    {"id":"cL4","type":"likert","style":"Director","text":"I focus on outcomes, timelines, and accountability so work stays on track."},
-    {"id":"cL5","type":"likert","style":"Director","text":"I’m comfortable naming expectations clearly, even when it’s an uncomfortable conversation."},
+    # Director (Day-to-day)
+    {"id":"cL1","type":"likert","style":"Director","text":"When things feel unstructured, I naturally step in to define clear expectations and move us toward action."},
+    {"id":"cL2","type":"likert","style":"Director","text":"I feel most effective when I see staff utilizing their training and resources to solve problems rather than waiting for me to decide."},
+    {"id":"cL3","type":"likert","style":"Director","text":"In fast-moving situations, I prioritize momentum over discussion."},
+    {"id":"cL4","type":"likert","style":"Director","text":"Others often look to me when a decision needs to be made quickly."},
+    {"id":"cL5","type":"likert","style":"Director","text":"I would rather adjust a plan later than stall progress now."},
 
-    # Encourager (Day-to-day) — The Morale Builder
-    {"id":"cL6","type":"likert","style":"Encourager","text":"I pay attention to team energy and help restore steadiness when morale dips."},
-    {"id":"cL7","type":"likert","style":"Encourager","text":"I name effort and progress to reinforce what’s working and keep people engaged."},
-    {"id":"cL8","type":"likert","style":"Encourager","text":"Before correcting performance, I try to understand what’s going on for the person."},
-    {"id":"cL9","type":"likert","style":"Encourager","text":"I build rapport in a way that helps people stay motivated through hard shifts."},
-    {"id":"cL10","type":"likert","style":"Encourager","text":"I communicate in a way that protects dignity and helps people feel supported."},
+    # Encourager (Day-to-day)
+    {"id":"cL6","type":"likert","style":"Encourager","text":"I pay close attention to how stress or morale is affecting the team."},
+    {"id":"cL7","type":"likert","style":"Encourager","text":"I intentionally name effort and wins to keep people motivated."},
+    {"id":"cL8","type":"likert","style":"Encourager","text":"After a crisis or hard shift, I prioritize reflecting with the team to process what happened."},
+    {"id":"cL9","type":"likert","style":"Encourager","text":"I feel confident encouraging staff to use their own problem-solving skills rather than giving them an immediate answer."},
+    {"id":"cL10","type":"likert","style":"Encourager","text":"I believe how we treat each other matters as much as what we get done."},
 
-    # Facilitator (Day-to-day) — The Alignment Builder
-    {"id":"cL11","type":"likert","style":"Facilitator","text":"I create space for different perspectives before the team locks into a plan."},
-    {"id":"cL12","type":"likert","style":"Facilitator","text":"I restate or summarize what I’m hearing to reduce misunderstanding."},
-    {"id":"cL13","type":"likert","style":"Facilitator","text":"I help groups move from disagreement to workable alignment and shared buy-in."},
-    {"id":"cL14","type":"likert","style":"Facilitator","text":"I stay grounded and help de-escalate emotional intensity when things get heated."},
-    {"id":"cL15","type":"likert","style":"Facilitator","text":"I pay attention to the process of decision-making so outcomes are owned and durable."},
+    # Facilitator (Day-to-day)
+    {"id":"cL11","type":"likert","style":"Facilitator","text":"I help slow conversations down so everyone feels heard."},
+    {"id":"cL12","type":"likert","style":"Facilitator","text":"I often restate or summarize to help people understand each other."},
+    {"id":"cL13","type":"likert","style":"Facilitator","text":"I prefer shared buy-in over unilateral decisions."},
+    {"id":"cL14","type":"likert","style":"Facilitator","text":"I stay relatively calm when others are escalated."},
+    {"id":"cL15","type":"likert","style":"Facilitator","text":"I pay attention to how decisions are made, not just the result."},
 
-    # Tracker (Day-to-day) — The Quality Guardian
-    {"id":"cL16","type":"likert","style":"Tracker","text":"I notice gaps in follow-through, documentation, routines, or handoffs that others miss."},
-    {"id":"cL17","type":"likert","style":"Tracker","text":"I clarify expectations so tasks are completed correctly and consistently."},
-    {"id":"cL18","type":"likert","style":"Tracker","text":"I create structure (checklists, schedules, simple systems) to prevent preventable errors."},
-    {"id":"cL19","type":"likert","style":"Tracker","text":"I focus on standards and consistency because quality and safety depend on it."},
-    {"id":"cL20","type":"likert","style":"Tracker","text":"I’m comfortable verifying key details before moving forward, especially when stakes are high."},
+    # Tracker (Day-to-day)
+    {"id":"cL16","type":"likert","style":"Tracker","text":"When I notice gaps in documentation or routines, I view them as opportunities to teach or improve the system."},
+    {"id":"cL17","type":"likert","style":"Tracker","text":"I’m uncomfortable when expectations or procedures feel vague."},
+    {"id":"cL18","type":"likert","style":"Tracker","text":"I naturally track details others miss."},
+    {"id":"cL19","type":"likert","style":"Tracker","text":"I feel responsible for maintaining standards and consistency."},
+    {"id":"cL20","type":"likert","style":"Tracker","text":"I ask clarifying questions to prevent future problems."},
 
     # Under stress (weighted)
-    {"id":"cS1","type":"likert","style":"Director","weight":STRESS_WEIGHT,"text":"Under pressure, I narrow focus to priorities and decisions so the team doesn’t drift."},
-    {"id":"cS2","type":"likert","style":"Encourager","weight":STRESS_WEIGHT,"text":"When stressed, I increase support and check-ins to keep people steady."},
-    {"id":"cS3","type":"likert","style":"Facilitator","weight":STRESS_WEIGHT,"text":"In conflict, I slow the pace and reframe what’s happening to reduce escalation."},
-    {"id":"cS4","type":"likert","style":"Tracker","weight":STRESS_WEIGHT,"text":"When anxious, I double-check details and procedures to reduce risk and surprises."},
+    {"id":"cS1","type":"likert","style":"Director","weight":STRESS_WEIGHT,"text":"Under pressure, I tend to take control immediately because I worry others won't complete the task effectively."},
+    {"id":"cS2","type":"likert","style":"Encourager","weight":STRESS_WEIGHT,"text":"When stressed, I become more emotionally attuned to others."},
+    {"id":"cS3","type":"likert","style":"Facilitator","weight":STRESS_WEIGHT,"text":"In conflict, I try to slow things down and reduce intensity."},
+    {"id":"cS4","type":"likert","style":"Tracker","weight":STRESS_WEIGHT,"text":"When anxious, I focus more on rules, procedures, or correctness."},
 
-    # Priority check (forced choice) — value-neutral tradeoffs
-    {"id":"cF1","type":"forced","prompt":"In a difficult shift, I’m more focused on…","a_text":"Creating a clear decision and forward motion.","a_style":"Director","b_text":"Stabilizing people so they can keep functioning.","b_style":"Encourager"},
-    {"id":"cF2","type":"forced","prompt":"When plans are unclear, I’m more likely to…","a_text":"Set direction quickly so the team can act.","a_style":"Director","b_text":"Ask questions to build alignment before acting.","b_style":"Facilitator"},
+    # Priority check (forced choice)
+    {"id":"cF1","type":"forced","prompt":"In a difficult shift, I’m more focused on…","a_text":"Making a clear decision and moving the team forward.","a_style":"Director","b_text":"Making sure people feel supported and steady.","b_style":"Encourager"},
+    {"id":"cF2","type":"forced","prompt":"When plans are unclear, I’m more likely to…","a_text":"Step in and define direction quickly.","a_style":"Director","b_text":"Ask questions and build alignment first.","b_style":"Facilitator"},
     {"id":"cF3","type":"forced","prompt":"When something feels off, my first instinct is to…","a_text":"Check the details, expectations, and process gaps.","a_style":"Tracker","b_text":"Check the human dynamics and emotional temperature.","b_style":"Encourager"},
-    {"id":"cF4","type":"forced","prompt":"When disagreement starts escalating, I’m more likely to…","a_text":"Set a boundary and close the loop so we can proceed.","a_style":"Director","b_text":"Slow down, reflect back, and de-escalate first.","b_style":"Facilitator"},
+    {"id":"cF4","type":"forced","prompt":"When disagreement starts escalating, I’m more likely to…","a_text":"Set the boundary and end the debate.","a_style":"Director","b_text":"Slow down, reflect back, and de-escalate.","b_style":"Facilitator"},
 ]
 
 # --- Part 2: Motivation Drivers (Day-to-day + Priority Check + Burnout Context) ---
 MOTIVATION_QUESTIONS = [
     # Growth
-    {"id":"mL1","type":"likert","style":"Growth","text":"I feel energized when I’m learning or being stretched."},
+    {"id":"mL1","type":"likert","style":"Growth","text":"I view difficult behaviors or shifts as opportunities to build new skills."},
     {"id":"mL2","type":"likert","style":"Growth","text":"I’m motivated by opportunities to improve my skills."},
     {"id":"mL3","type":"likert","style":"Growth","text":"Doing the same work repeatedly drains my energy."},
     {"id":"mL4","type":"likert","style":"Growth","text":"Feedback that helps me grow matters to me."},
-    {"id":"mL5","type":"likert","style":"Growth","text":"Development opportunities influence whether I stay engaged."},
+    {"id":"mL5","type":"likert","style":"Growth","text":"I feel motivated when there is an environment of support for my development."},
 
     # Purpose
     {"id":"mL6","type":"likert","style":"Purpose","text":"I need to feel my work aligns with values about youth and dignity."},
     {"id":"mL7","type":"likert","style":"Purpose","text":"Decisions that don’t make sense for youth bother me deeply."},
     {"id":"mL8","type":"likert","style":"Purpose","text":"Meaning matters more to me than efficiency alone."},
     {"id":"mL9","type":"likert","style":"Purpose","text":"I feel proud when I can see real impact."},
-    {"id":"mL10","type":"likert","style":"Purpose","text":"I question policies that feel disconnected from care."},
+    {"id":"mL10","type":"likert","style":"Purpose","text":"I set goals for myself to achieve even if those goals were not clearly set by others."},
 
     # Connection
     {"id":"mL11","type":"likert","style":"Connection","text":"Feeling connected to coworkers affects my motivation."},
     {"id":"mL12","type":"likert","style":"Connection","text":"Team tension drains my energy quickly."},
     {"id":"mL13","type":"likert","style":"Connection","text":"I value being known and supported by my supervisor."},
-    {"id":"mL14","type":"likert","style":"Connection","text":"Belonging influences how much effort I give."},
-    {"id":"mL15","type":"likert","style":"Connection","text":"Emotional climate matters to me."},
+    {"id":"mL14","type":"likert","style":"Connection","text":"I’m more likely to go above and beyond when I feel valued and supported."},
+    {"id":"mL15","type":"likert","style":"Connection","text":"When the team feels disconnected, I feel motivated to communicate and resolve the tension."},
 
     # Achievement
     {"id":"mL16","type":"likert","style":"Achievement","text":"Clear goals help me feel effective."},
     {"id":"mL17","type":"likert","style":"Achievement","text":"I like knowing exactly what success looks like."},
     {"id":"mL18","type":"likert","style":"Achievement","text":"I’m motivated by measurable progress."},
-    {"id":"mL19","type":"likert","style":"Achievement","text":"Tracking outcomes helps me stay focused."},
+    {"id":"mL19","type":"likert","style":"Achievement","text":"I feel satisfied when I can see that my effort led to positive improvements."},
     {"id":"mL20","type":"likert","style":"Achievement","text":"Ambiguous expectations frustrate me."},
 
     # Priority check (forced choice)
@@ -312,6 +310,7 @@ MOTIVATION_QUESTIONS = [
     {"id":"mB1","type":"likert","style":"Context","text":"When I feel emotionally exhausted, even work I care about becomes hard to engage with."},
     {"id":"mB2","type":"likert","style":"Context","text":"When I’m burned out, I become more detached or numb during the shift."},
     {"id":"mB3","type":"likert","style":"Context","text":"When I’m burned out, small problems feel bigger than they should."},
+    {"id":"mB4","type":"likert","style":"Context","text":"After an emotionally or physically draining week, I find it difficult to prioritize my own self-care."},
 ]
 
 
@@ -319,8 +318,8 @@ MOTIVATION_QUESTIONS = [
 
 COMM_PROFILES = {
     "Director": {
-        "name": "Director — The Clarity Builder",
-        "tagline": "Clarity Builder",
+        "name": "Director Communicator",
+        "tagline": "The Decisive Driver",
         "overview": "<strong>Core Style:</strong> You blend decisive, crisis-ready leadership with a bias for action. You are likely to set direction quickly and then rally people to move with you. You prioritize efficiency and competence, often serving as the 'adult in the room' who keeps things calm while making necessary calls. You rarely suffer from 'analysis paralysis,' preferring to make a wrong decision that can be fixed rather than no decision at all.<br><br><strong>Your Superpower:</strong> In high-pressure moments, you step in and organize. Staff see you as fair and decisive—they know you will act, so they aren't stuck in limbo. When everyone else is panicking, your clarity acts as an anchor.",
         "conflictImpact": "Under stress, you may move faster than staff can realistically integrate, making them feel like they are always 'behind' or incompetent. You might default to control before curiosity, issuing orders rather than asking questions.",
         "traumaStrategy": "Your consistency and clear boundaries can be regulating for youth who need predictability, though some may find your intensity intimidating. Traumatized brains often crave structure to feel safe.",
@@ -351,8 +350,8 @@ COMM_PROFILES = {
         }
     },
     "Encourager": {
-        "name": "Encourager — The Morale Builder",
-        "tagline": "Morale Builder",
+        "name": "Encourager Communicator",
+        "tagline": "The Relational Energizer",
         "overview": "<strong>Core Style:</strong> You lead with enthusiasm, vision, and warmth. You act as the emotional glue of the team, paying attention to how people feel and ensuring they feel seen and supported. You help change feel both human and organized. You are likely the person others come to when they are discouraged.<br><br><strong>Your Superpower:</strong> You keep the 'why' of the work alive when others are exhausted. You are often the one who notices and names growth in youth or staff.",
         "conflictImpact": "You may avoid giving sharp feedback because you don't want to discourage someone or damage the relationship. You might also overcommit your emotional energy when many people need you, leading to 'empathy fatigue'.",
         "traumaStrategy": "Your ability to foster belonging helps youth feel that adults are approachable, kind, and on their side. For youth who expect rejection or harshness, your consistent warmth disrupts their negative worldview.",
@@ -383,8 +382,8 @@ COMM_PROFILES = {
         }
     },
     "Facilitator": {
-        "name": "Facilitator — The Alignment Builder",
-        "tagline": "Alignment Builder",
+        "name": "Facilitator Communicator",
+        "tagline": "The Calm Bridge",
         "overview": "<strong>Core Style:</strong> You prefer to listen first and build consensus. You blend a calm, listening posture with a genuine desire to keep relationships steady. You create calmer, more predictable environments. You operate on the belief that the collective wisdom of the group is stronger than any single directive.<br><br><strong>Your Superpower:</strong> You de-escalate tension by staying steady and non-threatening. People feel safe bringing mistakes or worries to you without fear of shame.",
         "conflictImpact": "You might stay neutral too long when a strong stance is needed, hoping the group will self-correct. You may quietly carry moral distress or frustration without voicing it.",
         "traumaStrategy": "Your steady presence helps youth feel safe enough to open up, especially when they aren't ready for intensity. Hyper-vigilant youth often scan for aggression; your low-affect, calm demeanor signals 'no threat'.",
@@ -415,8 +414,8 @@ COMM_PROFILES = {
         }
     },
     "Tracker": {
-        "name": "Tracker — The Quality Guardian",
-        "tagline": "Quality Guardian",
+        "name": "Tracker Communicator",
+        "tagline": "The Structured Guardian",
         "overview": "<strong>Core Style:</strong> You lead with structure, detail, and a strong respect for procedure. You want plans to be sound and aligned before you move. You believe the path to success is through good systems and accurate work.<br><br><strong>Your Superpower:</strong> You protect youth and staff by ensuring documentation and procedures support ethical, safe care. You notice small patterns that could become big risks. You check the smoke detectors to ensure the fire doesn't happen.",
         "conflictImpact": "You may feel intolerant of what looks like carelessness in others, interpreting a missed checkbox as a lack of care. You can focus so much on accurate reporting that you under-communicate empathy.",
         "traumaStrategy": "Your consistency creates a predictable environment that feels safe for youth with trauma histories. Chaos is a trigger for trauma; your ability to create order acts as a soothing balm for dysregulated nervous systems.",
