@@ -230,8 +230,8 @@ STRESS_WEIGHT = 1.2          # small boost so stress-pattern items shape the pri
 # --- Part 1: Communication Style (Day-to-day + Under Stress + Priority Check) ---
 COMM_QUESTIONS = [
     # Director (Day-to-day)
-    {"id":"cL1","type":"likert","style":"Director","text":"When things feel unstructured, I naturally start organizing people toward action."},
-    {"id":"cL2","type":"likert","style":"Director","text":"I’m comfortable making a call even if not everyone agrees."},
+    {"id":"cL1","type":"likert","style":"Director","text":"When things feel unstructured, I naturally step in to define clear expectations and move us toward action."},
+    {"id":"cL2","type":"likert","style":"Director","text":"I feel most effective when I see staff utilizing their training and resources to solve problems rather than waiting for me to decide."},
     {"id":"cL3","type":"likert","style":"Director","text":"In fast-moving situations, I prioritize momentum over discussion."},
     {"id":"cL4","type":"likert","style":"Director","text":"Others often look to me when a decision needs to be made quickly."},
     {"id":"cL5","type":"likert","style":"Director","text":"I would rather adjust a plan later than stall progress now."},
@@ -239,8 +239,8 @@ COMM_QUESTIONS = [
     # Encourager (Day-to-day)
     {"id":"cL6","type":"likert","style":"Encourager","text":"I pay close attention to how stress or morale is affecting the team."},
     {"id":"cL7","type":"likert","style":"Encourager","text":"I intentionally name effort and wins to keep people motivated."},
-    {"id":"cL8","type":"likert","style":"Encourager","text":"I often check in emotionally before jumping into task correction."},
-    {"id":"cL9","type":"likert","style":"Encourager","text":"People tend to confide in me when they feel overwhelmed."},
+    {"id":"cL8","type":"likert","style":"Encourager","text":"After a crisis or hard shift, I prioritize reflecting with the team to process what happened."},
+    {"id":"cL9","type":"likert","style":"Encourager","text":"I feel confident encouraging staff to use their own problem-solving skills rather than giving them an immediate answer."},
     {"id":"cL10","type":"likert","style":"Encourager","text":"I believe how we treat each other matters as much as what we get done."},
 
     # Facilitator (Day-to-day)
@@ -251,14 +251,14 @@ COMM_QUESTIONS = [
     {"id":"cL15","type":"likert","style":"Facilitator","text":"I pay attention to how decisions are made, not just the result."},
 
     # Tracker (Day-to-day)
-    {"id":"cL16","type":"likert","style":"Tracker","text":"I notice gaps in documentation, routines, or follow-through."},
+    {"id":"cL16","type":"likert","style":"Tracker","text":"When I notice gaps in documentation or routines, I view them as opportunities to teach or improve the system."},
     {"id":"cL17","type":"likert","style":"Tracker","text":"I’m uncomfortable when expectations or procedures feel vague."},
     {"id":"cL18","type":"likert","style":"Tracker","text":"I naturally track details others miss."},
     {"id":"cL19","type":"likert","style":"Tracker","text":"I feel responsible for maintaining standards and consistency."},
     {"id":"cL20","type":"likert","style":"Tracker","text":"I ask clarifying questions to prevent future problems."},
 
     # Under stress (weighted)
-    {"id":"cS1","type":"likert","style":"Director","weight":STRESS_WEIGHT,"text":"Under pressure, I tend to take control rather than consult."},
+    {"id":"cS1","type":"likert","style":"Director","weight":STRESS_WEIGHT,"text":"Under pressure, I tend to take control immediately because I worry others won't complete the task effectively."},
     {"id":"cS2","type":"likert","style":"Encourager","weight":STRESS_WEIGHT,"text":"When stressed, I become more emotionally attuned to others."},
     {"id":"cS3","type":"likert","style":"Facilitator","weight":STRESS_WEIGHT,"text":"In conflict, I try to slow things down and reduce intensity."},
     {"id":"cS4","type":"likert","style":"Tracker","weight":STRESS_WEIGHT,"text":"When anxious, I focus more on rules, procedures, or correctness."},
@@ -273,31 +273,31 @@ COMM_QUESTIONS = [
 # --- Part 2: Motivation Drivers (Day-to-day + Priority Check + Burnout Context) ---
 MOTIVATION_QUESTIONS = [
     # Growth
-    {"id":"mL1","type":"likert","style":"Growth","text":"I feel energized when I’m learning or being stretched."},
+    {"id":"mL1","type":"likert","style":"Growth","text":"I view difficult behaviors or shifts as opportunities to build new skills."},
     {"id":"mL2","type":"likert","style":"Growth","text":"I’m motivated by opportunities to improve my skills."},
     {"id":"mL3","type":"likert","style":"Growth","text":"Doing the same work repeatedly drains my energy."},
     {"id":"mL4","type":"likert","style":"Growth","text":"Feedback that helps me grow matters to me."},
-    {"id":"mL5","type":"likert","style":"Growth","text":"Development opportunities influence whether I stay engaged."},
+    {"id":"mL5","type":"likert","style":"Growth","text":"I feel motivated when there is an environment of support for my development."},
 
     # Purpose
     {"id":"mL6","type":"likert","style":"Purpose","text":"I need to feel my work aligns with values about youth and dignity."},
     {"id":"mL7","type":"likert","style":"Purpose","text":"Decisions that don’t make sense for youth bother me deeply."},
     {"id":"mL8","type":"likert","style":"Purpose","text":"Meaning matters more to me than efficiency alone."},
     {"id":"mL9","type":"likert","style":"Purpose","text":"I feel proud when I can see real impact."},
-    {"id":"mL10","type":"likert","style":"Purpose","text":"I question policies that feel disconnected from care."},
+    {"id":"mL10","type":"likert","style":"Purpose","text":"I set goals for myself to achieve even if those goals were not clearly set by others."},
 
     # Connection
     {"id":"mL11","type":"likert","style":"Connection","text":"Feeling connected to coworkers affects my motivation."},
     {"id":"mL12","type":"likert","style":"Connection","text":"Team tension drains my energy quickly."},
     {"id":"mL13","type":"likert","style":"Connection","text":"I value being known and supported by my supervisor."},
-    {"id":"mL14","type":"likert","style":"Connection","text":"Belonging influences how much effort I give."},
-    {"id":"mL15","type":"likert","style":"Connection","text":"Emotional climate matters to me."},
+    {"id":"mL14","type":"likert","style":"Connection","text":"I’m more likely to go above and beyond when I feel valued and supported."},
+    {"id":"mL15","type":"likert","style":"Connection","text":"When the team feels disconnected, I feel motivated to communicate and resolve the tension."},
 
     # Achievement
     {"id":"mL16","type":"likert","style":"Achievement","text":"Clear goals help me feel effective."},
     {"id":"mL17","type":"likert","style":"Achievement","text":"I like knowing exactly what success looks like."},
     {"id":"mL18","type":"likert","style":"Achievement","text":"I’m motivated by measurable progress."},
-    {"id":"mL19","type":"likert","style":"Achievement","text":"Tracking outcomes helps me stay focused."},
+    {"id":"mL19","type":"likert","style":"Achievement","text":"I feel satisfied when I can see that my effort led to positive improvements."},
     {"id":"mL20","type":"likert","style":"Achievement","text":"Ambiguous expectations frustrate me."},
 
     # Priority check (forced choice)
@@ -310,6 +310,7 @@ MOTIVATION_QUESTIONS = [
     {"id":"mB1","type":"likert","style":"Context","text":"When I feel emotionally exhausted, even work I care about becomes hard to engage with."},
     {"id":"mB2","type":"likert","style":"Context","text":"When I’m burned out, I become more detached or numb during the shift."},
     {"id":"mB3","type":"likert","style":"Context","text":"When I’m burned out, small problems feel bigger than they should."},
+    {"id":"mB4","type":"likert","style":"Context","text":"After an emotionally or physically draining week, I find it difficult to prioritize my own self-care."},
 ]
 
 
