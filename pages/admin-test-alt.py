@@ -4454,6 +4454,119 @@ def display_guide(name, role, p_comm, s_comm, p_mot, s_mot):
             },
         }
         alignment = alignment_map.get(comm_p, alignment_map["Director"])
+        def _phase_upgrade_move_(mv, style_or_driver, phase_i):
+            """Return a *new* move card tuned by phase so Phase 2/3 build on Phase 1."""
+            try:
+                ph = int(phase_i)
+            except Exception:
+                ph = 1
+            if not isinstance(mv, dict) or ph <= 1:
+                return mv
+            out = dict(mv)
+            title = str(out.get("title", ""))
+            why = str(out.get("why", ""))
+            how = str(out.get("how", ""))
+            avoid = str(out.get("avoid", ""))
+            scripts = list(out.get("scripts", []) or [])
+
+            def add_script(s):
+                if s and s not in scripts:
+                    scripts.append(s)
+
+            # --- Communication openers + assignments (build by phase) ---
+            if "Relational Buffer" in title:
+                if ph == 2:
+                    why = "Phase 2 goal: turn support into learning and repair, not just comfort."
+                    how = ("1) Name the emotion/effort. 2) Validate briefly. 3) Pivot to: What did we learn? "
+                           "4) Ask for a specific next-step plan. 5) Close with a repair/connection action.")
+                    add_script("I can see this hit you. Before we problem-solve, what do you need for 30 seconds?")
+                    add_script("Now: what is the standard we are holding, and what is your next step?")
+                    add_script("Who do you need to repair with before end of shift, and what will you say?")
+                    avoid = "Over-therapizing, rescuing, or never pivoting to the learning/standard."
+                elif ph >= 3:
+                    why = "Phase 3 goal: make them a culture carrier who can run the buffer with others."
+                    how = ("Teach them the same 5-step buffer, then have them lead it with peers after a tough moment. "
+                           "Your role becomes observer + short feedback, not the primary comfort source.")
+                    add_script("Run a 2-minute check-in with the team after this. Bring me themes + one request.")
+                    add_script("What is the one sentence you will use to name effort and set the standard?")
+                    add_script("How will you help a newer staff member debrief this in a calm way?")
+                    avoid = "Letting warmth replace accountability, or keeping the supervisor as the only stabilizer."
+
+            if "Bottom-Line Opener" in title:
+                if ph == 2:
+                    why = "Phase 2 goal: keep clarity while inviting ownership and problem-solving."
+                    how = ("State the headline + expectation, then ask: What is your plan? and What support do you need? "
+                           "End with a time-bound follow-up.")
+                    add_script("Here is the headline and the standard. What is your plan in the next 10 minutes?")
+                    add_script("What support do you need from me vs. what can you handle yourself?")
+                    avoid = "Only directing without checking understanding, buy-in, or capacity."
+                elif ph >= 3:
+                    why = "Phase 3 goal: transfer decision-framing to them so they lead under pressure."
+                    how = ("Have them deliver the bottom-line message to others (with you coaching). "
+                           "Debrief: what landed, what didnt, and how to tighten the next message.")
+                    add_script("You deliver the headline to the team; I will listen. Then we will debrief for 2 minutes.")
+                    add_script("What is your decision and what is the single reason you will lead with?")
+                    avoid = "Staying the only decision voice; creating dependence on your clarity."
+
+            if "Shared Frame" in title:
+                if ph == 2:
+                    why = "Phase 2 goal: move from consensus to commitment and action."
+                    how = ("Summarize both sides, name the decision rule (safety/impact/standard), then lock a next step: "
+                           "who does what by when.")
+                    add_script("I hear two needs. What is the decision rule here: safety, impact, or standard?")
+                    add_script("What is our next step and who owns it by end of shift?")
+                    avoid = "Endless processing without a decision, boundary, or follow-through."
+                elif ph >= 3:
+                    why = "Phase 3 goal: teach them to facilitate alignment for the unit, not just in 1:1s."
+                    how = ("Have them run a short team huddle using the shared-frame pattern. You coach prep + debrief. "
+                           "Make them practice closing with a decision + tasking.")
+                    add_script("Draft the huddle agenda in 3 bullets. You will facilitate; I will debrief after.")
+                    add_script("End your huddle with: decision, owner, deadline, check-back time.")
+                    avoid = "Letting group harmony replace clarity, boundaries, and standards."
+
+            if "Precision Frame" in title:
+                if ph == 2:
+                    why = "Phase 2 goal: shift from catching errors to teaching systems."
+                    how = ("Ask for 3 concrete facts, identify the process gap, then co-design a simple fix: "
+                           "checklist, reminder, or handoff step.")
+                    add_script("What are the 3 facts we know, and what is the exact gap in the process?")
+                    add_script("What is one small system fix that prevents this tomorrow?")
+                    avoid = "Only auditing or criticizing without building a teachable system."
+                elif ph >= 3:
+                    why = "Phase 3 goal: make them the owner of prevention and training for others."
+                    how = ("Have them create a micro-tool (checklist, template, mini-training) and teach it to peers. Ensure "
+                           "they can explain the why, not just the rule.")
+                    add_script("Build a one-page checklist and teach it to the team in 5 minutes.")
+                    add_script("Explain the why behind the standard so it sticks under pressure.")
+                    avoid = "Policing without empowering; becoming the rule enforcer instead of the system builder."
+
+            if "Assignment" in title or "Sprint" in title or "Anchor" in title or "Container" in title or "Ladder" in title:
+                if ph == 2:
+                    why = (why + " Phase 2 adds: require them to present a recommendation with rationale and a follow-up plan.").strip()
+                    how = (how + " Add a 48-hour check-back and require one documented learning point.").strip()
+                    add_script("Bring me a recommendation, not a brainstorm: what should we do and why?")
+                    add_script("What will you document, where, and by when? When will we re-check this?")
+                    avoid = (avoid + " Also avoid: vague plans without owners, deadlines, or documentation.").strip()
+                elif ph >= 3:
+                    why = (why + " Phase 3 adds: they teach it to someone else and lead the follow-up.").strip()
+                    how = (how + " Require them to coach a peer/new staff member using the same steps.").strip()
+                    add_script("Teach this approach to a newer staff member and bring back what they learned.")
+                    add_script("You own the follow-up. How will you hold the system accountable next week?")
+                    avoid = (avoid + " Also avoid: supervisor taking the wheel when its time for them to lead.").strip()
+
+            # Save back
+            out["why"] = why
+            out["how"] = how
+            out["avoid"] = avoid
+            out["scripts"] = scripts
+            return out
+
+        # Phase-tune the first four moves so each phase builds on the prior phase
+        move_1 = _phase_upgrade_move_(move_1, comm_p, phase)
+        move_2 = _phase_upgrade_move_(move_2, comm_p, phase)
+        move_3 = _phase_upgrade_move_(move_3, motiv_p, phase)
+        alignment = _phase_upgrade_move_(alignment, comm_p, phase)
+
 
         move_5, move_6 = phase_moves.get(int(phase), phase_moves[1])
 
